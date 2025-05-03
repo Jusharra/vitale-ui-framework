@@ -1,343 +1,224 @@
 
-import React, { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { 
-  FileSpreadsheet, 
-  Download, 
-  Search, 
-  Filter, 
-  Calendar,
-  User
-} from 'lucide-react';
-import { 
-  PieChart, 
-  Pie, 
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  Legend
-} from 'recharts';
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { AlertCircle, ArrowDownToLine, BarChart, FileSpreadsheet, Search, Users } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-const toolUsageData = [
-  { name: 'Symptom Checker', value: 243 },
-  { name: 'Medication Reminders', value: 178 },
-  { name: 'Health Assessment', value: 156 },
-  { name: 'BMI Calculator', value: 135 },
-  { name: 'Calorie Tracker', value: 120 },
+// Mock data for the health tools usage dashboard
+const healthToolUsage = [
+  { id: 1, tool: "Health Risk Assessment", users: 1245, completionRate: 78, averageTime: "7:30" },
+  { id: 2, tool: "Symptom Checker", users: 3789, completionRate: 92, averageTime: "3:15" },
+  { id: 3, tool: "Medication Tracker", users: 957, completionRate: 65, averageTime: "5:45" },
+  { id: 4, tool: "Sleep Analysis", users: 1624, completionRate: 73, averageTime: "8:20" },
+  { id: 5, tool: "Mental Wellness Assessment", users: 2340, completionRate: 81, averageTime: "12:10" }
 ];
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
-
-const toolAccessData = [
-  { id: 1, user_name: "Jennifer Smith", tool_name: "Symptom Checker", access_date: "2023-05-02T14:30:00Z", status: "delivered", membership: "vip" },
-  { id: 2, user_name: "Michael Johnson", tool_name: "Health Assessment", access_date: "2023-05-02T10:15:00Z", status: "delivered", membership: "core" },
-  { id: 3, user_name: "Robert Williams", tool_name: "Medication Reminders", access_date: "2023-05-01T16:45:00Z", status: "delivered", membership: "smart" },
-  { id: 4, user_name: "Emily Davis", tool_name: "BMI Calculator", access_date: "2023-04-30T09:20:00Z", status: "error", membership: "core" },
-  { id: 5, user_name: "Christopher Brown", tool_name: "Calorie Tracker", access_date: "2023-04-30T13:50:00Z", status: "delivered", membership: "vip" },
-  { id: 6, user_name: "Sarah Miller", tool_name: "Symptom Checker", access_date: "2023-04-29T11:05:00Z", status: "delivered", membership: "core" },
-  { id: 7, user_name: "Daniel Wilson", tool_name: "Health Assessment", access_date: "2023-04-29T15:30:00Z", status: "pending", membership: "smart" },
-  { id: 8, user_name: "Amanda Jones", tool_name: "Medication Reminders", access_date: "2023-04-28T12:15:00Z", status: "delivered", membership: "vip" },
-  { id: 9, user_name: "Thomas Moore", tool_name: "BMI Calculator", access_date: "2023-04-28T10:40:00Z", status: "delivered", membership: "core" },
-  { id: 10, user_name: "Jessica Taylor", tool_name: "Calorie Tracker", access_date: "2023-04-27T14:55:00Z", status: "error", membership: "smart" },
+const recentUsage = [
+  { id: 1, user: "Emily Johnson", tool: "Symptom Checker", date: "Today, 10:35 AM", completed: true },
+  { id: 2, user: "Thomas Wilson", tool: "Mental Wellness Assessment", date: "Today, 9:12 AM", completed: true },
+  { id: 3, user: "Sarah Davis", tool: "Medication Tracker", date: "Yesterday, 7:45 PM", completed: false },
+  { id: 4, user: "James Miller", tool: "Health Risk Assessment", date: "Yesterday, 3:20 PM", completed: true },
+  { id: 5, user: "Jessica Brown", tool: "Sleep Analysis", date: "May 2, 2025", completed: true },
+  { id: 6, user: "Robert Taylor", tool: "Symptom Checker", date: "May 2, 2025", completed: false }
 ];
 
-const AdminHealthToolUsage = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [toolSubmissions, setToolSubmissions] = useState([]);
-  const { toast } = useToast();
+const AdminHealthToolUsage: React.FC = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [toolFilter, setToolFilter] = useState("all");
 
-  useEffect(() => {
-    const fetchToolUsage = async () => {
-      setIsLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('tool_access_logs')
-          .select('*')
-          .order('access_date', { ascending: false })
-          .limit(100);
-
-        if (error) throw error;
-        
-        const logs = data || [];
-        
-        if (logs.length > 0) {
-          setToolSubmissions(logs);
-        } else {
-          // Use mock data if no real data is available
-          setToolSubmissions(toolAccessData);
-        }
-      } catch (error) {
-        console.error('Error fetching tool usage:', error);
-        // Fallback to mock data
-        setToolSubmissions(toolAccessData);
-        toast({
-          title: 'Warning',
-          description: 'Using sample data - could not fetch actual tool usage',
-          variant: 'warning',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchToolUsage();
-  }, [toast]);
-
-  const filteredToolAccess = toolAccessData.filter(item =>
-    item.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.tool_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.membership.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter data based on search query and tool filter
+  const filteredUsage = recentUsage.filter(item => 
+    (toolFilter === "all" || item.tool.toLowerCase().includes(toolFilter.toLowerCase())) &&
+    (item.user.toLowerCase().includes(searchQuery.toLowerCase()) || 
+     item.tool.toLowerCase().includes(searchQuery.toLowerCase()))
   );
-
-  // Format date for display
-  const formatDate = (dateString) => {
-    try {
-      return new Date(dateString).toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch (e) {
-      return dateString;
-    }
-  };
-
-  const exportData = () => {
-    toast({
-      title: 'Export Started',
-      description: 'Your data export is being prepared and will be downloaded shortly.',
-    });
-    
-    // In a real app, we would generate and download a CSV here
-    setTimeout(() => {
-      toast({
-        title: 'Export Complete',
-        description: 'Your data has been exported successfully.',
-      });
-    }, 1500);
-  };
 
   return (
     <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Health Tools Usage</h1>
+        <p className="text-muted-foreground">Analyze and manage member health tool interactions</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center space-x-2">
+              <BarChart className="h-4 w-4 text-primary" />
+              <CardTitle className="text-sm font-medium">Total Sessions</CardTitle>
+            </div>
+            <CardDescription>All health tools</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">12,457</div>
+            <p className="text-xs text-muted-foreground">+5.3% from last month</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center space-x-2">
+              <Users className="h-4 w-4 text-primary" />
+              <CardTitle className="text-sm font-medium">Unique Users</CardTitle>
+            </div>
+            <CardDescription>Active members</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">5,732</div>
+            <p className="text-xs text-muted-foreground">+2.7% from last month</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center space-x-2">
+              <FileSpreadsheet className="h-4 w-4 text-primary" />
+              <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
+            </div>
+            <CardDescription>Average across all tools</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">78%</div>
+            <p className="text-xs text-muted-foreground">+1.2% from last month</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-4 w-4 text-primary" />
+              <CardTitle className="text-sm font-medium">Flagged Results</CardTitle>
+            </div>
+            <CardDescription>Requiring attention</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">124</div>
+            <p className="text-xs text-muted-foreground">-3.5% from last month</p>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <Alert variant="default">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Attention Required</AlertTitle>
+        <AlertDescription>
+          The Mental Wellness Assessment is displaying a higher than normal number of flagged results. Consider reviewing the assessment criteria.
+        </AlertDescription>
+      </Alert>
+
       <Card>
-        <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <CardTitle className="text-2xl">Health Tool Usage</CardTitle>
-            <CardDescription>Monitor and audit member interactions with health tools</CardDescription>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={exportData}>
-              <FileSpreadsheet className="mr-2 h-4 w-4" />
-              Export Audit Logs
+        <CardHeader>
+          <CardTitle>Tool Usage Analytics</CardTitle>
+          <CardDescription>Performance metrics for all health assessment tools</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Tool Name</TableHead>
+                <TableHead className="text-right">Users</TableHead>
+                <TableHead className="text-right">Completion Rate</TableHead>
+                <TableHead className="text-right">Avg. Time</TableHead>
+                <TableHead></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {healthToolUsage.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell className="font-medium">{item.tool}</TableCell>
+                  <TableCell className="text-right">{item.users.toLocaleString()}</TableCell>
+                  <TableCell className="text-right">{item.completionRate}%</TableCell>
+                  <TableCell className="text-right">{item.averageTime}</TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="sm">Details</Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Usage</CardTitle>
+          <CardDescription>Latest member interactions with health tools</CardDescription>
+          <div className="flex items-center gap-4 pt-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by member or tool..."
+                  className="pl-8"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+            <Select value={toolFilter} onValueChange={setToolFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by tool" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Tools</SelectItem>
+                <SelectItem value="health">Health Risk Assessment</SelectItem>
+                <SelectItem value="symptom">Symptom Checker</SelectItem>
+                <SelectItem value="medication">Medication Tracker</SelectItem>
+                <SelectItem value="sleep">Sleep Analysis</SelectItem>
+                <SelectItem value="mental">Mental Wellness</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline">
+              <ArrowDownToLine className="mr-2 h-4 w-4" />
+              Export
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-1">
-              <CardHeader>
-                <CardTitle className="text-lg">Tool Popularity</CardTitle>
-                <CardDescription>Most used health tools by members</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={toolUsageData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      >
-                        {toolUsageData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        formatter={(value) => [`${value} uses`, 'Usage']}
-                      />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="mt-4 space-y-2">
-                  <div className="flex justify-between items-center text-sm">
-                    <span>Total Tool Usages:</span>
-                    <span className="font-semibold">{toolUsageData.reduce((sum, item) => sum + item.value, 0)}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span>Unique Users:</span>
-                    <span className="font-semibold">412</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span>Average Uses Per Member:</span>
-                    <span className="font-semibold">2.4</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="lg:col-span-2">
-              <CardHeader className="pb-2">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <div>
-                    <CardTitle className="text-lg">Access Audit Log</CardTitle>
-                    <CardDescription>Complete record of tool access and usage</CardDescription>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="relative">
-                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        type="search" 
-                        placeholder="Search logs..." 
-                        className="pl-8 w-[200px]" 
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                      />
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Member</TableHead>
+                <TableHead>Tool</TableHead>
+                <TableHead>Date & Time</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredUsage.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell className="font-medium">{item.user}</TableCell>
+                  <TableCell>{item.tool}</TableCell>
+                  <TableCell>{item.date}</TableCell>
+                  <TableCell>
+                    <div className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                      item.completed 
+                        ? "bg-green-100 text-green-800" 
+                        : "bg-amber-100 text-amber-800"
+                    }`}>
+                      {item.completed ? "Completed" : "Abandoned"}
                     </div>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button size="sm" variant="outline" className="h-10">
-                          <Filter className="mr-2 h-4 w-4" />
-                          Filter
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[200px] p-4">
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <div className="font-medium">Date Range</div>
-                            <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              <span className="text-sm">Last 7 days</span>
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="font-medium">Status</div>
-                            <div className="flex flex-col gap-1">
-                              <div className="flex items-center">
-                                <input type="checkbox" id="status-delivered" className="mr-2" defaultChecked />
-                                <label htmlFor="status-delivered" className="text-sm">Delivered</label>
-                              </div>
-                              <div className="flex items-center">
-                                <input type="checkbox" id="status-pending" className="mr-2" defaultChecked />
-                                <label htmlFor="status-pending" className="text-sm">Pending</label>
-                              </div>
-                              <div className="flex items-center">
-                                <input type="checkbox" id="status-error" className="mr-2" defaultChecked />
-                                <label htmlFor="status-error" className="text-sm">Error</label>
-                              </div>
-                            </div>
-                          </div>
-                          <Button size="sm" className="w-full">Apply</Button>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                    <Button size="sm" variant="outline" className="h-10" onClick={exportData}>
-                      <Download className="mr-2 h-4 w-4" />
-                      Export
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {isLoading ? (
-                  <div className="flex justify-center items-center h-40">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  </div>
-                ) : (
-                  <ScrollArea className="h-[370px] w-full rounded-md border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>User</TableHead>
-                          <TableHead>Tool</TableHead>
-                          <TableHead>Access Date</TableHead>
-                          <TableHead>Membership</TableHead>
-                          <TableHead>Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {filteredToolAccess.length === 0 ? (
-                          <TableRow>
-                            <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
-                              {searchTerm ? "No logs found matching your search" : "No logs found"}
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          filteredToolAccess.map((log) => (
-                            <TableRow key={log.id}>
-                              <TableCell>
-                                <div className="flex items-center gap-2">
-                                  <div className="bg-muted rounded-full w-7 h-7 flex items-center justify-center shrink-0">
-                                    <User className="h-4 w-4" />
-                                  </div>
-                                  <span>{log.user_name}</span>
-                                </div>
-                              </TableCell>
-                              <TableCell>{log.tool_name}</TableCell>
-                              <TableCell>{formatDate(log.access_date)}</TableCell>
-                              <TableCell>
-                                <Badge variant="outline" className={
-                                  log.membership === 'vip' ? 'border-purple-500 text-purple-500' :
-                                  log.membership === 'core' ? 'border-blue-500 text-blue-500' : 
-                                  'border-gray-500 text-gray-500'
-                                }>
-                                  {log.membership}
-                                </Badge>
-                              </TableCell>
-                              <TableCell>
-                                <Badge variant={
-                                  log.status === 'delivered' ? 'outline' :
-                                  log.status === 'pending' ? 'secondary' :
-                                  'destructive'
-                                } className={
-                                  log.status === 'delivered' ? 'border-green-500 text-green-500' : ''
-                                }>
-                                  {log.status}
-                                </Badge>
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        )}
-                      </TableBody>
-                    </Table>
-                  </ScrollArea>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="sm">View</Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {filteredUsage.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
+                    No matching records found
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>

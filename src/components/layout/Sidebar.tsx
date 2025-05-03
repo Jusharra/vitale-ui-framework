@@ -38,6 +38,10 @@ import {
   MapPin,
   Activity,
   Palmtree,
+  BarChart,
+  Package,
+  Settings,
+  FileSpreadsheet
 } from "lucide-react";
 import MembershipBadge from "../common/MembershipBadge";
 
@@ -330,10 +334,63 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
                   onClick={() => navigate("/dashboard/admin")}
                 >
                   <Gauge />
-                  <span>Dashboard</span>
+                  <span>Overview</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              {/* Add admin navigation items here */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive("/dashboard/admin/vacations")}
+                  onClick={() => navigate("/dashboard/admin/vacations")}
+                >
+                  <Palmtree />
+                  <span>Vacations</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive("/dashboard/admin/promotions")}
+                  onClick={() => navigate("/dashboard/admin/promotions")}
+                >
+                  <Gift />
+                  <span>Promotions</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive("/dashboard/admin/leads")}
+                  onClick={() => navigate("/dashboard/admin/leads")}
+                >
+                  <BarChart />
+                  <span>Leads & Analytics</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive("/dashboard/admin/care-teams")}
+                  onClick={() => navigate("/dashboard/admin/care-teams")}
+                >
+                  <Users />
+                  <span>Care Teams</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive("/dashboard/admin/health-tools")}
+                  onClick={() => navigate("/dashboard/admin/health-tools")}
+                >
+                  <Heart />
+                  <span>Health Tools</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive("/dashboard/admin/settings")}
+                  onClick={() => navigate("/dashboard/admin/settings")}
+                >
+                  <Settings />
+                  <span>System Settings</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
         )}

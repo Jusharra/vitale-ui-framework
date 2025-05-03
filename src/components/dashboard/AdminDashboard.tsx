@@ -1,8 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsItem, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   User, 
   Users, 
@@ -14,11 +13,6 @@ import {
   FileSpreadsheet,
   Home
 } from 'lucide-react';
-import AdminVacations from '../admin/AdminVacations';
-import AdminPromotions from '../admin/AdminPromotions';
-import AdminLeads from '../admin/AdminLeads';
-import AdminCareTeams from '../admin/AdminCareTeams';
-import AdminHealthToolUsage from '../admin/AdminHealthToolUsage';
 
 // Mock data
 const systemStats = {
@@ -42,8 +36,6 @@ const recentActivities = [
 ];
 
 const AdminDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("overview");
-
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -57,173 +49,142 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid grid-cols-2 md:grid-cols-6 lg:w-auto w-full">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="vacations">Vacations</TabsTrigger>
-          <TabsTrigger value="promotions">Promotions</TabsTrigger>
-          <TabsTrigger value="leads">Leads & Analytics</TabsTrigger>
-          <TabsTrigger value="care-teams">Care Teams</TabsTrigger>
-          <TabsTrigger value="health-tools">Health Tools</TabsTrigger>
-        </TabsList>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="bg-primary/10 w-10 h-10 rounded-md flex items-center justify-center mb-2">
+                <Users className="h-5 w-5 text-primary" />
+              </div>
+              <CardTitle className="text-4xl">{systemStats.totalMembers}</CardTitle>
+              <CardDescription>Total Members</CardDescription>
+            </CardHeader>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="bg-primary/10 w-10 h-10 rounded-md flex items-center justify-center mb-2">
+                <User className="h-5 w-5 text-primary" />
+              </div>
+              <CardTitle className="text-4xl">{systemStats.totalProfessionals}</CardTitle>
+              <CardDescription>Healthcare Professionals</CardDescription>
+            </CardHeader>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="bg-primary/10 w-10 h-10 rounded-md flex items-center justify-center mb-2">
+                <LayoutDashboard className="h-5 w-5 text-primary" />
+              </div>
+              <CardTitle className="text-4xl">{systemStats.activeSubscriptions}</CardTitle>
+              <CardDescription>Active Subscriptions</CardDescription>
+            </CardHeader>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="bg-primary/10 w-10 h-10 rounded-md flex items-center justify-center mb-2">
+                <Settings className="h-5 w-5 text-primary" />
+              </div>
+              <CardTitle className="text-4xl">{systemStats.pendingApprovals}</CardTitle>
+              <CardDescription>Pending Approvals</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
 
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="bg-primary/10 w-10 h-10 rounded-md flex items-center justify-center mb-2">
-                  <Users className="h-5 w-5 text-primary" />
-                </div>
-                <CardTitle className="text-4xl">{systemStats.totalMembers}</CardTitle>
-                <CardDescription>Total Members</CardDescription>
-              </CardHeader>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="bg-primary/10 w-10 h-10 rounded-md flex items-center justify-center mb-2">
-                  <User className="h-5 w-5 text-primary" />
-                </div>
-                <CardTitle className="text-4xl">{systemStats.totalProfessionals}</CardTitle>
-                <CardDescription>Healthcare Professionals</CardDescription>
-              </CardHeader>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="bg-primary/10 w-10 h-10 rounded-md flex items-center justify-center mb-2">
-                  <LayoutDashboard className="h-5 w-5 text-primary" />
-                </div>
-                <CardTitle className="text-4xl">{systemStats.activeSubscriptions}</CardTitle>
-                <CardDescription>Active Subscriptions</CardDescription>
-              </CardHeader>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="bg-primary/10 w-10 h-10 rounded-md flex items-center justify-center mb-2">
-                  <Settings className="h-5 w-5 text-primary" />
-                </div>
-                <CardTitle className="text-4xl">{systemStats.pendingApprovals}</CardTitle>
-                <CardDescription>Pending Approvals</CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Membership Distribution</CardTitle>
-                  <CardDescription>Breakdown by membership tier</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    {membershipBreakdown.map((item) => (
-                      <div key={item.tier}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium">{item.tier}</span>
-                          <span className="text-sm text-muted-foreground">{item.count} members</span>
-                        </div>
-                        <div className="w-full bg-muted rounded-full h-2.5">
-                          <div 
-                            className="h-2.5 rounded-full bg-primary"
-                            style={{ width: `${item.percentage}%` }}
-                          ></div>
-                        </div>
-                        <span className="text-xs text-muted-foreground">{item.percentage}%</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button variant="outline" className="w-full">View Detailed Report</Button>
-                </CardFooter>
-              </Card>
-            </div>
-            
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>Admin operations</CardDescription>
+                <CardTitle>Membership Distribution</CardTitle>
+                <CardDescription>Breakdown by membership tier</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 gap-2">
-                  <Button className="justify-start" onClick={() => setActiveTab("vacations")}>
-                    <Home className="mr-2 h-4 w-4" />
-                    <span>Manage Vacation Packages</span>
-                  </Button>
-                  <Button className="justify-start" variant="outline" onClick={() => setActiveTab("promotions")}>
-                    <Award className="mr-2 h-4 w-4" />
-                    <span>Manage Promotions & Offers</span>
-                  </Button>
-                  <Button className="justify-start" variant="outline" onClick={() => setActiveTab("leads")}>
-                    <Users className="mr-2 h-4 w-4" />
-                    <span>Member Analytics</span>
-                  </Button>
-                  <Button className="justify-start" variant="outline" onClick={() => setActiveTab("care-teams")}>
-                    <Briefcase className="mr-2 h-4 w-4" />
-                    <span>Manage Care Teams</span>
-                  </Button>
+                <div className="space-y-6">
+                  {membershipBreakdown.map((item) => (
+                    <div key={item.tier}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium">{item.tier}</span>
+                        <span className="text-sm text-muted-foreground">{item.count} members</span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2.5">
+                        <div 
+                          className="h-2.5 rounded-full bg-primary"
+                          style={{ width: `${item.percentage}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-xs text-muted-foreground">{item.percentage}%</span>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
+              <CardFooter>
+                <Button variant="outline" className="w-full">View Detailed Report</Button>
+              </CardFooter>
             </Card>
           </div>
-
+          
           <Card>
             <CardHeader>
-              <CardTitle>Recent Activities</CardTitle>
-              <CardDescription>Latest system events</CardDescription>
+              <CardTitle>Quick Actions</CardTitle>
+              <CardDescription>Admin operations</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentActivities.map((activity) => (
-                  <div key={activity.id} className="flex items-start gap-3 pb-4 last:pb-0 border-b last:border-0">
-                    <div className="bg-muted rounded-full w-10 h-10 flex items-center justify-center shrink-0">
-                      <User className="h-5 w-5" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between">
-                        <p className="font-medium">{activity.activity}</p>
-                        <span className="text-xs text-muted-foreground">{activity.time}</span>
-                      </div>
-                      <p className="text-sm">{activity.user}</p>
-                      {(activity.from && activity.to) && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Upgraded from {activity.from} to {activity.to}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
+              <div className="grid grid-cols-1 gap-2">
+                <Button className="justify-start" onClick={() => window.location.href = "/dashboard/admin/vacations"}>
+                  <Home className="mr-2 h-4 w-4" />
+                  <span>Manage Vacation Packages</span>
+                </Button>
+                <Button className="justify-start" variant="outline" onClick={() => window.location.href = "/dashboard/admin/promotions"}>
+                  <Award className="mr-2 h-4 w-4" />
+                  <span>Manage Promotions & Offers</span>
+                </Button>
+                <Button className="justify-start" variant="outline" onClick={() => window.location.href = "/dashboard/admin/leads"}>
+                  <Users className="mr-2 h-4 w-4" />
+                  <span>Member Analytics</span>
+                </Button>
+                <Button className="justify-start" variant="outline" onClick={() => window.location.href = "/dashboard/admin/care-teams"}>
+                  <Briefcase className="mr-2 h-4 w-4" />
+                  <span>Manage Care Teams</span>
+                </Button>
               </div>
             </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full">View All Activities</Button>
-            </CardFooter>
           </Card>
-        </TabsContent>
+        </div>
 
-        <TabsContent value="vacations">
-          <AdminVacations />
-        </TabsContent>
-
-        <TabsContent value="promotions">
-          <AdminPromotions />
-        </TabsContent>
-
-        <TabsContent value="leads">
-          <AdminLeads />
-        </TabsContent>
-
-        <TabsContent value="care-teams">
-          <AdminCareTeams />
-        </TabsContent>
-
-        <TabsContent value="health-tools">
-          <AdminHealthToolUsage />
-        </TabsContent>
-      </Tabs>
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activities</CardTitle>
+            <CardDescription>Latest system events</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentActivities.map((activity) => (
+                <div key={activity.id} className="flex items-start gap-3 pb-4 last:pb-0 border-b last:border-0">
+                  <div className="bg-muted rounded-full w-10 h-10 flex items-center justify-center shrink-0">
+                    <User className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex justify-between">
+                      <p className="font-medium">{activity.activity}</p>
+                      <span className="text-xs text-muted-foreground">{activity.time}</span>
+                    </div>
+                    <p className="text-sm">{activity.user}</p>
+                    {(activity.from && activity.to) && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Upgraded from {activity.from} to {activity.to}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button variant="outline" className="w-full">View All Activities</Button>
+          </CardFooter>
+        </Card>
+      </div>
     </div>
   );
 };
