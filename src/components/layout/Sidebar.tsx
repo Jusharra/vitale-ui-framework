@@ -37,6 +37,7 @@ import {
   Users,
   MapPin,
   Activity,
+  Palmtree,
 } from "lucide-react";
 import MembershipBadge from "../common/MembershipBadge";
 
@@ -213,6 +214,15 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
                     >
                       <Receipt />
                       <span>Promotions</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      isActive={isActive("/dashboard/vacations")}
+                      onClick={() => navigate("/dashboard/vacations")}
+                    >
+                      <Palmtree />
+                      <span>Vacations</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
