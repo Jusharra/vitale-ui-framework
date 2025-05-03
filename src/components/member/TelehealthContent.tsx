@@ -42,7 +42,7 @@ const TelehealthContent: React.FC = () => {
   const { toast } = useToast();
 
   // In a real app, we'd check the user's membership tier from context or API
-  const userMembership = "smart"; // Mock value: This should be "vip" to unlock features
+  const userMembership: "smart" | "core" | "vip" = "smart"; // Mock value: This should be "vip" to unlock features
 
   const handleScheduleSession = () => {
     if (userMembership !== "vip") {

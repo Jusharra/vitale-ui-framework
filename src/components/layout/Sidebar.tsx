@@ -88,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    active={pathname === "/dashboard"}
+                    isActive={pathname === "/dashboard"}
                     onClick={() => navigate("/dashboard")}
                   >
                     <Home />
@@ -97,7 +97,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    active={isActive("/dashboard/appointments")}
+                    isActive={isActive("/dashboard/appointments")}
                     onClick={() => navigate("/dashboard/appointments")}
                   >
                     <Calendar />
@@ -106,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    active={isActive("/dashboard/health-tools")}
+                    isActive={isActive("/dashboard/health-tools")}
                     onClick={() => navigate("/dashboard/health-tools")}
                   >
                     <Heart />
@@ -115,7 +115,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    active={isActive("/dashboard/messages")}
+                    isActive={isActive("/dashboard/messages")}
                     onClick={() => navigate("/dashboard/messages")}
                   >
                     <MessageSquare />
@@ -124,7 +124,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    active={isActive("/dashboard/pharmacy")}
+                    isActive={isActive("/dashboard/pharmacy")}
                     onClick={() => navigate("/dashboard/pharmacy")}
                   >
                     <Pill />
@@ -133,7 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    active={isActive("/dashboard/telehealth")}
+                    isActive={isActive("/dashboard/telehealth")}
                     onClick={() => navigate("/dashboard/telehealth")}
                   >
                     <Video />
@@ -154,7 +154,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
                 <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton
-                      active={isActive("/dashboard/rewards")}
+                      isActive={isActive("/dashboard/rewards")}
                       onClick={() => navigate("/dashboard/rewards")}
                     >
                       <Gift />
@@ -163,7 +163,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton
-                      active={isActive("/dashboard/promotions")}
+                      isActive={isActive("/dashboard/promotions")}
                       onClick={() => navigate("/dashboard/promotions")}
                     >
                       <Receipt />
@@ -172,7 +172,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton
-                      active={isActive("/dashboard/membership")}
+                      isActive={isActive("/dashboard/membership")}
                       onClick={() => navigate("/dashboard/membership")}
                     >
                       <CreditCard />
@@ -191,7 +191,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  active={pathname === "/dashboard/professional"}
+                  isActive={pathname === "/dashboard/professional"}
                   onClick={() => navigate("/dashboard/professional")}
                 >
                   <Gauge />
@@ -200,7 +200,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  active={isActive("/dashboard/professional/calendar")}
+                  isActive={isActive("/dashboard/professional/calendar")}
                   onClick={() => navigate("/dashboard/professional/calendar")}
                 >
                   <Calendar />
@@ -209,7 +209,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  active={isActive("/dashboard/professional/requests")}
+                  isActive={isActive("/dashboard/professional/requests")}
                   onClick={() => navigate("/dashboard/professional/requests")}
                 >
                   <ClipboardList />
@@ -218,7 +218,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  active={isActive("/dashboard/professional/tools")}
+                  isActive={isActive("/dashboard/professional/tools")}
                   onClick={() => navigate("/dashboard/professional/tools")}
                 >
                   <Stethoscope />
@@ -227,7 +227,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  active={isActive("/dashboard/professional/earnings")}
+                  isActive={isActive("/dashboard/professional/earnings")}
                   onClick={() => navigate("/dashboard/professional/earnings")}
                 >
                   <BadgeDollarSign />
@@ -236,7 +236,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  active={isActive("/dashboard/professional/profile")}
+                  isActive={isActive("/dashboard/professional/profile")}
                   onClick={() => navigate("/dashboard/professional/profile")}
                 >
                   <User />
@@ -253,7 +253,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  active={pathname === "/dashboard/admin"}
+                  isActive={pathname === "/dashboard/admin"}
                   onClick={() => navigate("/dashboard/admin")}
                 >
                   <Gauge />
@@ -269,7 +269,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
-                active={isActive("/dashboard/support")}
+                isActive={isActive("/dashboard/support")}
                 onClick={() => navigate("/dashboard/support")}
               >
                 <HelpCircle />
