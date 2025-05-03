@@ -25,7 +25,8 @@ import {
   LayoutDashboard,
   ListCheck,
   Folder,
-  HelpCircle
+  HelpCircle,
+  Briefcase
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import MembershipBadge from "../common/MembershipBadge";
@@ -61,6 +62,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
     { title: "Patient Requests", icon: ListCheck, path: "/dashboard/professional/requests" },
     { title: "Calendar", icon: Calendar, path: "/dashboard/professional/calendar" },
     { title: "Earnings", icon: FileText, path: "/dashboard/professional/earnings" },
+    { title: "Tools of the Trade", icon: Briefcase, path: "/dashboard/professional/tools" },
     { title: "Profile Settings", icon: Settings, path: "/dashboard/professional/profile" },
   ];
 
