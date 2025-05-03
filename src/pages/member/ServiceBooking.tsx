@@ -7,7 +7,7 @@ const ServiceBooking = () => {
   return (
     <MemberPageLayout 
       title="Service Booking" 
-      description="Book specialist and aesthetic services with your membership discount"
+      description="Book specialist and aesthetic services with your membership discount, and customize your service preferences"
     >
       <ServiceBookingContent />
     </MemberPageLayout>

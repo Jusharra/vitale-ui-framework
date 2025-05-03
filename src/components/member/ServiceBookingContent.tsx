@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarIcon, Clock, CreditCard, Percent, Tag } from "lucide-react";
+import { CalendarIcon, Clock, CreditCard, Percent, Tag, Settings } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -11,6 +10,7 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import MembershipBadge from '../common/MembershipBadge';
+import ServicePreferencesForm from './ServicePreferencesForm';
 
 // Type definitions
 type ServiceCategory = "specialist" | "aesthetic" | "wellness";
@@ -106,6 +106,7 @@ const getDiscountPercentage = (membership: MembershipTier): number => {
 };
 
 const ServiceBookingContent: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<string>("services");
   const [category, setCategory] = useState<ServiceCategory>("specialist");
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [date, setDate] = useState<Date | undefined>(undefined);
@@ -197,6 +198,7 @@ const ServiceBookingContent: React.FC = () => {
     setSelectedService(null);
     setDate(undefined);
     setTimeSlot(null);
+    setActiveTab("services");
   };
 
   return (
@@ -212,66 +214,79 @@ const ServiceBookingContent: React.FC = () => {
             </div>
           </div>
 
-          <Tabs defaultValue="specialist" className="w-full" onValueChange={(value) => setCategory(value as ServiceCategory)}>
-            <TabsList className="grid w-full md:w-[400px] grid-cols-3">
-              <TabsTrigger value="specialist">Specialists</TabsTrigger>
-              <TabsTrigger value="aesthetic">Aesthetic</TabsTrigger>
-              <TabsTrigger value="wellness">Wellness</TabsTrigger>
+          <Tabs defaultValue="services" value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full md:w-[400px] grid-cols-2">
+              <TabsTrigger value="services">Available Services</TabsTrigger>
+              <TabsTrigger value="preferences">My Preferences</TabsTrigger>
             </TabsList>
 
-            {["specialist", "aesthetic", "wellness"].map((categoryType) => (
-              <TabsContent key={categoryType} value={categoryType} className="mt-6">
-                {filteredServices.length === 0 ? (
-                  <Card>
-                    <CardContent className="py-10 text-center">
-                      <p className="text-muted-foreground">No services available in this category</p>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredServices.map((service) => (
-                      <Card key={service.id} className="overflow-hidden flex flex-col h-full">
-                        <div className="h-48 overflow-hidden">
-                          <img 
-                            src={service.image} 
-                            alt={service.name} 
-                            className="w-full h-full object-cover transition-transform hover:scale-105"
-                          />
-                        </div>
-                        <CardHeader>
-                          <div className="flex justify-between items-start">
-                            <CardTitle className="text-lg">{service.name}</CardTitle>
-                            <Badge variant="outline" className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" /> {service.duration}
-                            </Badge>
-                          </div>
-                          <CardDescription>{service.description}</CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex-grow">
-                          <p className="text-sm mb-1">Provider: {service.provider}</p>
-                          <div className="flex items-center mt-2">
-                            <div className="flex items-center">
-                              <span className="font-medium text-lg">
-                                {formatPrice(calculateDiscountedPrice(service.price))}
-                              </span>
-                              <span className="ml-2 text-sm line-through text-muted-foreground">
-                                {formatPrice(service.price)}
-                              </span>
-                            </div>
-                            <Badge variant="secondary" className="ml-auto flex items-center gap-1">
-                              <Percent className="h-3 w-3" /> {getDiscountPercentage(userMembership)}% off
-                            </Badge>
-                          </div>
+            <TabsContent value="services" className="mt-6">
+              <Tabs defaultValue="specialist" className="w-full" onValueChange={(value) => setCategory(value as ServiceCategory)}>
+                <TabsList className="grid w-full md:w-[400px] grid-cols-3">
+                  <TabsTrigger value="specialist">Specialists</TabsTrigger>
+                  <TabsTrigger value="aesthetic">Aesthetic</TabsTrigger>
+                  <TabsTrigger value="wellness">Wellness</TabsTrigger>
+                </TabsList>
+
+                {["specialist", "aesthetic", "wellness"].map((categoryType) => (
+                  <TabsContent key={categoryType} value={categoryType} className="mt-6">
+                    {filteredServices.length === 0 ? (
+                      <Card>
+                        <CardContent className="py-10 text-center">
+                          <p className="text-muted-foreground">No services available in this category</p>
                         </CardContent>
-                        <CardFooter>
-                          <Button onClick={() => handleServiceSelect(service)} className="w-full">Book Now</Button>
-                        </CardFooter>
                       </Card>
-                    ))}
-                  </div>
-                )}
-              </TabsContent>
-            ))}
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {filteredServices.map((service) => (
+                          <Card key={service.id} className="overflow-hidden flex flex-col h-full">
+                            <div className="h-48 overflow-hidden">
+                              <img 
+                                src={service.image} 
+                                alt={service.name} 
+                                className="w-full h-full object-cover transition-transform hover:scale-105"
+                              />
+                            </div>
+                            <CardHeader>
+                              <div className="flex justify-between items-start">
+                                <CardTitle className="text-lg">{service.name}</CardTitle>
+                                <Badge variant="outline" className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" /> {service.duration}
+                                </Badge>
+                              </div>
+                              <CardDescription>{service.description}</CardDescription>
+                            </CardHeader>
+                            <CardContent className="flex-grow">
+                              <p className="text-sm mb-1">Provider: {service.provider}</p>
+                              <div className="flex items-center mt-2">
+                                <div className="flex items-center">
+                                  <span className="font-medium text-lg">
+                                    {formatPrice(calculateDiscountedPrice(service.price))}
+                                  </span>
+                                  <span className="ml-2 text-sm line-through text-muted-foreground">
+                                    {formatPrice(service.price)}
+                                  </span>
+                                </div>
+                                <Badge variant="secondary" className="ml-auto flex items-center gap-1">
+                                  <Percent className="h-3 w-3" /> {getDiscountPercentage(userMembership)}% off
+                                </Badge>
+                              </div>
+                            </CardContent>
+                            <CardFooter>
+                              <Button onClick={() => handleServiceSelect(service)} className="w-full">Book Now</Button>
+                            </CardFooter>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </TabsContent>
+                ))}
+              </Tabs>
+            </TabsContent>
+            
+            <TabsContent value="preferences" className="mt-6">
+              <ServicePreferencesForm />
+            </TabsContent>
           </Tabs>
         </>
       ) : (
