@@ -3,8 +3,9 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FeatureCard from '../common/FeatureCard';
-import { Calendar, FileText, MessageSquare, Settings, User, Users } from 'lucide-react';
+import { Calendar, FileText, MessageSquare, Settings, User, Users, Video } from 'lucide-react';
 import MembershipBadge from '../common/MembershipBadge';
+import { useNavigate } from 'react-router-dom';
 
 // Mock data
 const upcomingAppointments = [
@@ -18,6 +19,8 @@ const alerts = [
 ];
 
 const MemberDashboard: React.FC = () => {
+  const navigate = useNavigate();
+  
   // Mock user data - in a real app this would come from auth context or API
   const userData = {
     name: "John Doe",
@@ -34,7 +37,7 @@ const MemberDashboard: React.FC = () => {
         </div>
         <div className="flex items-center gap-2">
           <MembershipBadge type={userData.membership} size="lg" />
-          <Button variant="outline">View Benefits</Button>
+          <Button variant="outline" onClick={() => navigate('/dashboard/membership')}>View Benefits</Button>
         </div>
       </div>
 
@@ -65,7 +68,7 @@ const MemberDashboard: React.FC = () => {
             )}
           </CardContent>
           <CardFooter>
-            <Button className="w-full">Book Appointment</Button>
+            <Button className="w-full" onClick={() => navigate('/dashboard/appointments')}>Book Appointment</Button>
           </CardFooter>
         </Card>
 
@@ -101,7 +104,7 @@ const MemberDashboard: React.FC = () => {
                 <FileText className="h-5 w-5 mb-1" />
                 <span>Request Prescription</span>
               </Button>
-              <Button variant="outline" className="flex flex-col h-24 justify-center items-center text-center">
+              <Button variant="outline" className="flex flex-col h-24 justify-center items-center text-center" onClick={() => navigate('/dashboard/messages')}>
                 <MessageSquare className="h-5 w-5 mb-1" />
                 <span>Message Provider</span>
               </Button>
@@ -124,11 +127,13 @@ const MemberDashboard: React.FC = () => {
           title="Symptom Checker"
           description="Check your symptoms and get recommendations"
           icon={FileText}
+          onClick={() => navigate('/dashboard/health-tools')}
         />
         <FeatureCard
           title="Virtual Consultation"
           description="Connect with a healthcare provider via video"
           icon={User}
+          onClick={() => navigate('/dashboard/health-tools')}
         />
         <FeatureCard
           title="Specialist Referral"
@@ -136,6 +141,20 @@ const MemberDashboard: React.FC = () => {
           icon={Users}
           locked
           requiresUpgrade="core"
+          onClick={() => navigate('/dashboard/membership')}
+        />
+      </div>
+
+      <h2 className="text-2xl font-bold tracking-tight mt-8">VIP Exclusive</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 gap-4">
+        <FeatureCard
+          title="Telehealth Services"
+          description="Schedule virtual sessions with your assigned healthcare partners"
+          icon={Video}
+          locked={userData.membership !== "vip"}
+          requiresUpgrade="vip"
+          onClick={() => navigate('/dashboard/telehealth')}
+          className="bg-gradient-to-r from-purple-50 to-indigo-50 border-indigo-100"
         />
       </div>
 

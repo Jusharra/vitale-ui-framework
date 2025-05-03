@@ -17,6 +17,7 @@ import Rewards from "./pages/member/Rewards";
 import Promotions from "./pages/member/Promotions";
 import Membership from "./pages/member/Membership";
 import Support from "./pages/member/Support";
+import Telehealth from "./pages/member/Telehealth";
 import Calendar from "./pages/professional/Calendar";
 import PatientRequests from "./pages/professional/PatientRequests";
 import ToolsOfTrade from "./pages/professional/ToolsOfTrade";
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/dashboard/promotions" element={<Promotions />} />
           <Route path="/dashboard/membership" element={<Membership />} />
           <Route path="/dashboard/support" element={<Support />} />
+          <Route path="/dashboard/telehealth" element={<Telehealth />} />
           <Route path="/dashboard/professional" element={<ProfessionalDashboard />} />
           <Route path="/dashboard/professional/calendar" element={<Calendar />} />
           <Route path="/dashboard/professional/requests" element={<PatientRequests />} />
