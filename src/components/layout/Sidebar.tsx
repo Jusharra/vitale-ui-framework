@@ -61,8 +61,8 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
     { title: "Dashboard", icon: Home, path: "/dashboard/professional" },
     { title: "Patient Requests", icon: ListCheck, path: "/dashboard/professional/requests" },
     { title: "Calendar", icon: Calendar, path: "/dashboard/professional/calendar" },
-    { title: "Earnings", icon: FileText, path: "/dashboard/professional/earnings" },
     { title: "Tools of the Trade", icon: Briefcase, path: "/dashboard/professional/tools" },
+    { title: "Earnings", icon: FileText, path: "/dashboard/professional/earnings" },
     { title: "Profile Settings", icon: Settings, path: "/dashboard/professional/profile" },
   ];
 
