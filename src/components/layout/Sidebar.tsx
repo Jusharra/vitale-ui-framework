@@ -272,6 +272,15 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
+                  isActive={isActive("/dashboard/professional/message-center")}
+                  onClick={() => navigate("/dashboard/professional/message-center")}
+                >
+                  <MessageSquare />
+                  <span>Message Center</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
                   isActive={isActive("/dashboard/professional/tools")}
                   onClick={() => navigate("/dashboard/professional/tools")}
                 >

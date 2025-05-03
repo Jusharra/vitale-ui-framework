@@ -28,6 +28,7 @@ import ToolsOfTrade from "./pages/professional/ToolsOfTrade";
 import Earnings from "./pages/professional/Earnings";
 import ProfileSettings from "./pages/professional/ProfileSettings";
 import MemberManager from "./pages/professional/MemberManager";
+import MessageCenter from "./pages/professional/MessageCenter";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => (
           <Route path="/dashboard/professional/earnings" element={<Earnings />} />
           <Route path="/dashboard/professional/profile" element={<ProfileSettings />} />
           <Route path="/dashboard/professional/member-manager" element={<MemberManager />} />
+          <Route path="/dashboard/professional/message-center" element={<MessageCenter />} />
           <Route path="/dashboard/admin" element={<AdminDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
