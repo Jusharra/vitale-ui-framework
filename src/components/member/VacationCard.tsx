@@ -31,13 +31,22 @@ const VacationCard: React.FC<VacationCardProps> = ({ vacation, onViewDetails }) 
       if (!user) return { membership_tier: 'smart' };
 
       const { data, error } = await supabase
-        .from('users')
-        .select('membership_tier')
+        .from('profiles')
+        .select('id, role')
         .eq('id', user.id)
         .single();
       
-      if (error || !data) return { membership_tier: 'smart' };
-      return data;
+      // For this example, we'll hard-code membership tiers until we have a proper field
+      // In a real app, we'd store the membership_tier in a proper field
+      // This is temporary until we update the database schema
+      let membership_tier = 'smart';
+      if (data?.role === 'vip' || data?.role === 'professional') {
+        membership_tier = 'vip';
+      } else if (data?.role === 'member') {
+        membership_tier = 'core';
+      }
+      
+      return { id: data?.id || user.id, membership_tier };
     },
   });
 

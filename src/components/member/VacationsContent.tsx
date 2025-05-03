@@ -44,7 +44,15 @@ const VacationsContent = () => {
         .order('featured', { ascending: false });
       
       if (error) throw error;
-      return data as VacationPackage[];
+      
+      // Convert the data to match our expected type
+      return (data as any[]).map(pkg => ({
+        ...pkg,
+        // Safely parse available_dates which might be a string or already an object
+        available_dates: typeof pkg.available_dates === 'string' 
+          ? JSON.parse(pkg.available_dates)
+          : pkg.available_dates
+      })) as VacationPackage[];
     },
   });
 
