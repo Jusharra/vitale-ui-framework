@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button, ButtonProps } from "@/components/ui/button";
-import { FilePdf } from "lucide-react";
+import { FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface DownloadReportButtonProps extends ButtonProps {
@@ -35,7 +35,7 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({
   
   return (
     <Button onClick={handleClick} {...buttonProps}>
-      <FilePdf />
+      <FileText />
       {label}
     </Button>
   );

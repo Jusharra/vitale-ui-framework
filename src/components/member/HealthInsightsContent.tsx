@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { useForm } from "react-hook-form";
-import { AlertTriangle, Heart, Activity, Thermometer, Weight, Bell, Pill, Brain, FileText, ChevronRight, Calendar, FilePdf } from "lucide-react";
+import { AlertTriangle, Heart, Activity, Thermometer, Weight, Bell, Pill, Brain, FileText, ChevronRight, Calendar } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import DownloadReportButton from './DownloadReportButton';
 import { downloadHealthInsightsPDF } from '@/utils/pdfGenerator';

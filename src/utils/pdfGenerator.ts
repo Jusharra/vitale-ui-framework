@@ -7,6 +7,14 @@ import { format } from 'date-fns';
 declare module 'jspdf' {
   interface jsPDF {
     autoTable: (options: any) => jsPDF;
+    internal: {
+      pageSize: {
+        getWidth: () => number;
+        getHeight: () => number;
+      };
+      pages: any[];  // Add this to fix the missing getNumberOfPages issue
+      getNumberOfPages: () => number;  // Add this explicit declaration
+    };
   }
 }
 
@@ -239,7 +247,7 @@ export const generateHealthInsightsPDF = (healthData: HealthData): jsPDF => {
   }
   
   // Add footer with page numbers
-  const totalPages = doc.internal.getNumberOfPages();
+  const totalPages = doc.internal.pages.length - 1;  // Fix for getNumberOfPages
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
     doc.setFontSize(8);
