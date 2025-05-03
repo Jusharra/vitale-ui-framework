@@ -19,6 +19,7 @@ import Membership from "./pages/member/Membership";
 import Support from "./pages/member/Support";
 import Calendar from "./pages/professional/Calendar";
 import PatientRequests from "./pages/professional/PatientRequests";
+import ToolsOfTrade from "./pages/professional/ToolsOfTrade";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/dashboard/professional" element={<ProfessionalDashboard />} />
           <Route path="/dashboard/professional/calendar" element={<Calendar />} />
           <Route path="/dashboard/professional/requests" element={<PatientRequests />} />
+          <Route path="/dashboard/professional/tools" element={<ToolsOfTrade />} />
           <Route path="/dashboard/admin" element={<AdminDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

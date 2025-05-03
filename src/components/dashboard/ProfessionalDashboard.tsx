@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, MessageSquare, FileText, User, Users, ListCheck } from 'lucide-react';
+import { Calendar, MessageSquare, FileText, User, Users, ListCheck, Briefcase } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 // Mock data
 const todaysAppointments = [
@@ -43,7 +43,7 @@ const ProfessionalDashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="pb-2">
             <div className="bg-primary/10 w-10 h-10 rounded-md flex items-center justify-center mb-2">
@@ -73,6 +73,16 @@ const ProfessionalDashboard: React.FC = () => {
             <CardDescription>Unread Messages</CardDescription>
           </CardHeader>
         </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="bg-primary/10 w-10 h-10 rounded-md flex items-center justify-center mb-2">
+              <Briefcase className="h-5 w-5 text-primary" />
+            </div>
+            <CardTitle className="text-4xl">12</CardTitle>
+            <CardDescription>Financing Opportunities</CardDescription>
+          </CardHeader>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -100,7 +110,9 @@ const ProfessionalDashboard: React.FC = () => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button variant="outline" className="w-full">View Full Calendar</Button>
+            <Button variant="outline" className="w-full" asChild>
+              <Link to="/dashboard/professional/calendar">View Full Calendar</Link>
+            </Button>
           </CardFooter>
         </Card>
         
@@ -133,7 +145,9 @@ const ProfessionalDashboard: React.FC = () => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button className="w-full">Respond to Requests</Button>
+            <Button className="w-full" asChild>
+              <Link to="/dashboard/professional/requests">Respond to Requests</Link>
+            </Button>
           </CardFooter>
         </Card>
       </div>
@@ -164,6 +178,42 @@ const ProfessionalDashboard: React.FC = () => {
           </CardContent>
           <CardFooter>
             <Button variant="outline" className="w-full">Open Message Center</Button>
+          </CardFooter>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6">
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle>Tools of the Trade</CardTitle>
+              <Badge variant="outline">New Resources</Badge>
+            </div>
+            <CardDescription>Financing, funding, and resources for your practice</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex flex-col items-center p-4 border rounded-lg">
+                <PiggyBank className="h-8 w-8 mb-2 text-primary" />
+                <h3 className="font-semibold">Research Funding</h3>
+                <p className="text-xs text-center text-muted-foreground mt-1">Grant opportunities up to $250K</p>
+              </div>
+              <div className="flex flex-col items-center p-4 border rounded-lg">
+                <CreditCard className="h-8 w-8 mb-2 text-primary" />
+                <h3 className="font-semibold">Equipment Financing</h3>
+                <p className="text-xs text-center text-muted-foreground mt-1">Special 0% financing for 12 months</p>
+              </div>
+              <div className="flex flex-col items-center p-4 border rounded-lg">
+                <FileText className="h-8 w-8 mb-2 text-primary" />
+                <h3 className="font-semibold">Licensing Support</h3>
+                <p className="text-xs text-center text-muted-foreground mt-1">Streamlined multi-state processing</p>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button className="w-full" asChild>
+              <Link to="/dashboard/professional/tools">Explore All Resources</Link>
+            </Button>
           </CardFooter>
         </Card>
       </div>
