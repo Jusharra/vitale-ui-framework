@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, MessageSquare, FileText, User, Users, ListCheck, Briefcase, PiggyBank, CreditCard } from 'lucide-react';
+import { Calendar, MessageSquare, FileText, User, Users, ListCheck, Briefcase, PiggyBank, CreditCard, Palette } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
 
@@ -246,6 +246,54 @@ const ProfessionalDashboard: React.FC = () => {
           </CardFooter>
         </Card>
       </div>
+
+      {/* White-Label Option */}
+      <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-primary/20">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle>White-Label Concierge Platform</CardTitle>
+            <Badge className="bg-primary/20 text-primary">Premium</Badge>
+          </div>
+          <CardDescription>Get your own branded concierge platform for your practice</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-6">
+            <div className="bg-white p-4 rounded-lg shadow-sm">
+              <Palette className="h-10 w-10 text-primary mb-2" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-medium text-lg">Your Brand, Our Technology</h3>
+              <p className="text-sm text-muted-foreground">
+                Launch your own branded concierge platform with custom colors, logo, and domain.
+                All the features you love, under your practice's brand.
+              </p>
+              <ul className="grid grid-cols-2 gap-2 text-sm mt-2">
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                  <span>Custom branding & colors</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                  <span>Dedicated domain</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                  <span>All premium features</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                  <span>Priority support</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button className="w-full" size="lg">
+            Get Your Own Concierge Platform
+          </Button>
+        </CardFooter>
+      </Card>
 
       <div className="bg-muted rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between">
         <div className="flex flex-col sm:flex-row items-center gap-4 mb-4 sm:mb-0">
