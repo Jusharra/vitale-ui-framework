@@ -71,6 +71,8 @@ const Support = () => {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [aiAssistantVisible, setAiAssistantVisible] = useState(false);
+  // Add state to track active tab
+  const [activeTab, setActiveTab] = useState("faq");
 
   // Filter FAQs based on search
   const filteredFaqs = searchQuery.trim() === "" 
@@ -102,12 +104,17 @@ const Support = () => {
     // Show confirmation in a real app
   };
 
+  // Function to handle tab switching
+  const handleTabChange = (value) => {
+    setActiveTab(value);
+  };
+
   return (
     <MemberPageLayout 
       title="Support" 
       description="Get help with your account and services"
     >
-      <Tabs defaultValue="faq" className="w-full">
+      <Tabs defaultValue="faq" className="w-full" onValueChange={handleTabChange}>
         <TabsList className="grid w-full md:w-[500px] grid-cols-3">
           <TabsTrigger value="faq">FAQ</TabsTrigger>
           <TabsTrigger value="contact">Contact Us</TabsTrigger>
@@ -172,12 +179,12 @@ const Support = () => {
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Button 
                   variant="outline" 
-                  onClick={() => document.querySelector('[data-value="contact"]')?.click()}
+                  onClick={() => setActiveTab("contact")}
                 >
                   Contact Support Team
                 </Button>
                 <Button
-                  onClick={() => document.querySelector('[data-value="ai-assistant"]')?.click()}
+                  onClick={() => setActiveTab("ai-assistant")}
                 >
                   Chat with AI Assistant
                 </Button>
@@ -280,7 +287,7 @@ const Support = () => {
                   <Button 
                     variant="outline" 
                     className="w-full"
-                    onClick={() => document.querySelector('[data-value="ai-assistant"]')?.click()}
+                    onClick={() => setActiveTab("ai-assistant")}
                   >
                     <MessageSquare className="mr-2 h-4 w-4" />
                     Chat with AI Assistant
@@ -393,7 +400,7 @@ const Support = () => {
           <Button 
             className="h-14 w-14 rounded-full shadow-lg flex items-center justify-center"
             onClick={() => {
-              document.querySelector('[data-value="ai-assistant"]')?.click();
+              setActiveTab("ai-assistant");
               setAiAssistantVisible(true);
             }}
           >

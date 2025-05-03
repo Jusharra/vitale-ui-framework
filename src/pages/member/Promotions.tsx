@@ -129,7 +129,7 @@ const Promotions = () => {
                       </div>
                       <Badge>{promo.category}</Badge>
                     </div>
-                    <MembershipBadge type={promo.requiredTier} size="sm" />
+                    <MembershipBadge type={promo.requiredTier as "smart" | "core" | "vip"} size="sm" />
                   </div>
                   <CardTitle className="mt-2">{promo.title}</CardTitle>
                   <CardDescription>Valid until: {promo.validUntil}</CardDescription>
@@ -155,7 +155,7 @@ const Promotions = () => {
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="bg-background/80 px-4 py-2 rounded-full">
                       <div className="flex items-center gap-2">
-                        <MembershipBadge type={promo.requiredTier} size="sm" />
+                        <MembershipBadge type={promo.requiredTier as "smart" | "core" | "vip"} size="sm" />
                         <span className="text-sm font-medium">Exclusive</span>
                       </div>
                     </div>

@@ -107,7 +107,7 @@ const Membership = () => {
                     <CardTitle className="text-2xl">Your Membership</CardTitle>
                     <CardDescription>Current plan and membership benefits</CardDescription>
                   </div>
-                  <MembershipBadge type={membershipData.currentPlan} size="lg" />
+                  <MembershipBadge type={membershipData.currentPlan as "smart" | "core" | "vip"} size="lg" />
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
