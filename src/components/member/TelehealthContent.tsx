@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,18 +33,22 @@ const pastSessions = [
   { id: 4, doctor: "Dr. Sarah Johnson", specialty: "Cardiology", date: "March 10, 2025", time: "9:00 AM", notes: "EKG results normal" },
 ];
 
+// Define membership type
+type MembershipTier = "smart" | "core" | "vip";
+
 const TelehealthContent: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedPartner, setSelectedPartner] = useState<number | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [showVipLock, setShowVipLock] = useState(true);
+  const [activeTab, setActiveTab] = useState<string>("schedule");
   const { toast } = useToast();
 
   // In a real app, we'd check the user's membership tier from context or API
-  const userMembership: "smart" | "core" | "vip" = "smart"; // Mock value: This should be "vip" to unlock features
+  const userMembership: MembershipTier = "smart"; // Mock value: This should be "vip" to unlock features
 
   const handleScheduleSession = () => {
-    if (userMembership !== "vip") {
+    if (userMembership !== "vip" as MembershipTier) {
       toast({
         title: "VIP Membership Required",
         description: "Telehealth services are available exclusively for VIP members. Please upgrade your membership to access this feature.",
@@ -77,8 +80,13 @@ const TelehealthContent: React.FC = () => {
     setSelectedTime(null);
   };
 
+  // Handler to switch tabs
+  const handleSwitchToScheduleTab = () => {
+    setActiveTab("schedule");
+  };
+
   // If user is not a VIP member, show the upgrade card
-  if (userMembership !== "vip" && showVipLock) {
+  if (userMembership !== "vip" as MembershipTier && showVipLock) {
     return (
       <Card className="my-6 border-dashed border-2">
         <CardHeader className="text-center">
@@ -110,7 +118,7 @@ const TelehealthContent: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      {userMembership !== "vip" && (
+      {userMembership !== "vip" as MembershipTier && (
         <div className="bg-amber-50 border-amber-200 border rounded-md p-4 text-amber-800 flex items-center space-x-3">
           <Bell className="h-5 w-5 flex-shrink-0" />
           <div className="flex-grow">
@@ -123,7 +131,7 @@ const TelehealthContent: React.FC = () => {
         </div>
       )}
 
-      <Tabs defaultValue="schedule" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full md:w-[400px] grid-cols-3">
           <TabsTrigger value="schedule">Schedule</TabsTrigger>
           <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
@@ -283,7 +291,7 @@ const TelehealthContent: React.FC = () => {
                 <VideoOff className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
                 <p className="text-lg font-medium">No upcoming sessions</p>
                 <p className="text-muted-foreground">Schedule a telehealth session to get started</p>
-                <Button className="mt-4" onClick={() => document.querySelector('[value="schedule"]')?.click()}>
+                <Button className="mt-4" onClick={handleSwitchToScheduleTab}>
                   Schedule Now
                 </Button>
               </CardContent>
