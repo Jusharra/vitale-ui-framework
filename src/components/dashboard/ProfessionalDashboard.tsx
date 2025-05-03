@@ -39,7 +39,9 @@ const ProfessionalDashboard: React.FC = () => {
           <p className="text-muted-foreground">Welcome back, {professionalData.name}</p>
         </div>
         <div className="space-x-2">
-          <Button>Calendar View</Button>
+          <Button asChild>
+            <Link to="/dashboard/professional/calendar">Calendar View</Link>
+          </Button>
           <Button variant="outline">Export Schedule</Button>
         </div>
       </div>
@@ -183,7 +185,33 @@ const ProfessionalDashboard: React.FC = () => {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle>Member Management</CardTitle>
+              <Badge variant="outline">New Feature</Badge>
+            </div>
+            <CardDescription>Manage assigned members and their patient relationships</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="bg-primary/10 w-12 h-12 rounded-md flex items-center justify-center">
+                <Users className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-medium">Member Manager</h3>
+                <p className="text-sm text-muted-foreground">Schedule appointments, send messages, view health records</p>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button className="w-full" asChild>
+              <Link to="/dashboard/professional/member-manager">Go to Member Manager</Link>
+            </Button>
+          </CardFooter>
+        </Card>
+
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
