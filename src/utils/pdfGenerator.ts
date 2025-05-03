@@ -3,18 +3,10 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { format } from 'date-fns';
 
-// Extend the jsPDF types to include autoTable
+// Extend the jsPDF types to include autoTable without redefining existing properties
 declare module 'jspdf' {
   interface jsPDF {
     autoTable: (options: any) => jsPDF;
-    internal: {
-      pageSize: {
-        getWidth: () => number;
-        getHeight: () => number;
-      };
-      pages: any[];  // Add this to fix the missing getNumberOfPages issue
-      getNumberOfPages: () => number;  // Add this explicit declaration
-    };
   }
 }
 
@@ -247,12 +239,12 @@ export const generateHealthInsightsPDF = (healthData: HealthData): jsPDF => {
   }
   
   // Add footer with page numbers
-  const totalPages = doc.internal.pages.length - 1;  // Fix for getNumberOfPages
-  for (let i = 1; i <= totalPages; i++) {
+  const pageCount = doc.internal.pages.length - 1;
+  for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(100, 100, 100);
-    doc.text(`Page ${i} of ${totalPages}`, pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+    doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
   }
   
   return doc;
