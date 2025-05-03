@@ -1,8 +1,9 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, MessageSquare, FileText, User, Users, ListCheck, Briefcase } from 'lucide-react';
+import { Calendar, MessageSquare, FileText, User, Users, ListCheck, Briefcase, PiggyBank, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Badge } from "@/components/ui/badge";
 
 // Mock data
 const todaysAppointments = [
