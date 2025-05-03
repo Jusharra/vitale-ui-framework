@@ -22,7 +22,6 @@ import {
 import { 
   AlertTriangle, 
   FileText, 
-  Prescription, 
   User 
 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
@@ -153,7 +152,7 @@ const PatientRequestsList: React.FC = () => {
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-2">
                     <div className={`bg-muted w-10 h-10 rounded-full flex items-center justify-center ${request.urgency === 'high' ? 'bg-red-100' : request.urgency === 'medium' ? 'bg-amber-100' : ''}`}>
-                      <Prescription className={`h-5 w-5 ${request.urgency === 'high' ? 'text-red-500' : request.urgency === 'medium' ? 'text-amber-500' : 'text-primary'}`} />
+                      <FileText className={`h-5 w-5 ${request.urgency === 'high' ? 'text-red-500' : request.urgency === 'medium' ? 'text-amber-500' : 'text-primary'}`} />
                     </div>
                     <div>
                       <CardTitle className="text-lg">{request.patient}</CardTitle>
