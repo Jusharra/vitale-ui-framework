@@ -132,6 +132,15 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton
+                    isActive={isActive("/dashboard/purchase-history")}
+                    onClick={() => navigate("/dashboard/purchase-history")}
+                  >
+                    <Receipt />
+                    <span>Purchase History</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
                     isActive={isActive("/dashboard/health-tools")}
                     onClick={() => navigate("/dashboard/health-tools")}
                   >
