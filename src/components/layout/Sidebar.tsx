@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -258,6 +259,15 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
                 >
                   <ClipboardList />
                   <span>Patient Requests</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive("/dashboard/professional/member-manager")}
+                  onClick={() => navigate("/dashboard/professional/member-manager")}
+                >
+                  <Users />
+                  <span>Member Manager</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
