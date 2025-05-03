@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FeatureCard from '../common/FeatureCard';
-import { Calendar, FileText, MessageSquare, Settings, User, Users, Video } from 'lucide-react';
+import { Calendar, FileText, MessageSquare, Settings, Tag, User, Users, Video } from 'lucide-react';
 import MembershipBadge from '../common/MembershipBadge';
 import { useNavigate } from 'react-router-dom';
 
@@ -112,9 +112,9 @@ const MemberDashboard: React.FC = () => {
                 <User className="h-5 w-5 mb-1" />
                 <span>Update Profile</span>
               </Button>
-              <Button variant="outline" className="flex flex-col h-24 justify-center items-center text-center">
-                <Settings className="h-5 w-5 mb-1" />
-                <span>Settings</span>
+              <Button variant="outline" className="flex flex-col h-24 justify-center items-center text-center" onClick={() => navigate('/dashboard/service-booking')}>
+                <Tag className="h-5 w-5 mb-1" />
+                <span>Book Services</span>
               </Button>
             </div>
           </CardContent>
@@ -136,12 +136,10 @@ const MemberDashboard: React.FC = () => {
           onClick={() => navigate('/dashboard/health-tools')}
         />
         <FeatureCard
-          title="Specialist Referral"
-          description="Get referred to the right specialist quickly"
-          icon={Users}
-          locked
-          requiresUpgrade="core"
-          onClick={() => navigate('/dashboard/membership')}
+          title="Service Booking"
+          description="Book specialist and aesthetic services with your membership discount"
+          icon={Tag}
+          onClick={() => navigate('/dashboard/service-booking')}
         />
       </div>
 

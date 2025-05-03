@@ -33,6 +33,7 @@ import {
   Stethoscope,
   BadgeDollarSign,
   Video,
+  Tag,
 } from "lucide-react";
 import MembershipBadge from "../common/MembershipBadge";
 
@@ -102,6 +103,20 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
                   >
                     <Calendar />
                     <span>Appointments</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    isActive={isActive("/dashboard/service-booking")}
+                    onClick={() => navigate("/dashboard/service-booking")}
+                  >
+                    <Tag />
+                    <span>Service Booking</span>
+                    <div className="ml-auto">
+                      <span className="bg-green-100 text-green-800 text-xs px-1.5 py-0.5 rounded-md">
+                        10% Off
+                      </span>
+                    </div>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
