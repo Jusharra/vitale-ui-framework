@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -36,6 +35,7 @@ import {
   Tag,
   Users,
   MapPin,
+  Activity,
 } from "lucide-react";
 import MembershipBadge from "../common/MembershipBadge";
 
@@ -146,6 +146,15 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
                   >
                     <Heart />
                     <span>Health Tools</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    isActive={isActive("/dashboard/health-insights")}
+                    onClick={() => navigate("/dashboard/health-insights")}
+                  >
+                    <Activity />
+                    <span>Health Insights</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>

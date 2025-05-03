@@ -21,6 +21,7 @@ import Telehealth from "./pages/member/Telehealth";
 import ServiceBooking from "./pages/member/ServiceBooking";
 import Concierge from "./pages/member/Concierge";
 import PurchaseHistory from "./pages/member/PurchaseHistory";
+import HealthInsights from "./pages/member/HealthInsights";
 import Calendar from "./pages/professional/Calendar";
 import PatientRequests from "./pages/professional/PatientRequests";
 import ToolsOfTrade from "./pages/professional/ToolsOfTrade";
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/appointments" element={<Appointments />} />
           <Route path="/dashboard/health-tools" element={<HealthTools />} />
+          <Route path="/dashboard/health-insights" element={<HealthInsights />} />
           <Route path="/dashboard/messages" element={<Messages />} />
           <Route path="/dashboard/pharmacy" element={<Pharmacy />} />
           <Route path="/dashboard/rewards" element={<Rewards />} />

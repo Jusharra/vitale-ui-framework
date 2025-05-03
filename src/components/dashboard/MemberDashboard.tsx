@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FeatureCard from '../common/FeatureCard';
-import { Calendar, FileText, MessageSquare, Settings, Tag, User, Users, Video, MapPin } from 'lucide-react';
+import { Calendar, FileText, MessageSquare, Settings, Tag, User, Users, Video, MapPin, Activity } from 'lucide-react';
 import MembershipBadge from '../common/MembershipBadge';
 import { useNavigate } from 'react-router-dom';
 
@@ -123,6 +122,12 @@ const MemberDashboard: React.FC = () => {
 
       <h2 className="text-2xl font-bold tracking-tight mt-8">Health Tools</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <FeatureCard
+          title="Health Insights"
+          description="View your personalized health data and recommendations"
+          icon={Activity}
+          onClick={() => navigate('/dashboard/health-insights')}
+        />
         <FeatureCard
           title="Symptom Checker"
           description="Check your symptoms and get recommendations"
