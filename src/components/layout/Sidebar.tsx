@@ -41,7 +41,8 @@ import {
   BarChart,
   Package,
   Settings,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Ambulance
 } from "lucide-react";
 import MembershipBadge from "../common/MembershipBadge";
 
@@ -134,6 +135,15 @@ const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
                         10% Off
                       </span>
                     </div>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    isActive={isActive("/dashboard/medical-transport")}
+                    onClick={() => navigate("/dashboard/medical-transport")}
+                  >
+                    <Ambulance />
+                    <span>Medical Transport</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>

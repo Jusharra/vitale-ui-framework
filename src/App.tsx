@@ -23,6 +23,7 @@ import Concierge from "./pages/member/Concierge";
 import PurchaseHistory from "./pages/member/PurchaseHistory";
 import HealthInsights from "./pages/member/HealthInsights";
 import Vacations from "./pages/member/Vacations";
+import MedicalTransport from "./pages/member/MedicalTransport";
 import Calendar from "./pages/professional/Calendar";
 import PatientRequests from "./pages/professional/PatientRequests";
 import ToolsOfTrade from "./pages/professional/ToolsOfTrade";
@@ -57,6 +58,7 @@ const App = () => (
           <Route path="/dashboard/concierge" element={<Concierge />} />
           <Route path="/dashboard/purchase-history" element={<PurchaseHistory />} />
           <Route path="/dashboard/vacations" element={<Vacations />} />
+          <Route path="/dashboard/medical-transport" element={<MedicalTransport />} />
           <Route path="/dashboard/professional" element={<ProfessionalDashboard />} />
           <Route path="/dashboard/professional/calendar" element={<Calendar />} />
           <Route path="/dashboard/professional/requests" element={<PatientRequests />} />

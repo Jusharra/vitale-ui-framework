@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FeatureCard from '../common/FeatureCard';
-import { Calendar, FileText, MessageSquare, Settings, Tag, User, Users, Video, MapPin, Activity, Palmtree } from 'lucide-react';
+import { Calendar, FileText, MessageSquare, Settings, Tag, User, Users, Video, MapPin, Activity, Palmtree, Ambulance } from 'lucide-react';
 import MembershipBadge from '../common/MembershipBadge';
 import { useNavigate } from 'react-router-dom';
 
@@ -146,6 +146,12 @@ const MemberDashboard: React.FC = () => {
           description="Manage your healthcare provider team and preferred pharmacy"
           icon={Users}
           onClick={() => navigate('/dashboard/concierge')}
+        />
+        <FeatureCard
+          title="Medical Transport"
+          description="Book medical transport for appointments and medical tourism"
+          icon={Ambulance}
+          onClick={() => navigate('/dashboard/medical-transport')}
         />
         <FeatureCard
           title="Vacation Marketplace"
