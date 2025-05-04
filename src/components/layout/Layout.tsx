@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { Sidebar } from '@/components/layout/Sidebar';
-import { Navbar } from '@/components/layout/Navbar';
-import { MobileNavbar } from '@/components/layout/MobileNavbar';
+import Sidebar from '@/components/layout/Sidebar';
+import Navbar from '@/components/layout/Navbar';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import WhiteLabelProvider from '@/components/white-label/WhiteLabelProvider';
 import LanguageProvider from '@/components/i18n/LanguageProvider';

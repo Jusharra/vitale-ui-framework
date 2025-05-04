@@ -24,9 +24,15 @@ import {
 
 interface NavbarProps {
   role?: "member" | "professional" | "admin";
+  onToggleSidebar?: () => void;
+  isMobile?: boolean;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ role = "member" }) => {
+const Navbar: React.FC<NavbarProps> = ({ 
+  role = "member",
+  onToggleSidebar,
+  isMobile
+}) => {
   const [searchQuery, setSearchQuery] = useState("");
   
   // Mock data
@@ -42,7 +48,7 @@ const Navbar: React.FC<NavbarProps> = ({ role = "member" }) => {
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center px-4 md:px-6">
         <div className="md:hidden mr-2">
-          <SidebarTrigger>
+          <SidebarTrigger onClick={onToggleSidebar}>
             <Menu className="h-6 w-6" />
           </SidebarTrigger>
         </div>
@@ -102,7 +108,7 @@ const Navbar: React.FC<NavbarProps> = ({ role = "member" }) => {
                 <Link to="/profile">Profile</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/settings">Settings</Link>
+                <Link to="/dashboard/settings">Settings</Link>
               </DropdownMenuItem>
               {role === "member" && (
                 <DropdownMenuItem asChild>

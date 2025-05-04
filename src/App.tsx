@@ -26,6 +26,7 @@ import MemberMessagesPage from '@/pages/member/Messages';
 import MemberMembershipPage from '@/pages/member/Membership';
 import MemberPromotionsPage from '@/pages/member/Promotions';
 import ShareAndEarn from '@/pages/member/ShareAndEarn';
+import GlobalSettingsPage from '@/pages/member/GlobalSettingsPage';
 import { AuthProvider } from '@/context/AuthContext';
 
 const App: React.FC = () => {
@@ -126,6 +127,14 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute>
                   <MemberPromotionsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/settings"
+              element={
+                <ProtectedRoute>
+                  <GlobalSettingsPage />
                 </ProtectedRoute>
               }
             />
