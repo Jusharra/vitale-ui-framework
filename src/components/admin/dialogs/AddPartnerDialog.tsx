@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -26,7 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { CheckBox } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -56,7 +55,7 @@ const AddPartnerDialog = ({ open, onOpenChange, onSuccess }: AddPartnerDialogPro
       email: '',
       phone: '',
       practice_name: '',
-      specialties: '',
+      specialties: '', // Keep as string for input, will be transformed to array on submit
       bio: '',
       accepting_new_patients: true,
       telehealth_enabled: false,
@@ -72,7 +71,7 @@ const AddPartnerDialog = ({ open, onOpenChange, onSuccess }: AddPartnerDialogPro
           email: values.email,
           phone: values.phone,
           practice_name: values.practice_name,
-          specialties: values.specialties,
+          specialties: values.specialties, // This will now be an array after the transform
           bio: values.bio,
           accepting_new_patients: values.accepting_new_patients,
           telehealth_enabled: values.telehealth_enabled,
