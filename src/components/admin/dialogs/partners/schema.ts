@@ -7,7 +7,7 @@ export const partnerFormSchema = z.object({
   email: z.string().email('Valid email is required'),
   phone: z.string().optional(),
   practice_name: z.string().optional(),
-  // Fix the specialties preprocessing to correctly handle the type transformation
+  // Fix the specialties field to properly handle the transformation
   specialties: z.preprocess(
     // This ensures the input is treated as a string in the form
     (val) => (typeof val === 'string' ? val : Array.isArray(val) ? val.join(',') : ''),
@@ -19,21 +19,20 @@ export const partnerFormSchema = z.object({
   telehealth_enabled: z.boolean().default(false),
 });
 
-// Export the type for the form values
+// Export the type for the form values - this ensures the form values match what the schema expects
 export type PartnerFormValues = z.infer<typeof partnerFormSchema>;
 
-// Default form values
+// Default form values - specialties is a string here for the form input
 export const defaultPartnerFormValues: Partial<PartnerFormValues> = {
   name: '',
   email: '',
   phone: '',
   practice_name: '',
-  specialties: '', // This should be a string input that will be processed by the schema
+  specialties: '', // String for the form input
   bio: '',
   accepting_new_patients: true,
   telehealth_enabled: false,
 };
 
-// Export a specific type for the form's internal use
-export type PartnerFormSpecialties = string;
-
+// Define a specific type for the specialties form field to make it clear it's a string in the form
+export type PartnerFormSpecialtiesField = string;
