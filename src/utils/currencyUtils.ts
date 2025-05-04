@@ -86,28 +86,22 @@ export const getUserRegionalSettings = async (userId: string | null): Promise<{
   
   try {
     // In a real implementation, this would fetch from a user_preferences table
-    const { data, error } = await supabase
-      .from('user_preferences')
-      .select('region, currency')
-      .eq('user_id', userId)
-      .single();
-    
-    if (error || !data) {
-      return {
-        region: 'North America',
-        currency: 'USD',
-        multiplier: 1.0,
-      };
-    }
+    // Since the user_preferences table doesn't have region and currency columns yet,
+    // we'll return default values
+    const defaultSettings = {
+      region: 'North America' as Region,
+      currency: 'USD' as Currency,
+      multiplier: 1.0,
+    };
     
     // Find the appropriate pricing details based on region
     const pricingDetails = defaultRegionalPricing.find(
-      pricing => pricing.region === data.region
+      pricing => pricing.region === defaultSettings.region
     ) || defaultRegionalPricing[0];
     
     return {
-      region: data.region as Region,
-      currency: data.currency as Currency || pricingDetails.currency,
+      region: defaultSettings.region,
+      currency: defaultSettings.currency,
       multiplier: pricingDetails.baseMultiplier,
     };
   } catch (error) {

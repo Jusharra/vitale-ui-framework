@@ -38,7 +38,7 @@ const Layout = ({ children, role = 'member' }: LayoutProps) => {
     <LanguageProvider>
       <WhiteLabelProvider>
         <div className="min-h-screen flex bg-background">
-          <Sidebar role={role} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+          <Sidebar role={role} />
           
           <div className="flex flex-col flex-1">
             <Navbar 
