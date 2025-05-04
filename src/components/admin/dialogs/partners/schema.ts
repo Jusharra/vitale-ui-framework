@@ -8,12 +8,12 @@ export const partnerFormSchema = z.object({
   phone: z.string().optional(),
   practice_name: z.string().optional(),
   // Fix the specialties field to properly handle the transformation
-  specialties: z.preprocess(
-    // This ensures the input is treated as a string in the form
-    (val) => (typeof val === 'string' ? val : Array.isArray(val) ? val.join(',') : ''),
-    // And then we transform it to an array when submitting
-    z.string().transform(val => val.split(',').map(s => s.trim()).filter(Boolean))
-  ),
+  specialties: z.union([
+    // Accept string input from form
+    z.string().transform(val => val.split(',').map(s => s.trim()).filter(Boolean)),
+    // Also accept array input which might come from database
+    z.array(z.string())
+  ]),
   bio: z.string().optional(),
   accepting_new_patients: z.boolean().default(true),
   telehealth_enabled: z.boolean().default(false),
@@ -28,7 +28,7 @@ export const defaultPartnerFormValues: Partial<PartnerFormValues> = {
   email: '',
   phone: '',
   practice_name: '',
-  specialties: '', // String for the form input
+  specialties: [], // Fix: Initialize as an empty array instead of an empty string
   bio: '',
   accepting_new_patients: true,
   telehealth_enabled: false,
