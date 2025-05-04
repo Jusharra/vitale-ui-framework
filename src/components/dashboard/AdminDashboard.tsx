@@ -147,6 +147,10 @@ const AdminDashboard: React.FC = () => {
                   <Briefcase className="mr-2 h-4 w-4" />
                   <span>Manage Care Teams</span>
                 </Button>
+                <Button className="justify-start" variant="outline" onClick={() => window.location.href = "/dashboard/admin/settings"}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>System Settings</span>
+                </Button>
               </div>
             </CardContent>
           </Card>
