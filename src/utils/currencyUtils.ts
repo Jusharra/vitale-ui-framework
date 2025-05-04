@@ -76,23 +76,20 @@ export const getUserRegionalSettings = async (userId: string | null): Promise<{
   currency: Currency;
   multiplier: number;
 }> => {
+  // Default values if user is not logged in or no custom settings
+  const defaultSettings = {
+    region: 'North America' as Region,
+    currency: 'USD' as Currency,
+    multiplier: 1.0,
+  };
+  
   if (!userId) {
-    return {
-      region: 'North America',
-      currency: 'USD',
-      multiplier: 1.0,
-    };
+    return defaultSettings;
   }
   
   try {
-    // In a real implementation, this would fetch from a user_preferences table
     // Since the user_preferences table doesn't have region and currency columns yet,
-    // we'll return default values
-    const defaultSettings = {
-      region: 'North America' as Region,
-      currency: 'USD' as Currency,
-      multiplier: 1.0,
-    };
+    // we'll return default values instead of trying to query them
     
     // Find the appropriate pricing details based on region
     const pricingDetails = defaultRegionalPricing.find(
@@ -106,10 +103,6 @@ export const getUserRegionalSettings = async (userId: string | null): Promise<{
     };
   } catch (error) {
     console.error('Error fetching user regional settings:', error);
-    return {
-      region: 'North America',
-      currency: 'USD',
-      multiplier: 1.0,
-    };
+    return defaultSettings;
   }
 };

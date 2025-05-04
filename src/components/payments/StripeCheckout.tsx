@@ -8,6 +8,8 @@ interface StripeCheckoutProps {
   buttonText?: string;
   onSuccess?: () => void;
   onCancel?: () => void;
+  tier?: "smart" | "core" | "vip";
+  variant?: string;
 }
 
 const StripeCheckout: React.FC<StripeCheckoutProps> = ({
@@ -15,15 +17,23 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
   description = 'Payment',
   buttonText = 'Pay Now',
   onSuccess,
-  onCancel
+  onCancel,
+  tier,
+  variant = 'default'
 }) => {
   const handleClick = () => {
+    console.log(`Stripe checkout would open here for tier: ${tier}`);
     // In a real implementation, this would open the Stripe checkout
-    console.log('Stripe checkout would open here');
   };
 
   return (
-    <Button onClick={handleClick}>{buttonText}</Button>
+    <Button 
+      onClick={handleClick} 
+      variant={variant as any}
+      className="w-full"
+    >
+      {buttonText} {tier && tier.charAt(0).toUpperCase() + tier.slice(1)}
+    </Button>
   );
 };
 
