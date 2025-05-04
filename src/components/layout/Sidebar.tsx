@@ -1,3 +1,4 @@
+
 import React from "react";
 import { NavLink } from 'react-router-dom';
 import { 
@@ -18,7 +19,12 @@ import {
   Truck, 
   Palmtree,
   Gift, 
-  Tag
+  Tag,
+  BarChart2 as BarChart,
+  Heart,
+  Clipboard,
+  BadgeDollar as BadgeDollarSign,
+  Gauge as GaugeIcon
 } from 'lucide-react';
 import { 
   Sidebar as SidebarContainer, 
@@ -73,9 +79,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
       <SidebarLink to="/dashboard/medical-transport" icon={Truck}>Medical Transport</SidebarLink>
       <SidebarLink to="/dashboard/service-booking" icon={ShoppingCart}>Services</SidebarLink>
       <SidebarLink to="/dashboard/vacations" icon={Palmtree}>Vacations</SidebarLink>
-      {/* Add Share & Earn link */}
       <SidebarLink to="/dashboard/share-and-earn" icon={Gift}>Share & Earn</SidebarLink>
-      {/* Add Promotions link */}
       <SidebarLink to="/dashboard/promotions" icon={Tag}>Promotions</SidebarLink>
       <SidebarLink to="/dashboard/messages" icon={MessageSquare}>Messages</SidebarLink>
       <SidebarLink to="/dashboard/membership" icon={CreditCard}>Membership</SidebarLink>
@@ -84,12 +88,12 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
 
   const renderProfessionalLinks = () => (
     <>
-      <SidebarLink to="/dashboard/professional" icon={Gauge}>Dashboard</SidebarLink>
+      <SidebarLink to="/dashboard/professional" icon={GaugeIcon}>Dashboard</SidebarLink>
       <SidebarLink to="/dashboard/professional/calendar" icon={Calendar}>Calendar</SidebarLink>
-      <SidebarLink to="/dashboard/professional/requests" icon={ClipboardList}>Patient Requests</SidebarLink>
+      <SidebarLink to="/dashboard/professional/requests" icon={Clipboard}>Patient Requests</SidebarLink>
       <SidebarLink to="/dashboard/professional/member-manager" icon={Users}>Member Manager</SidebarLink>
       <SidebarLink to="/dashboard/professional/message-center" icon={MessageSquare}>Message Center</SidebarLink>
-      <SidebarLink to="/dashboard/professional/tools" icon={Stethoscope}>Tools of the Trade</SidebarLink>
+      <SidebarLink to="/dashboard/professional/tools" icon={Pill}>Tools of the Trade</SidebarLink>
       <SidebarLink to="/dashboard/professional/earnings" icon={BadgeDollarSign}>Earnings</SidebarLink>
       <SidebarLink to="/dashboard/professional/profile" icon={User}>Profile Settings</SidebarLink>
     </>
@@ -97,7 +101,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
 
   const renderAdminLinks = () => (
     <>
-      <SidebarLink to="/dashboard/admin" icon={Gauge}>Overview</SidebarLink>
+      <SidebarLink to="/dashboard/admin" icon={GaugeIcon}>Overview</SidebarLink>
       <SidebarLink to="/dashboard/admin/vacations" icon={Palmtree}>Vacations</SidebarLink>
       <SidebarLink to="/dashboard/admin/promotions" icon={Gift}>Promotions</SidebarLink>
       <SidebarLink to="/dashboard/admin/leads" icon={BarChart}>Leads & Analytics</SidebarLink>

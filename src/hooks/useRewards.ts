@@ -11,7 +11,7 @@ interface Reward {
   reward_type: string;
   value: number;
   expires_at: string;
-  status: 'available' | 'limited' | 'unavailable';
+  status: 'available' | 'limited' | 'unavailable' | string; // Allow string to accommodate DB values
   claimed?: boolean;
 }
 
@@ -88,7 +88,7 @@ export const useRewards = (): UseRewardsReturn => {
       const availableRewards = rewardsData?.map(reward => ({
         ...reward,
         claimed: claimedRewardIds.includes(reward.id)
-      })) || [];
+      })) as Reward[] || [];
       
       // Fetch reward transactions history
       const { data: historyData, error: historyError } = await supabase

@@ -1,10 +1,11 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import IndexPage from '@/pages/IndexPage';
+import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
 import Dashboard from '@/pages/Dashboard';
 import NotFound from '@/pages/NotFound';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import AdminPage from '@/pages/AdminDashboard';
@@ -15,14 +16,14 @@ import AdminCareTeamsPage from '@/pages/admin/AdminCareTeamsPage';
 import AdminHealthToolsPage from '@/pages/admin/AdminHealthToolsPage';
 import AdminSettingsPage from '@/pages/admin/AdminSettingsPage';
 import ProfessionalPage from '@/pages/ProfessionalDashboard';
-import MemberConciergePage from '@/pages/member/MemberConciergePage';
-import MemberPharmacyPage from '@/pages/member/MemberPharmacyPage';
-import MemberMedicalTransportPage from '@/pages/member/MemberMedicalTransportPage';
-import MemberServiceBookingPage from '@/pages/member/MemberServiceBookingPage';
-import MemberVacationsPage from '@/pages/member/MemberVacationsPage';
-import MemberHealthInsightsPage from '@/pages/member/MemberHealthInsightsPage';
-import MemberMessagesPage from '@/pages/member/MemberMessagesPage';
-import MemberMembershipPage from '@/pages/member/MemberMembershipPage';
+import MemberConciergePage from '@/pages/member/Concierge';
+import MemberPharmacyPage from '@/pages/member/Pharmacy';
+import MemberMedicalTransportPage from '@/pages/member/MedicalTransport';
+import MemberServiceBookingPage from '@/pages/member/ServiceBooking';
+import MemberVacationsPage from '@/pages/member/Vacations';
+import MemberHealthInsightsPage from '@/pages/member/HealthInsights';
+import MemberMessagesPage from '@/pages/member/Messages';
+import MemberMembershipPage from '@/pages/member/Membership';
 import MemberPromotionsPage from '@/pages/member/Promotions';
 import ShareAndEarn from '@/pages/member/ShareAndEarn';
 import { AuthProvider } from '@/context/AuthContext';
@@ -34,7 +35,7 @@ const App: React.FC = () => {
         <ThemeProvider defaultTheme="light" storageKey="vitale-ui-theme">
           <Toaster />
           <Routes>
-            <Route path="/" element={<IndexPage />} />
+            <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             
             {/* Member routes */}

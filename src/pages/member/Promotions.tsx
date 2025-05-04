@@ -21,6 +21,25 @@ interface Promotion {
   image: string;
 }
 
+// Define a type for the server promotion data
+interface ServerPromotion {
+  id: string;
+  title: string;
+  type: string;
+  description?: string;
+  expires_at?: string;
+  target_audience?: "smart" | "core" | "vip";
+  image_url?: string;
+  reward_amount: number;
+  service_id?: string;
+  partner_id?: string;
+  redemption_limit: number;
+  redemptions_used: number;
+  created_at: string;
+  status: string;
+  terms_conditions?: string;
+}
+
 const Promotions = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -47,7 +66,7 @@ const Promotions = () => {
       
       if (data && data.length > 0) {
         // Transform the data to match our interface
-        const formattedPromotions = data.map(promo => ({
+        const formattedPromotions = (data as ServerPromotion[]).map(promo => ({
           id: promo.id,
           title: promo.title,
           category: promo.type,
