@@ -45,7 +45,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // Check tier if required (only applies to members)
-  if (requiredTier && userRole === 'member') {
+  // Admins always bypass tier restrictions
+  if (requiredTier && userRole === 'member' && userRole !== 'admin') {
     const tierLevels = {
       'smart': 1,
       'core': 2,

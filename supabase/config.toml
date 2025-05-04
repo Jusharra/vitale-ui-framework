@@ -1,5 +1,19 @@
 
+# This is the Supabase project configuration file
 project_id = "ogmqiiyksylbpeixhhmm"
 
-[functions.stripe-webhooks]
+[api]
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[[functions]]
 verify_jwt = false
+name = "health-check"
+schema = "public"
+
+[[functions]]
+verify_jwt = true
+name = "admin-reset-password"
+schema = "public"

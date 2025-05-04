@@ -540,6 +540,126 @@ export type Database = {
         }
         Relationships: []
       }
+      media_asset_permissions: {
+        Row: {
+          asset_id: string
+          created_at: string | null
+          id: string
+          permission_type: string
+          shared_with: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string | null
+          id?: string
+          permission_type: string
+          shared_with?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string | null
+          id?: string
+          permission_type?: string
+          shared_with?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_asset_permissions_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_asset_permissions_shared_with_fkey"
+            columns: ["shared_with"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_assets: {
+        Row: {
+          asset_type: string
+          category: string
+          created_at: string | null
+          description: string | null
+          file_path: string
+          file_size: number | null
+          file_type: string
+          id: string
+          is_master: boolean | null
+          is_source: boolean | null
+          metadata: Json | null
+          original_filename: string
+          parent_id: string | null
+          profile_id: string | null
+          storage_type: string | null
+          title: string
+          updated_at: string | null
+          version: number | null
+        }
+        Insert: {
+          asset_type: string
+          category: string
+          created_at?: string | null
+          description?: string | null
+          file_path: string
+          file_size?: number | null
+          file_type: string
+          id?: string
+          is_master?: boolean | null
+          is_source?: boolean | null
+          metadata?: Json | null
+          original_filename: string
+          parent_id?: string | null
+          profile_id?: string | null
+          storage_type?: string | null
+          title: string
+          updated_at?: string | null
+          version?: number | null
+        }
+        Update: {
+          asset_type?: string
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          file_path?: string
+          file_size?: number | null
+          file_type?: string
+          id?: string
+          is_master?: boolean | null
+          is_source?: boolean | null
+          metadata?: Json | null
+          original_filename?: string
+          parent_id?: string | null
+          profile_id?: string | null
+          storage_type?: string | null
+          title?: string
+          updated_at?: string | null
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_assets_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "media_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_assets_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medications: {
         Row: {
           created_at: string | null

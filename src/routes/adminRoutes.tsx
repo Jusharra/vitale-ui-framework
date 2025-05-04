@@ -8,6 +8,7 @@ import AdminLeadsPage from '@/pages/admin/AdminLeadsPage';
 import AdminCareTeamsPage from '@/pages/admin/AdminCareTeamsPage';
 import AdminHealthToolsPage from '@/pages/admin/AdminHealthToolsPage';
 import AdminSettingsPage from '@/pages/admin/AdminSettingsPage';
+import AdminMediaAssetsPage from '@/pages/admin/AdminMediaAssetsPage';
 
 // Admin routes to be added to the App.tsx Routes component
 const AdminRoutes = (
@@ -19,6 +20,7 @@ const AdminRoutes = (
     <Route path="/dashboard/admin/care-teams" element={<AdminCareTeamsPage />} />
     <Route path="/dashboard/admin/health-tools" element={<AdminHealthToolsPage />} />
     <Route path="/dashboard/admin/settings" element={<AdminSettingsPage />} />
+    <Route path="/dashboard/admin/media-assets" element={<AdminMediaAssetsPage />} />
   </>
 );
 

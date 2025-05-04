@@ -6,11 +6,26 @@ import { supabase } from '@/integrations/supabase/client';
  * Base hook that provides the core tool access checking functionality
  */
 export function useToolAccess() {
-  // Check tool access based on membership tier
+  // Check tool access based on membership tier or admin role
   const hasToolAccess = useCallback(async (userId: string | null, toolName: string): Promise<boolean> => {
     if (!userId) return false;
     
     try {
+      // First check if user is admin
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', userId)
+        .single();
+      
+      if (userError) {
+        console.error("Error checking user role:", userError);
+      } else if (userData?.role === 'admin') {
+        // Admins have access to all tools
+        return true;
+      }
+      
+      // If not admin, check tool access based on membership tier
       const { data } = await supabase.rpc('check_tool_access', {
         user_id: userId,
         tool_name: toolName
