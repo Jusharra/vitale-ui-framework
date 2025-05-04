@@ -12,7 +12,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Transport } from '@/components/admin/care-teams/useCareTeamsData';
-import { useToolAccess } from '@/hooks/useToolAccess';
+import { useAccessCheck } from '@/hooks/useToolAccess';
+import { useAuth } from '@/context/AuthContext';
 
 // Form schema for medical transport booking
 export const transportFormSchema = z.object({
@@ -38,7 +39,8 @@ const TransportBookingForm: React.FC<TransportBookingFormProps> = ({
   isLoading, 
   onSubmit 
 }) => {
-  const { hasAccess: hasVipTransport } = useToolAccess('vip_transport');
+  const { user } = useAuth();
+  const { hasAccess: hasVipTransport } = useAccessCheck(user?.id || null, 'vip_transport');
   
   const form = useForm<TransportFormValues>({
     resolver: zodResolver(transportFormSchema),

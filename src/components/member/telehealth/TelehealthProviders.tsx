@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
-import { useToolAccess } from "@/hooks/useToolAccess";
+import { useAccessCheck } from "@/hooks/useToolAccess";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface Provider {
@@ -29,8 +29,8 @@ interface Provider {
 const TelehealthProviders = () => {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { profile } = useAuth();
-  const { hasAccess } = useToolAccess('telehealth');
+  const { profile, user } = useAuth();
+  const { hasAccess } = useAccessCheck(user?.id || null, 'telehealth');
 
   useEffect(() => {
     const fetchProviders = async () => {

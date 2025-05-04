@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ import { format, isToday } from 'date-fns';
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
-import useToolAccess from "@/hooks/useToolAccess";
+import { useAccessCheck } from "@/hooks/useToolAccess";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface TelehealthSession {
@@ -28,10 +27,10 @@ interface TelehealthSession {
 }
 
 const UpcomingTelehealthSessions = () => {
-  const [sessions, setSessions] = useState<TelehealthSession[]>([]);
+  const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { profile } = useAuth();
-  const { hasAccess } = useToolAccess('telehealth');
+  const { profile, user } = useAuth();
+  const { hasAccess } = useAccessCheck(user?.id || null, 'telehealth');
 
   useEffect(() => {
     const fetchSessions = async () => {

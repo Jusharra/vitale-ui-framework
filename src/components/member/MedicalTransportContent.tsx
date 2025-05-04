@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
-import { useToolAccess } from '@/hooks/useToolAccess';
+import { useAccessCheck } from '@/hooks/useToolAccess';
 import { Transport } from '@/components/admin/care-teams/useCareTeamsData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import AccessDeniedCard from './transport/AccessDeniedCard';
@@ -17,9 +17,9 @@ const MedicalTransportContent: React.FC = () => {
   const [transportProviders, setTransportProviders] = useState<Transport[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<Transport | null>(null);
-  const { membershipTier } = useAuth();
-  const { hasAccess } = useToolAccess('medical_transport');
-  const { hasAccess: hasVipTransport } = useToolAccess('vip_transport');
+  const { membershipTier, user } = useAuth();
+  const { hasAccess } = useAccessCheck(user?.id || null, 'medical_transport');
+  const { hasAccess: hasVipTransport } = useAccessCheck(user?.id || null, 'vip_transport');
   
   const [formValues, setFormValues] = useState<TransportFormValues | null>(null);
 
