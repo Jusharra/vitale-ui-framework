@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -34,7 +33,9 @@ import {
   ChevronRight,
   Filter,
   Check,
-  X
+  X,
+  UserPlus,
+  Pill
 } from 'lucide-react';
 import {
   Dialog,
@@ -45,6 +46,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import AddPartnerDialog from './dialogs/AddPartnerDialog';
+import AddPharmacyDialog from './dialogs/AddPharmacyDialog';
 
 const AdminCareTeams = () => {
   const [partners, setPartners] = useState([]);
@@ -52,43 +55,45 @@ const AdminCareTeams = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('partners');
+  const [isPartnerDialogOpen, setIsPartnerDialogOpen] = useState(false);
+  const [isPharmacyDialogOpen, setIsPharmacyDialogOpen] = useState(false);
   
   const { toast } = useToast();
 
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      // Fetch partners
+      const { data: partnersData, error: partnersError } = await supabase
+        .from('partners')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (partnersError) throw partnersError;
+      setPartners(partnersData || []);
+      
+      // Fetch pharmacies
+      const { data: pharmaciesData, error: pharmaciesError } = await supabase
+        .from('pharmacies')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (pharmaciesError) throw pharmaciesError;
+      setPharmacies(pharmaciesData || []);
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load team data',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        // Fetch partners
-        const { data: partnersData, error: partnersError } = await supabase
-          .from('partners')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (partnersError) throw partnersError;
-        setPartners(partnersData || []);
-        
-        // Fetch pharmacies
-        const { data: pharmaciesData, error: pharmaciesError } = await supabase
-          .from('pharmacies')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (pharmaciesError) throw pharmaciesError;
-        setPharmacies(pharmaciesData || []);
-
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load team data',
-          variant: 'destructive',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchData();
   }, [toast]);
 
@@ -114,6 +119,14 @@ const AdminCareTeams = () => {
       .slice(0, 2);
   };
 
+  const handleAddProvider = () => {
+    if (activeTab === 'partners') {
+      setIsPartnerDialogOpen(true);
+    } else {
+      setIsPharmacyDialogOpen(true);
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -132,9 +145,9 @@ const AdminCareTeams = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button>
+          <Button onClick={handleAddProvider}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Provider
+            {activeTab === 'partners' ? 'Add Healthcare Provider' : 'Add Pharmacy'}
           </Button>
         </div>
       </CardHeader>
@@ -142,11 +155,11 @@ const AdminCareTeams = () => {
         <Tabs defaultValue="partners" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="partners" className="flex gap-2 items-center">
-              <Briefcase className="h-4 w-4" />
+              <UserPlus className="h-4 w-4" />
               <span>Healthcare Professionals</span>
             </TabsTrigger>
             <TabsTrigger value="pharmacies" className="flex gap-2 items-center">
-              <ShieldCheck className="h-4 w-4" />
+              <Pill className="h-4 w-4" />
               <span>Pharmacies</span>
             </TabsTrigger>
           </TabsList>
@@ -317,6 +330,18 @@ const AdminCareTeams = () => {
           </TabsContent>
         </Tabs>
       </CardContent>
+      
+      <AddPartnerDialog 
+        open={isPartnerDialogOpen} 
+        onOpenChange={setIsPartnerDialogOpen} 
+        onSuccess={fetchData} 
+      />
+      
+      <AddPharmacyDialog 
+        open={isPharmacyDialogOpen} 
+        onOpenChange={setIsPharmacyDialogOpen} 
+        onSuccess={fetchData} 
+      />
     </Card>
   );
 };
