@@ -37,6 +37,9 @@ const MedicalTransportContent: React.FC = () => {
   const [transportProviders, setTransportProviders] = useState<Transport[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<Transport | null>(null);
+  const { membershipTier } = useAuth();
+  const { hasAccess } = useToolAccess('medical_transport');
+  const { hasAccess: hasVipTransport } = useToolAccess('vip_transport');
   
   const form = useForm<TransportFormValues>({
     resolver: zodResolver(formSchema),
@@ -113,6 +116,29 @@ const MedicalTransportContent: React.FC = () => {
       setStep(1);
     }, 2000);
   };
+
+  if (!hasAccess) {
+    return (
+      <Card className="bg-muted/50 border-dashed">
+        <CardHeader>
+          <CardTitle>Premium Feature: Medical Transport</CardTitle>
+          <CardDescription>
+            Medical transport booking is available to Core and VIP members.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center py-6 text-center">
+            <Car className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium mb-2">Upgrade to Core Concierge</h3>
+            <p className="text-muted-foreground mb-4">
+              Get access to medical transport services and coordination.
+            </p>
+            <Button>Upgrade Membership</Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -247,10 +273,19 @@ const MedicalTransportContent: React.FC = () => {
                               <SelectItem value="standard">Standard Vehicle</SelectItem>
                               <SelectItem value="wheelchair">Wheelchair Accessible</SelectItem>
                               <SelectItem value="stretcher">Stretcher Service</SelectItem>
-                              <SelectItem value="luxury">Luxury Vehicle</SelectItem>
-                              <SelectItem value="ambulance">Non-Emergency Ambulance</SelectItem>
+                              {hasVipTransport && (
+                                <>
+                                  <SelectItem value="luxury">Luxury Vehicle</SelectItem>
+                                  <SelectItem value="ambulance">Non-Emergency Ambulance</SelectItem>
+                                </>
+                              )}
                             </SelectContent>
                           </Select>
+                          {!hasVipTransport && (
+                            <FormDescription>
+                              Upgrade to VIP for luxury vehicle and non-emergency ambulance options
+                            </FormDescription>
+                          )}
                           <FormMessage />
                         </FormItem>
                       )}
@@ -349,7 +384,15 @@ const MedicalTransportContent: React.FC = () => {
                   <Separator className="my-2" />
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Estimated Price:</span>
-                    <span className="font-medium">$75.00</span>
+                    <span className="font-medium">
+                      {membershipTier === "vip" ? (
+                        <span className="flex items-center gap-1">
+                          <s>$75.00</s> <span className="text-green-600">$0.00 (VIP Benefit)</span>
+                        </span>
+                      ) : (
+                        "$75.00"
+                      )}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -359,6 +402,7 @@ const MedicalTransportContent: React.FC = () => {
                   <h3 className="font-medium mb-2">Payment Method</h3>
                   <p className="text-sm text-muted-foreground">
                     This would connect to Stripe for secure payment processing in a real implementation.
+                    {membershipTier === "vip" && " As a VIP member, your transport is complimentary."}
                   </p>
                 </div>
               </div>
@@ -366,7 +410,42 @@ const MedicalTransportContent: React.FC = () => {
           </CardContent>
           <CardFooter className="flex gap-4 justify-end">
             <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
-            <Button onClick={handlePayment}>Complete Payment</Button>
+            <Button onClick={handlePayment}>
+              {membershipTier === "vip" ? "Confirm Booking" : "Complete Payment"}
+            </Button>
+          </CardFooter>
+        </Card>
+      )}
+
+      {hasVipTransport && (
+        <Card className="mt-6 bg-gradient-to-br from-purple-50 to-indigo-50 border-primary/20">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle>VIP Transport Concierge</CardTitle>
+              <Badge className="bg-primary/20 text-primary">VIP Exclusive</Badge>
+            </div>
+            <CardDescription>
+              Let our AI assistant coordinate your medical transport needs
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-6">
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <Activity className="h-10 w-10 text-primary mb-2" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-medium text-lg">Automated Transport Service</h3>
+                <p className="text-sm text-muted-foreground">
+                  As a VIP member, our AI assistant can automatically coordinate transport after your
+                  symptom triage or appointment scheduling.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button variant="outline" className="w-full">
+              Configure AI Transport Settings
+            </Button>
           </CardFooter>
         </Card>
       )}
