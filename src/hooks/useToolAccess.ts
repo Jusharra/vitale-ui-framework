@@ -31,8 +31,8 @@ export function useToolAccess() {
  * Returns an object with hasAccess boolean and isChecking loading state
  */
 export function useAccessCheck(userId: string | null, toolName: string) {
-  const [hasAccess, setHasAccess] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
+  const [hasAccess, setHasAccess] = useState<boolean>(false);
+  const [isChecking, setIsChecking] = useState<boolean>(true);
   const { hasToolAccess } = useToolAccess();
   
   useEffect(() => {
