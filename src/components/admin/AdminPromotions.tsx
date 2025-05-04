@@ -15,7 +15,7 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { Award, Briefcase, CalendarPlus, Plus, Search, Trash2, Edit, BarChart2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
@@ -28,15 +28,9 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import AddPromotionDialog from './dialogs/AddPromotionDialog';
+import AddOfferDialog from './dialogs/AddOfferDialog';
+import AddRewardDialog from './dialogs/AddRewardDialog';
 
 const AdminPromotions: React.FC = () => {
   const [activeTab, setActiveTab] = useState('promotions');
@@ -45,53 +39,56 @@ const AdminPromotions: React.FC = () => {
   const [promotions, setPromotions] = useState([]);
   const [offers, setOffers] = useState([]);
   const [rewards, setRewards] = useState([]);
+  const [isAddPromotionOpen, setIsAddPromotionOpen] = useState(false);
+  const [isAddOfferOpen, setIsAddOfferOpen] = useState(false);
+  const [isAddRewardOpen, setIsAddRewardOpen] = useState(false);
   
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchPromotions = async () => {
-      setIsLoading(true);
-      try {
-        // Fetch promotions
-        const { data: promotionsData, error: promotionsError } = await supabase
-          .from('promotions')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (promotionsError) throw promotionsError;
-        setPromotions(promotionsData || []);
-        
-        // Fetch offers
-        const { data: offersData, error: offersError } = await supabase
-          .from('partner_offers')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (offersError) throw offersError;
-        setOffers(offersData || []);
-        
-        // Fetch rewards
-        const { data: rewardsData, error: rewardsError } = await supabase
-          .from('member_rewards')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (rewardsError) throw rewardsError;
-        setRewards(rewardsData || []);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load promotions data',
-          variant: 'destructive',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPromotions();
+    fetchData();
   }, [toast]);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      // Fetch promotions
+      const { data: promotionsData, error: promotionsError } = await supabase
+        .from('promotions')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (promotionsError) throw promotionsError;
+      setPromotions(promotionsData || []);
+      
+      // Fetch offers
+      const { data: offersData, error: offersError } = await supabase
+        .from('partner_offers')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (offersError) throw offersError;
+      setOffers(offersData || []);
+      
+      // Fetch rewards
+      const { data: rewardsData, error: rewardsError } = await supabase
+        .from('member_rewards')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (rewardsError) throw rewardsError;
+      setRewards(rewardsData || []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load promotions data',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getFilteredData = (data: any[]) => {
     if (!searchTerm) return data;
@@ -109,6 +106,22 @@ const AdminPromotions: React.FC = () => {
   const formatDate = (dateString: string) => {
     if (!dateString) return '—';
     return new Date(dateString).toLocaleDateString();
+  };
+
+  const handleAddClick = () => {
+    switch (activeTab) {
+      case 'promotions':
+        setIsAddPromotionOpen(true);
+        break;
+      case 'offers':
+        setIsAddOfferOpen(true);
+        break;
+      case 'rewards':
+        setIsAddRewardOpen(true);
+        break;
+      default:
+        break;
+    }
   };
 
   return (
@@ -129,7 +142,7 @@ const AdminPromotions: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button>
+          <Button onClick={handleAddClick}>
             <Plus className="mr-2 h-4 w-4" />
             Add New
           </Button>
@@ -342,6 +355,24 @@ const AdminPromotions: React.FC = () => {
           </TabsContent>
         </Tabs>
       </CardContent>
+
+      <AddPromotionDialog 
+        open={isAddPromotionOpen} 
+        onOpenChange={setIsAddPromotionOpen}
+        onSuccess={fetchData}
+      />
+      
+      <AddOfferDialog 
+        open={isAddOfferOpen} 
+        onOpenChange={setIsAddOfferOpen}
+        onSuccess={fetchData}
+      />
+      
+      <AddRewardDialog 
+        open={isAddRewardOpen} 
+        onOpenChange={setIsAddRewardOpen}
+        onSuccess={fetchData}
+      />
     </Card>
   );
 };
