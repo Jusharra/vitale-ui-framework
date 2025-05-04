@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -28,12 +27,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Check } from 'lucide-react';
 
+// Modified schema to make TypeScript happy with our default values
 const formSchema = z.object({
   name: z.string().min(2, 'Name is required'),
   email: z.string().email('Valid email is required'),
   phone: z.string().optional(),
   practice_name: z.string().optional(),
-  specialties: z.string().transform(val => val.split(',').map(s => s.trim())),
+  // Using preprocess to ensure we always work with a string in the form
+  specialties: z.preprocess(
+    // This ensures the input is treated as a string in the form
+    (val) => (typeof val === 'string' ? val : ''),
+    // And then we transform it to an array when submitting
+    z.string().transform(val => val.split(',').map(s => s.trim()))
+  ),
   bio: z.string().optional(),
   accepting_new_patients: z.boolean().default(true),
   telehealth_enabled: z.boolean().default(false),
@@ -56,7 +62,7 @@ const AddPartnerDialog = ({ open, onOpenChange, onSuccess }: AddPartnerDialogPro
       email: '',
       phone: '',
       practice_name: '',
-      specialties: '', // This is correct - we keep as string for input, will be transformed on submit
+      specialties: '', // Now this matches our schema's expected type
       bio: '',
       accepting_new_patients: true,
       telehealth_enabled: false,
