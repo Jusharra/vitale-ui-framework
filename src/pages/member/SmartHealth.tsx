@@ -8,9 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CircleCheck, Heart, HeartPulse, MessageSquare, Pill, ThermometerSun } from "lucide-react";
+import { useAuth } from '@/context/AuthContext';
+import { useAccessCheck } from '@/hooks/useToolAccess';
 
 const SmartHealth: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('symptom-checker');
+  const { user } = useAuth();
   
   const handleAIAction = (action: string, data: any) => {
     console.log('AI Action:', action, data);
