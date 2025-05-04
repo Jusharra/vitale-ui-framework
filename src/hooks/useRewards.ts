@@ -1,14 +1,13 @@
 
 import { useState, useEffect } from 'react';
 
-// Update the Reward interface to have status as string instead of restricted enum
 export interface Reward {
   id: string;
   name: string;
   description: string | null;
   image_url: string | null;
   value: number | null;
-  status: string; // Changed from union type to string
+  status: string; // Using string instead of union type
   expires_at: string | null;
   created_at: string | null;
   terms_conditions: string | null;
@@ -30,7 +29,7 @@ export const useRewards = () => {
     
     try {
       // Mock data response
-      const mockRewards = [
+      const mockRewards: Reward[] = [
         {
           id: '1',
           name: 'Free Hotel Night',

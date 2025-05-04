@@ -13,7 +13,7 @@ interface Promotion {
   id: string;
   title: string;
   description: string;
-  imageUrl: string; // Changed from image_url to imageUrl for consistency
+  imageUrl: string; // Changed to match what we're using in the component
   type: string;
   partner_id: string;
   service_id: string;

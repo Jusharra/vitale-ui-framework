@@ -24,7 +24,10 @@ import {
   Heart,
   Clipboard,
   BadgeDollarSign,
-  Gauge
+  Gauge,
+  FileText,
+  Download,
+  Stethoscope
 } from 'lucide-react';
 import { 
   Sidebar as SidebarContainer, 
@@ -83,6 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
       <SidebarLink to="/dashboard/promotions" icon={Tag}>Promotions</SidebarLink>
       <SidebarLink to="/dashboard/messages" icon={MessageSquare}>Messages</SidebarLink>
       <SidebarLink to="/dashboard/membership" icon={CreditCard}>Membership</SidebarLink>
+      <SidebarLink to="/dashboard/health-tools" icon={Heart}>Health Tools</SidebarLink>
     </>
   );
 
@@ -93,9 +97,10 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
       <SidebarLink to="/dashboard/professional/requests" icon={Clipboard}>Patient Requests</SidebarLink>
       <SidebarLink to="/dashboard/professional/member-manager" icon={Users}>Member Manager</SidebarLink>
       <SidebarLink to="/dashboard/professional/message-center" icon={MessageSquare}>Message Center</SidebarLink>
-      <SidebarLink to="/dashboard/professional/tools" icon={Pill}>Tools of the Trade</SidebarLink>
+      <SidebarLink to="/dashboard/professional/tools" icon={Stethoscope}>Tools of the Trade</SidebarLink>
       <SidebarLink to="/dashboard/professional/earnings" icon={BadgeDollarSign}>Earnings</SidebarLink>
       <SidebarLink to="/dashboard/professional/profile" icon={User}>Profile Settings</SidebarLink>
+      <SidebarLink to="/dashboard/professional/analytics" icon={BarChart}>Analytics</SidebarLink>
     </>
   );
 
@@ -107,6 +112,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
       <SidebarLink to="/dashboard/admin/leads" icon={BarChart}>Leads & Analytics</SidebarLink>
       <SidebarLink to="/dashboard/admin/care-teams" icon={Users}>Care Teams</SidebarLink>
       <SidebarLink to="/dashboard/admin/health-tools" icon={Heart}>Health Tools</SidebarLink>
+      <SidebarLink to="/dashboard/admin/reports" icon={FileText}>Reports</SidebarLink>
       <SidebarLink to="/dashboard/admin/settings" icon={Settings}>System Settings</SidebarLink>
     </>
   );
