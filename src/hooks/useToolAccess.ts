@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -37,9 +37,9 @@ export const useToolAccess = (toolName: string) => {
   }, [isAuthenticated, profile, toolName]);
 
   // Initial check
-  useState(() => {
+  useEffect(() => {
     checkAccess();
-  });
+  }, [checkAccess]);
 
   return { hasAccess, isLoading, checkAccess };
 };

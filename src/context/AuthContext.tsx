@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
@@ -18,7 +17,7 @@ type AuthState = {
   membershipTier: MembershipTier | null;
   isAuthenticated: boolean;
   isTrialing: boolean;
-  hasToolAccess: (toolName: string) => boolean;
+  hasToolAccess: (toolName: string) => Promise<boolean>;
 };
 
 type UserProfile = {

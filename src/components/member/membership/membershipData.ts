@@ -2,7 +2,7 @@
 // Membership tiers data
 export const membershipTiers = [
   {
-    id: "smart",
+    id: "smart" as const,
     name: "Smart Access",
     price: "$497",
     interval: "month",
@@ -23,7 +23,7 @@ export const membershipTiers = [
     ]
   },
   {
-    id: "core",
+    id: "core" as const,
     name: "Core Concierge",
     price: "$997",
     interval: "month",
@@ -45,7 +45,7 @@ export const membershipTiers = [
     popular: true
   },
   {
-    id: "vip",
+    id: "vip" as const,
     name: "VIP Executive",
     price: "$1,297",
     interval: "month",
