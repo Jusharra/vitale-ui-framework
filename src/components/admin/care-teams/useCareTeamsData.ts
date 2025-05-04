@@ -13,7 +13,7 @@ export interface Partner {
   bio?: string;
   accepting_new_patients?: boolean;
   telehealth_enabled?: boolean;
-  status?: string;
+  status: string; // Changed from optional to required to match the expected type
   profile_image?: string;
   rating?: number;
 }
@@ -47,7 +47,14 @@ export const useCareTeamsData = () => {
         .order('created_at', { ascending: false });
       
       if (partnersError) throw partnersError;
-      setPartners(partnersData || []);
+      
+      // Ensure all partners have a status property
+      const partnersWithStatus = partnersData?.map(partner => ({
+        ...partner,
+        status: partner.status || 'inactive' // Set a default status if it's missing
+      })) || [];
+      
+      setPartners(partnersWithStatus);
       
       // Fetch pharmacies
       const { data: pharmaciesData, error: pharmaciesError } = await supabase

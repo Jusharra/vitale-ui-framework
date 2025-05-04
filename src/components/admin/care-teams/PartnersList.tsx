@@ -12,17 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Check, ChevronRight, Edit, Star, X } from 'lucide-react';
-
-interface Partner {
-  id: string;
-  name: string;
-  email: string;
-  status: string;
-  rating?: number;
-  profile_image?: string;
-  specialties?: string[];
-  accepting_new_patients?: boolean;
-}
+import { Partner } from './useCareTeamsData'; // Import the Partner type from useCareTeamsData
 
 interface PartnersListProps {
   partners: Partner[];
