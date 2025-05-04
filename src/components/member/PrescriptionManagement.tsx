@@ -28,10 +28,13 @@ interface Medication {
 interface RefillRequest {
   id: string;
   medication_id: string;
-  status: 'pending' | 'approved' | 'denied';
+  status: 'pending' | 'approved' | 'denied' | string; // Updated to allow string type from database
   request_date: string;
-  delivery_type: 'mail' | 'pickup' | 'drone';
+  delivery_type: 'mail' | 'pickup' | 'drone' | string; // Updated to allow string type from database
   notes?: string;
+  approved_by?: string; // Added missing property from database
+  patient_id?: string; // Added missing property from database
+  updated_at?: string; // Added missing property from database
 }
 
 // Schema for refill request form
@@ -78,7 +81,8 @@ const PrescriptionManagement = () => {
         if (reqError) throw reqError;
         
         setMedications(medsData || []);
-        setRefillRequests(reqData || []);
+        // Cast the response to RefillRequest array since we've updated our interface
+        setRefillRequests(reqData as RefillRequest[] || []);
       } catch (error) {
         console.error('Error fetching prescriptions data:', error);
         toast({
@@ -111,7 +115,8 @@ const PrescriptionManagement = () => {
         
       if (error) throw error;
       
-      setRefillRequests(prev => [data, ...prev]);
+      // Cast the new data to RefillRequest type
+      setRefillRequests(prev => [data as RefillRequest, ...prev]);
       form.reset();
       setOpenDialog(false);
       
