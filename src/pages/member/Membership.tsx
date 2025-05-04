@@ -94,7 +94,7 @@ const Membership = () => {
             
             {/* Upgrade Alert if needed */}
             {upgradeRequired && (
-              <Alert variant="warning" className="border-yellow-300 bg-yellow-50">
+              <Alert variant="default" className="border-yellow-300 bg-yellow-50">
                 <AlertTriangle className="h-4 w-4 text-yellow-600" />
                 <AlertDescription className="text-yellow-800">
                   You attempted to access a feature that requires a higher membership tier.

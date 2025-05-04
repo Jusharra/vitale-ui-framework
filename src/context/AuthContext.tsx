@@ -1,349 +1,71 @@
 
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import type { Session, User } from "@supabase/supabase-js";
-import { useNavigate } from "react-router-dom";
-import { toast } from "@/hooks/use-toast";
+import React, { createContext, useContext, useMemo } from "react";
+import { useAuthState } from '@/hooks/useAuthState';
+import { useAuthActions } from '@/hooks/useAuthActions';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useToolAccess } from '@/hooks/useToolAccess';
+import type { UserProfile, AuthState, UserRole, MembershipTier } from '@/types/auth';
 
-// Define types for our auth state and context
-type MembershipTier = "smart" | "core" | "vip";
-type UserRole = "member" | "professional" | "admin";
-
-type AuthState = {
-  user: User | null;
-  session: Session | null;
-  profile: UserProfile | null;
-  isLoading: boolean;
-  userRole: UserRole | null;
-  membershipTier: MembershipTier | null;
-  isAuthenticated: boolean;
-  isTrialing: boolean;
-  subscription: Subscription | null;
-  hasToolAccess: (toolName: string) => Promise<boolean>;
-};
-
-type UserProfile = {
-  id: string;
-  email: string;
-  full_name?: string;
-  role: UserRole;
-  membership_tier: MembershipTier;
-  trial_status?: string;
-  trial_end_date?: string;
-};
-
-type Subscription = {
-  id: string;
-  status: string;
-  tier: MembershipTier;
-  current_period_end: number;
-  cancel_at_period_end: boolean;
-  cancel_at?: number;
-  trial_end?: number;
-  interval?: 'month' | 'year';
-};
-
-type AuthContextType = AuthState & {
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, fullName: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  updateProfile: (data: Partial<UserProfile>) => Promise<void>;
+interface AuthContextType extends AuthState {
+  signIn: (email: string, password: string) => Promise<boolean>;
+  signUp: (email: string, password: string, fullName: string) => Promise<boolean>;
+  signOut: () => Promise<boolean>;
+  updateProfile: (data: Partial<UserProfile>) => Promise<boolean>;
   refreshSubscription: () => Promise<void>;
-};
+  hasToolAccess: (toolName: string) => Promise<boolean>;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isTrialing, setIsTrialing] = useState(false);
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
-  
-  // Initialize auth state
-  useEffect(() => {
-    const initializeAuth = async () => {
-      setIsLoading(true);
-      
-      // Set up the auth state listener first
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (event, session) => {
-          setSession(session);
-          setUser(session?.user || null);
-          
-          // If user logged in or token refreshed, fetch their profile
-          if (session?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
-            // Use setTimeout to avoid potential deadlocks
-            setTimeout(() => fetchUserProfile(session.user.id), 0);
-          } else if (event === 'SIGNED_OUT') {
-            setProfile(null);
-            setSubscription(null);
-          }
-        }
-      );
-      
-      // Check for existing session
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user || null);
-      
-      if (session?.user) {
-        await fetchUserProfile(session.user.id);
-        await checkSubscription();
-      }
-      
-      setIsLoading(false);
-      
-      // Cleanup subscription
-      return () => {
-        subscription.unsubscribe();
-      };
-    };
-    
-    initializeAuth();
-  }, []);
-  
-  // Fetch user profile data
-  const fetchUserProfile = async (userId: string) => {
-    try {
-      // Fetch user data from our users table
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
-      
-      if (userError) {
-        throw userError;
-      }
-      
-      if (userData) {
-        const userProfile: UserProfile = {
-          id: userData.id,
-          email: userData.email,
-          role: userData.role as UserRole,
-          membership_tier: userData.membership_tier as MembershipTier,
-          trial_status: userData.trial_status,
-          trial_end_date: userData.trial_end_date,
-        };
-        
-        // Fetch additional profile info
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('id', userId)
-          .single();
-        
-        if (profileData) {
-          userProfile.full_name = profileData.full_name;
-        }
-        
-        setProfile(userProfile);
-        
-        // Check if user is in trial period
-        if (userData.trial_status === 'active' && userData.trial_end_date) {
-          const trialEndDate = new Date(userData.trial_end_date);
-          setIsTrialing(trialEndDate > new Date());
-        } else {
-          setIsTrialing(false);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load user profile data",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Check and update subscription data
-  const checkSubscription = async () => {
-    if (!user) return;
-    
-    try {
-      const { data, error } = await supabase.functions.invoke('check-subscription');
-      
-      if (error) throw error;
-      
-      if (data?.subscription) {
-        setSubscription(data.subscription);
-      } else {
-        setSubscription(null);
-      }
-
-      // Update trial status based on subscription data
-      if (data?.isTrialing !== undefined) {
-        setIsTrialing(data.isTrialing);
-      }
-      
-    } catch (error) {
-      console.error("Error checking subscription:", error);
-    }
-  };
-  
-  const refreshSubscription = async () => {
-    await checkSubscription();
-  };
-  
-  // Check tool access based on membership tier
-  const hasToolAccess = async (toolName: string): Promise<boolean> => {
-    if (!profile) return false;
-    
-    try {
-      const { data } = await supabase.rpc('check_tool_access', {
-        user_id: profile.id,
-        tool_name: toolName
-      });
-      
-      return !!data;
-    } catch (error) {
-      console.error(`Error checking access for ${toolName}:`, error);
-      return false;
-    }
-  };
-  
-  // Sign in with email and password
-  const signIn = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email, password
-      });
-      
-      if (error) throw error;
-      
-      navigate('/dashboard');
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully signed in",
-      });
-      
-    } catch (error: any) {
-      toast({
-        title: "Sign in failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  // Sign up with email and password
-  const signUp = async (email: string, password: string, fullName: string) => {
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            role: 'member',
-          },
-        },
-      });
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Account created",
-        description: "Welcome to Vitale Health Concierge! Your 14-day trial has started.",
-      });
-      
-      // Redirect to dashboard after signup
-      navigate('/dashboard');
-      
-    } catch (error: any) {
-      toast({
-        title: "Sign up failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  // Sign out
-  const signOut = async () => {
-    setIsLoading(true);
-    try {
-      await supabase.auth.signOut();
-      navigate('/');
-      toast({
-        title: "Signed out",
-        description: "You have been signed out successfully",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to sign out",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  // Update user profile
-  const updateProfile = async (data: Partial<UserProfile>) => {
-    if (!user) return;
-    
-    try {
-      // Update profiles table first
-      if (data.full_name) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({ full_name: data.full_name })
-          .eq('id', user.id);
-          
-        if (profileError) throw profileError;
-      }
-      
-      // Then update users table if needed
-      const userUpdates: any = {};
-      
-      if (data.role) userUpdates.role = data.role;
-      if (data.membership_tier) userUpdates.membership_tier = data.membership_tier;
-      
-      if (Object.keys(userUpdates).length > 0) {
-        const { error: userError } = await supabase
-          .from('users')
-          .update(userUpdates)
-          .eq('id', user.id);
-          
-        if (userError) throw userError;
-      }
-      
-      // Refresh profile
-      await fetchUserProfile(user.id);
-      
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully",
-      });
-      
-    } catch (error: any) {
-      toast({
-        title: "Update failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-  
-  const value = {
+  const {
     user,
     session,
     profile,
     isLoading,
-    userRole: profile?.role || null,
-    membershipTier: profile?.membership_tier || null,
+    isTrialing: authIsTrialing,
+    fetchUserProfile
+  } = useAuthState();
+
+  const { subscription, isTrialing: subscriptionIsTrialing, refreshSubscription } = 
+    useSubscription(user?.id || null);
+  
+  const { hasToolAccess } = useToolAccess();
+  
+  const {
+    signIn,
+    signUp,
+    signOut,
+    updateProfile: updateUserProfile
+  } = useAuthActions();
+  
+  // Combine trial status from both auth and subscription
+  const isTrialing = authIsTrialing || subscriptionIsTrialing;
+
+  // Update profile wrapper
+  const updateProfile = async (data: Partial<UserProfile>) => {
+    if (!user) return false;
+    
+    const success = await updateUserProfile(user.id, data);
+    if (success) {
+      await fetchUserProfile(user.id);
+    }
+    return success;
+  };
+
+  // Cache the tool access check with user ID
+  const checkToolAccess = async (toolName: string): Promise<boolean> => {
+    return hasToolAccess(user?.id || null, toolName);
+  };
+
+  // Create a stable context value with useMemo to prevent unnecessary re-renders
+  const value = useMemo(() => ({
+    user,
+    session,
+    profile,
+    isLoading,
+    userRole: profile?.role || null as UserRole | null,
+    membershipTier: profile?.membership_tier || null as MembershipTier | null,
     isAuthenticated: !!user,
     isTrialing,
     subscription,
@@ -351,10 +73,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signUp,
     signOut,
     updateProfile,
-    hasToolAccess,
+    hasToolAccess: checkToolAccess,
     refreshSubscription
-  };
-  
+  }), [
+    user, 
+    session, 
+    profile, 
+    isLoading, 
+    isTrialing, 
+    subscription,
+    signIn,
+    signUp,
+    signOut
+  ]);
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 

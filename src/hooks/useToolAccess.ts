@@ -1,47 +1,23 @@
 
-import { useState, useCallback, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
-export const useToolAccess = (toolName: string) => {
-  const { isAuthenticated, profile } = useAuth();
-  const [hasAccess, setHasAccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Convert to async function that returns a Promise
-  const checkAccess = useCallback(async () => {
-    if (!isAuthenticated || !profile) {
-      setHasAccess(false);
-      setIsLoading(false);
-      return false;
-    }
-
+export function useToolAccess() {
+  // Check tool access based on membership tier
+  const hasToolAccess = async (userId: string | null, toolName: string): Promise<boolean> => {
+    if (!userId) return false;
+    
     try {
-      setIsLoading(true);
-      const { data, error } = await supabase.rpc('check_tool_access', {
-        user_id: profile.id,
+      const { data } = await supabase.rpc('check_tool_access', {
+        user_id: userId,
         tool_name: toolName
       });
-
-      if (error) throw error;
-      const hasToolAccess = !!data;
-      setHasAccess(hasToolAccess);
-      return hasToolAccess;
+      
+      return !!data;
     } catch (error) {
-      console.error(`Error checking access for tool ${toolName}:`, error);
-      setHasAccess(false);
+      console.error(`Error checking access for ${toolName}:`, error);
       return false;
-    } finally {
-      setIsLoading(false);
     }
-  }, [isAuthenticated, profile, toolName]);
+  };
 
-  // Initial check
-  useEffect(() => {
-    checkAccess();
-  }, [checkAccess]);
-
-  return { hasAccess, isLoading, checkAccess };
-};
-
-export default useToolAccess;
+  return { hasToolAccess };
+}
