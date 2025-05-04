@@ -28,7 +28,16 @@ export const useRewards = () => {
     setError(null);
     
     try {
-      // Mock data response
+      // This would be a Supabase query in a real implementation
+      // const { data, error } = await supabase
+      //   .from('member_rewards')
+      //   .select('*')
+      //   .eq('status', 'available');
+      
+      // if (error) throw error;
+      // setRewards(data || []);
+      
+      // Temporary mock data
       const mockRewards: Reward[] = [
         {
           id: '1',
