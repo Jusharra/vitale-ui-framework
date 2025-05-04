@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
-import useToolAccess from '@/hooks/useToolAccess';
+import { useToolAccess } from '@/hooks/useToolAccess';
 import { Transport } from '@/components/admin/care-teams/useCareTeamsData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import AccessDeniedCard from './transport/AccessDeniedCard';

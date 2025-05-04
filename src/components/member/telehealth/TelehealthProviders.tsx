@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
-import useToolAccess from "@/hooks/useToolAccess";
+import { useToolAccess } from "@/hooks/useToolAccess";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface Provider {

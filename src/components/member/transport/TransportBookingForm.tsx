@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -13,7 +12,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Transport } from '@/components/admin/care-teams/useCareTeamsData';
-import useToolAccess from '@/hooks/useToolAccess';
+import { useToolAccess } from '@/hooks/useToolAccess';
 
 // Form schema for medical transport booking
 export const transportFormSchema = z.object({
