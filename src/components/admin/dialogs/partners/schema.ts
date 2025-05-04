@@ -33,3 +33,7 @@ export const defaultPartnerFormValues: Partial<PartnerFormValues> = {
   accepting_new_patients: true,
   telehealth_enabled: false,
 };
+
+// Export a specific type for the form's internal use
+export type PartnerFormSpecialties = string;
+
