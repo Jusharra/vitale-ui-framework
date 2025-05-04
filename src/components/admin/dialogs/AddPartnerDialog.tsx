@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -55,7 +56,7 @@ const AddPartnerDialog = ({ open, onOpenChange, onSuccess }: AddPartnerDialogPro
       email: '',
       phone: '',
       practice_name: '',
-      specialties: '', // Keep as string for input, will be transformed to array on submit
+      specialties: '', // This is correct - we keep as string for input, will be transformed on submit
       bio: '',
       accepting_new_patients: true,
       telehealth_enabled: false,
