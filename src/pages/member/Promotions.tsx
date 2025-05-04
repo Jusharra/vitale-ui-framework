@@ -1,323 +1,221 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import MemberPageLayout from '@/components/layout/MemberPageLayout';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Heart, Pill, ThermometerSun } from 'lucide-react';
-import MembershipBadge from '@/components/common/MembershipBadge';
-import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Gift, Calendar, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
 
 interface Promotion {
   id: string;
   title: string;
-  category: string;
   description: string;
-  validUntil: string;
-  requiredTier: "smart" | "core" | "vip";
-  image: string;
-}
-
-// Define a type for the server promotion data
-interface ServerPromotion {
-  id: string;
-  title: string;
+  imageUrl: string; // Changed from image_url to imageUrl for consistency
   type: string;
-  description?: string;
-  expires_at?: string;
-  target_audience?: "smart" | "core" | "vip";
-  image_url?: string;
-  reward_amount: number;
-  service_id?: string;
-  partner_id?: string;
+  partner_id: string;
+  service_id: string;
+  start_date: string;
+  expires_at: string;
+  tier_eligibility: 'smart' | 'core' | 'vip' | 'all';
   redemption_limit: number;
   redemptions_used: number;
+  reward_amount: number;
   created_at: string;
-  status: string;
-  terms_conditions?: string;
 }
 
-const Promotions = () => {
-  const [activeTab, setActiveTab] = useState("all");
+const MemberPromotionsPage: React.FC = () => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { membershipTier } = useAuth();
+  const [activeTab, setActiveTab] = useState('all');
   const { toast } = useToast();
+  const { membershipTier } = useAuth();
   
-  // If membershipTier is null (not loaded yet), use "smart" as default
-  const userMembership = membershipTier || "smart"; 
-
   useEffect(() => {
-    fetchPromotions();
+    // Simulate loading promotions from API
+    const mockPromotions: Promotion[] = [
+      {
+        id: '1',
+        title: 'Premium Health Insurance Discount',
+        description: 'Get 15% off on premium health insurance plans from our trusted partners.',
+        imageUrl: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+        type: 'insurance',
+        partner_id: '123',
+        service_id: '456',
+        start_date: '2025-04-01',
+        expires_at: '2025-06-30',
+        tier_eligibility: 'all',
+        redemption_limit: 100,
+        redemptions_used: 45,
+        reward_amount: 15,
+        created_at: '2025-03-15'
+      },
+      {
+        id: '2',
+        title: 'Exclusive Resort Package',
+        description: 'Enjoy a 3-night stay at a luxury resort with 20% discount on all spa treatments.',
+        imageUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+        type: 'vacation',
+        partner_id: '789',
+        service_id: '012',
+        start_date: '2025-05-01',
+        expires_at: '2025-08-31',
+        tier_eligibility: 'vip',
+        redemption_limit: 50,
+        redemptions_used: 12,
+        reward_amount: 20,
+        created_at: '2025-04-01'
+      },
+      {
+        id: '3',
+        title: 'Telehealth Consultation',
+        description: 'Free first-time telehealth consultation with specialized doctors.',
+        imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+        type: 'telehealth',
+        partner_id: '345',
+        service_id: '678',
+        start_date: '2025-04-15',
+        expires_at: '2025-07-15',
+        tier_eligibility: 'core',
+        redemption_limit: 200,
+        redemptions_used: 78,
+        reward_amount: 100,
+        created_at: '2025-03-30'
+      },
+      {
+        id: '4',
+        title: 'Mental Wellness Package',
+        description: 'Three free therapy sessions with certified mental health professionals.',
+        imageUrl: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+        type: 'wellness',
+        partner_id: '901',
+        service_id: '234',
+        start_date: '2025-04-01',
+        expires_at: '2025-09-30',
+        tier_eligibility: 'all',
+        redemption_limit: 150,
+        redemptions_used: 67,
+        reward_amount: 250,
+        created_at: '2025-03-25'
+      }
+    ];
+    
+    setPromotions(mockPromotions);
   }, []);
 
-  const fetchPromotions = async () => {
-    setIsLoading(true);
-    try {
-      // Try to fetch from the real API
-      const { data, error } = await supabase
-        .from('promotions')
-        .select('*');
-      
-      if (error) throw error;
-      
-      if (data && data.length > 0) {
-        // Transform the data to match our interface
-        const formattedPromotions = (data as ServerPromotion[]).map(promo => ({
-          id: promo.id,
-          title: promo.title,
-          category: promo.type,
-          description: promo.description || '',
-          validUntil: promo.expires_at ? new Date(promo.expires_at).toLocaleDateString() : 'Ongoing',
-          requiredTier: (promo.target_audience || 'smart') as "smart" | "core" | "vip",
-          image: promo.image_url || `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000000)}`,
-        }));
-        
-        setPromotions(formattedPromotions);
-      } else {
-        // Fallback to mock data if no real data exists
-        setPromotions(mockPromotions);
-      }
-    } catch (error) {
-      console.error('Error fetching promotions:', error);
-      // Fallback to mock data on error
-      setPromotions(mockPromotions);
-    } finally {
-      setIsLoading(false);
+  const handleClaimOffer = (promotion: Promotion) => {
+    // Check if user's tier is eligible
+    if (
+      promotion.tier_eligibility !== 'all' && 
+      membershipTier !== promotion.tier_eligibility && 
+      !(promotion.tier_eligibility === 'core' && membershipTier === 'vip')
+    ) {
+      toast({
+        title: "Upgrade Required",
+        description: `This offer requires a ${promotion.tier_eligibility} membership or higher.`,
+        variant: "destructive"
+      });
+      return;
     }
+
+    // Simulate claiming the offer
+    toast({
+      title: "Offer Claimed!",
+      description: "Check your email for details on how to redeem this promotion.",
+    });
+
+    // Could log to API here for tracking
   };
 
-  // Filter promotions based on active tab and user's membership tier
-  const filteredPromotions = promotions.filter(promo => {
-    if (activeTab !== "all" && promo.category !== activeTab) return false;
-    
-    // Check membership tier access
-    const tierLevels = { "smart": 1, "core": 2, "vip": 3 };
-    const userLevel = tierLevels[userMembership];
-    const requiredLevel = tierLevels[promo.requiredTier];
-    
-    return userLevel >= requiredLevel;
-  });
+  const filteredPromotions = activeTab === 'all' 
+    ? promotions 
+    : promotions.filter(p => p.type === activeTab);
 
-  const lockedPromotions = promotions.filter(promo => {
-    if (activeTab !== "all" && promo.category !== activeTab) return false;
+  // A function to check if user can claim based on their tier
+  const canClaimPromotion = (tierEligibility: 'smart' | 'core' | 'vip' | 'all') => {
+    if (tierEligibility === 'all') return true;
+    if (!membershipTier) return false;
     
-    // Check membership tier access
-    const tierLevels = { "smart": 1, "core": 2, "vip": 3 };
-    const userLevel = tierLevels[userMembership];
-    const requiredLevel = tierLevels[promo.requiredTier];
+    const tierValues = { smart: 1, core: 2, vip: 3 };
+    const userTierValue = tierValues[membershipTier];
+    const requiredTierValue = tierValues[tierEligibility];
     
-    return userLevel < requiredLevel;
-  });
-
-  const handleClaimPromotion = async (promotionId: string, title: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('promotion_claims')
-        .insert({
-          promotion_id: promotionId,
-          status: 'pending',
-        });
-      
-      if (error) throw error;
-
-      toast({
-        title: "Promotion Claimed!",
-        description: `You've successfully claimed "${title}"`,
-      });
-    } catch (error) {
-      console.error('Error claiming promotion:', error);
-      toast({
-        title: "Error claiming promotion",
-        description: "There was a problem claiming this promotion. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case "health": 
-        return <ThermometerSun className="h-5 w-5 text-primary" />;
-      case "wellness": 
-        return <Heart className="h-5 w-5 text-primary" />;
-      case "travel":
-      case "discount":
-      case "cashback":
-      case "referral":
-      case "special":
-      default: 
-        return <Pill className="h-5 w-5 text-primary" />;
-    }
+    return userTierValue >= requiredTierValue;
   };
 
   return (
     <MemberPageLayout 
-      title="Promotions" 
-      description="Exclusive health and wellness offers for members"
+      title="Exclusive Promotions" 
+      description="Special offers and deals exclusively for Vitale members"
     >
-      {isLoading ? (
-        <div className="flex justify-center my-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      ) : (
-        <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="grid w-full md:w-[400px] grid-cols-4">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="health">Health</TabsTrigger>
-            <TabsTrigger value="wellness">Wellness</TabsTrigger>
-            <TabsTrigger value="travel">Travel</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value={activeTab} className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Available promotions */}
-              {filteredPromotions.map((promo) => (
-                <Card key={promo.id} className="overflow-hidden flex flex-col">
-                  <div className="aspect-video w-full overflow-hidden bg-muted">
+      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="w-full max-w-md mb-6">
+          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="insurance">Insurance</TabsTrigger>
+          <TabsTrigger value="telehealth">Telehealth</TabsTrigger>
+          <TabsTrigger value="wellness">Wellness</TabsTrigger>
+          <TabsTrigger value="vacation">Vacation</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value={activeTab}>
+          <div className="grid gap-6 md:grid-cols-2">
+            {filteredPromotions.length > 0 ? (
+              filteredPromotions.map((promotion) => (
+                <Card key={promotion.id} className="overflow-hidden">
+                  <div className="h-48 overflow-hidden">
                     <img 
-                      src={promo.image} 
-                      alt={promo.title} 
+                      src={promotion.imageUrl} 
+                      alt={promotion.title}
                       className="w-full h-full object-cover transition-transform hover:scale-105"
                     />
                   </div>
-                  <CardHeader className="pb-2">
+                  <CardHeader>
                     <div className="flex justify-between items-start">
-                      <div className="flex items-center gap-2">
-                        <div className="bg-primary/10 p-1 rounded-md">
-                          {getCategoryIcon(promo.category)}
-                        </div>
-                        <Badge>{promo.category}</Badge>
-                      </div>
-                      <MembershipBadge type={promo.requiredTier} size="sm" />
+                      <CardTitle>{promotion.title}</CardTitle>
+                      <Badge variant={canClaimPromotion(promotion.tier_eligibility) ? "default" : "outline"}>
+                        {promotion.tier_eligibility === 'all' ? 'All Members' : `${promotion.tier_eligibility} tier+`}
+                      </Badge>
                     </div>
-                    <CardTitle className="mt-2">{promo.title}</CardTitle>
-                    <CardDescription>Valid until: {promo.validUntil}</CardDescription>
+                    <CardDescription>{promotion.description}</CardDescription>
                   </CardHeader>
-                  <CardContent className="pb-2 flex-grow">
-                    <p className="text-muted-foreground">{promo.description}</p>
+                  <CardContent>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Calendar className="h-4 w-4 mr-1" />
+                      <span>Expires: {new Date(promotion.expires_at).toLocaleDateString()}</span>
+                    </div>
                   </CardContent>
-                  <CardFooter>
+                  <CardFooter className="flex justify-between">
+                    <Button variant="outline" size="sm">
+                      Learn More
+                    </Button>
                     <Button 
-                      className="w-full"
-                      onClick={() => handleClaimPromotion(promo.id, promo.title)}
+                      onClick={() => handleClaimOffer(promotion)}
+                      disabled={!canClaimPromotion(promotion.tier_eligibility)}
                     >
+                      <Gift className="mr-2 h-4 w-4" /> 
                       Claim Offer
+                      <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </CardFooter>
                 </Card>
-              ))}
-              
-              {/* Locked promotions */}
-              {lockedPromotions.map((promo) => (
-                <Card key={promo.id} className="overflow-hidden flex flex-col bg-muted/30">
-                  <div className="aspect-video w-full overflow-hidden bg-muted relative">
-                    <img 
-                      src={promo.image} 
-                      alt={promo.title} 
-                      className="w-full h-full object-cover filter grayscale opacity-50"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="bg-background/80 px-4 py-2 rounded-full">
-                        <div className="flex items-center gap-2">
-                          <MembershipBadge type={promo.requiredTier} size="sm" />
-                          <span className="text-sm font-medium">Exclusive</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-center gap-2">
-                        <div className="bg-muted p-1 rounded-md">
-                          {getCategoryIcon(promo.category)}
-                        </div>
-                        <Badge variant="outline">{promo.category}</Badge>
-                      </div>
-                    </div>
-                    <CardTitle className="mt-2">{promo.title}</CardTitle>
-                    <CardDescription>Upgrade to unlock</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pb-2 flex-grow">
-                    <p className="text-muted-foreground">{promo.description}</p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" className="w-full">
-                      Upgrade to {promo.requiredTier.charAt(0).toUpperCase() + promo.requiredTier.slice(1)}
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-            
-            {filteredPromotions.length === 0 && lockedPromotions.length === 0 && (
-              <div className="text-center p-10">
-                <div className="mx-auto bg-muted w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                  <Heart className="h-8 w-8 text-primary" />
+              ))
+            ) : (
+              <div className="col-span-full flex flex-col items-center justify-center p-10 text-center">
+                <div className="rounded-full bg-muted p-6 mb-4">
+                  <Gift className="h-10 w-10 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-medium mb-2">No promotions available</h3>
-                <p className="text-muted-foreground mb-4">
-                  There are currently no {activeTab === 'all' ? '' : activeTab + ' '}promotions available
+                <h3 className="text-xl font-semibold">No Promotions Available</h3>
+                <p className="text-muted-foreground">
+                  Check back later for new offers and promotions.
                 </p>
               </div>
             )}
-          </TabsContent>
-        </Tabs>
-      )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </MemberPageLayout>
   );
 };
 
-// Mock data for fallback
-const mockPromotions = [
-  {
-    id: "1",
-    title: "Annual Health Assessment",
-    category: "health",
-    description: "Comprehensive health check at 30% off regular price",
-    validUntil: "June 30, 2025",
-    requiredTier: "smart" as "smart" | "core" | "vip",
-    image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
-  },
-  {
-    id: "2",
-    title: "Travel Medical Insurance",
-    category: "travel",
-    description: "Special rates on international travel medical coverage",
-    validUntil: "December 31, 2025",
-    requiredTier: "core" as "smart" | "core" | "vip",
-    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
-  },
-  {
-    id: "3",
-    title: "Premium Supplement Bundle",
-    category: "wellness",
-    description: "Curated vitamin and supplement package at member pricing",
-    validUntil: "August 15, 2025",
-    requiredTier: "smart" as "smart" | "core" | "vip",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
-  },
-  {
-    id: "4",
-    title: "Executive Health Retreat",
-    category: "wellness",
-    description: "Exclusive weekend wellness retreat with health professionals",
-    validUntil: "October 1, 2025",
-    requiredTier: "vip" as "smart" | "core" | "vip",
-    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
-  },
-  {
-    id: "5",
-    title: "Medical Transportation Service",
-    category: "travel",
-    description: "Priority medical transport services worldwide",
-    validUntil: "December 31, 2025",
-    requiredTier: "vip" as "smart" | "core" | "vip",
-    image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
-  },
-];
-
-export default Promotions;
+export default MemberPromotionsPage;

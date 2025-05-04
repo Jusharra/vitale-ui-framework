@@ -134,21 +134,21 @@ const App: React.FC = () => {
             <Route
               path="/dashboard/admin/promotions"
               element={
-                <ProtectedRoute role="admin">
+                <ProtectedRoute requiredRole="admin">
                   <AdminPromotionsPage />
                 </ProtectedRoute>
               }
             />
             
-            <Route path="/dashboard/admin" element={<ProtectedRoute role="admin"><AdminPage /></ProtectedRoute>} />
-            <Route path="/dashboard/admin/vacations" element={<ProtectedRoute role="admin"><AdminVacationsPage /></ProtectedRoute>} />
-            <Route path="/dashboard/admin/leads" element={<ProtectedRoute role="admin"><AdminLeadsPage /></ProtectedRoute>} />
-            <Route path="/dashboard/admin/care-teams" element={<ProtectedRoute role="admin"><AdminCareTeamsPage /></ProtectedRoute>} />
-            <Route path="/dashboard/admin/health-tools" element={<ProtectedRoute role="admin"><AdminHealthToolsPage /></ProtectedRoute>} />
-            <Route path="/dashboard/admin/settings" element={<ProtectedRoute role="admin"><AdminSettingsPage /></ProtectedRoute>} />
+            <Route path="/dashboard/admin" element={<ProtectedRoute requiredRole="admin"><AdminPage /></ProtectedRoute>} />
+            <Route path="/dashboard/admin/vacations" element={<ProtectedRoute requiredRole="admin"><AdminVacationsPage /></ProtectedRoute>} />
+            <Route path="/dashboard/admin/leads" element={<ProtectedRoute requiredRole="admin"><AdminLeadsPage /></ProtectedRoute>} />
+            <Route path="/dashboard/admin/care-teams" element={<ProtectedRoute requiredRole="admin"><AdminCareTeamsPage /></ProtectedRoute>} />
+            <Route path="/dashboard/admin/health-tools" element={<ProtectedRoute requiredRole="admin"><AdminHealthToolsPage /></ProtectedRoute>} />
+            <Route path="/dashboard/admin/settings" element={<ProtectedRoute requiredRole="admin"><AdminSettingsPage /></ProtectedRoute>} />
             
             {/* Professional routes */}
-            <Route path="/dashboard/professional" element={<ProtectedRoute role="professional"><ProfessionalPage /></ProtectedRoute>} />
+            <Route path="/dashboard/professional" element={<ProtectedRoute requiredRole="professional"><ProfessionalPage /></ProtectedRoute>} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -23,8 +23,8 @@ import {
   BarChart2 as BarChart,
   Heart,
   Clipboard,
-  BadgeDollar as BadgeDollarSign,
-  Gauge as GaugeIcon
+  BadgeDollarSign,
+  Gauge
 } from 'lucide-react';
 import { 
   Sidebar as SidebarContainer, 
@@ -88,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
 
   const renderProfessionalLinks = () => (
     <>
-      <SidebarLink to="/dashboard/professional" icon={GaugeIcon}>Dashboard</SidebarLink>
+      <SidebarLink to="/dashboard/professional" icon={Gauge}>Dashboard</SidebarLink>
       <SidebarLink to="/dashboard/professional/calendar" icon={Calendar}>Calendar</SidebarLink>
       <SidebarLink to="/dashboard/professional/requests" icon={Clipboard}>Patient Requests</SidebarLink>
       <SidebarLink to="/dashboard/professional/member-manager" icon={Users}>Member Manager</SidebarLink>
@@ -101,7 +101,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
 
   const renderAdminLinks = () => (
     <>
-      <SidebarLink to="/dashboard/admin" icon={GaugeIcon}>Overview</SidebarLink>
+      <SidebarLink to="/dashboard/admin" icon={Gauge}>Overview</SidebarLink>
       <SidebarLink to="/dashboard/admin/vacations" icon={Palmtree}>Vacations</SidebarLink>
       <SidebarLink to="/dashboard/admin/promotions" icon={Gift}>Promotions</SidebarLink>
       <SidebarLink to="/dashboard/admin/leads" icon={BarChart}>Leads & Analytics</SidebarLink>
