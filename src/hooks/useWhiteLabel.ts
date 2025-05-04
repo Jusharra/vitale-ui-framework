@@ -71,30 +71,40 @@ export const useWhiteLabel = () => {
         
         // If on custom domain or subdomain, load that partner's branding
         if (customDomain || subdomain) {
-          const query = supabase.from('partners').select('*');
-          
           if (customDomain) {
-            const result = await query.eq('custom_domain', customDomain).eq('is_white_labeled', true).single();
-            partnerData = result.data;
-            error = result.error;
+            const { data, error: domainError } = await supabase
+              .from('partners')
+              .select('*')
+              .eq('custom_domain', customDomain)
+              .eq('is_white_labeled', true)
+              .single();
+            
+            partnerData = data;
+            error = domainError;
           } else if (subdomain) {
-            const result = await query.eq('subdomain', subdomain).eq('is_white_labeled', true).single();
-            partnerData = result.data;
-            error = result.error;
+            const { data, error: subdomainError } = await supabase
+              .from('partners')
+              .select('*')
+              .eq('subdomain', subdomain)
+              .eq('is_white_labeled', true)
+              .single();
+            
+            partnerData = data;
+            error = subdomainError;
           }
         }
         
         // If no domain match but user is a partner, load their branding
         if (!partnerData && !error && user) {
-          const result = await supabase
+          const { data: userData, error: userError } = await supabase
             .from('partners')
             .select('*')
             .eq('id', user.id)
             .eq('is_white_labeled', true)
             .single();
           
-          if (!result.error && result.data) {
-            partnerData = result.data;
+          if (!userError && userData) {
+            partnerData = userData;
           }
         }
         

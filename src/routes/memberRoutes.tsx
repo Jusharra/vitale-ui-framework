@@ -1,51 +1,107 @@
 
-import React from 'react';
-import { Route } from 'react-router-dom';
-import Dashboard from '@/pages/Dashboard';
-import MembershipPage from '@/pages/member/Membership';
-import HealthToolsPage from '@/pages/member/HealthTools';
-import TelehealthPage from '@/pages/member/Telehealth';
-import AppointmentsPage from '@/pages/member/Appointments';
-import PharmacyPage from '@/pages/member/Pharmacy';
-import MessagesPage from '@/pages/member/Messages';
-import MedicalTransportPage from '@/pages/member/MedicalTransport';
-import VacationsPage from '@/pages/member/Vacations';
-import PromotionsPage from '@/pages/member/Promotions';
-import ConciergePagePage from '@/pages/member/Concierge';
-import ServiceBookingPage from '@/pages/member/ServiceBooking';
-import PurchaseHistoryPage from '@/pages/member/PurchaseHistory';
-import HealthInsightsPage from '@/pages/member/HealthInsights';
-import ShareAndEarnPage from '@/pages/member/ShareAndEarn';
-import RewardsPage from '@/pages/member/Rewards';
-import SubscriptionSuccessPage from '@/pages/member/SubscriptionSuccess';
-import SupportPage from '@/pages/member/Support';
-import SmartHealthPage from '@/pages/member/SmartHealth';
+import { RouteObject } from 'react-router-dom';
+import Appointments from '@/pages/member/Appointments';
+import HealthInsights from '@/pages/member/HealthInsights';
+import HealthTools from '@/pages/member/HealthTools';
+import Membership from '@/pages/member/Membership';
+import Messages from '@/pages/member/Messages';
+import Pharmacy from '@/pages/member/Pharmacy';
+import Promotions from '@/pages/member/Promotions';
+import PurchaseHistory from '@/pages/member/PurchaseHistory';
+import Rewards from '@/pages/member/Rewards';
+import ServiceBooking from '@/pages/member/ServiceBooking';
+import ShareAndEarn from '@/pages/member/ShareAndEarn';
+import SmartHealth from '@/pages/member/SmartHealth';
+import Support from '@/pages/member/Support';
+import Telehealth from '@/pages/member/Telehealth';
+import Vacations from '@/pages/member/Vacations';
+import Concierge from '@/pages/member/Concierge';
+import MedicalTransport from '@/pages/member/MedicalTransport';
+import SubscriptionSuccess from '@/pages/member/SubscriptionSuccess';
 import GlobalSettingsPage from '@/pages/member/GlobalSettingsPage';
+import MediaAssets from '@/pages/member/MediaAssets';
 
-// Member routes to be added to the App.tsx Routes component
-const MemberRoutes = (
-  <>
-    <Route path="/dashboard" element={<Dashboard />} />
-    <Route path="/dashboard/membership" element={<MembershipPage />} />
-    <Route path="/dashboard/health-tools" element={<HealthToolsPage />} />
-    <Route path="/dashboard/telehealth" element={<TelehealthPage />} />
-    <Route path="/dashboard/appointments" element={<AppointmentsPage />} />
-    <Route path="/dashboard/pharmacy" element={<PharmacyPage />} />
-    <Route path="/dashboard/messages" element={<MessagesPage />} />
-    <Route path="/dashboard/medical-transport" element={<MedicalTransportPage />} />
-    <Route path="/dashboard/vacations" element={<VacationsPage />} />
-    <Route path="/dashboard/promotions" element={<PromotionsPage />} />
-    <Route path="/dashboard/concierge" element={<ConciergePagePage />} />
-    <Route path="/dashboard/service-booking" element={<ServiceBookingPage />} />
-    <Route path="/dashboard/purchase-history" element={<PurchaseHistoryPage />} />
-    <Route path="/dashboard/health-insights" element={<HealthInsightsPage />} />
-    <Route path="/dashboard/share-and-earn" element={<ShareAndEarnPage />} /> 
-    <Route path="/dashboard/rewards" element={<RewardsPage />} />
-    <Route path="/dashboard/subscription-success" element={<SubscriptionSuccessPage />} />
-    <Route path="/dashboard/support" element={<SupportPage />} />
-    <Route path="/dashboard/smart-health" element={<SmartHealthPage />} />
-    <Route path="/dashboard/settings" element={<GlobalSettingsPage />} />
-  </>
-);
+const memberRoutes: RouteObject[] = [
+  {
+    path: 'appointments',
+    element: <Appointments />
+  },
+  {
+    path: 'health-insights',
+    element: <HealthInsights />
+  },
+  {
+    path: 'health-tools',
+    element: <HealthTools />
+  },
+  {
+    path: 'membership',
+    element: <Membership />
+  },
+  {
+    path: 'messages',
+    element: <Messages />
+  },
+  {
+    path: 'pharmacy',
+    element: <Pharmacy />
+  },
+  {
+    path: 'promotions',
+    element: <Promotions />
+  },
+  {
+    path: 'purchase-history',
+    element: <PurchaseHistory />
+  },
+  {
+    path: 'rewards',
+    element: <Rewards />
+  },
+  {
+    path: 'service-booking',
+    element: <ServiceBooking />
+  },
+  {
+    path: 'share-and-earn',
+    element: <ShareAndEarn />
+  },
+  {
+    path: 'smart-health',
+    element: <SmartHealth />
+  },
+  {
+    path: 'support',
+    element: <Support />
+  },
+  {
+    path: 'telehealth',
+    element: <Telehealth />
+  },
+  {
+    path: 'vacations',
+    element: <Vacations />
+  },
+  {
+    path: 'concierge',
+    element: <Concierge />
+  },
+  {
+    path: 'medical-transport',
+    element: <MedicalTransport />
+  },
+  {
+    path: 'subscription-success',
+    element: <SubscriptionSuccess />
+  },
+  {
+    path: 'settings',
+    element: <GlobalSettingsPage />
+  },
+  {
+    path: 'media-assets',
+    element: <MediaAssets />
+  }
+];
 
-export default MemberRoutes;
+export default memberRoutes;
