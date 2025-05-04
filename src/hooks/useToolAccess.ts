@@ -1,9 +1,16 @@
 
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+
+interface UseToolAccessProps {
+  userId?: string | null;
+  toolName?: string;
+  checkOnMount?: boolean;
+}
 
 export function useToolAccess() {
   // Check tool access based on membership tier
-  const hasToolAccess = async (userId: string | null, toolName: string): Promise<boolean> => {
+  const hasToolAccess = useCallback(async (userId: string | null, toolName: string): Promise<boolean> => {
     if (!userId) return false;
     
     try {
@@ -17,7 +24,33 @@ export function useToolAccess() {
       console.error(`Error checking access for ${toolName}:`, error);
       return false;
     }
-  };
+  }, []);
 
   return { hasToolAccess };
+}
+
+// Custom hook for checking access with state management
+export function useAccessCheck(userId: string | null, toolName: string) {
+  const [hasAccess, setHasAccess] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+  const { hasToolAccess } = useToolAccess();
+  
+  useEffect(() => {
+    const checkAccess = async () => {
+      if (!userId || !toolName) {
+        setHasAccess(false);
+        setIsChecking(false);
+        return;
+      }
+      
+      setIsChecking(true);
+      const access = await hasToolAccess(userId, toolName);
+      setHasAccess(access);
+      setIsChecking(false);
+    };
+    
+    checkAccess();
+  }, [userId, toolName, hasToolAccess]);
+  
+  return { hasAccess, isChecking };
 }

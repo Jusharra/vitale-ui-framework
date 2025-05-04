@@ -8,7 +8,7 @@ import { ThermometerSun } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/hooks/use-toast';
-import useToolAccess from '@/hooks/useToolAccess';
+import { useToolAccess } from '@/hooks/useToolAccess';
 
 interface Delivery {
   id: string;
@@ -24,7 +24,20 @@ const PharmacyDelivery = () => {
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { profile } = useAuth();
-  const { hasAccess: hasDeliveryAccess } = useToolAccess('prescription_delivery');
+  const { hasToolAccess } = useToolAccess();
+  const [hasAccess, setHasAccess] = useState(false);
+
+  // Check for delivery access
+  useEffect(() => {
+    const checkAccess = async () => {
+      if (profile) {
+        const access = await hasToolAccess(profile.id, 'prescription_delivery');
+        setHasAccess(access);
+      }
+    };
+    
+    checkAccess();
+  }, [profile, hasToolAccess]);
 
   useEffect(() => {
     const fetchDeliveries = async () => {
@@ -75,7 +88,7 @@ const PharmacyDelivery = () => {
     fetchDeliveries();
   }, [profile]);
 
-  if (!hasDeliveryAccess) {
+  if (!hasAccess) {
     return (
       <Card className="bg-muted/50 border-dashed">
         <CardHeader>
