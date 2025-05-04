@@ -8,7 +8,6 @@ import { useToast } from '@/hooks/use-toast';
 
 interface StripeCheckoutProps {
   tier: 'smart' | 'core' | 'vip';
-  priceId?: string;
   buttonText?: string;
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
 }
@@ -33,7 +32,7 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
   buttonText = 'Subscribe',
   variant = 'default'
 }) => {
-  const { user } = useAuth();
+  const { user, isTrialing, refreshSubscription } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   
@@ -55,11 +54,20 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
         body: { 
           tier, 
           interval, 
-          price: tierPrices[tier][interval]
+          price: tierPrices[tier][interval],
+          trial: isTrialing // Pass trial status to checkout function
         }
       });
       
       if (error) throw error;
+      
+      // After successful checkout, refresh subscription data
+      window.addEventListener('focus', async () => {
+        // Short delay to ensure Stripe has processed everything
+        setTimeout(async () => {
+          await refreshSubscription();
+        }, 5000);
+      }, { once: true });
       
       // Redirect to Stripe Checkout
       window.location.href = data.url;

@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { Badge } from "@/components/ui/badge";
 
 interface BillingInformationProps {
   isLoading: boolean;
@@ -27,20 +28,60 @@ const BillingInformation: React.FC<BillingInformationProps> = ({ isLoading, subs
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p className="text-sm text-muted-foreground">Billing Cycle</p>
-              <p className="font-medium">Monthly</p>
+              <p className="font-medium">
+                {subscriptionData.subscription.interval === 'year' ? 'Yearly' : 'Monthly'}
+              </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Next Billing Date</p>
-              <p className="font-medium">{new Date(subscriptionData.subscription.current_period_end * 1000).toLocaleDateString()}</p>
+              <p className="font-medium">
+                {new Date(subscriptionData.subscription.current_period_end * 1000).toLocaleDateString()}
+              </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Subscription Status</p>
-              <p className="font-medium capitalize">{subscriptionData.subscription.status}</p>
+              <div className="flex items-center space-x-2">
+                <p className="font-medium capitalize">{subscriptionData.subscription.status}</p>
+                {subscriptionData.subscription.status === 'active' && (
+                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                    Active
+                  </Badge>
+                )}
+                {subscriptionData.subscription.status === 'past_due' && (
+                  <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                    Past Due
+                  </Badge>
+                )}
+              </div>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Auto-Renewal</p>
               <p className="font-medium">{subscriptionData.subscription.cancel_at_period_end ? 'Off' : 'On'}</p>
             </div>
+            
+            {subscriptionData.subscription.cancel_at && (
+              <div className="col-span-2">
+                <p className="text-sm text-muted-foreground">Cancellation</p>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mt-1">
+                  <p className="text-sm text-yellow-800">
+                    Your subscription will be canceled on {new Date(subscriptionData.subscription.cancel_at * 1000).toLocaleDateString()}.
+                    You'll continue to have access until this date.
+                  </p>
+                </div>
+              </div>
+            )}
+            
+            {subscriptionData.subscription.trial_end && new Date(subscriptionData.subscription.trial_end * 1000) > new Date() && (
+              <div className="col-span-2">
+                <p className="text-sm text-muted-foreground">Trial Period</p>
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mt-1">
+                  <p className="text-sm text-blue-800">
+                    Your trial ends on {new Date(subscriptionData.subscription.trial_end * 1000).toLocaleDateString()}.
+                    Payment will begin after this date unless canceled.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="py-4">

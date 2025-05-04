@@ -43,7 +43,7 @@ serve(async (req) => {
     }
 
     // Parse request body
-    const { tier, interval, price } = await req.json();
+    const { tier, interval, price, trial = false } = await req.json();
     
     // Initialize Stripe
     const stripe = new Stripe(stripeKey, {
@@ -54,9 +54,13 @@ serve(async (req) => {
     let customerId;
     const { data: userData } = await supabase
       .from("users")
-      .select("stripe_customer_id")
+      .select("stripe_customer_id, trial_status, trial_end_date")
       .eq("id", user.id)
       .single();
+      
+    const isInTrial = userData?.trial_status === 'active' && 
+                      userData?.trial_end_date && 
+                      new Date(userData.trial_end_date) > new Date();
       
     if (userData?.stripe_customer_id) {
       customerId = userData.stripe_customer_id;
@@ -99,6 +103,10 @@ serve(async (req) => {
       },
     };
 
+    // Set up subscription trial if user is eligible
+    const trialPeriodDays = (isInTrial && trial) ? 14 : undefined;
+    const trialEnd = userData?.trial_end_date ? new Date(userData.trial_end_date).getTime() / 1000 : undefined;
+
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -117,6 +125,8 @@ serve(async (req) => {
           user_id: user.id,
           tier,
         },
+        trial_period_days: trialPeriodDays,
+        trial_end: trialEnd,
       },
       metadata: {
         user_id: user.id,
@@ -130,6 +140,7 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error) {
+    console.error("Error creating checkout session:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 400,

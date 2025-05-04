@@ -4,6 +4,10 @@ import MemberPageLayout from '@/components/layout/MemberPageLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { useLocation } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
 
 // Import refactored components
 import SubscriptionDetails from '@/components/member/membership/SubscriptionDetails';
@@ -13,9 +17,12 @@ import PaymentHistory from '@/components/member/membership/PaymentHistory';
 import { membershipTiers } from '@/components/member/membership/membershipData';
 
 const Membership = () => {
-  const { profile, isTrialing, isAuthenticated } = useAuth();
+  const { profile, isTrialing, isAuthenticated, refreshSubscription } = useAuth();
   const [subscriptionData, setSubscriptionData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const location = useLocation();
+  const { toast } = useToast();
+  const upgradeRequired = location.state?.upgradeRequired;
 
   // Check subscription status
   useEffect(() => {
@@ -29,15 +36,39 @@ const Membership = () => {
         if (error) throw error;
         setSubscriptionData(data);
         
+        // Refresh auth context subscription data as well
+        refreshSubscription();
+        
       } catch (error) {
         console.error('Error checking subscription:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch subscription data",
+          variant: "destructive",
+        });
       } finally {
         setIsLoading(false);
       }
     };
     
     checkSubscription();
-  }, [isAuthenticated]);
+    
+    // Set up periodic refresh (every 30 seconds)
+    const refreshInterval = setInterval(checkSubscription, 30000);
+    
+    return () => clearInterval(refreshInterval);
+  }, [isAuthenticated, refreshSubscription]);
+
+  // When the user comes from an upgrade required redirect
+  useEffect(() => {
+    if (upgradeRequired) {
+      toast({
+        title: "Upgrade Required",
+        description: "This feature requires a higher membership tier. Please upgrade your plan to access it.",
+        variant: "default",
+      });
+    }
+  }, [upgradeRequired]);
 
   return (
     <MemberPageLayout 
@@ -60,6 +91,17 @@ const Membership = () => {
               subscriptionData={subscriptionData}
               isLoading={isLoading}
             />
+            
+            {/* Upgrade Alert if needed */}
+            {upgradeRequired && (
+              <Alert variant="warning" className="border-yellow-300 bg-yellow-50">
+                <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                <AlertDescription className="text-yellow-800">
+                  You attempted to access a feature that requires a higher membership tier.
+                  Please upgrade your plan to access all features.
+                </AlertDescription>
+              </Alert>
+            )}
             
             {/* Membership Tier Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

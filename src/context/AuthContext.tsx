@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
@@ -17,6 +18,7 @@ type AuthState = {
   membershipTier: MembershipTier | null;
   isAuthenticated: boolean;
   isTrialing: boolean;
+  subscription: Subscription | null;
   hasToolAccess: (toolName: string) => Promise<boolean>;
 };
 
@@ -30,11 +32,23 @@ type UserProfile = {
   trial_end_date?: string;
 };
 
+type Subscription = {
+  id: string;
+  status: string;
+  tier: MembershipTier;
+  current_period_end: number;
+  cancel_at_period_end: boolean;
+  cancel_at?: number;
+  trial_end?: number;
+  interval?: 'month' | 'year';
+};
+
 type AuthContextType = AuthState & {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (data: Partial<UserProfile>) => Promise<void>;
+  refreshSubscription: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -46,6 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isTrialing, setIsTrialing] = useState(false);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
   
   // Initialize auth state
   useEffect(() => {
@@ -64,6 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setTimeout(() => fetchUserProfile(session.user.id), 0);
           } else if (event === 'SIGNED_OUT') {
             setProfile(null);
+            setSubscription(null);
           }
         }
       );
@@ -75,6 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (session?.user) {
         await fetchUserProfile(session.user.id);
+        await checkSubscription();
       }
       
       setIsLoading(false);
@@ -141,6 +158,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         variant: "destructive",
       });
     }
+  };
+
+  // Check and update subscription data
+  const checkSubscription = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('check-subscription');
+      
+      if (error) throw error;
+      
+      if (data?.subscription) {
+        setSubscription(data.subscription);
+      } else {
+        setSubscription(null);
+      }
+
+      // Update trial status based on subscription data
+      if (data?.isTrialing !== undefined) {
+        setIsTrialing(data.isTrialing);
+      }
+      
+    } catch (error) {
+      console.error("Error checking subscription:", error);
+    }
+  };
+  
+  const refreshSubscription = async () => {
+    await checkSubscription();
   };
   
   // Check tool access based on membership tier
@@ -300,11 +346,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     membershipTier: profile?.membership_tier || null,
     isAuthenticated: !!user,
     isTrialing,
+    subscription,
     signIn,
     signUp,
     signOut,
     updateProfile,
-    hasToolAccess
+    hasToolAccess,
+    refreshSubscription
   };
   
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -15,7 +15,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRole,
   requiredTier
 }) => {
-  const { isAuthenticated, isLoading, userRole, membershipTier } = useAuth();
+  const { isAuthenticated, isLoading, userRole, membershipTier, isTrialing, subscription } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -55,8 +55,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     const userTierLevel = membershipTier ? tierLevels[membershipTier] : 0;
     const requiredTierLevel = tierLevels[requiredTier];
     
-    if (userTierLevel < requiredTierLevel) {
-      // Redirect to upgrade page
+    // If they're in trial, allow access to any tier
+    if (!isTrialing && userTierLevel < requiredTierLevel) {
+      // If they have a subscription but wrong tier, redirect to upgrade page
+      if (subscription?.status === 'active') {
+        return <Navigate to="/dashboard/membership" state={{ upgradeRequired: true }} replace />;
+      }
+      // If they don't have an active subscription, redirect to membership page
       return <Navigate to="/dashboard/membership" replace />;
     }
   }
