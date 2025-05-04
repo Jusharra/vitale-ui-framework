@@ -32,49 +32,64 @@ import ProfileSettings from "./pages/professional/ProfileSettings";
 import MemberManager from "./pages/professional/MemberManager";
 import MessageCenter from "./pages/professional/MessageCenter";
 import AdminRoutes from "./routes/adminRoutes";
+import Auth from "./pages/Auth";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import SubscriptionSuccess from "./pages/member/SubscriptionSuccess";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/appointments" element={<Appointments />} />
-          <Route path="/dashboard/health-tools" element={<HealthTools />} />
-          <Route path="/dashboard/health-insights" element={<HealthInsights />} />
-          <Route path="/dashboard/messages" element={<Messages />} />
-          <Route path="/dashboard/pharmacy" element={<Pharmacy />} />
-          <Route path="/dashboard/rewards" element={<Rewards />} />
-          <Route path="/dashboard/promotions" element={<Promotions />} />
-          <Route path="/dashboard/membership" element={<Membership />} />
-          <Route path="/dashboard/support" element={<Support />} />
-          <Route path="/dashboard/telehealth" element={<Telehealth />} />
-          <Route path="/dashboard/service-booking" element={<ServiceBooking />} />
-          <Route path="/dashboard/concierge" element={<Concierge />} />
-          <Route path="/dashboard/purchase-history" element={<PurchaseHistory />} />
-          <Route path="/dashboard/vacations" element={<Vacations />} />
-          <Route path="/dashboard/medical-transport" element={<MedicalTransport />} />
-          <Route path="/dashboard/professional" element={<ProfessionalDashboard />} />
-          <Route path="/dashboard/professional/calendar" element={<Calendar />} />
-          <Route path="/dashboard/professional/requests" element={<PatientRequests />} />
-          <Route path="/dashboard/professional/tools" element={<ToolsOfTrade />} />
-          <Route path="/dashboard/professional/earnings" element={<Earnings />} />
-          <Route path="/dashboard/professional/profile" element={<ProfileSettings />} />
-          <Route path="/dashboard/professional/member-manager" element={<MemberManager />} />
-          <Route path="/dashboard/professional/message-center" element={<MessageCenter />} />
-          <Route path="/dashboard/admin" element={<AdminDashboard />} />
-          
-          {/* Include the admin routes */}
-          {AdminRoutes}
-          
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            
+            {/* Protected Member routes */}
+            <Route path="/dashboard" element={<ProtectedRoute requiredRole="member"><Dashboard /></ProtectedRoute>} />
+            <Route path="/dashboard/appointments" element={<ProtectedRoute requiredRole="member"><Appointments /></ProtectedRoute>} />
+            <Route path="/dashboard/health-tools" element={<ProtectedRoute requiredRole="member"><HealthTools /></ProtectedRoute>} />
+            <Route path="/dashboard/health-insights" element={<ProtectedRoute requiredRole="member"><HealthInsights /></ProtectedRoute>} />
+            <Route path="/dashboard/messages" element={<ProtectedRoute requiredRole="member"><Messages /></ProtectedRoute>} />
+            <Route path="/dashboard/pharmacy" element={<ProtectedRoute requiredRole="member"><Pharmacy /></ProtectedRoute>} />
+            <Route path="/dashboard/rewards" element={<ProtectedRoute requiredRole="member"><Rewards /></ProtectedRoute>} />
+            <Route path="/dashboard/promotions" element={<ProtectedRoute requiredRole="member"><Promotions /></ProtectedRoute>} />
+            <Route path="/dashboard/membership" element={<ProtectedRoute requiredRole="member"><Membership /></ProtectedRoute>} />
+            <Route path="/dashboard/support" element={<ProtectedRoute requiredRole="member"><Support /></ProtectedRoute>} />
+            <Route path="/dashboard/telehealth" element={<ProtectedRoute requiredRole="member" requiredTier="vip"><Telehealth /></ProtectedRoute>} />
+            <Route path="/dashboard/service-booking" element={<ProtectedRoute requiredRole="member"><ServiceBooking /></ProtectedRoute>} />
+            <Route path="/dashboard/concierge" element={<ProtectedRoute requiredRole="member"><Concierge /></ProtectedRoute>} />
+            <Route path="/dashboard/purchase-history" element={<ProtectedRoute requiredRole="member"><PurchaseHistory /></ProtectedRoute>} />
+            <Route path="/dashboard/vacations" element={<ProtectedRoute requiredRole="member"><Vacations /></ProtectedRoute>} />
+            <Route path="/dashboard/medical-transport" element={<ProtectedRoute requiredRole="member"><MedicalTransport /></ProtectedRoute>} />
+            <Route path="/subscription-success" element={<ProtectedRoute requiredRole="member"><SubscriptionSuccess /></ProtectedRoute>} />
+            
+            {/* Protected Professional routes */}
+            <Route path="/dashboard/professional" element={<ProtectedRoute requiredRole="professional"><ProfessionalDashboard /></ProtectedRoute>} />
+            <Route path="/dashboard/professional/calendar" element={<ProtectedRoute requiredRole="professional"><Calendar /></ProtectedRoute>} />
+            <Route path="/dashboard/professional/requests" element={<ProtectedRoute requiredRole="professional"><PatientRequests /></ProtectedRoute>} />
+            <Route path="/dashboard/professional/tools" element={<ProtectedRoute requiredRole="professional"><ToolsOfTrade /></ProtectedRoute>} />
+            <Route path="/dashboard/professional/earnings" element={<ProtectedRoute requiredRole="professional"><Earnings /></ProtectedRoute>} />
+            <Route path="/dashboard/professional/profile" element={<ProtectedRoute requiredRole="professional"><ProfileSettings /></ProtectedRoute>} />
+            <Route path="/dashboard/professional/member-manager" element={<ProtectedRoute requiredRole="professional"><MemberManager /></ProtectedRoute>} />
+            <Route path="/dashboard/professional/message-center" element={<ProtectedRoute requiredRole="professional"><MessageCenter /></ProtectedRoute>} />
+            
+            {/* Protected Admin routes */}
+            <Route path="/dashboard/admin" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
+            
+            {/* Include the admin routes with protection */}
+            {AdminRoutes}
+            
+            {/* Catch-all route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

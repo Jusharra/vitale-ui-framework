@@ -1,140 +1,137 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated, userRole, signOut } = useAuth();
+
+  const handleDashboardClick = () => {
+    if (isAuthenticated) {
+      if (userRole === 'professional') {
+        navigate('/dashboard/professional');
+      } else if (userRole === 'admin') {
+        navigate('/dashboard/admin');
+      } else {
+        navigate('/dashboard');
+      }
+    } else {
+      navigate('/auth');
+    }
+  };
+
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="border-b bg-background">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="bg-primary rounded-md w-8 h-8 flex items-center justify-center">
-              <span className="text-primary-foreground text-lg font-bold">V</span>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+      <header className="py-4 px-8 flex justify-between items-center bg-white shadow-sm">
+        <div className="flex items-center">
+          <div className="bg-indigo-600 text-white font-bold text-xl px-3 py-1 rounded mr-2">VH</div>
+          <h1 className="text-xl font-bold text-gray-800">Vitale Health Concierge</h1>
+        </div>
+        <div>
+          {isAuthenticated ? (
+            <div className="flex gap-2">
+              <Button onClick={handleDashboardClick}>Dashboard</Button>
+              <Button variant="outline" onClick={signOut}>Sign Out</Button>
             </div>
-            <span className="text-xl font-bold tracking-tight">Vitale Health Concierge</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link to="/" className="text-sm font-medium">Home</Link>
-            <Link to="/" className="text-sm font-medium">Membership</Link>
-            <Link to="/" className="text-sm font-medium">Services</Link>
-            <Link to="/" className="text-sm font-medium">About</Link>
-            <Link to="/" className="text-sm font-medium">Contact</Link>
-          </nav>
-          <div className="flex items-center gap-2">
-            <Button asChild variant="outline">
-              <Link to="/dashboard">Member Login</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/">Join Now</Link>
-            </Button>
-          </div>
+          ) : (
+            <Button onClick={() => navigate('/auth')}>Sign In</Button>
+          )}
         </div>
       </header>
 
-      {/* Hero */}
-      <div className="bg-gradient-to-b from-primary/10 to-background">
-        <div className="container mx-auto px-4 py-16 md:py-24 flex flex-col items-center text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
-            Welcome to Vitale Health Concierge
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center">
+          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+            <span className="block">Premium Healthcare</span>
+            <span className="block text-indigo-600">At Your Fingertips</span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mb-8">
-            Your premium healthcare concierge service with personalized care and exclusive benefits
+          <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+            Experience personalized care with our tiered membership plans. Connect with healthcare professionals, access digital health tools, and more.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 mb-12">
-            <Button size="lg" asChild>
-              <Link to="/dashboard">Access Dashboard</Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link to="/">Explore Membership Plans</Link>
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl w-full">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="rounded-full bg-membership-smart-bg w-12 h-12 flex items-center justify-center mx-auto mb-4">
-                  <span className="text-membership-smart-text font-bold">S</span>
-                </div>
-                <h3 className="text-lg font-bold mb-2">Smart Access</h3>
-                <p className="text-muted-foreground">Basic healthcare concierge support and digital health tools</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="rounded-full bg-membership-core-bg w-12 h-12 flex items-center justify-center mx-auto mb-4">
-                  <span className="text-membership-core-text font-bold">C</span>
-                </div>
-                <h3 className="text-lg font-bold mb-2">Core Concierge</h3>
-                <p className="text-muted-foreground">Enhanced access and priority services for your healthcare needs</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="rounded-full bg-membership-vip-bg w-12 h-12 flex items-center justify-center mx-auto mb-4">
-                  <span className="text-membership-vip-text font-bold">V</span>
-                </div>
-                <h3 className="text-lg font-bold mb-2">VIP Executive</h3>
-                <p className="text-muted-foreground">Premium healthcare experience with exclusive VIP benefits</p>
-              </CardContent>
-            </Card>
+          <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
+            <div className="rounded-md shadow">
+              <Button className="w-full" size="lg" onClick={handleDashboardClick}>
+                {isAuthenticated ? 'Go to Dashboard' : 'Start Free Trial'}
+              </Button>
+            </div>
+            <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
+              <Button variant="outline" className="w-full" size="lg" onClick={() => navigate('/auth')}>
+                Learn More
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Role Selection for Demo */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-6">Access Role-Based Dashboards</h2>
-          <p className="text-muted-foreground text-center mb-8">
-            For demonstration purposes, you can access the different role dashboards directly:
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Button asChild variant="outline" size="lg" className="h-auto py-6">
-              <Link to="/dashboard">
-                <div className="flex flex-col items-center">
-                  <span className="text-lg font-medium">Member</span>
-                  <span className="text-sm text-muted-foreground">Patient Dashboard</span>
-                </div>
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="h-auto py-6">
-              <Link to="/dashboard/professional">
-                <div className="flex flex-col items-center">
-                  <span className="text-lg font-medium">Professional</span>
-                  <span className="text-sm text-muted-foreground">Provider Portal</span>
-                </div>
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="h-auto py-6">
-              <Link to="/dashboard/admin">
-                <div className="flex flex-col items-center">
-                  <span className="text-lg font-medium">Admin</span>
-                  <span className="text-sm text-muted-foreground">System Management</span>
-                </div>
-              </Link>
-            </Button>
+        <div className="mt-24 grid gap-8 md:grid-cols-3">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-indigo-100 text-indigo-600 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-medium text-gray-900">Smart Access</h3>
+            <p className="mt-2 text-gray-500">
+              Get started with essential healthcare features. Book services, access basic health tools, and engage with our AI assistant.
+            </p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md border border-indigo-200">
+            <div className="bg-indigo-600 text-white p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-medium text-gray-900">Core Concierge</h3>
+            <p className="mt-2 text-gray-500">
+              Upgrade to priority scheduling with specialists, unlock more health tools, and enjoy 15% off all bookings.
+            </p>
+          </div>
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-lg shadow-md border border-purple-200">
+            <div className="bg-purple-600 text-white p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-medium text-gray-900">VIP Executive</h3>
+            <p className="mt-2 text-gray-500">
+              Our premium tier offers all features plus telehealth services, a personal primary care physician, and 20% off bookings.
+            </p>
           </div>
         </div>
-      </div>
+      </main>
 
-      {/* Footer */}
-      <footer className="mt-auto border-t bg-muted/50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <div className="bg-primary rounded-md w-6 h-6 flex items-center justify-center">
-                <span className="text-primary-foreground text-sm font-bold">V</span>
+      <footer className="bg-gray-800 text-white py-8 mt-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between">
+            <div className="mb-6 md:mb-0">
+              <div className="flex items-center">
+                <div className="bg-white text-indigo-600 font-bold text-xl px-3 py-1 rounded mr-2">VH</div>
+                <span className="text-xl font-bold">Vitale Health</span>
               </div>
-              <span className="text-sm font-bold">Vitale Health Concierge</span>
+              <p className="mt-2 text-gray-400 text-sm">Personalized healthcare at your fingertips</p>
             </div>
-            <div className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} Vitale Health. All rights reserved.
+            <div className="grid grid-cols-2 gap-8 md:gap-20">
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-wider">Membership</h3>
+                <ul className="mt-4 space-y-2">
+                  <li><a href="#" className="text-gray-400 hover:text-white">Smart Access</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Core Concierge</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">VIP Executive</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-wider">Support</h3>
+                <ul className="mt-4 space-y-2">
+                  <li><a href="#" className="text-gray-400 hover:text-white">Contact</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">FAQ</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Privacy</a></li>
+                </ul>
+              </div>
             </div>
+          </div>
+          <div className="mt-8 border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between">
+            <p className="text-gray-400 text-sm">© 2025 Vitale Health Concierge. All rights reserved.</p>
           </div>
         </div>
       </footer>
