@@ -12,7 +12,7 @@ export const partnerFormSchema = z.object({
     // This ensures the input is treated as a string in the form
     (val) => (typeof val === 'string' ? val : ''),
     // And then we transform it to an array when submitting
-    z.string().transform(val => val.split(',').map(s => s.trim()))
+    z.string().transform(val => val.split(',').map(s => s.trim()).filter(Boolean))
   ),
   bio: z.string().optional(),
   accepting_new_patients: z.boolean().default(true),
