@@ -31,9 +31,26 @@ export interface Pharmacy {
   status?: string;
 }
 
+export interface Transport {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  service_area?: string;
+  services?: string;
+  available_24_7?: boolean;
+  wheelchair_accessible?: boolean;
+  status: string;
+  insurance_accepted?: string;
+  profile_image?: string;
+  rating?: number;
+}
+
 export const useCareTeamsData = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
+  const [transports, setTransports] = useState<Transport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -65,6 +82,15 @@ export const useCareTeamsData = () => {
       if (pharmaciesError) throw pharmaciesError;
       setPharmacies(pharmaciesData || []);
 
+      // Fetch transports
+      const { data: transportsData, error: transportsError } = await supabase
+        .from('transports')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (transportsError) throw transportsError;
+      setTransports(transportsData || []);
+
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -84,6 +110,7 @@ export const useCareTeamsData = () => {
   return {
     partners,
     pharmacies,
+    transports,
     isLoading,
     refetchData: fetchData
   };

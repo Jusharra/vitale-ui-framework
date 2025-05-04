@@ -1915,6 +1915,60 @@ export type Database = {
           },
         ]
       }
+      transports: {
+        Row: {
+          address: string | null
+          available_24_7: boolean | null
+          created_at: string | null
+          created_by: string | null
+          email: string | null
+          id: string
+          insurance_accepted: string | null
+          name: string
+          phone: string | null
+          profile_image: string | null
+          rating: number | null
+          service_area: string | null
+          services: string | null
+          status: string | null
+          wheelchair_accessible: boolean | null
+        }
+        Insert: {
+          address?: string | null
+          available_24_7?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          insurance_accepted?: string | null
+          name: string
+          phone?: string | null
+          profile_image?: string | null
+          rating?: number | null
+          service_area?: string | null
+          services?: string | null
+          status?: string | null
+          wheelchair_accessible?: boolean | null
+        }
+        Update: {
+          address?: string | null
+          available_24_7?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          insurance_accepted?: string | null
+          name?: string
+          phone?: string | null
+          profile_image?: string | null
+          rating?: number | null
+          service_area?: string | null
+          services?: string | null
+          status?: string | null
+          wheelchair_accessible?: boolean | null
+        }
+        Relationships: []
+      }
       triage_activity_logs: {
         Row: {
           action: string
