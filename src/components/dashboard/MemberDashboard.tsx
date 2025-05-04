@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FeatureCard from '../common/FeatureCard';
-import { Calendar, FileText, MessageSquare, Settings, Tag, User, Users, Video, MapPin, Activity, Palmtree, Ambulance } from 'lucide-react';
+import { Calendar, FileText, MessageSquare, Settings, Tag, User, Users, Video, MapPin, Activity, Palmtree, Ambulance, Heart, Gift } from 'lucide-react';
 import MembershipBadge from '../common/MembershipBadge';
 import { useNavigate } from 'react-router-dom';
 
@@ -134,6 +133,12 @@ const MemberDashboard: React.FC = () => {
           description="Check your symptoms and get recommendations"
           icon={FileText}
           onClick={() => navigate('/dashboard/health-tools')}
+        />
+        <FeatureCard
+          title="Share & Earn"
+          description="Refer friends, earn points, and unlock exclusive rewards"
+          icon={Gift}
+          onClick={() => navigate('/dashboard/share-and-earn')}
         />
         <FeatureCard
           title="Virtual Consultation"

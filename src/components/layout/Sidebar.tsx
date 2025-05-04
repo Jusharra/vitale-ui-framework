@@ -1,444 +1,153 @@
-
 import React from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import {
-  Sidebar as SidebarPrimitive,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-
-import {
-  Calendar,
-  Home,
-  MessageSquare,
-  Pill,
-  GraduationCap,
-  Gift,
-  Receipt,
-  HelpCircle,
-  Heart,
-  CreditCard,
-  User,
-  Gauge,
-  ClipboardList,
-  Stethoscope,
-  BadgeDollarSign,
-  Video,
-  Tag,
-  Users,
-  MapPin,
-  Activity,
+import { NavLink } from 'react-router-dom';
+import { 
+  CreditCard, 
+  LifeBuoy, 
+  LucideIcon, 
+  MessageSquare, 
+  PanelLeft, 
+  Settings, 
+  Users, 
+  User, 
+  Calendar, 
+  Activity, 
+  Home, 
+  Map, 
+  Pill, 
+  ShoppingCart, 
+  Truck, 
   Palmtree,
-  BarChart,
-  Package,
-  Settings,
-  FileSpreadsheet,
-  Ambulance
-} from "lucide-react";
-import MembershipBadge from "../common/MembershipBadge";
+  Gift, 
+  Tag
+} from 'lucide-react';
+import { 
+  Sidebar as SidebarContainer, 
+  SidebarContent, 
+  SidebarFooter, 
+  SidebarHeader, 
+  SidebarMenu, 
+  SidebarMenuButton, 
+  SidebarMenuItem, 
+  SidebarTrigger 
+} from '@/components/ui/sidebar';
+import { Button } from '../ui/button';
+import { useAuth } from '@/context/AuthContext';
 
 interface SidebarProps {
-  role?: "member" | "professional" | "admin";
+  role?: 'member' | 'professional' | 'admin';
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ role = "member" }) => {
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
+interface SidebarLinkProps {
+  to: string;
+  icon: LucideIcon;
+  children: React.ReactNode;
+  className?: string;
+}
 
-  // Determine if a menu item is active based on its path
-  const isActive = (path: string) => {
-    if (path === "/dashboard" && pathname === "/dashboard") {
-      return true;
-    }
-    return path !== "/dashboard" && pathname.startsWith(path);
-  };
+const SidebarLink: React.FC<SidebarLinkProps> = ({ to, icon: Icon, children, className }) => {
+  return (
+    <SidebarMenuItem className={className}>
+      <SidebarMenuButton asChild>
+        <NavLink 
+          to={to} 
+          className={({ isActive }) => isActive ? "bg-primary/10 text-primary" : "hover:bg-primary/5"}
+        >
+          <Icon className="h-5 w-5 mr-3" />
+          {children}
+        </NavLink>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+};
 
-  // Simplified mock membership type
-  const membershipType: "smart" | "core" | "vip" = "smart";
+const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
+  const { signOut } = useAuth();
 
-  // Mock user data
-  const userData = {
-    name: "John Doe",
-    role: role,
-    email: "john.doe@example.com",
-    membership: membershipType,
-  };
+  const renderMemberLinks = () => (
+    <>
+      <SidebarLink to="/dashboard" icon={Home}>Dashboard</SidebarLink>
+      <SidebarLink to="/dashboard/health-insights" icon={Activity}>Health Insights</SidebarLink>
+      <SidebarLink to="/dashboard/appointments" icon={Calendar}>Appointments</SidebarLink>
+      <SidebarLink to="/dashboard/concierge" icon={Users}>My Care Team</SidebarLink>
+      <SidebarLink to="/dashboard/pharmacy" icon={Pill}>Pharmacy</SidebarLink>
+      <SidebarLink to="/dashboard/medical-transport" icon={Truck}>Medical Transport</SidebarLink>
+      <SidebarLink to="/dashboard/service-booking" icon={ShoppingCart}>Services</SidebarLink>
+      <SidebarLink to="/dashboard/vacations" icon={Palmtree}>Vacations</SidebarLink>
+      {/* Add Share & Earn link */}
+      <SidebarLink to="/dashboard/share-and-earn" icon={Gift}>Share & Earn</SidebarLink>
+      {/* Add Promotions link */}
+      <SidebarLink to="/dashboard/promotions" icon={Tag}>Promotions</SidebarLink>
+      <SidebarLink to="/dashboard/messages" icon={MessageSquare}>Messages</SidebarLink>
+      <SidebarLink to="/dashboard/membership" icon={CreditCard}>Membership</SidebarLink>
+    </>
+  );
+
+  const renderProfessionalLinks = () => (
+    <>
+      <SidebarLink to="/dashboard/professional" icon={Gauge}>Dashboard</SidebarLink>
+      <SidebarLink to="/dashboard/professional/calendar" icon={Calendar}>Calendar</SidebarLink>
+      <SidebarLink to="/dashboard/professional/requests" icon={ClipboardList}>Patient Requests</SidebarLink>
+      <SidebarLink to="/dashboard/professional/member-manager" icon={Users}>Member Manager</SidebarLink>
+      <SidebarLink to="/dashboard/professional/message-center" icon={MessageSquare}>Message Center</SidebarLink>
+      <SidebarLink to="/dashboard/professional/tools" icon={Stethoscope}>Tools of the Trade</SidebarLink>
+      <SidebarLink to="/dashboard/professional/earnings" icon={BadgeDollarSign}>Earnings</SidebarLink>
+      <SidebarLink to="/dashboard/professional/profile" icon={User}>Profile Settings</SidebarLink>
+    </>
+  );
+
+  const renderAdminLinks = () => (
+    <>
+      <SidebarLink to="/dashboard/admin" icon={Gauge}>Overview</SidebarLink>
+      <SidebarLink to="/dashboard/admin/vacations" icon={Palmtree}>Vacations</SidebarLink>
+      <SidebarLink to="/dashboard/admin/promotions" icon={Gift}>Promotions</SidebarLink>
+      <SidebarLink to="/dashboard/admin/leads" icon={BarChart}>Leads & Analytics</SidebarLink>
+      <SidebarLink to="/dashboard/admin/care-teams" icon={Users}>Care Teams</SidebarLink>
+      <SidebarLink to="/dashboard/admin/health-tools" icon={Heart}>Health Tools</SidebarLink>
+      <SidebarLink to="/dashboard/admin/settings" icon={Settings}>System Settings</SidebarLink>
+    </>
+  );
 
   return (
-    <SidebarPrimitive>
-      <SidebarHeader>
-        <div className="px-6 py-3 flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <div className="rounded-full bg-primary w-8 h-8 flex items-center justify-center text-primary-foreground font-medium">
-              {userData.name.charAt(0)}
-            </div>
-            <div>
-              <h3 className="font-medium leading-none">{userData.name}</h3>
-              <p className="text-xs text-muted-foreground">{userData.email}</p>
-            </div>
+    <SidebarContainer>
+      <SidebarHeader className="p-4 border-b">
+        <div className="flex items-center gap-2">
+          <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
+            <span className="font-semibold text-lg text-primary-foreground">V</span>
           </div>
-          {role === "member" && <MembershipBadge type={userData.membership} />}
+          <div>
+            <h2 className="text-lg font-semibold">Vitale</h2>
+            <p className="text-xs text-muted-foreground">Health Concierge</p>
+          </div>
         </div>
       </SidebarHeader>
-
-      <SidebarContent>
-        {/* Member Navigation */}
-        {role === "member" && (
-          <>
-            <SidebarGroup>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={pathname === "/dashboard"}
-                    onClick={() => navigate("/dashboard")}
-                  >
-                    <Home />
-                    <span>Dashboard</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={isActive("/dashboard/appointments")}
-                    onClick={() => navigate("/dashboard/appointments")}
-                  >
-                    <Calendar />
-                    <span>Appointments</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={isActive("/dashboard/concierge")}
-                    onClick={() => navigate("/dashboard/concierge")}
-                  >
-                    <Users />
-                    <span>My Concierge</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={isActive("/dashboard/service-booking")}
-                    onClick={() => navigate("/dashboard/service-booking")}
-                  >
-                    <Tag />
-                    <span>Service Booking</span>
-                    <div className="ml-auto">
-                      <span className="bg-green-100 text-green-800 text-xs px-1.5 py-0.5 rounded-md">
-                        10% Off
-                      </span>
-                    </div>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={isActive("/dashboard/medical-transport")}
-                    onClick={() => navigate("/dashboard/medical-transport")}
-                  >
-                    <Ambulance />
-                    <span>Medical Transport</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={isActive("/dashboard/purchase-history")}
-                    onClick={() => navigate("/dashboard/purchase-history")}
-                  >
-                    <Receipt />
-                    <span>Purchase History</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={isActive("/dashboard/health-tools")}
-                    onClick={() => navigate("/dashboard/health-tools")}
-                  >
-                    <Heart />
-                    <span>Health Tools</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={isActive("/dashboard/health-insights")}
-                    onClick={() => navigate("/dashboard/health-insights")}
-                  >
-                    <Activity />
-                    <span>Health Insights</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={isActive("/dashboard/messages")}
-                    onClick={() => navigate("/dashboard/messages")}
-                  >
-                    <MessageSquare />
-                    <span>Messages</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={isActive("/dashboard/pharmacy")}
-                    onClick={() => navigate("/dashboard/pharmacy")}
-                  >
-                    <Pill />
-                    <span>Pharmacy</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={isActive("/dashboard/telehealth")}
-                    onClick={() => navigate("/dashboard/telehealth")}
-                  >
-                    <Video />
-                    <span>Telehealth</span>
-                    <div className="ml-auto">
-                      <span className="bg-primary/10 text-primary text-xs px-1.5 py-0.5 rounded-md">
-                        VIP
-                      </span>
-                    </div>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroup>
-
-            <SidebarGroup>
-              <SidebarGroupLabel>Benefits</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      isActive={isActive("/dashboard/rewards")}
-                      onClick={() => navigate("/dashboard/rewards")}
-                    >
-                      <Gift />
-                      <span>Rewards</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      isActive={isActive("/dashboard/promotions")}
-                      onClick={() => navigate("/dashboard/promotions")}
-                    >
-                      <Receipt />
-                      <span>Promotions</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      isActive={isActive("/dashboard/vacations")}
-                      onClick={() => navigate("/dashboard/vacations")}
-                    >
-                      <Palmtree />
-                      <span>Vacations</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      isActive={isActive("/dashboard/membership")}
-                      onClick={() => navigate("/dashboard/membership")}
-                    >
-                      <CreditCard />
-                      <span>Membership</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </>
-        )}
-
-        {/* Professional Navigation */}
-        {role === "professional" && (
-          <SidebarGroup>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={pathname === "/dashboard/professional"}
-                  onClick={() => navigate("/dashboard/professional")}
-                >
-                  <Gauge />
-                  <span>Dashboard</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive("/dashboard/professional/calendar")}
-                  onClick={() => navigate("/dashboard/professional/calendar")}
-                >
-                  <Calendar />
-                  <span>Calendar</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive("/dashboard/professional/requests")}
-                  onClick={() => navigate("/dashboard/professional/requests")}
-                >
-                  <ClipboardList />
-                  <span>Patient Requests</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive("/dashboard/professional/member-manager")}
-                  onClick={() => navigate("/dashboard/professional/member-manager")}
-                >
-                  <Users />
-                  <span>Member Manager</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive("/dashboard/professional/message-center")}
-                  onClick={() => navigate("/dashboard/professional/message-center")}
-                >
-                  <MessageSquare />
-                  <span>Message Center</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive("/dashboard/professional/tools")}
-                  onClick={() => navigate("/dashboard/professional/tools")}
-                >
-                  <Stethoscope />
-                  <span>Tools of the Trade</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive("/dashboard/professional/earnings")}
-                  onClick={() => navigate("/dashboard/professional/earnings")}
-                >
-                  <BadgeDollarSign />
-                  <span>Earnings</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive("/dashboard/professional/profile")}
-                  onClick={() => navigate("/dashboard/professional/profile")}
-                >
-                  <User />
-                  <span>Profile Settings</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroup>
-        )}
-
-        {/* Admin Navigation */}
-        {role === "admin" && (
-          <SidebarGroup>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={pathname === "/dashboard/admin"}
-                  onClick={() => navigate("/dashboard/admin")}
-                >
-                  <Gauge />
-                  <span>Overview</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive("/dashboard/admin/vacations")}
-                  onClick={() => navigate("/dashboard/admin/vacations")}
-                >
-                  <Palmtree />
-                  <span>Vacations</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive("/dashboard/admin/promotions")}
-                  onClick={() => navigate("/dashboard/admin/promotions")}
-                >
-                  <Gift />
-                  <span>Promotions</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive("/dashboard/admin/leads")}
-                  onClick={() => navigate("/dashboard/admin/leads")}
-                >
-                  <BarChart />
-                  <span>Leads & Analytics</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive("/dashboard/admin/care-teams")}
-                  onClick={() => navigate("/dashboard/admin/care-teams")}
-                >
-                  <Users />
-                  <span>Care Teams</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive("/dashboard/admin/health-tools")}
-                  onClick={() => navigate("/dashboard/admin/health-tools")}
-                >
-                  <Heart />
-                  <span>Health Tools</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  isActive={isActive("/dashboard/admin/settings")}
-                  onClick={() => navigate("/dashboard/admin/settings")}
-                >
-                  <Settings />
-                  <span>System Settings</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroup>
-        )}
-
-        <SidebarGroup className="mt-auto">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                isActive={isActive("/dashboard/support")}
-                onClick={() => navigate("/dashboard/support")}
-              >
-                <HelpCircle />
-                <span>Support</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarGroup>
+      <SidebarContent className="p-2">
+        <SidebarMenu>
+          {role === 'member' && renderMemberLinks()}
+          {role === 'professional' && renderProfessionalLinks()}
+          {role === 'admin' && renderAdminLinks()}
+        </SidebarMenu>
       </SidebarContent>
-
-      <SidebarFooter>
-        <div className="px-3 py-2">
-          <Button
-            variant="outline"
-            className="w-full justify-start"
-            onClick={() => navigate("/")}
+      <SidebarFooter className="p-4 border-t">
+        <div className="flex flex-col gap-2">
+          <SidebarLink to="/dashboard/support" icon={LifeBuoy}>Support</SidebarLink>
+          <SidebarTrigger asChild>
+            <Button variant="outline" className="w-full justify-start" size="sm">
+              <PanelLeft className="h-4 w-4 mr-2" />
+              Toggle Sidebar
+            </Button>
+          </SidebarTrigger>
+          <Button 
+            variant="outline" 
+            className="w-full justify-start text-red-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
+            size="sm"
+            onClick={signOut}
           >
-            <CreditCard className="mr-2 h-4 w-4" />
-            <span className="flex-1 text-left">
-              {role === "member"
-                ? "Manage Membership"
-                : role === "professional"
-                  ? "Manage Account"
-                  : "Admin Settings"}
-            </span>
+            <User className="h-4 w-4 mr-2" />
+            Sign Out
           </Button>
         </div>
       </SidebarFooter>
-    </SidebarPrimitive>
+    </SidebarContainer>
   );
 };
 
