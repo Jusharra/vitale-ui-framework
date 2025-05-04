@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useRegionalPricing } from '@/hooks/useRegionalPricing';
 
 interface StripeCheckoutProps {
   tier: 'smart' | 'core' | 'vip';
@@ -35,6 +36,7 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
   const { user, isTrialing, refreshSubscription } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { currency, region, convertPrice } = useRegionalPricing();
   
   const handleSubscription = async (interval: 'monthly' | 'yearly') => {
     if (!user) {
@@ -49,12 +51,18 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
     setIsLoading(true);
     
     try {
+      // Convert prices to regional currency
+      const basePrice = tierPrices[tier][interval];
+      const regionalPrice = convertPrice(basePrice);
+      
       // This will call our edge function to create a Stripe checkout session
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { 
           tier, 
           interval, 
-          price: tierPrices[tier][interval],
+          price: regionalPrice,
+          currency,
+          region,
           trial: isTrialing // Pass trial status to checkout function
         }
       });
@@ -83,6 +91,15 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
     }
   };
   
+  // Format prices using regional pricing
+  const formatPrice = (price: number): string => {
+    const regionalPrice = convertPrice(price);
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency
+    }).format(regionalPrice / 100);
+  };
+  
   return (
     <div className="flex flex-col sm:flex-row gap-2 w-full">
       <Button 
@@ -97,7 +114,7 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
             Processing...
           </>
         ) : (
-          `${buttonText} Monthly`
+          `${buttonText} Monthly (${formatPrice(tierPrices[tier].monthly/100)})`
         )}
       </Button>
       <Button 
@@ -112,7 +129,7 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
             Processing...
           </>
         ) : (
-          `${buttonText} Yearly (Save 16%)`
+          `${buttonText} Yearly (${formatPrice(tierPrices[tier].yearly/100)}) - Save 16%`
         )}
       </Button>
     </div>

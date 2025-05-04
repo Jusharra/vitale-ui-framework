@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTranslation } from '@/utils/i18n';
 
 interface Activity {
   id: number | string;
@@ -14,10 +15,12 @@ interface ActivityHistoryProps {
 }
 
 const ActivityHistory: React.FC<ActivityHistoryProps> = ({ activities }) => {
+  const { t } = useTranslation();
+  
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Activity History</CardTitle>
+        <CardTitle>{t('rewards.history')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -29,7 +32,7 @@ const ActivityHistory: React.FC<ActivityHistoryProps> = ({ activities }) => {
               </div>
               <div className="text-right">
                 <p className="font-medium text-primary">+{activity.points}</p>
-                <p className="text-sm text-muted-foreground">points</p>
+                <p className="text-sm text-muted-foreground">{t('rewards.points')}</p>
               </div>
             </div>
           ))}

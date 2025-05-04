@@ -7,6 +7,8 @@ import { CircleCheck, Heart, Gift, CirclePlus } from 'lucide-react';
 import { Reward } from '@/hooks/useRewards';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from '@/utils/i18n';
+import { useRegionalPricing } from '@/hooks/useRegionalPricing';
 
 interface RewardsListProps {
   rewards: Reward[];
@@ -16,12 +18,14 @@ interface RewardsListProps {
 
 const RewardsList: React.FC<RewardsListProps> = ({ rewards, currentPoints, isLoading }) => {
   const { toast } = useToast();
+  const { t } = useTranslation();
+  const { formatPrice } = useRegionalPricing();
   
   const handleRedeem = (reward: Reward) => {
     // In a real implementation, this would call an API to redeem the reward
     toast({
-      title: "Redeeming Reward",
-      description: `Processing your redemption for ${reward.name}`,
+      title: t('rewards.redeemingReward'),
+      description: t('rewards.processingRedemption', { reward: reward.name }),
     });
   };
   
@@ -29,7 +33,7 @@ const RewardsList: React.FC<RewardsListProps> = ({ rewards, currentPoints, isLoa
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Available Rewards</CardTitle>
+          <CardTitle>{t('rewards.availableRewards')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -66,7 +70,7 @@ const RewardsList: React.FC<RewardsListProps> = ({ rewards, currentPoints, isLoa
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Available Rewards</CardTitle>
+        <CardTitle>{t('rewards.availableRewards')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -83,22 +87,27 @@ const RewardsList: React.FC<RewardsListProps> = ({ rewards, currentPoints, isLoa
                   <h3 className="font-medium">{reward.name}</h3>
                 </div>
                 {reward.claimed && (
-                  <Badge variant="outline" className="ml-2">Claimed</Badge>
+                  <Badge variant="outline" className="ml-2">{t('rewards.claimed')}</Badge>
                 )}
                 {reward.status === 'limited' && (
-                  <Badge variant="secondary" className="ml-2">Limited</Badge>
+                  <Badge variant="secondary" className="ml-2">{t('rewards.limited')}</Badge>
                 )}
               </div>
               <p className="text-sm text-muted-foreground mb-4">{reward.description}</p>
               <div className="mt-auto flex justify-between items-center">
-                <span className="text-sm font-medium">{reward.value} points</span>
+                <span className="text-sm font-medium">{reward.value} {t('rewards.points')}</span>
                 <Button 
                   variant={reward.claimed ? "outline" : (currentPoints >= (reward.value || 0) ? "default" : "outline")}
                   disabled={reward.claimed || currentPoints < (reward.value || 0)}
                   size="sm"
                   onClick={() => handleRedeem(reward)}
                 >
-                  {reward.claimed ? "Claimed" : (currentPoints >= (reward.value || 0) ? "Redeem" : "Not Enough Points")}
+                  {reward.claimed 
+                    ? t('rewards.claimed') 
+                    : (currentPoints >= (reward.value || 0) 
+                      ? t('rewards.redeem') 
+                      : t('rewards.notEnoughPoints'))
+                  }
                 </Button>
               </div>
             </div>
@@ -108,7 +117,7 @@ const RewardsList: React.FC<RewardsListProps> = ({ rewards, currentPoints, isLoa
       <CardFooter>
         <Button variant="outline" className="w-full">
           <CirclePlus className="mr-2 h-4 w-4" />
-          View More Rewards
+          {t('rewards.viewMoreRewards')}
         </Button>
       </CardFooter>
     </Card>
