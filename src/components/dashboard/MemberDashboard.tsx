@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,13 +18,15 @@ import {
   Gift, 
   Download,
   Award,
-  Pill
+  Pill,
+  Bell
 } from 'lucide-react';
 import MembershipBadge from '../common/MembershipBadge';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useRewards } from "@/hooks/useRewards";
+import { Badge } from "@/components/ui/badge";
 
 // Mock data
 const upcomingAppointments = [
