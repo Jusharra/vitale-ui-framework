@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -8,35 +8,40 @@ export const useToolAccess = (toolName: string) => {
   const [hasAccess, setHasAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const checkAccess = async () => {
-      if (!isAuthenticated || !profile) {
-        setHasAccess(false);
-        setIsLoading(false);
-        return;
-      }
+  // Convert to async function that returns a Promise
+  const checkAccess = useCallback(async () => {
+    if (!isAuthenticated || !profile) {
+      setHasAccess(false);
+      setIsLoading(false);
+      return false;
+    }
 
-      try {
-        setIsLoading(true);
-        const { data, error } = await supabase.rpc('check_tool_access', {
-          user_id: profile.id,
-          tool_name: toolName
-        });
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase.rpc('check_tool_access', {
+        user_id: profile.id,
+        tool_name: toolName
+      });
 
-        if (error) throw error;
-        setHasAccess(!!data);
-      } catch (error) {
-        console.error(`Error checking access for tool ${toolName}:`, error);
-        setHasAccess(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAccess();
+      if (error) throw error;
+      const hasToolAccess = !!data;
+      setHasAccess(hasToolAccess);
+      return hasToolAccess;
+    } catch (error) {
+      console.error(`Error checking access for tool ${toolName}:`, error);
+      setHasAccess(false);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
   }, [isAuthenticated, profile, toolName]);
 
-  return { hasAccess, isLoading };
+  // Initial check
+  useState(() => {
+    checkAccess();
+  });
+
+  return { hasAccess, isLoading, checkAccess };
 };
 
 export default useToolAccess;
