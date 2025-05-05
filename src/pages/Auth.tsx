@@ -12,6 +12,9 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 // Validation schemas
 const loginSchema = z.object({
@@ -29,13 +32,21 @@ const registerSchema = z.object({
   path: ["confirmPassword"],
 });
 
+const forgotPasswordSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email address" })
+});
+
 type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
+type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 const Auth = () => {
   const navigate = useNavigate();
   const { signIn, signUp, isLoading, isAuthenticated } = useAuth();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>("login");
+  const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
   
   // Redirect if already authenticated
   React.useEffect(() => {
@@ -72,23 +83,63 @@ const Auth = () => {
     await signUp(values.email, values.password, values.fullName);
   };
 
+  // Forgot password form
+  const forgotPasswordForm = useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+
+  const onForgotPasswordSubmit = async (values: ForgotPasswordFormValues) => {
+    try {
+      setForgotPasswordLoading(true);
+      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
+        redirectTo: window.location.origin + '/reset-password',
+      });
+
+      if (error) {
+        throw error;
+      }
+      
+      setResetEmailSent(true);
+      toast({
+        title: "Password reset email sent",
+        description: "Check your inbox for further instructions",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send password reset email",
+        variant: "destructive",
+      });
+    } finally {
+      setForgotPasswordLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <Card className="w-full max-w-md">
         <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-2">
+          <TabsList className="grid grid-cols-3">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="register">Register</TabsTrigger>
+            <TabsTrigger value="forgot-password">Forgot Password</TabsTrigger>
           </TabsList>
           
           <CardHeader>
             <CardTitle>
-              {activeTab === "login" ? "Welcome Back" : "Create an Account"}
+              {activeTab === "login" ? "Welcome Back" : 
+               activeTab === "register" ? "Create an Account" : 
+               "Reset Your Password"}
             </CardTitle>
             <CardDescription>
-              {activeTab === "login" 
-                ? "Sign in to access your health concierge dashboard" 
-                : "Start your 14-day free trial with all features unlocked"}
+              {activeTab === "login" ? 
+                "Sign in to access your health concierge dashboard" : 
+               activeTab === "register" ? 
+                "Start your 14-day free trial with all features unlocked" : 
+                "Enter your email and we'll send you a link to reset your password"}
             </CardDescription>
           </CardHeader>
           
@@ -123,6 +174,17 @@ const Auth = () => {
                       </FormItem>
                     )}
                   />
+                  
+                  <div className="text-right">
+                    <Button 
+                      type="button" 
+                      variant="link" 
+                      className="p-0 h-auto" 
+                      onClick={() => setActiveTab("forgot-password")}
+                    >
+                      Forgot password?
+                    </Button>
+                  </div>
                   
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? (
@@ -210,14 +272,55 @@ const Auth = () => {
                 </form>
               </Form>
             </TabsContent>
+
+            <TabsContent value="forgot-password">
+              {resetEmailSent ? (
+                <Alert className="bg-green-50 border-green-200">
+                  <AlertDescription className="text-center py-4">
+                    Password reset email sent! Check your inbox for further instructions.
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <Form {...forgotPasswordForm}>
+                  <form onSubmit={forgotPasswordForm.handleSubmit(onForgotPasswordSubmit)} className="space-y-4">
+                    <FormField
+                      control={forgotPasswordForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input placeholder="your@email.com" {...field} autoComplete="email" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <Button type="submit" className="w-full" disabled={forgotPasswordLoading}>
+                      {forgotPasswordLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Sending reset link...
+                        </>
+                      ) : (
+                        "Send Reset Link"
+                      )}
+                    </Button>
+                  </form>
+                </Form>
+              )}
+            </TabsContent>
           </CardContent>
           
           <CardFooter className="flex justify-center">
             <p className="text-sm text-muted-foreground">
               {activeTab === "login" ? (
                 <>Don't have an account? <Button variant="link" className="p-0 h-auto" onClick={() => setActiveTab("register")}>Register</Button></>
-              ) : (
+              ) : activeTab === "register" ? (
                 <>Already have an account? <Button variant="link" className="p-0 h-auto" onClick={() => setActiveTab("login")}>Login</Button></>
+              ) : (
+                <>Remember your password? <Button variant="link" className="p-0 h-auto" onClick={() => setActiveTab("login")}>Login</Button></>
               )}
             </p>
           </CardFooter>
