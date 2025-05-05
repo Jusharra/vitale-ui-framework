@@ -17,7 +17,7 @@ import PaymentHistory from '@/components/member/membership/PaymentHistory';
 import { membershipTiers } from '@/components/member/membership/membershipData';
 
 const Membership = () => {
-  const { profile, isTrialing, isAuthenticated, refreshSubscription } = useAuth();
+  const { profile, isTrialing, isAuthenticated, refreshSubscription, membershipTier, subscription } = useAuth();
   const [subscriptionData, setSubscriptionData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
@@ -85,10 +85,10 @@ const Membership = () => {
           <div className="space-y-6">
             {/* Subscription Details */}
             <SubscriptionDetails 
-              profile={profile}
+              profile={{...profile, membership_tier: membershipTier}}
               isTrialing={isTrialing}
               membershipTiers={membershipTiers}
-              subscriptionData={subscriptionData}
+              subscriptionData={{subscription}}
               isLoading={isLoading}
             />
             
@@ -109,8 +109,8 @@ const Membership = () => {
                 <MembershipTierCard 
                   key={tier.id}
                   tier={tier}
-                  isCurrent={tier.id === profile?.membership_tier}
-                  hasSubscription={!!subscriptionData?.subscription}
+                  isCurrent={tier.id === membershipTier}
+                  hasSubscription={!!subscription}
                 />
               ))}
             </div>
@@ -122,12 +122,12 @@ const Membership = () => {
             {/* Billing Information */}
             <BillingInformation 
               isLoading={isLoading} 
-              subscriptionData={subscriptionData} 
+              subscriptionData={{subscription}} 
             />
             
             {/* Payment History */}
             <PaymentHistory 
-              hasSubscription={!!subscriptionData?.subscription}
+              hasSubscription={!!subscription}
             />
           </div>
         </TabsContent>

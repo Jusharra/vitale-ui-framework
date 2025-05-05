@@ -27,4 +27,5 @@ export interface AuthState {
   isTrialing: boolean;
   userRole: UserRole | null;
   subscription: Subscription | null;
+  membershipTier: string | null;
 }

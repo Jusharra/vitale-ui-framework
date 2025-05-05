@@ -17,7 +17,7 @@ const MedicalTransportContent: React.FC = () => {
   const [transportProviders, setTransportProviders] = useState<Transport[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<Transport | null>(null);
-  const { membershipTier, user } = useAuth();
+  const { user, membershipTier } = useAuth();
   const { hasAccess } = useAccessCheck(user?.id || null, 'medical_transport');
   const { hasAccess: hasVipTransport } = useAccessCheck(user?.id || null, 'vip_transport');
   
@@ -118,7 +118,7 @@ const MedicalTransportContent: React.FC = () => {
         <TransportPaymentSummary
           selectedProvider={selectedProvider}
           formValues={formValues}
-          membershipTier={membershipTier}
+          membershipTier={membershipTier || 'smart'}
           onBack={() => setStep(1)}
           onPayment={handlePayment}
         />

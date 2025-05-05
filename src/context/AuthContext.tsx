@@ -59,6 +59,9 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
     return hasToolAccess(user?.id || null, toolName);
   }, [hasToolAccess, user?.id]);
 
+  // Get membership tier from subscription
+  const membershipTier = useMemo(() => subscription?.tier || null, [subscription]);
+
   // Create a stable context value with more complete dependency array
   const value = useMemo(() => ({
     user,
@@ -69,6 +72,7 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
     isAuthenticated: !!user,
     isTrialing,
     subscription,
+    membershipTier,
     signIn,
     signUp,
     signOut,
@@ -82,6 +86,7 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
     isLoading, 
     isTrialing, 
     subscription,
+    membershipTier,
     signIn,
     signUp,
     signOut,
