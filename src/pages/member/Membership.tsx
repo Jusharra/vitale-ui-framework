@@ -99,7 +99,7 @@ const Membership = () => {
             <SubscriptionDetails 
               profile={{...profile, membership_tier: membershipTier}}
               isTrialing={isTrialing}
-              membershipTiers={membershipTiers}
+              membershipTiers={[...membershipTiers]}
               subscriptionData={adaptedSubscriptionData}
               isLoading={isLoading}
             />

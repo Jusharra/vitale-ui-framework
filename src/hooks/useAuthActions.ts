@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import type { UserProfile } from '@/types/auth';
+import type { UserProfile, UserRole } from '@/types/auth';
 
 export function useAuthActions() {
   const navigate = useNavigate();
@@ -147,7 +147,7 @@ export function useAuthActions() {
     
     try {
       // Security validation - prevent updating role to admin
-      if (data.role === 'admin') {
+      if (data.role === 'admin' as UserRole) {
         // Role elevation should be handled by a separate admin function
         throw new Error("Unauthorized role update");
       }
@@ -165,7 +165,7 @@ export function useAuthActions() {
       // Then update users table if needed
       const userUpdates: any = {};
       
-      if (data.role && data.role !== 'admin') userUpdates.role = data.role;
+      if (data.role && data.role !== 'admin' as UserRole) userUpdates.role = data.role;
       
       if (Object.keys(userUpdates).length > 0) {
         const { error: userError } = await supabase
