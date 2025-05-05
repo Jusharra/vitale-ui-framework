@@ -27,6 +27,7 @@ import MemberMembershipPage from '@/pages/member/Membership';
 import MemberPromotionsPage from '@/pages/member/Promotions';
 import ShareAndEarn from '@/pages/member/ShareAndEarn';
 import GlobalSettingsPage from '@/pages/member/GlobalSettingsPage';
+import ResetPassword from '@/pages/ResetPassword';
 import { AuthProvider } from '@/context/AuthContext';
 
 const App: React.FC = () => {
@@ -38,6 +39,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             
             {/* Member routes */}
             <Route

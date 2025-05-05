@@ -101,13 +101,24 @@ export const useWhiteLabel = () => {
         // If we found white-label data, set it
         if (partnerData) {
           // Extract branding from partner data
-          let brandingData = {
+          // Fix: Define interface for branding properties to avoid recursive type instantiation
+          interface BrandingData {
+            companyName: string;
+            logo: string | null;
+            primaryColor: string;
+            secondaryColor: string;
+            contactEmail: string | null;
+            contactPhone: string | null;
+          }
+          
+          // Initialize with empty values
+          let brandingData: BrandingData = {
             companyName: '',
-            logo: null as string | null,
+            logo: null,
             primaryColor: '',
             secondaryColor: '',
-            contactEmail: null as string | null,
-            contactPhone: null as string | null
+            contactEmail: null,
+            contactPhone: null
           };
           
           // Safely extract branding properties
