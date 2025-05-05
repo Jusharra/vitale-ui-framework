@@ -100,8 +100,12 @@ export const useWhiteLabel = () => {
         
         // If we found white-label data, set it
         if (partnerData) {
-          // Use type assertion for the branding data
-          const brandingData = partnerData.branding ? partnerData.branding as Record<string, any> : {};
+          // Convert branding data to safe type
+          const brandingData = partnerData.branding 
+            ? (typeof partnerData.branding === 'string' 
+                ? JSON.parse(partnerData.branding) 
+                : partnerData.branding as Record<string, any>)
+            : {};
           
           setBranding({
             isWhiteLabeled: true,
