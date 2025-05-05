@@ -72,10 +72,7 @@ export function useAuthState() {
         const userProfile: UserProfile = {
           id: userData.id,
           email: userData.email,
-          role: userData.role as UserProfile['role'],
-          membership_tier: userData.membership_tier as UserProfile['membership_tier'],
-          trial_status: userData.trial_status,
-          trial_end_date: userData.trial_end_date,
+          role: userData.role as UserProfile['role']
         };
         
         // Fetch additional profile info
@@ -91,13 +88,9 @@ export function useAuthState() {
         
         setProfile(userProfile);
         
-        // Check if user is in trial period
-        if (userData.trial_status === 'active' && userData.trial_end_date) {
-          const trialEndDate = new Date(userData.trial_end_date);
-          setIsTrialing(trialEndDate > new Date());
-        } else {
-          setIsTrialing(false);
-        }
+        // We removed the trial fields from users table, 
+        // so we're setting isTrialing to false by default
+        setIsTrialing(false);
       }
     } catch (error) {
       console.error("Error fetching user profile:", error);

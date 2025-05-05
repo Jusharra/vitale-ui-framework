@@ -2250,33 +2250,21 @@ export type Database = {
           created_at: string | null
           email: string
           id: string
-          membership_tier: string | null
           role: string
-          stripe_customer_id: string | null
-          trial_end_date: string | null
-          trial_status: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           email: string
           id: string
-          membership_tier?: string | null
           role?: string
-          stripe_customer_id?: string | null
-          trial_end_date?: string | null
-          trial_status?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           email?: string
           id?: string
-          membership_tier?: string | null
           role?: string
-          stripe_customer_id?: string | null
-          trial_end_date?: string | null
-          trial_status?: string | null
           updated_at?: string | null
         }
         Relationships: []

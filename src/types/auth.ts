@@ -1,38 +1,30 @@
 
-import type { Session, User } from "@supabase/supabase-js";
+import { User, Session } from '@supabase/supabase-js';
 
-export type MembershipTier = "smart" | "core" | "vip";
-export type UserRole = "member" | "professional" | "admin";
+export type UserRole = 'member' | 'admin' | 'professional';
 
-export type UserProfile = {
+export interface UserProfile {
   id: string;
   email: string;
   full_name?: string;
   role: UserRole;
-  membership_tier: MembershipTier;
-  trial_status?: string;
-  trial_end_date?: string;
-};
+}
 
-export type Subscription = {
+export interface Subscription {
   id: string;
   status: string;
-  tier: MembershipTier;
-  current_period_end: number;
+  tier: string;
+  current_period_end: string;
   cancel_at_period_end: boolean;
-  cancel_at?: number;
-  trial_end?: number;
-  interval?: 'month' | 'year';
-};
+}
 
 export interface AuthState {
   user: User | null;
   session: Session | null;
   profile: UserProfile | null;
   isLoading: boolean;
-  userRole: UserRole | null;
-  membershipTier: MembershipTier | null;
   isAuthenticated: boolean;
   isTrialing: boolean;
+  userRole: UserRole | null;
   subscription: Subscription | null;
 }

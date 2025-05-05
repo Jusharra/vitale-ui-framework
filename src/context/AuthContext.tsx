@@ -4,7 +4,7 @@ import { useAuthState } from '@/hooks/useAuthState';
 import { useAuthActions } from '@/hooks/useAuthActions';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useToolAccess } from '@/hooks/useToolAccess';
-import type { UserProfile, AuthState, UserRole, MembershipTier } from '@/types/auth';
+import type { UserProfile, AuthState, UserRole } from '@/types/auth';
 
 interface AuthContextType extends AuthState {
   signIn: (email: string, password: string) => Promise<boolean>;
@@ -66,7 +66,6 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
     profile,
     isLoading,
     userRole: profile?.role || null as UserRole | null,
-    membershipTier: profile?.membership_tier || null as MembershipTier | null,
     isAuthenticated: !!user,
     isTrialing,
     subscription,
@@ -86,8 +85,8 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
     signIn,
     signUp,
     signOut,
-    updateProfile, // Adding memoized function
-    checkToolAccess, // Adding memoized function
+    updateProfile,
+    checkToolAccess,
     refreshSubscription
   ]);
 

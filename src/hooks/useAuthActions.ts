@@ -52,7 +52,7 @@ export function useAuthActions() {
       
       toast({
         title: "Account created",
-        description: "Welcome to Vitale Health Concierge! Your 14-day trial has started.",
+        description: "Welcome to Vitale Health Concierge!",
       });
       
       // Redirect to dashboard after signup
@@ -107,7 +107,6 @@ export function useAuthActions() {
       const userUpdates: any = {};
       
       if (data.role) userUpdates.role = data.role;
-      if (data.membership_tier) userUpdates.membership_tier = data.membership_tier;
       
       if (Object.keys(userUpdates).length > 0) {
         const { error: userError } = await supabase
