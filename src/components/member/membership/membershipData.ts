@@ -1,65 +1,87 @@
 
-// Membership tiers data
-export const membershipTiers = [
+// This is a secure, read-only implementation of membership tiers data
+// No sensitive information should be stored here
+
+import type { MembershipTier } from '@/components/member/membership/MembershipTierCard';
+
+// Create a frozen (immutable) object for membership tiers
+export const membershipTiers: ReadonlyArray<MembershipTier> = Object.freeze([
   {
-    id: "smart" as const,
+    id: "smart",
     name: "Smart Access",
-    price: "$497",
+    price: "$12.99",
     interval: "month",
-    yearlyPrice: "$5,964",
-    description: "Basic healthcare access and digital tools",
+    yearlyPrice: "$129.99",
+    description: "Basic plan with essential health monitoring features",
     features: [
-      "Basic healthcare access",
-      "Digital health assessment",
-      "Symptom checker tool",
-      "Medication tracking",
-      "Basic rewards program"
+      "Basic health monitoring",
+      "Smart medication reminders",
+      "Pharmacy delivery coordination",
+      "Basic telehealth consultations"
     ],
     notIncluded: [
+      "Premium health tools",
+      "Concierge care team",
       "Priority appointment scheduling",
-      "Specialist referral coordination",
-      "Medical concierge services",
-      "24/7 provider access"
+      "VIP transport services"
     ]
   },
   {
-    id: "core" as const,
-    name: "Core Concierge",
-    price: "$997",
+    id: "core",
+    name: "Core Concierge", 
+    price: "$24.99",
     interval: "month",
-    yearlyPrice: "$10,764",
-    description: "Enhanced care coordination and priority access",
+    yearlyPrice: "$249.99",
+    description: "Enhanced plan with premium care coordination",
     features: [
-      "Everything in Smart Access",
+      "All Smart Access features",
+      "Premium health assessments",
+      "Advanced analytics and insights",
       "Priority appointment scheduling",
-      "Specialist referral coordination",
-      "Prescription delivery service",
-      "Advanced health monitoring tools",
-      "Enhanced rewards program"
+      "Dedicated care coordinators"
     ],
     notIncluded: [
-      "24/7 dedicated concierge",
-      "Travel medical support",
-      "Executive health services"
+      "Exclusive VIP services",
+      "Personal 24/7 concierge",
+      "White-glove medical transport"
     ],
     popular: true
   },
   {
-    id: "vip" as const,
-    name: "VIP Executive",
-    price: "$1,297",
+    id: "vip",
+    name: "VIP Experience",
+    price: "$49.99",
     interval: "month",
-    yearlyPrice: "$15,564",
-    description: "Premium healthcare experience with concierge services",
+    yearlyPrice: "$499.99",
+    description: "All-inclusive luxury health concierge experience",
     features: [
-      "Everything in Core Concierge",
-      "24/7 dedicated healthcare concierge",
-      "Same-day appointments guaranteed",
-      "Executive health assessments",
-      "Global travel medical support",
-      "Premium wellness services",
-      "VIP membership perks"
+      "All Core Concierge features",
+      "24/7 personal health concierge",
+      "White-glove medical transport",
+      "Virtual and in-home care options",
+      "Exclusive wellness retreats access",
+      "Global health support and coordination",
+      "Family coverage options"
     ],
     notIncluded: []
   }
-];
+]);
+
+// Helper function to safely get tier by ID
+export function getTierById(tierId: string): MembershipTier | undefined {
+  return membershipTiers.find(tier => tier.id === tierId);
+}
+
+// Helper function to safely check if a tier level is sufficient
+export function hasSufficientTier(userTier: string | null, requiredTier: string): boolean {
+  const tierLevels: Record<string, number> = {
+    "smart": 1,
+    "core": 2,
+    "vip": 3
+  };
+  
+  const userLevel = userTier ? tierLevels[userTier] || 0 : 0;
+  const requiredLevel = tierLevels[requiredTier] || 0;
+  
+  return userLevel >= requiredLevel;
+}

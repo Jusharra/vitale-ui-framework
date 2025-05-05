@@ -23,15 +23,67 @@ const Auth = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      // Check if there's a stored redirect path
+      const redirectPath = sessionStorage.getItem('redirectAfterLogin');
+      if (redirectPath) {
+        sessionStorage.removeItem('redirectAfterLogin');
+        navigate(redirectPath);
+      } else {
+        navigate('/dashboard');
+      }
     }
   }, [isAuthenticated, navigate]);
 
+  // Rate limiting for login attempts (security)
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [loginDisabled, setLoginDisabled] = useState(false);
+  
+  useEffect(() => {
+    if (loginAttempts >= 5) {
+      setLoginDisabled(true);
+      toast({
+        title: "Too many attempts",
+        description: "Please try again after 2 minutes",
+        variant: "destructive",
+      });
+      
+      // Reset after 2 minutes
+      const timer = setTimeout(() => {
+        setLoginAttempts(0);
+        setLoginDisabled(false);
+      }, 120000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [loginAttempts, toast]);
+
   const onLoginSubmit = async (values: LoginFormValues) => {
-    await signIn(values.email, values.password);
+    if (loginDisabled) {
+      toast({
+        title: "Login temporarily disabled",
+        description: "Too many attempts. Please try again later.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const success = await signIn(values.email, values.password);
+    if (!success) {
+      setLoginAttempts(prev => prev + 1);
+    }
   };
 
   const onRegisterSubmit = async (values: RegisterFormValues) => {
+    // Add basic password strength validation
+    if (values.password.length < 8) {
+      toast({
+        title: "Weak password",
+        description: "Password must be at least 8 characters long",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     await signUp(values.email, values.password, values.fullName);
   };
 
@@ -52,11 +104,12 @@ const Auth = () => {
         description: "Check your inbox for further instructions",
       });
     } catch (error: any) {
+      // Don't reveal if email exists or not (security)
       toast({
-        title: "Error",
-        description: error.message || "Failed to send password reset email",
-        variant: "destructive",
+        title: "Password Reset",
+        description: "If your email exists in our system, you'll receive reset instructions.",
       });
+      console.error("Error in password reset:", error);
     } finally {
       setForgotPasswordLoading(false);
     }
@@ -108,9 +161,14 @@ const Auth = () => {
               <TabsContent value="login">
                 <LoginForm 
                   onSubmit={onLoginSubmit}
-                  isLoading={isLoading}
+                  isLoading={isLoading || loginDisabled}
                   onForgotPassword={() => setShowForgotPassword(true)}
                 />
+                {loginAttempts > 2 && !loginDisabled && (
+                  <p className="text-amber-600 text-sm mt-2">
+                    Warning: {5 - loginAttempts} login attempts remaining before temporary lockout.
+                  </p>
+                )}
               </TabsContent>
               
               <TabsContent value="register">
