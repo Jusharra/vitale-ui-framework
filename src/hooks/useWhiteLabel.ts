@@ -101,12 +101,14 @@ export const useWhiteLabel = () => {
         // If we found white-label data, set it
         if (partnerData) {
           // Extract branding from partner data
-          let brandingCompanyName = '';
-          let brandingLogo = null;
-          let brandingPrimaryColor = '';
-          let brandingSecondaryColor = '';
-          let brandingContactEmail = null;
-          let brandingContactPhone = null;
+          let brandingData = {
+            companyName: '',
+            logo: null as string | null,
+            primaryColor: '',
+            secondaryColor: '',
+            contactEmail: null as string | null,
+            contactPhone: null as string | null
+          };
           
           // Safely extract branding properties
           if (partnerData.branding) {
@@ -115,22 +117,26 @@ export const useWhiteLabel = () => {
               if (typeof partnerData.branding === 'string') {
                 const parsedBranding = JSON.parse(partnerData.branding);
                 if (parsedBranding) {
-                  brandingCompanyName = parsedBranding.companyName || '';
-                  brandingLogo = parsedBranding.logo || null;
-                  brandingPrimaryColor = parsedBranding.primaryColor || '';
-                  brandingSecondaryColor = parsedBranding.secondaryColor || '';
-                  brandingContactEmail = parsedBranding.contactEmail || null;
-                  brandingContactPhone = parsedBranding.contactPhone || null;
+                  brandingData = {
+                    companyName: parsedBranding.companyName || '',
+                    logo: parsedBranding.logo || null,
+                    primaryColor: parsedBranding.primaryColor || '',
+                    secondaryColor: parsedBranding.secondaryColor || '',
+                    contactEmail: parsedBranding.contactEmail || null,
+                    contactPhone: parsedBranding.contactPhone || null
+                  };
                 }
               } 
               // Handle object
               else if (partnerData.branding && typeof partnerData.branding === 'object') {
-                brandingCompanyName = partnerData.branding.companyName || '';
-                brandingLogo = partnerData.branding.logo || null;
-                brandingPrimaryColor = partnerData.branding.primaryColor || '';
-                brandingSecondaryColor = partnerData.branding.secondaryColor || '';
-                brandingContactEmail = partnerData.branding.contactEmail || null;
-                brandingContactPhone = partnerData.branding.contactPhone || null;
+                brandingData = {
+                  companyName: partnerData.branding.companyName || '',
+                  logo: partnerData.branding.logo || null,
+                  primaryColor: partnerData.branding.primaryColor || '',
+                  secondaryColor: partnerData.branding.secondaryColor || '',
+                  contactEmail: partnerData.branding.contactEmail || null,
+                  contactPhone: partnerData.branding.contactPhone || null
+                };
               }
             } catch (e) {
               console.error('Error processing branding data:', e);
@@ -141,12 +147,12 @@ export const useWhiteLabel = () => {
           setBranding({
             isWhiteLabeled: true,
             partnerId: partnerData.id || null,
-            companyName: partnerData.practice_name || brandingCompanyName || defaultBranding.companyName,
-            logo: brandingLogo || defaultBranding.logo,
-            primaryColor: brandingPrimaryColor || defaultBranding.primaryColor,
-            secondaryColor: brandingSecondaryColor || defaultBranding.secondaryColor,
-            contactEmail: partnerData.email || brandingContactEmail || null,
-            contactPhone: partnerData.phone || brandingContactPhone || null,
+            companyName: partnerData.practice_name || brandingData.companyName || defaultBranding.companyName,
+            logo: brandingData.logo || defaultBranding.logo,
+            primaryColor: brandingData.primaryColor || defaultBranding.primaryColor,
+            secondaryColor: brandingData.secondaryColor || defaultBranding.secondaryColor,
+            contactEmail: partnerData.email || brandingData.contactEmail || null,
+            contactPhone: partnerData.phone || brandingData.contactPhone || null,
             customDomain: partnerData.custom_domain || null,
             subdomain: partnerData.subdomain || null
           });
