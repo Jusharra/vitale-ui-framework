@@ -1,126 +1,154 @@
-
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CircleCheck, Heart, Gift, CirclePlus } from 'lucide-react';
-import { Reward } from '@/hooks/useRewards';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useTranslation } from '@/utils/i18n';
-import { useRegionalPricing } from '@/hooks/useRegionalPricing';
+import { Loader2, Gift, Award, Clock } from 'lucide-react';
+
+interface Reward {
+  id: string;
+  title: string;
+  description: string;
+  points_required: number;
+  category: string;
+  status: 'available' | 'claimed' | 'expired';
+  expiry_date?: string;
+}
 
 interface RewardsListProps {
   rewards: Reward[];
-  currentPoints: number;
-  isLoading: boolean;
+  userPoints: number;
+  isLoading?: boolean;
+  onClaimReward?: (rewardId: string) => void;
 }
 
-const RewardsList: React.FC<RewardsListProps> = ({ rewards, currentPoints, isLoading }) => {
+const RewardsList: React.FC<RewardsListProps> = ({ 
+  rewards, 
+  userPoints, 
+  isLoading = false,
+  onClaimReward 
+}) => {
+  const { user } = useAuth();
   const { toast } = useToast();
-  const { t } = useTranslation();
-  const { formatPrice } = useRegionalPricing();
-  
-  const handleRedeem = (reward: Reward) => {
-    // In a real implementation, this would call an API to redeem the reward
-    toast({
-      title: t('rewards.redeemingReward'),
-      description: t('rewards.processingRedemption', { reward: reward.name }),
-    });
+
+  const handleClaimReward = (reward: Reward) => {
+    if (userPoints < reward.points_required) {
+      toast({
+        title: "Not enough points",
+        description: "You need more points to claim this reward",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (onClaimReward) {
+      onClaimReward(reward.id);
+    }
   };
-  
+
   if (isLoading) {
     return (
+      <div className="flex justify-center items-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!rewards || rewards.length === 0) {
+    return (
       <Card>
-        <CardHeader>
-          <CardTitle>{t('rewards.availableRewards')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="border rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Skeleton className="h-8 w-8 rounded-full" />
-                  <Skeleton className="h-4 w-32" />
-                </div>
-                <Skeleton className="h-3 w-full mb-1" />
-                <Skeleton className="h-3 w-3/4 mb-4" />
-                <div className="flex justify-between items-center">
-                  <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-8 w-24" />
-                </div>
-              </div>
-            ))}
-          </div>
+        <CardContent className="pt-6 text-center">
+          <Gift className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+          <p className="text-muted-foreground">No rewards available at the moment.</p>
+          <p className="text-sm text-muted-foreground mt-1">Check back soon for new rewards!</p>
         </CardContent>
       </Card>
     );
   }
-  
-  const getRewardIcon = (reward: Reward) => {
-    if (reward.reward_type.includes('wellness')) {
-      return <Heart className="h-5 w-5" />;
-    } else if (reward.reward_type.includes('referral')) {
-      return <Gift className="h-5 w-5" />;
-    } else {
-      return <CircleCheck className="h-5 w-5" />;
-    }
-  };
-  
+
+  const availableRewards = rewards.filter(r => r.status === 'available');
+  const claimedRewards = rewards.filter(r => r.status === 'claimed');
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t('rewards.availableRewards')}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {rewards.map((reward) => (
-            <div 
-              key={reward.id}
-              className="border rounded-lg p-4 flex flex-col"
-            >
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    {getRewardIcon(reward)}
-                  </div>
-                  <h3 className="font-medium">{reward.name}</h3>
+    <Tabs defaultValue="available">
+      <TabsList className="mb-4">
+        <TabsTrigger value="available">
+          Available
+          {availableRewards.length > 0 && (
+            <Badge variant="secondary" className="ml-2">{availableRewards.length}</Badge>
+          )}
+        </TabsTrigger>
+        <TabsTrigger value="claimed">
+          Claimed
+          {claimedRewards.length > 0 && (
+            <Badge variant="secondary" className="ml-2">{claimedRewards.length}</Badge>
+          )}
+        </TabsTrigger>
+      </TabsList>
+      
+      <TabsContent value="available" className="space-y-4">
+        {availableRewards.map(reward => (
+          <Card key={reward.id}>
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-start">
+                <CardTitle className="text-lg">{reward.title}</CardTitle>
+                <Badge variant="outline" className="font-mono">
+                  {reward.points_required} pts
+                </Badge>
+              </div>
+              <CardDescription>{reward.description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {reward.expiry_date && (
+                <div className="flex items-center text-sm text-muted-foreground mb-2">
+                  <Clock className="h-4 w-4 mr-1" />
+                  Expires: {new Date(reward.expiry_date).toLocaleDateString()}
                 </div>
-                {reward.claimed && (
-                  <Badge variant="outline" className="ml-2">{t('rewards.claimed')}</Badge>
-                )}
-                {reward.status === 'limited' && (
-                  <Badge variant="secondary" className="ml-2">{t('rewards.limited')}</Badge>
-                )}
-              </div>
-              <p className="text-sm text-muted-foreground mb-4">{reward.description}</p>
-              <div className="mt-auto flex justify-between items-center">
-                <span className="text-sm font-medium">{reward.value} {t('rewards.points')}</span>
-                <Button 
-                  variant={reward.claimed ? "outline" : (currentPoints >= (reward.value || 0) ? "default" : "outline")}
-                  disabled={reward.claimed || currentPoints < (reward.value || 0)}
-                  size="sm"
-                  onClick={() => handleRedeem(reward)}
-                >
-                  {reward.claimed 
-                    ? t('rewards.claimed') 
-                    : (currentPoints >= (reward.value || 0) 
-                      ? t('rewards.redeem') 
-                      : t('rewards.notEnoughPoints'))
-                  }
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-      <CardFooter>
-        <Button variant="outline" className="w-full">
-          <CirclePlus className="mr-2 h-4 w-4" />
-          {t('rewards.viewMoreRewards')}
-        </Button>
-      </CardFooter>
-    </Card>
+              )}
+            </CardContent>
+            <CardFooter>
+              <Button 
+                onClick={() => handleClaimReward(reward)} 
+                disabled={userPoints < reward.points_required}
+                className="w-full"
+              >
+                {userPoints < reward.points_required ? 'Not Enough Points' : 'Claim Reward'}
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
+      </TabsContent>
+      
+      <TabsContent value="claimed" className="space-y-4">
+        {claimedRewards.length === 0 ? (
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <Award className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+              <p className="text-muted-foreground">You haven't claimed any rewards yet.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          claimedRewards.map(reward => (
+            <Card key={reward.id}>
+              <CardHeader className="pb-2">
+                <div className="flex justify-between items-start">
+                  <CardTitle className="text-lg">{reward.title}</CardTitle>
+                  <Badge variant="secondary">Claimed</Badge>
+                </div>
+                <CardDescription>{reward.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  This reward has been added to your account.
+                </p>
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </TabsContent>
+    </Tabs>
   );
 };
 

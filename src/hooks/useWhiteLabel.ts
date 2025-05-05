@@ -101,17 +101,16 @@ export const useWhiteLabel = () => {
         // If we found white-label data, set it
         if (partnerData) {
           // Safely handle branding data by checking type and parsing if needed
-          let brandingData = {};
+          let brandingData: Record<string, any> = {};
           if (partnerData.branding) {
             if (typeof partnerData.branding === 'string') {
               try {
                 brandingData = JSON.parse(partnerData.branding);
               } catch (e) {
                 console.error('Error parsing branding JSON:', e);
-                brandingData = {};
               }
             } else if (typeof partnerData.branding === 'object') {
-              brandingData = partnerData.branding;
+              brandingData = partnerData.branding as Record<string, any>;
             }
           }
           
