@@ -101,22 +101,21 @@ export const useWhiteLabel = () => {
         // If we found white-label data, set it
         if (partnerData) {
           // Parse branding data safely
-          let brandingObj: Record<string, any> = {};
+          const brandingObj: Record<string, any> = {};
           
           if (partnerData.branding) {
             if (typeof partnerData.branding === 'string') {
               try {
-                brandingObj = JSON.parse(partnerData.branding);
+                Object.assign(brandingObj, JSON.parse(partnerData.branding));
               } catch (e) {
                 console.error('Error parsing branding JSON:', e);
-                brandingObj = {};
               }
             } else if (typeof partnerData.branding === 'object') {
-              brandingObj = partnerData.branding;
+              Object.assign(brandingObj, partnerData.branding);
             }
           }
           
-          const newBranding: WhiteLabelBranding = {
+          setBranding({
             isWhiteLabeled: true,
             partnerId: partnerData.id,
             companyName: partnerData.practice_name || brandingObj.companyName || defaultBranding.companyName,
@@ -127,9 +126,7 @@ export const useWhiteLabel = () => {
             contactPhone: partnerData.phone || brandingObj.contactPhone,
             customDomain: partnerData.custom_domain || null,
             subdomain: partnerData.subdomain || null
-          };
-          
-          setBranding(newBranding);
+          });
         } else {
           // Reset to default if no white-labeling is found
           setBranding(defaultBranding);

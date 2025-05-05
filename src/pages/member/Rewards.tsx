@@ -12,6 +12,19 @@ const RewardsPage = () => {
   const { user } = useAuth();
   const { rewards, activities, points, isLoading } = useRewards(user?.id || null);
   
+  // This maps the rewards from useRewards hook to the format expected by RewardsList component
+  const mappedRewards = rewards.map(reward => ({
+    id: reward.id,
+    title: reward.name,
+    description: reward.description || '',
+    points_required: reward.points_required,
+    category: reward.category || 'general',
+    status: reward.status === 'available' || reward.status === 'claimed' || reward.status === 'expired' 
+      ? reward.status 
+      : 'available',
+    expiry_date: reward.expires_at || undefined
+  }));
+
   return (
     <MemberPageLayout 
       title="Rewards & Referrals"
@@ -32,7 +45,7 @@ const RewardsPage = () => {
       </div>
       
       <RewardsList 
-        rewards={rewards} 
+        rewards={mappedRewards} 
         userPoints={points.current} 
         isLoading={isLoading}
       />

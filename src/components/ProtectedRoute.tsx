@@ -1,73 +1,57 @@
 
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { Loader2 } from 'lucide-react';
+import React from "react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Layout from "./layout/Layout";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
-  requiredRole?: 'member' | 'professional' | 'admin';
-  requiredTier?: 'smart' | 'core' | 'vip';
+  requiredRole?: "member" | "admin" | "professional";
+  redirectPath?: string;
+  children?: React.ReactNode;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  requiredRole,
-  requiredTier
+// This component is used to protect routes based on authentication and roles
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  requiredRole = "member",
+  redirectPath = "/auth",
+  children,
 }) => {
-  const { isAuthenticated, isLoading, userRole, membershipTier, isTrialing, subscription } = useAuth();
+  const { user, isLoading } = useAuth();
   const location = useLocation();
+  const { subscription, isLoading: isLoadingSubscription } = useSubscription();
 
-  if (isLoading) {
+  // Show loading state if auth is still being determined
+  if (isLoading || isLoadingSubscription) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <span className="ml-2 text-lg">Loading...</span>
-      </div>
+      <Layout>
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      </Layout>
     );
   }
 
-  if (!isAuthenticated) {
-    // Redirect to login page, but remember where they were trying to go
-    return <Navigate to="/auth" state={{ from: location }} replace />;
+  // If user is not authenticated, redirect to login
+  if (!user) {
+    return <Navigate to={redirectPath} state={{ from: location }} replace />;
   }
 
-  // Check role if required
-  if (requiredRole && userRole !== requiredRole && userRole !== 'admin') {
-    if (userRole === 'professional') {
-      return <Navigate to="/dashboard/professional" replace />;
-    }
-    if (userRole === 'member') {
-      return <Navigate to="/dashboard" replace />;
-    }
-    // If somehow they have an invalid role
-    return <Navigate to="/" replace />;
+  // Check if user has the required role
+  // For member routes, all authenticated users have access
+  // For admin routes, only admin users have access
+  // For professional routes, only professional users have access
+  const hasRequiredRole =
+    requiredRole === "member" ||
+    (requiredRole === "admin" && user.role === "admin") ||
+    (requiredRole === "professional" && user.role === "professional");
+
+  if (!hasRequiredRole) {
+    return <Navigate to="/dashboard" replace />;
   }
 
-  // Check tier if required (only applies to members)
-  // Admins always bypass tier restrictions
-  if (requiredTier && userRole === 'member' && userRole !== 'admin') {
-    const tierLevels = {
-      'smart': 1,
-      'core': 2,
-      'vip': 3
-    };
-    
-    const userTierLevel = membershipTier ? tierLevels[membershipTier] : 0;
-    const requiredTierLevel = tierLevels[requiredTier];
-    
-    // If they're in trial, allow access to any tier
-    if (!isTrialing && userTierLevel < requiredTierLevel) {
-      // If they have a subscription but wrong tier, redirect to upgrade page
-      if (subscription?.status === 'active') {
-        return <Navigate to="/dashboard/membership" state={{ upgradeRequired: true }} replace />;
-      }
-      // If they don't have an active subscription, redirect to membership page
-      return <Navigate to="/dashboard/membership" replace />;
-    }
-  }
-
-  return <>{children}</>;
+  // Render children or outlet
+  return children ? <>{children}</> : <Outlet />;
 };
 
 export default ProtectedRoute;

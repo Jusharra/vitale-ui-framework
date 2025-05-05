@@ -34,6 +34,19 @@ const ShareAndEarn: React.FC = () => {
     ]
   };
 
+  // Map rewards to the format expected by RewardsList component
+  const mappedRewards = rewards.map(reward => ({
+    id: reward.id,
+    title: reward.name,
+    description: reward.description || '',
+    points_required: reward.points_required,
+    category: reward.category || 'general',
+    status: reward.status === 'available' || reward.status === 'claimed' || reward.status === 'expired' 
+      ? reward.status 
+      : 'available',
+    expiry_date: reward.expires_at || undefined
+  }));
+
   const handleViewActivity = () => {
     // In a real implementation, this would navigate to a detailed activity history view
     // or expand the current view to show more history
@@ -102,7 +115,7 @@ const ShareAndEarn: React.FC = () => {
             </TabsList>
             
             <TabsContent value="rewards" className="pt-4">
-              <RewardsList rewards={rewards} userPoints={rewardsData.points} isLoading={isLoading} />
+              <RewardsList rewards={mappedRewards} userPoints={rewardsData.points} isLoading={isLoading} />
             </TabsContent>
             
             <TabsContent value="activity" className="pt-4">
