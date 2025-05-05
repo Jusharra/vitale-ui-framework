@@ -1,14 +1,25 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
 interface AIAssistantProps {
   mode?: 'chat' | 'widget';
   initialPrompt?: string;
+  title?: string;
+  description?: string;
+  initialMessage?: string;
+  isFloating?: boolean;
+  onAction?: (action: string, data: any) => void;
 }
 
 const AIAssistant: React.FC<AIAssistantProps> = ({ 
   mode = 'chat',
-  initialPrompt 
+  initialPrompt,
+  title,
+  description,
+  initialMessage,
+  isFloating = false,
+  onAction
 }) => {
   const { membershipTier } = useAuth();
   const [availableModels, setAvailableModels] = useState<string[]>([]);
@@ -32,8 +43,14 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
   
   return (
     <div>
-      <h2>AI Assistant</h2>
+      {title && <h2>{title}</h2>}
+      {description && <p className="text-sm text-muted-foreground mb-2">{description}</p>}
       <p>Available models: {availableModels.join(', ')}</p>
+      {initialMessage && (
+        <div className="bg-slate-50 p-4 rounded-lg mt-2 border">
+          <p className="text-sm">{initialMessage}</p>
+        </div>
+      )}
       {/* Assistant implementation */}
     </div>
   );

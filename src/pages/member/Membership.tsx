@@ -70,6 +70,15 @@ const Membership = () => {
     }
   }, [upgradeRequired]);
 
+  // Adapt subscription data to match expected format in subcomponents
+  const adaptedSubscriptionData = {
+    subscription: subscription ? {
+      current_period_end: subscription.current_period_end,
+      status: subscription.status,
+      cancel_at_period_end: subscription.cancel_at_period_end
+    } : null
+  };
+
   return (
     <MemberPageLayout 
       title="Membership" 
@@ -88,7 +97,7 @@ const Membership = () => {
               profile={{...profile, membership_tier: membershipTier}}
               isTrialing={isTrialing}
               membershipTiers={membershipTiers}
-              subscriptionData={{subscription}}
+              subscriptionData={adaptedSubscriptionData}
               isLoading={isLoading}
             />
             
@@ -122,7 +131,7 @@ const Membership = () => {
             {/* Billing Information */}
             <BillingInformation 
               isLoading={isLoading} 
-              subscriptionData={{subscription}} 
+              subscriptionData={adaptedSubscriptionData} 
             />
             
             {/* Payment History */}

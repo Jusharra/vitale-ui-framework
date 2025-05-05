@@ -184,7 +184,10 @@ const SmartHealth: React.FC = () => {
       {/* Floating assistant is only shown on non-chat tabs */}
       {activeTab !== 'chat' && (
         <div className="fixed bottom-6 right-6">
-          <AIAssistant isFloating={true} onAction={handleAIAction} />
+          <AIAssistant 
+            isFloating={true} 
+            onAction={handleAIAction} 
+          />
         </div>
       )}
     </MemberPageLayout>
