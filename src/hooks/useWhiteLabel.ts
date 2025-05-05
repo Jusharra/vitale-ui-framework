@@ -100,32 +100,36 @@ export const useWhiteLabel = () => {
         
         // If we found white-label data, set it
         if (partnerData) {
-          // Safely handle branding data by checking type and parsing if needed
-          let brandingData: Record<string, any> = {};
+          // Parse branding data safely
+          let brandingObj: Record<string, any> = {};
+          
           if (partnerData.branding) {
             if (typeof partnerData.branding === 'string') {
               try {
-                brandingData = JSON.parse(partnerData.branding);
+                brandingObj = JSON.parse(partnerData.branding);
               } catch (e) {
                 console.error('Error parsing branding JSON:', e);
+                brandingObj = {};
               }
             } else if (typeof partnerData.branding === 'object') {
-              brandingData = partnerData.branding as Record<string, any>;
+              brandingObj = partnerData.branding;
             }
           }
           
-          setBranding({
+          const newBranding: WhiteLabelBranding = {
             isWhiteLabeled: true,
             partnerId: partnerData.id,
-            companyName: partnerData.practice_name || brandingData.companyName || defaultBranding.companyName,
-            logo: brandingData.logo || defaultBranding.logo,
-            primaryColor: brandingData.primaryColor || defaultBranding.primaryColor,
-            secondaryColor: brandingData.secondaryColor || defaultBranding.secondaryColor,
-            contactEmail: partnerData.email || brandingData.contactEmail,
-            contactPhone: partnerData.phone || brandingData.contactPhone,
+            companyName: partnerData.practice_name || brandingObj.companyName || defaultBranding.companyName,
+            logo: brandingObj.logo || defaultBranding.logo,
+            primaryColor: brandingObj.primaryColor || defaultBranding.primaryColor,
+            secondaryColor: brandingObj.secondaryColor || defaultBranding.secondaryColor,
+            contactEmail: partnerData.email || brandingObj.contactEmail,
+            contactPhone: partnerData.phone || brandingObj.contactPhone,
             customDomain: partnerData.custom_domain || null,
             subdomain: partnerData.subdomain || null
-          });
+          };
+          
+          setBranding(newBranding);
         } else {
           // Reset to default if no white-labeling is found
           setBranding(defaultBranding);

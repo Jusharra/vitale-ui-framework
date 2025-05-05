@@ -33,7 +33,7 @@ const RewardsPage = () => {
       
       <RewardsList 
         rewards={rewards} 
-        currentPoints={points.current} 
+        userPoints={points.current} 
         isLoading={isLoading}
       />
       

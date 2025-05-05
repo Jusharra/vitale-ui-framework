@@ -102,7 +102,7 @@ const ShareAndEarn: React.FC = () => {
             </TabsList>
             
             <TabsContent value="rewards" className="pt-4">
-              <RewardsList rewards={rewards} currentPoints={rewardsData.points} isLoading={isLoading} />
+              <RewardsList rewards={rewards} userPoints={rewardsData.points} isLoading={isLoading} />
             </TabsContent>
             
             <TabsContent value="activity" className="pt-4">
