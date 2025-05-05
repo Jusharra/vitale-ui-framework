@@ -43,32 +43,27 @@ export class MediaAssetManager {
       // if (storageError) throw storageError;
       
       // Create asset record in database
-      const newAsset: Partial<MediaAsset> = {
-        title,
-        description,
-        asset_type: assetType,
-        category,
-        file_path: filePath,
-        original_filename: file.name,
-        file_type: file.type,
-        file_size: file.size,
-        storage_type: 'local',
-        metadata: {
-          ...additionalMetadata,
-          uploaded_at: new Date().toISOString(),
-        },
-        profile_id: this.authUser
-      };
-      
       const { data, error } = await supabase
         .from('media_assets')
-        .insert(newAsset)
+        .insert({
+          title,
+          description,
+          asset_type: assetType,
+          category,
+          file_path: filePath,
+          original_filename: file.name,
+          file_type: file.type,
+          file_size: file.size,
+          storage_type: 'local',
+          metadata: additionalMetadata,
+          profile_id: this.authUser
+        })
         .select()
         .single();
       
       if (error) throw error;
       
-      return data;
+      return data as unknown as MediaAsset;
     } catch (error) {
       console.error('Error uploading asset:', error);
       return null;
@@ -122,7 +117,7 @@ export class MediaAssetManager {
       
       if (error) throw error;
       
-      return data || [];
+      return (data || []) as unknown as MediaAsset[];
     } catch (error) {
       console.error('Error fetching assets:', error);
       return [];
@@ -142,7 +137,7 @@ export class MediaAssetManager {
       
       if (error) throw error;
       
-      return data;
+      return data as unknown as MediaAsset;
     } catch (error) {
       console.error('Error fetching asset:', error);
       return null;
@@ -186,14 +181,14 @@ export class MediaAssetManager {
       // Perform the update
       const { data, error } = await supabase
         .from('media_assets')
-        .update(validUpdates)
+        .update(validUpdates as any)
         .eq('id', assetId)
         .select()
         .single();
       
       if (error) throw error;
       
-      return data;
+      return data as unknown as MediaAsset;
     } catch (error) {
       console.error('Error updating asset:', error);
       return null;

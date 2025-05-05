@@ -12,10 +12,37 @@ interface Activity {
 
 interface ActivityHistoryProps {
   activities: Activity[];
+  isLoading?: boolean;
 }
 
-const ActivityHistory: React.FC<ActivityHistoryProps> = ({ activities }) => {
+const ActivityHistory: React.FC<ActivityHistoryProps> = ({ activities, isLoading }) => {
   const { t } = useTranslation();
+  
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('rewards.history')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse space-y-4">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="flex justify-between pb-4 border-b last:border-0 last:pb-0">
+                <div className="space-y-2">
+                  <div className="h-4 w-32 bg-gray-200 rounded"></div>
+                  <div className="h-3 w-20 bg-gray-200 rounded"></div>
+                </div>
+                <div className="space-y-2">
+                  <div className="h-4 w-10 bg-gray-200 rounded"></div>
+                  <div className="h-3 w-16 bg-gray-200 rounded"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
   
   return (
     <Card>

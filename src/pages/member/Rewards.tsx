@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useRewards } from '@/hooks/useRewards';
 import { useAuth } from '@/context/AuthContext';
 import MemberPageLayout from '@/components/layout/MemberPageLayout';
@@ -25,7 +25,8 @@ const RewardsPage = () => {
           isLoading={isLoading}
         />
         <ReferralCard 
-          referralCount={points.referrals} 
+          referralCode="FRIEND25"
+          successfulReferrals={points.referrals} 
           isLoading={isLoading}
         />
       </div>

@@ -18,8 +18,23 @@ export interface Reward {
   renewal_date: string;
 }
 
-export const useRewards = () => {
+export interface Activity {
+  id: string | number;
+  date: string;
+  action: string;
+  points: number;
+}
+
+export interface RewardPoints {
+  current: number;
+  lifetime: number;
+  referrals: number;
+}
+
+export const useRewards = (userId: string | null = null) => {
   const [rewards, setRewards] = useState<Reward[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [points, setPoints] = useState<RewardPoints>({ current: 0, lifetime: 0, referrals: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -121,9 +136,46 @@ export const useRewards = () => {
         },
       ];
 
+      // Mock activities data
+      const mockActivities: Activity[] = [
+        {
+          id: '1',
+          date: '2025-04-25',
+          action: 'Completed health assessment',
+          points: 100
+        },
+        {
+          id: '2',
+          date: '2025-04-22',
+          action: 'Referred a friend',
+          points: 300
+        },
+        {
+          id: '3',
+          date: '2025-04-15',
+          action: 'Logged workout activity',
+          points: 50
+        },
+        {
+          id: '4',
+          date: '2025-04-10',
+          action: 'Annual checkup completed',
+          points: 200
+        },
+      ];
+      
+      // Mock points data
+      const mockPoints: RewardPoints = {
+        current: 2150,
+        lifetime: 3500,
+        referrals: 2
+      };
+
       // Simulate API delay
       setTimeout(() => {
         setRewards(mockRewards);
+        setActivities(mockActivities);
+        setPoints(mockPoints);
         setIsLoading(false);
       }, 500);
     } catch (err) {
@@ -134,10 +186,12 @@ export const useRewards = () => {
 
   useEffect(() => {
     fetchRewards();
-  }, []);
+  }, [userId]);
 
   return {
     rewards,
+    activities,
+    points,
     isLoading,
     error,
     fetchRewards

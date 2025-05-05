@@ -5,19 +5,27 @@ import { Button } from "@/components/ui/button";
 import { CircleCheck, Share, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { Progress } from '@/components/ui/progress';
 
 interface ReferralCardProps {
   referralCode: string;
-  successfulReferrals: number;
+  successfulReferrals?: number;
+  referralCount?: number; // Added for backward compatibility
+  isLoading?: boolean;
 }
 
 const ReferralCard: React.FC<ReferralCardProps> = ({ 
   referralCode,
-  successfulReferrals
+  successfulReferrals = 0,
+  referralCount, // Backward compatibility
+  isLoading = false
 }) => {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
   const referralLink = `https://vitale.health/refer/${referralCode}`;
+  
+  // Use either successfulReferrals or referralCount, whichever is provided
+  const referrals = referralCount !== undefined ? referralCount : successfulReferrals;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(referralLink);
@@ -59,6 +67,33 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
     }
   };
 
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Referral Program</CardTitle>
+          <CardDescription>Share Vitale with friends and family</CardDescription>
+        </CardHeader>
+        <CardContent className="animate-pulse space-y-4">
+          <div className="h-32 bg-gray-200 rounded"></div>
+          <div className="h-4 w-32 bg-gray-200 rounded"></div>
+          <div className="h-2 bg-gray-200 rounded"></div>
+          <div className="flex">
+            <div className="h-10 flex-1 bg-gray-200 rounded-l"></div>
+            <div className="h-10 w-20 bg-gray-200 rounded-r"></div>
+          </div>
+        </CardContent>
+        <CardFooter className="flex flex-col gap-2">
+          <div className="h-10 w-full bg-gray-200 rounded"></div>
+          <div className="flex gap-2 w-full">
+            <div className="h-10 flex-1 bg-gray-200 rounded"></div>
+            <div className="h-10 flex-1 bg-gray-200 rounded"></div>
+          </div>
+        </CardFooter>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -78,8 +113,8 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
           </ul>
         </div>
         
-        <p className="text-sm font-medium mb-2">Your progress: {successfulReferrals}/5 referrals</p>
-        <Progress value={(successfulReferrals / 5) * 100} className="h-2 mb-4" />
+        <p className="text-sm font-medium mb-2">Your progress: {referrals}/5 referrals</p>
+        <Progress value={(referrals / 5) * 100} className="h-2 mb-4" />
         
         <div className="space-y-2">
           <p className="text-sm font-medium">Your personal referral link:</p>
@@ -120,6 +155,3 @@ const ReferralCard: React.FC<ReferralCardProps> = ({
 };
 
 export default ReferralCard;
-
-// Add this at the top of your component for the progress bar
-import { Progress } from '@/components/ui/progress';

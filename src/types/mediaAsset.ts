@@ -10,7 +10,7 @@ export interface MediaAsset {
   file_type: string;
   file_size?: number;
   storage_type?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, any> | any; // Adjusted to handle both Record and Json types
   version?: number;
   is_source?: boolean;
   is_master?: boolean;

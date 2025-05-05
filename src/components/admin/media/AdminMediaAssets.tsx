@@ -27,7 +27,7 @@ const AdminMediaAssets = () => {
           .order('created_at', { ascending: false });
 
         if (error) throw error;
-        setAssets(data || []);
+        setAssets((data || []) as unknown as MediaAsset[]);
       } catch (error: any) {
         console.error('Error fetching media assets:', error);
         toast({
@@ -80,7 +80,9 @@ const AdminMediaAssets = () => {
       if (error) throw error;
       
       if (data) {
-        setAssets([...data, ...assets]);
+        // Cast to MediaAsset[] to avoid type issues
+        const newData = data as unknown as MediaAsset[];
+        setAssets(prev => [...newData, ...prev]);
         toast({
           title: 'Upload successful',
           description: `File ${file.name} has been uploaded`,
