@@ -71,9 +71,12 @@ const Membership = () => {
   }, [upgradeRequired]);
 
   // Adapt subscription data to match expected format in subcomponents
+  // Convert current_period_end to a number if it's a string
   const adaptedSubscriptionData = {
     subscription: subscription ? {
-      current_period_end: subscription.current_period_end,
+      current_period_end: typeof subscription.current_period_end === 'string' 
+        ? Math.floor(new Date(subscription.current_period_end).getTime() / 1000) // Convert string date to UNIX timestamp
+        : subscription.current_period_end,
       status: subscription.status,
       cancel_at_period_end: subscription.cancel_at_period_end
     } : null
