@@ -19,9 +19,9 @@ const RewardsPage = () => {
     description: reward.description || '',
     points_required: reward.points_required,
     category: reward.category || 'general',
-    status: reward.status === 'available' || reward.status === 'claimed' || reward.status === 'expired' 
-      ? reward.status 
-      : 'available',
+    status: (reward.status === 'available' || reward.status === 'claimed' || reward.status === 'expired') 
+      ? (reward.status as "available" | "claimed" | "expired") 
+      : "available" as const,
     expiry_date: reward.expires_at || undefined
   }));
 

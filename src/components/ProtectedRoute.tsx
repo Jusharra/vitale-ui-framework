@@ -17,12 +17,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   redirectPath = "/auth",
   children,
 }) => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const location = useLocation();
-  const { subscription, isLoading: isLoadingSubscription } = useSubscription();
+  const { subscription, checkSubscription, isLoading: subscriptionLoading } = useSubscription(user?.id || null);
 
   // Show loading state if auth is still being determined
-  if (isLoading || isLoadingSubscription) {
+  if (authLoading || subscriptionLoading) {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
