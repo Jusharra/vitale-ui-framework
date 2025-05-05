@@ -101,30 +101,29 @@ export const useWhiteLabel = () => {
         // If we found white-label data, set it
         if (partnerData) {
           // Parse branding data safely
-          let brandingData = {};
+          const parsedBranding: Record<string, any> = {};
           
           if (partnerData.branding) {
             if (typeof partnerData.branding === 'string') {
               try {
-                brandingData = JSON.parse(partnerData.branding);
+                Object.assign(parsedBranding, JSON.parse(partnerData.branding));
               } catch (e) {
                 console.error('Error parsing branding JSON:', e);
-                brandingData = {};
               }
             } else if (typeof partnerData.branding === 'object') {
-              brandingData = partnerData.branding;
+              Object.assign(parsedBranding, partnerData.branding);
             }
           }
           
           setBranding({
             isWhiteLabeled: true,
             partnerId: partnerData.id,
-            companyName: partnerData.practice_name || (brandingData as any).companyName || defaultBranding.companyName,
-            logo: (brandingData as any).logo || defaultBranding.logo,
-            primaryColor: (brandingData as any).primaryColor || defaultBranding.primaryColor,
-            secondaryColor: (brandingData as any).secondaryColor || defaultBranding.secondaryColor,
-            contactEmail: partnerData.email || (brandingData as any).contactEmail,
-            contactPhone: partnerData.phone || (brandingData as any).contactPhone,
+            companyName: partnerData.practice_name || parsedBranding.companyName || defaultBranding.companyName,
+            logo: parsedBranding.logo || defaultBranding.logo,
+            primaryColor: parsedBranding.primaryColor || defaultBranding.primaryColor,
+            secondaryColor: parsedBranding.secondaryColor || defaultBranding.secondaryColor,
+            contactEmail: partnerData.email || parsedBranding.contactEmail,
+            contactPhone: partnerData.phone || parsedBranding.contactPhone,
             customDomain: partnerData.custom_domain || null,
             subdomain: partnerData.subdomain || null
           });
