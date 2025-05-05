@@ -100,30 +100,42 @@ export const useWhiteLabel = () => {
         
         // If we found white-label data, set it
         if (partnerData) {
-          // Parse branding data safely
-          const parsedBranding: Record<string, any> = {};
+          // Create a separate object to store parsed branding data to avoid type recursion
+          type BrandingData = {
+            companyName?: string;
+            logo?: string;
+            primaryColor?: string;
+            secondaryColor?: string;
+            contactEmail?: string;
+            contactPhone?: string;
+          };
+          
+          // Safely parse branding data
+          let brandingData: BrandingData = {};
           
           if (partnerData.branding) {
             if (typeof partnerData.branding === 'string') {
               try {
-                Object.assign(parsedBranding, JSON.parse(partnerData.branding));
+                const parsed = JSON.parse(partnerData.branding);
+                brandingData = parsed || {};
               } catch (e) {
                 console.error('Error parsing branding JSON:', e);
               }
-            } else if (typeof partnerData.branding === 'object') {
-              Object.assign(parsedBranding, partnerData.branding);
+            } else if (partnerData.branding && typeof partnerData.branding === 'object') {
+              brandingData = { ...partnerData.branding };
             }
           }
           
+          // Apply the branding data with explicit property access to avoid type recursion
           setBranding({
             isWhiteLabeled: true,
             partnerId: partnerData.id,
-            companyName: partnerData.practice_name || parsedBranding.companyName || defaultBranding.companyName,
-            logo: parsedBranding.logo || defaultBranding.logo,
-            primaryColor: parsedBranding.primaryColor || defaultBranding.primaryColor,
-            secondaryColor: parsedBranding.secondaryColor || defaultBranding.secondaryColor,
-            contactEmail: partnerData.email || parsedBranding.contactEmail,
-            contactPhone: partnerData.phone || parsedBranding.contactPhone,
+            companyName: partnerData.practice_name || brandingData.companyName || defaultBranding.companyName,
+            logo: brandingData.logo || defaultBranding.logo,
+            primaryColor: brandingData.primaryColor || defaultBranding.primaryColor,
+            secondaryColor: brandingData.secondaryColor || defaultBranding.secondaryColor,
+            contactEmail: partnerData.email || brandingData.contactEmail || null,
+            contactPhone: partnerData.phone || brandingData.contactPhone || null,
             customDomain: partnerData.custom_domain || null,
             subdomain: partnerData.subdomain || null
           });
