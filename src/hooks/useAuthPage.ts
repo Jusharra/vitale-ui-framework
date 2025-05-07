@@ -81,7 +81,8 @@ export const useAuthPage = () => {
       return;
     }
     
-    await signUp(values.email, values.password, { fullName: values.fullName });
+    // Fix: Pass fullName as an object in the metadata
+    await signUp(values.email, values.password, { full_name: values.fullName });
   };
 
   const onForgotPasswordSubmit = async (values: ForgotPasswordFormValues) => {
