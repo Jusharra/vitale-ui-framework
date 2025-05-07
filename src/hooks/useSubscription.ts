@@ -1,49 +1,19 @@
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useState } from 'react';
 import type { Subscription } from '@/types/auth';
 
 export function useSubscription(userId: string | null) {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isTrialing, setIsTrialing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Check and update subscription data
+  // No-op check subscription function since auth is removed
   const checkSubscription = async () => {
-    if (!userId) {
-      setIsLoading(false);
-      return;
-    }
-    
-    try {
-      setIsLoading(true);
-      const { data, error } = await supabase.functions.invoke('check-subscription');
-      
-      if (error) throw error;
-      
-      if (data?.subscription) {
-        setSubscription(data.subscription);
-      } else {
-        setSubscription(null);
-      }
-
-      // Update trial status based on subscription data
-      if (data?.isTrialing !== undefined) {
-        setIsTrialing(data.isTrialing);
-      }
-      
-    } catch (error) {
-      console.error("Error checking subscription:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    setIsLoading(false);
+    return;
   };
   
-  // Initial subscription check
-  useEffect(() => {
-    checkSubscription();
-  }, [userId]);
-  
+  // No-op refresh subscription function
   const refreshSubscription = async () => {
     await checkSubscription();
   };

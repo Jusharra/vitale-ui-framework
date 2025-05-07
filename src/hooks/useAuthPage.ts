@@ -1,8 +1,7 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { LoginFormValues } from '@/components/auth/LoginForm';
 import { RegisterFormValues } from '@/components/auth/RegisterForm';
@@ -20,39 +19,6 @@ export const useAuthPage = () => {
   // Rate limiting for login attempts (security)
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [loginDisabled, setLoginDisabled] = useState(false);
-  
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      // Check if there's a stored redirect path
-      const redirectPath = sessionStorage.getItem('redirectAfterLogin');
-      if (redirectPath) {
-        sessionStorage.removeItem('redirectAfterLogin');
-        navigate(redirectPath);
-      } else {
-        navigate('/dashboard');
-      }
-    }
-  }, [isAuthenticated, navigate]);
-  
-  useEffect(() => {
-    if (loginAttempts >= 5) {
-      setLoginDisabled(true);
-      toast({
-        title: "Too many attempts",
-        description: "Please try again after 2 minutes",
-        variant: "destructive",
-      });
-      
-      // Reset after 2 minutes
-      const timer = setTimeout(() => {
-        setLoginAttempts(0);
-        setLoginDisabled(false);
-      }, 120000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [loginAttempts, toast]);
 
   const onLoginSubmit = async (values: LoginFormValues) => {
     if (loginDisabled) {
@@ -64,10 +30,12 @@ export const useAuthPage = () => {
       return;
     }
     
-    const success = await signIn(values.email, values.password);
-    if (!success) {
-      setLoginAttempts(prev => prev + 1);
-    }
+    toast({
+      title: "Authentication removed",
+      description: "Supabase authentication has been removed",
+      variant: "destructive",
+    });
+    setLoginAttempts(prev => prev + 1);
   };
 
   const onRegisterSubmit = async (values: RegisterFormValues) => {
@@ -81,31 +49,29 @@ export const useAuthPage = () => {
       return;
     }
     
-    // Pass full_name as part of an object
-    await signUp(values.email, values.password, { full_name: values.fullName });
+    toast({
+      title: "Authentication removed",
+      description: "Supabase authentication has been removed",
+      variant: "destructive",
+    });
   };
 
   const onForgotPasswordSubmit = async (values: ForgotPasswordFormValues) => {
     try {
       setForgotPasswordLoading(true);
-      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-
-      if (error) {
-        throw error;
-      }
       
+      // Placeholder implementation
       setResetEmailSent(true);
       toast({
-        title: "Password reset email sent",
-        description: "Check your inbox for further instructions",
+        title: "Authentication removed",
+        description: "Supabase authentication has been removed",
+        variant: "destructive",
       });
     } catch (error: any) {
-      // Don't reveal if email exists or not (security)
       toast({
-        title: "Password Reset",
-        description: "If your email exists in our system, you'll receive reset instructions.",
+        title: "Authentication removed",
+        description: "Supabase authentication has been removed",
+        variant: "destructive",
       });
       console.error("Error in password reset:", error);
     } finally {

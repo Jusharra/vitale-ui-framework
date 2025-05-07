@@ -2,8 +2,6 @@
 import React, { createContext, useContext, useMemo, memo, useCallback } from "react";
 import { useAuthState } from '@/hooks/useAuthState';
 import { useAuthActions } from '@/hooks/useAuthActions';
-import { useSubscription } from '@/hooks/useSubscription';
-import { useToolAccess } from '@/hooks/useToolAccess';
 import type { UserProfile, AuthState, UserRole } from '@/types/auth';
 
 interface AuthContextType extends AuthState {
@@ -24,15 +22,9 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
     session,
     profile,
     isLoading,
-    isTrialing: authIsTrialing,
-    fetchUserProfile
+    isTrialing: authIsTrialing
   } = useAuthState();
 
-  const { subscription, isTrialing: subscriptionIsTrialing, refreshSubscription } = 
-    useSubscription(user?.id || null);
-  
-  const { hasToolAccess } = useToolAccess();
-  
   const {
     signIn,
     signUp,
@@ -40,27 +32,25 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
     updateProfile: updateUserProfile
   } = useAuthActions();
   
-  // Combine trial status from both auth and subscription
-  const isTrialing = authIsTrialing || subscriptionIsTrialing;
+  // Placeholder values since auth is removed
+  const isTrialing = false;
+  const subscription = null;
+  const membershipTier = null;
 
   // Update profile wrapper - memoize to prevent recreation on every render
   const updateProfile = useCallback(async (data: Partial<UserProfile>) => {
-    if (!user) return false;
-    
-    const success = await updateUserProfile(user.id, data);
-    if (success) {
-      await fetchUserProfile(user.id);
-    }
-    return success;
-  }, [user, updateUserProfile, fetchUserProfile]);
+    return false; // Authentication removed
+  }, []);
 
   // Cache the tool access check with user ID - memoize for performance
   const checkToolAccess = useCallback(async (toolName: string): Promise<boolean> => {
-    return hasToolAccess(user?.id || null, toolName);
-  }, [hasToolAccess, user?.id]);
+    return false; // Authentication removed
+  }, []);
 
-  // Get membership tier from subscription
-  const membershipTier = useMemo(() => subscription?.tier || null, [subscription]);
+  // Placeholder for refresh subscription
+  const refreshSubscription = useCallback(async () => {
+    console.log('Subscription refresh functionality removed');
+  }, []);
 
   // Create a stable context value with more complete dependency array
   const value = useMemo(() => ({
@@ -68,8 +58,8 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
     session,
     profile,
     isLoading,
-    userRole: profile?.role || null as UserRole | null,
-    isAuthenticated: !!user,
+    userRole: null as UserRole | null,
+    isAuthenticated: false,
     isTrialing,
     subscription,
     membershipTier,
@@ -85,8 +75,6 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
     profile, 
     isLoading, 
     isTrialing, 
-    subscription,
-    membershipTier,
     signIn,
     signUp,
     signOut,
