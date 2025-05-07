@@ -40,11 +40,6 @@ export default {
     downgrade: 'Downgrade',
     manage: 'Manage Membership',
     renew: 'Renew Membership',
-    billing: 'Billing',
-    errorFetchingSubscription: 'Failed to fetch subscription data',
-    upgradeRequired: 'Upgrade Required',
-    upgradeRequiredDescription: 'This feature requires a higher membership tier. Please upgrade your plan to access it.',
-    upgradeRequiredFeatureAccess: 'You attempted to access a feature that requires a higher membership tier. Please upgrade your plan to access all features.'
   },
   telehealth: {
     appointments: 'Appointments',

@@ -8,6 +8,7 @@ import { useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
+import { useTranslation } from '@/utils/i18n';
 
 // Import refactored components
 import SubscriptionDetails from '@/components/member/membership/SubscriptionDetails';
@@ -22,6 +23,7 @@ const Membership = () => {
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const upgradeRequired = location.state?.upgradeRequired;
 
   // Check subscription status
@@ -42,8 +44,8 @@ const Membership = () => {
       } catch (error) {
         console.error('Error checking subscription:', error);
         toast({
-          title: "Error",
-          description: "Failed to fetch subscription data",
+          title: t('common.error'),
+          description: t('membership.errorFetchingSubscription'),
           variant: "destructive",
         });
       } finally {
@@ -57,18 +59,18 @@ const Membership = () => {
     const refreshInterval = setInterval(checkSubscription, 30000);
     
     return () => clearInterval(refreshInterval);
-  }, [isAuthenticated, refreshSubscription]);
+  }, [isAuthenticated, refreshSubscription, t, toast]);
 
   // When the user comes from an upgrade required redirect
   useEffect(() => {
     if (upgradeRequired) {
       toast({
-        title: "Upgrade Required",
-        description: "This feature requires a higher membership tier. Please upgrade your plan to access it.",
+        title: t('membership.upgradeRequired'),
+        description: t('membership.upgradeRequiredDescription'),
         variant: "default",
       });
     }
-  }, [upgradeRequired]);
+  }, [upgradeRequired, t, toast]);
 
   // Adapt subscription data to match expected format in subcomponents
   // Convert current_period_end to a number if it's a string
@@ -84,13 +86,13 @@ const Membership = () => {
 
   return (
     <MemberPageLayout 
-      title="Membership" 
-      description="Manage your membership plan and billing"
+      title={t('membership.tier')} 
+      description={t('membership.manage')}
     >
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full md:w-[400px] grid-cols-2">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="billing">Billing</TabsTrigger>
+          <TabsTrigger value="overview">{t('dashboard.overview')}</TabsTrigger>
+          <TabsTrigger value="billing">{t('membership.billing')}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="mt-6">
@@ -109,8 +111,7 @@ const Membership = () => {
               <Alert variant="default" className="border-yellow-300 bg-yellow-50">
                 <AlertTriangle className="h-4 w-4 text-yellow-600" />
                 <AlertDescription className="text-yellow-800">
-                  You attempted to access a feature that requires a higher membership tier.
-                  Please upgrade your plan to access all features.
+                  {t('membership.upgradeRequiredFeatureAccess')}
                 </AlertDescription>
               </Alert>
             )}

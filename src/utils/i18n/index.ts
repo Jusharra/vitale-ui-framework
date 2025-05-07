@@ -1,7 +1,7 @@
 
 import { createContext, useContext } from 'react';
 
-export type SupportedLanguage = 'en' | 'es' | 'fr' | 'sw';
+export type SupportedLanguage = 'en' | 'es' | 'pt' | 'en-uk' | 'en-ca' | 'en-za' | 'fr' | 'sw';
 
 export interface LanguageContextType {
   currentLanguage: SupportedLanguage;
@@ -10,8 +10,12 @@ export interface LanguageContextType {
 }
 
 export const supportedLanguages = [
-  { code: 'en', name: 'English' },
-  { code: 'es', name: 'Español' },
+  { code: 'en', name: 'English (US)' },
+  { code: 'es', name: 'Español (Latinoamérica)' },
+  { code: 'pt', name: 'Português' },
+  { code: 'en-uk', name: 'English (UK)' },
+  { code: 'en-ca', name: 'English (Canada)' },
+  { code: 'en-za', name: 'English (South Africa)' },
   { code: 'fr', name: 'Français' },
   { code: 'sw', name: 'Kiswahili' }
 ];

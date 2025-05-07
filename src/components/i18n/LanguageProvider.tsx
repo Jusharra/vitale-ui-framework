@@ -7,6 +7,10 @@ import en from '@/utils/i18n/translations/en';
 import es from '@/utils/i18n/translations/es';
 import fr from '@/utils/i18n/translations/fr';
 import sw from '@/utils/i18n/translations/sw';
+import pt from '@/utils/i18n/translations/pt';
+import enUk from '@/utils/i18n/translations/en-uk';
+import enCa from '@/utils/i18n/translations/en-ca';
+import enZa from '@/utils/i18n/translations/en-za';
 
 interface LanguageProviderProps {
   children: React.ReactNode;
@@ -16,7 +20,11 @@ const translations = {
   en,
   es,
   fr,
-  sw
+  sw,
+  pt,
+  'en-uk': enUk,
+  'en-ca': enCa,
+  'en-za': enZa
 };
 
 const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
@@ -72,7 +80,8 @@ const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
   
   // Set html lang attribute
   useEffect(() => {
-    document.documentElement.lang = currentLanguage;
+    const langCode = currentLanguage.split('-')[0]; // Extract base language for HTML lang attribute
+    document.documentElement.lang = langCode;
   }, [currentLanguage]);
 
   return (
