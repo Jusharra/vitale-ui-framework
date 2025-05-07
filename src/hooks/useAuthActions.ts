@@ -1,97 +1,128 @@
 
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import type { UserProfile, UserRole } from '@/types/auth';
 
 export function useAuthActions() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Sign in with email and password - placeholder implementation
+  // Sign in with email and password
   const signIn = async (email: string, password: string) => {
     try {
-      // This is a placeholder implementation
-      console.log('Sign in functionality removed');
-      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        throw error;
+      }
+
       toast({
-        title: "Authentication removed",
-        description: "Supabase authentication has been removed",
+        title: "Welcome back!",
+        description: "You have successfully signed in.",
       });
       
-      return false;
+      return true;
     } catch (error: any) {
       console.error("Sign in error:", error);
       
       toast({
         title: "Sign in failed",
-        description: "Authentication has been removed",
+        description: error.message || "Please check your credentials and try again.",
         variant: "destructive",
       });
       return false;
     }
   };
   
-  // Sign up with email and password - placeholder implementation
+  // Sign up with email and password
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      // This is a placeholder implementation
-      console.log('Sign up functionality removed');
-      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName
+          }
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
       toast({
-        title: "Authentication removed",
-        description: "Supabase authentication has been removed",
+        title: "Account created!",
+        description: "Please check your email to confirm your account.",
       });
       
-      return false;
+      return true;
     } catch (error: any) {
       console.error("Sign up error:", error);
       
       toast({
         title: "Sign up failed",
-        description: "Authentication has been removed",
+        description: error.message || "There was an error creating your account.",
         variant: "destructive",
       });
       return false;
     }
   };
   
-  // Sign out - placeholder implementation
+  // Sign out
   const signOut = async () => {
     try {
-      console.log('Sign out functionality removed');
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        throw error;
+      }
       
       toast({
-        title: "Authentication removed",
-        description: "Supabase authentication has been removed",
+        title: "Signed out",
+        description: "You have been signed out successfully.",
       });
-      return false;
+
+      navigate('/auth');
+      return true;
     } catch (error: any) {
       console.error("Sign out error:", error);
       toast({
         title: "Error",
-        description: "Authentication has been removed",
+        description: "There was a problem signing you out.",
         variant: "destructive",
       });
       return false;
     }
   };
   
-  // Update user profile - placeholder implementation
+  // Update user profile
   const updateProfile = async (userId: string, data: Partial<UserProfile>) => {
     try {
-      console.log('Update profile functionality removed');
+      const { error } = await supabase
+        .from('profiles')
+        .update(data)
+        .eq('id', userId);
+      
+      if (error) {
+        throw error;
+      }
       
       toast({
-        title: "Authentication removed",
-        description: "Supabase authentication has been removed",
+        title: "Profile updated",
+        description: "Your profile has been updated successfully.",
       });
       
-      return false;
+      return true;
     } catch (error: any) {
       console.error("Profile update error:", error);
       toast({
         title: "Update failed",
-        description: "Authentication has been removed",
+        description: error.message || "There was a problem updating your profile.",
         variant: "destructive",
       });
       return false;

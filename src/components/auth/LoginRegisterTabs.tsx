@@ -52,11 +52,6 @@ const LoginRegisterTabs: React.FC<LoginRegisterTabsProps> = ({
             t('auth.signInDescription') : 
             t('auth.registerDescription')}
         </CardDescription>
-        <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
-          <p className="text-amber-600 text-sm">
-            Authentication has been removed. Login and registration are non-functional.
-          </p>
-        </div>
       </CardHeader>
       
       <CardContent>

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Session, User } from '@supabase/supabase-js';
@@ -87,9 +88,18 @@ export function useAuthState() {
         
         setProfile(userProfile);
         
-        // We removed the trial fields from users table, 
-        // so we're setting isTrialing to false by default
-        setIsTrialing(false);
+        // Check if user is in trial period
+        const { data: subscriptionData } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', userId)
+          .single();
+        
+        if (subscriptionData) {
+          setIsTrialing(subscriptionData.status === 'trialing');
+        } else {
+          setIsTrialing(false);
+        }
       }
     } catch (error) {
       console.error("Error fetching user profile:", error);

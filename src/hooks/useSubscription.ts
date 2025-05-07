@@ -1,19 +1,67 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import type { Subscription } from '@/types/auth';
 
 export function useSubscription(userId: string | null) {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isTrialing, setIsTrialing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // No-op check subscription function since auth is removed
+  useEffect(() => {
+    if (userId) {
+      checkSubscription();
+    } else {
+      setSubscription(null);
+      setIsTrialing(false);
+      setIsLoading(false);
+    }
+  }, [userId]);
+
   const checkSubscription = async () => {
-    setIsLoading(false);
-    return;
+    if (!userId) {
+      setSubscription(null);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      
+      // Query subscriptions table for the user
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+      
+      if (error) {
+        throw error;
+      }
+      
+      if (data) {
+        const subscriptionData: Subscription = {
+          id: data.id,
+          status: data.status,
+          tier: data.tier,
+          current_period_end: data.current_period_end,
+          cancel_at_period_end: data.cancel_at_period_end
+        };
+        
+        setSubscription(subscriptionData);
+        setIsTrialing(data.status === 'trialing');
+      } else {
+        setSubscription(null);
+        setIsTrialing(false);
+      }
+    } catch (error) {
+      console.error('Error fetching subscription:', error);
+      setSubscription(null);
+    } finally {
+      setIsLoading(false);
+    }
   };
   
-  // No-op refresh subscription function
   const refreshSubscription = async () => {
     await checkSubscription();
   };

@@ -30,12 +30,26 @@ export const useAuthPage = () => {
       return;
     }
     
-    toast({
-      title: "Authentication removed",
-      description: "Supabase authentication has been removed",
-      variant: "destructive",
-    });
-    setLoginAttempts(prev => prev + 1);
+    const success = await signIn(values.email, values.password);
+    
+    if (!success) {
+      setLoginAttempts(prev => {
+        const newAttempts = prev + 1;
+        // Disable login after 5 failed attempts
+        if (newAttempts >= 5) {
+          setLoginDisabled(true);
+          // Re-enable after 10 minutes
+          setTimeout(() => {
+            setLoginDisabled(false);
+            setLoginAttempts(0);
+          }, 10 * 60 * 1000);
+        }
+        return newAttempts;
+      });
+    } else {
+      // Redirect to dashboard on success
+      navigate('/dashboard');
+    }
   };
 
   const onRegisterSubmit = async (values: RegisterFormValues) => {
@@ -49,28 +63,49 @@ export const useAuthPage = () => {
       return;
     }
     
-    toast({
-      title: "Authentication removed",
-      description: "Supabase authentication has been removed",
-      variant: "destructive",
-    });
+    // Ensure passwords match
+    if (values.password !== values.confirmPassword) {
+      toast({
+        title: "Passwords don't match",
+        description: "Please make sure your passwords match",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const success = await signUp(values.email, values.password, values.fullName);
+    
+    if (success) {
+      // Switch to login tab with a message
+      setActiveTab("login");
+      toast({
+        title: "Account created",
+        description: "Please check your email to verify your account",
+      });
+    }
   };
 
   const onForgotPasswordSubmit = async (values: ForgotPasswordFormValues) => {
     try {
       setForgotPasswordLoading(true);
       
-      // Placeholder implementation
+      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
       setResetEmailSent(true);
       toast({
-        title: "Authentication removed",
-        description: "Supabase authentication has been removed",
-        variant: "destructive",
+        title: "Password reset email sent",
+        description: "Check your inbox for further instructions",
       });
     } catch (error: any) {
       toast({
-        title: "Authentication removed",
-        description: "Supabase authentication has been removed",
+        title: "Password reset failed",
+        description: error.message || "An error occurred sending the reset email",
         variant: "destructive",
       });
       console.error("Error in password reset:", error);

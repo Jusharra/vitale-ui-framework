@@ -2,6 +2,8 @@
 import React, { createContext, useContext, useMemo, memo, useCallback } from "react";
 import { useAuthState } from '@/hooks/useAuthState';
 import { useAuthActions } from '@/hooks/useAuthActions';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useToolAccess } from '@/hooks/useToolAccess';
 import type { UserProfile, AuthState, UserRole } from '@/types/auth';
 
 interface AuthContextType extends AuthState {
@@ -32,34 +34,40 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
     updateProfile: updateUserProfile
   } = useAuthActions();
   
-  // Placeholder values since auth is removed
-  const isTrialing = false;
-  const subscription = null;
-  const membershipTier = null;
+  const {
+    subscription,
+    isTrialing,
+    refreshSubscription
+  } = useSubscription(user?.id || null);
+  
+  const { hasToolAccess: toolAccessCheck } = useToolAccess();
+
+  // Determine user role and authentication status
+  const userRole = profile?.role || null;
+  const isAuthenticated = !!session;
+  
+  // Get membership tier from subscription or default to null
+  const membershipTier = subscription?.tier || null;
 
   // Update profile wrapper - memoize to prevent recreation on every render
   const updateProfile = useCallback(async (data: Partial<UserProfile>) => {
-    return false; // Authentication removed
-  }, []);
+    if (!user) return false;
+    return await updateUserProfile(user.id, data);
+  }, [user, updateUserProfile]);
 
   // Cache the tool access check with user ID - memoize for performance
   const checkToolAccess = useCallback(async (toolName: string): Promise<boolean> => {
-    return false; // Authentication removed
-  }, []);
+    return await toolAccessCheck(user?.id || null, toolName);
+  }, [user, toolAccessCheck]);
 
-  // Placeholder for refresh subscription
-  const refreshSubscription = useCallback(async () => {
-    console.log('Subscription refresh functionality removed');
-  }, []);
-
-  // Create a stable context value with more complete dependency array
+  // Create a stable context value with complete dependency array
   const value = useMemo(() => ({
     user,
     session,
     profile,
     isLoading,
-    userRole: null as UserRole | null,
-    isAuthenticated: false,
+    userRole,
+    isAuthenticated,
     isTrialing,
     subscription,
     membershipTier,
@@ -74,7 +82,11 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
     session, 
     profile, 
     isLoading, 
+    userRole,
+    isAuthenticated,
     isTrialing, 
+    subscription,
+    membershipTier,
     signIn,
     signUp,
     signOut,
