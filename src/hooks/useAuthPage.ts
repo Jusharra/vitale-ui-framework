@@ -74,10 +74,6 @@ export const useAuthPage = () => {
       return;
     }
     
-    const userData = {
-      full_name: values.fullName
-    };
-    
     const success = await signUp(values.email, values.password, values.fullName);
     
     if (success) {

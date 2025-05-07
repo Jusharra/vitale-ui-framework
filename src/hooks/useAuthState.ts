@@ -21,6 +21,7 @@ export function useAuthState() {
       // Set up the auth state listener first
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
         async (event, session) => {
+          console.log("Auth state change event:", event);
           setSession(session);
           setUser(session?.user || null);
           
@@ -36,6 +37,7 @@ export function useAuthState() {
       
       // Check for existing session
       const { data: { session } } = await supabase.auth.getSession();
+      console.log("Initial session check:", session ? "Session exists" : "No session");
       setSession(session);
       setUser(session?.user || null);
       
@@ -57,6 +59,7 @@ export function useAuthState() {
   // Fetch user profile data
   const fetchUserProfile = async (userId: string) => {
     try {
+      console.log("Fetching profile for user:", userId);
       // Fetch user data from our users table
       const { data: userData, error: userError } = await supabase
         .from('users')
@@ -65,7 +68,21 @@ export function useAuthState() {
         .single();
       
       if (userError) {
-        throw userError;
+        console.error("Error fetching user data:", userError);
+        // If we can't find the user in our users table, it might be a new registration
+        // We can still create a basic profile from auth data
+        const userProfile: UserProfile = {
+          id: userId,
+          email: user?.email || '', 
+          role: 'member' as UserProfile['role']
+        };
+        
+        if (user?.user_metadata?.full_name) {
+          userProfile.full_name = user.user_metadata.full_name;
+        }
+        
+        setProfile(userProfile);
+        return;
       }
       
       if (userData) {
@@ -100,6 +117,8 @@ export function useAuthState() {
         } else {
           setIsTrialing(false);
         }
+      } else {
+        console.log("No user data found for ID:", userId);
       }
     } catch (error) {
       console.error("Error fetching user profile:", error);
