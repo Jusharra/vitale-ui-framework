@@ -366,11 +366,6 @@ export default {
   "common.rubyTextEmphasisRubyTextEmphasisFontOpticalSizing": "Ruby Text Emphasis Ruby Text Emphasis Font Optical Sizing",
   "common.rubyTextEmphasisRubyTextEmphasisFontPalette": "Ruby Text Emphasis Ruby Text Emphasis Font Palette",
   "common.rubyTextEmphasisRubyTextEmphasisFontVariationSettings": "Ruby Text Emphasis Ruby Text Emphasis Font Variation Settings",
-  "common.rubyTextEmphasisRubyTextEmphasisTextOrientation": "Ruby Text Emphasis Ruby Text Emphasis Text Orientation",
-  "common.rubyTextEmphasisRubyTextEmphasisTextCombineUpright": "Ruby Text Emphasis Ruby Text Emphasis Text Combine Upright",
-  "common.rubyTextEmphasisRubyTextEmphasisWritingMode": "Ruby Text Emphasis Ruby Writing Mode",
-  "common.rubyTextEmphasisRubyTextEmphasisDirection": "Ruby Text Emphasis Ruby Text Emphasis Direction",
-  "common.rubyTextEmphasisRubyTextEmphasisUnicodeBidi": "Ruby Text Emphasis Ruby Text Emphasis Unicode Bidi",
   "common.rubyTextEmphasisRubyRubyPosition": "Ruby Text Emphasis Ruby Ruby Position",
   "common.rubyTextEmphasisRubyRubyMerge": "Ruby Text Emphasis Ruby Ruby Merge",
   "common.rubyTextEmphasisRubyRubyAlign": "Ruby Text Emphasis Ruby Ruby Align",
@@ -494,4 +489,8 @@ export default {
   "common.rubyTextEmphasisRubyRubyRubyRubyTextEmphasisTransition": "Ruby Text Emphasis Ruby Ruby Ruby Ruby Text Emphasis Transition",
   "common.rubyTextEmphasisRubyRubyRubyRubyTextEmphasisTransform": "Ruby Text Emphasis Ruby Ruby Ruby Ruby Text Emphasis Transform",
   "common.rubyTextEmphasisRubyRubyRubyRubyTextEmphasisFilter": "Ruby Text Emphasis Ruby Ruby Ruby Ruby Text Emphasis Filter",
-  "
+  "common.rubyTextEmphasisRubyRubyRubyRubyTextEmphasisBackdropFilter": "Ruby Text Emphasis Ruby Ruby Ruby Ruby Text Emphasis Backdrop Filter",
+  "common.rubyTextEmphasisRubyRubyRubyRubyTextEmphasisClipPath": "Ruby Text Emphasis Ruby Ruby Ruby Ruby Text Emphasis Clip Path",
+  "common.rubyTextEmphasisRubyRubyRubyRubyTextEmphasisMask": "Ruby Text Emphasis Ruby Ruby Ruby Ruby Text Emphasis Mask",
+  "common.rubyTextEmphasisRubyRubyRubyRubyTextEmphasisMixBlendMode": "Ruby Text Emphasis Ruby Ruby Ruby Ruby Text Emphasis Mix Blend Mode",
+  "common
