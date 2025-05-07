@@ -10,11 +10,15 @@ import { supabase } from '@/integrations/supabase/client';
 import LoginForm, { LoginFormValues } from '@/components/auth/LoginForm';
 import RegisterForm, { RegisterFormValues } from '@/components/auth/RegisterForm';
 import ForgotPasswordForm, { ForgotPasswordFormValues } from '@/components/auth/ForgotPasswordForm';
+import { ArrowLeft } from 'lucide-react';
+import { useTranslation } from '@/utils/i18n';
+import LanguageSelector from '@/components/i18n/LanguageSelector';
 
 const Auth = () => {
   const navigate = useNavigate();
   const { signIn, signUp, isLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<string>("login");
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
@@ -116,14 +120,25 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
+      <div className="w-full max-w-md flex justify-between items-center mb-4">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/')} 
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t('navigation.backToHome')}
+        </Button>
+        <LanguageSelector variant="compact" />
+      </div>
       <Card className="w-full max-w-md">
         {showForgotPassword ? (
           <>
             <CardHeader>
-              <CardTitle>Reset Your Password</CardTitle>
+              <CardTitle>{t('auth.resetPassword')}</CardTitle>
               <CardDescription>
-                Enter your email and we'll send you a link to reset your password
+                {t('auth.resetPasswordDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -135,25 +150,25 @@ const Auth = () => {
             </CardContent>
             <CardFooter className="flex justify-center">
               <p className="text-sm text-muted-foreground">
-                Remember your password? <Button variant="link" className="p-0 h-auto" onClick={() => setShowForgotPassword(false)}>Back to Login</Button>
+                {t('auth.rememberPassword')} <Button variant="link" className="p-0 h-auto" onClick={() => setShowForgotPassword(false)}>{t('auth.backToLogin')}</Button>
               </p>
             </CardFooter>
           </>
         ) : (
           <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="register">Register</TabsTrigger>
+              <TabsTrigger value="login">{t('auth.login')}</TabsTrigger>
+              <TabsTrigger value="register">{t('auth.register')}</TabsTrigger>
             </TabsList>
             
             <CardHeader>
               <CardTitle>
-                {activeTab === "login" ? "Welcome Back" : "Create an Account"}
+                {activeTab === "login" ? t('auth.welcomeBack') : t('auth.createAccount')}
               </CardTitle>
               <CardDescription>
                 {activeTab === "login" ? 
-                  "Sign in to access your health concierge dashboard" : 
-                  "Start your 14-day free trial with all features unlocked"}
+                  t('auth.signInDescription') : 
+                  t('auth.registerDescription')}
               </CardDescription>
             </CardHeader>
             
@@ -166,7 +181,7 @@ const Auth = () => {
                 />
                 {loginAttempts > 2 && !loginDisabled && (
                   <p className="text-amber-600 text-sm mt-2">
-                    Warning: {5 - loginAttempts} login attempts remaining before temporary lockout.
+                    {t('auth.warningLoginAttempts', { count: 5 - loginAttempts })}
                   </p>
                 )}
               </TabsContent>
@@ -182,9 +197,9 @@ const Auth = () => {
             <CardFooter className="flex justify-center">
               <p className="text-sm text-muted-foreground">
                 {activeTab === "login" ? (
-                  <>Don't have an account? <Button variant="link" className="p-0 h-auto" onClick={() => setActiveTab("register")}>Register</Button></>
+                  <>{t('auth.noAccount')} <Button variant="link" className="p-0 h-auto" onClick={() => setActiveTab("register")}>{t('auth.registerLink')}</Button></>
                 ) : (
-                  <>Already have an account? <Button variant="link" className="p-0 h-auto" onClick={() => setActiveTab("login")}>Login</Button></>
+                  <>{t('auth.haveAccount')} <Button variant="link" className="p-0 h-auto" onClick={() => setActiveTab("login")}>{t('auth.loginLink')}</Button></>
                 )}
               </p>
             </CardFooter>

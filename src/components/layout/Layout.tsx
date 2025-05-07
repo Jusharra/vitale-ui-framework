@@ -3,7 +3,6 @@ import React, { ReactNode } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { useAuth } from '@/context/AuthContext';
-import FloatingLanguageSelector from '@/components/i18n/FloatingLanguageSelector';
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,7 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role = 'member' }) => {
   
   return (
     <div className="h-screen flex flex-col bg-background">
-      <Navbar />
+      <Navbar role={role} />
       <div className="flex flex-1 overflow-hidden">
         {user && <Sidebar role={role} />}
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
@@ -24,7 +23,6 @@ const Layout: React.FC<LayoutProps> = ({ children, role = 'member' }) => {
           </div>
         </main>
       </div>
-      <FloatingLanguageSelector />
     </div>
   );
 };

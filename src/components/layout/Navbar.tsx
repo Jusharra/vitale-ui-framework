@@ -11,7 +11,8 @@ import {
   MessageSquare,
   Search,
   Settings,
-  User
+  User,
+  Globe
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -21,6 +22,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import LanguageSelector from "@/components/i18n/LanguageSelector";
+import { useTranslation } from "@/utils/i18n";
 
 interface NavbarProps {
   role?: "member" | "professional" | "admin";
@@ -34,6 +37,7 @@ const Navbar: React.FC<NavbarProps> = ({
   isMobile
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const { t } = useTranslation();
   
   // Mock data
   const notifications = 3;
@@ -56,9 +60,9 @@ const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center md:gap-2 lg:gap-4">
           <div className="hidden md:block">
             <h1 className="text-xl font-semibold">
-              {role === "professional" ? "Professional Portal" : 
-               role === "admin" ? "Admin Portal" : 
-               "Vitale Health Concierge"}
+              {role === "professional" ? t('navigation.professionalPortal') : 
+               role === "admin" ? t('navigation.adminPortal') : 
+               t('navigation.healthConcierge')}
             </h1>
           </div>
         </div>
@@ -68,7 +72,7 @@ const Navbar: React.FC<NavbarProps> = ({
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <input
               type="search"
-              placeholder="Search..."
+              placeholder={t('actions.search')}
               className="flex h-9 w-full rounded-md border border-input bg-background px-9 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -77,6 +81,8 @@ const Navbar: React.FC<NavbarProps> = ({
         </div>
         
         <div className="flex items-center gap-2">
+          <LanguageSelector variant="compact" className="mr-2" />
+          
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
             {notifications > 0 && (
@@ -102,22 +108,22 @@ const Navbar: React.FC<NavbarProps> = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('user.myAccount')}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/profile">Profile</Link>
+                <Link to="/profile">{t('user.profile')}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/dashboard/settings">Settings</Link>
+                <Link to="/dashboard/settings">{t('user.settings')}</Link>
               </DropdownMenuItem>
               {role === "member" && (
                 <DropdownMenuItem asChild>
-                  <Link to="/dashboard/membership">Membership</Link>
+                  <Link to="/dashboard/membership">{t('user.membership')}</Link>
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/">Sign out</Link>
+                <Link to="/">{t('auth.signOut')}</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -125,7 +131,7 @@ const Navbar: React.FC<NavbarProps> = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="hidden md:flex gap-1">
-                <span>Help</span>
+                <span>{t('navigation.help')}</span>
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -133,19 +139,19 @@ const Navbar: React.FC<NavbarProps> = ({
               <DropdownMenuItem asChild>
                 <Link to="/support">
                   <HelpCircle className="mr-2 h-4 w-4" />
-                  <span>Support</span>
+                  <span>{t('navigation.support')}</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/faq">
                   <MessageSquare className="mr-2 h-4 w-4" />
-                  <span>FAQ</span>
+                  <span>{t('navigation.faq')}</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/contact">
                   <Settings className="mr-2 h-4 w-4" />
-                  <span>Contact</span>
+                  <span>{t('navigation.contact')}</span>
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
