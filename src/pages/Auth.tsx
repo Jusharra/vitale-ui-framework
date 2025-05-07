@@ -87,8 +87,8 @@ const Auth = () => {
       return;
     }
     
-    // Fixed signUp call to pass values.fullName as the third argument
-    await signUp(values.email, values.password, values.fullName);
+    // Pass fullName as metadata instead of a third parameter
+    await signUp(values.email, values.password, { fullName: values.fullName });
   };
 
   const onForgotPasswordSubmit = async (values: ForgotPasswordFormValues) => {

@@ -58,8 +58,9 @@ const VacationsContent = () => {
   const fetchVacations = async () => {
     setIsLoading(true);
     try {
+      // Fix the table name for proper Supabase query - using 'vacation_packages' instead of 'destinations'
       const { data, error } = await supabase
-        .from('destinations')
+        .from('vacation_packages')
         .select('*');
 
       if (error) {
