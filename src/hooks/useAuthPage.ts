@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { LoginFormValues } from '@/components/auth/LoginForm';
 import { RegisterFormValues } from '@/components/auth/RegisterForm';
 import { ForgotPasswordFormValues } from '@/components/auth/ForgotPasswordForm';
@@ -72,6 +73,10 @@ export const useAuthPage = () => {
       });
       return;
     }
+    
+    const userData = {
+      full_name: values.fullName
+    };
     
     const success = await signUp(values.email, values.password, values.fullName);
     
