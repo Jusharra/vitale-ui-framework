@@ -71,7 +71,7 @@ export function useAuthState() {
       if (userData) {
         const userProfile: UserProfile = {
           id: userData.id,
-          email: userData.email,
+          email: user?.email || '', // Get email from auth user object
           role: userData.role as UserProfile['role']
         };
         
