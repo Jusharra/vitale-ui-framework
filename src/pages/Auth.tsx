@@ -87,7 +87,7 @@ const Auth = () => {
       return;
     }
     
-    // Pass the full name as a string to signUp
+    // Fixed signUp call to pass values.fullName as the third argument
     await signUp(values.email, values.password, values.fullName);
   };
 

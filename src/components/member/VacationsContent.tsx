@@ -1,303 +1,287 @@
-
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Search, SlidersHorizontal } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import VacationCard from './VacationCard';
 import VacationDetailsModal from './VacationDetailsModal';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Slider } from '@/components/ui/slider';
-import { 
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+import { Loader2, Search, Filter, SlidersHorizontal } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { useAuth } from '@/context/AuthContext';
 import { Badge } from '@/components/ui/badge';
 
-type VacationPackage = {
+// Define the VacationPackage interface
+interface VacationPackage {
   id: string;
-  destination_name: string;
-  region: string;
-  description_short: string;
-  description_full: string | null;
+  title: string;
+  description: string;
   price: number;
-  duration: string | null;
+  duration: string;
+  destination: string;
   package_type: string;
-  image_url: string | null;
+  image_url: string;
   amenities: string[];
-  available_dates: {
-    start_date: string | null;
-    end_date: string | null;
-  };
-  status: string;
-  featured: boolean;
-};
-
-type FilterState = {
-  searchText: string;
-  maxPrice: number;
-  selectedRegions: string[];
-  activePackageType: string;
+  region: string;
+  featured?: boolean;
 }
 
+// The rest of the component implementation
 const VacationsContent = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [packageTypeFilter, setPackageTypeFilter] = useState<string | null>(null);
+  const [destinationFilter, setDestinationFilter] = useState<string | null>(null);
+  const [priceRangeFilter, setPriceRangeFilter] = useState<string | null>(null);
+  const [amenitiesFilter, setAmenitiesFilter] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
+  const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Fix the vacation type to ensure it matches the expected interface
   const [selectedVacation, setSelectedVacation] = useState<VacationPackage | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [filters, setFilters] = useState<FilterState>({
-    searchText: '',
-    maxPrice: 10000,
-    selectedRegions: [],
-    activePackageType: 'all'
-  });
+  const [vacations, setVacations] = useState<VacationPackage[]>([]);
+  const [filteredVacations, setFilteredVacations] = useState<VacationPackage[]>([]);
 
-  // Fetch vacation packages from Supabase
-  const { data: vacationPackages, isLoading, error } = useQuery({
-    queryKey: ['vacationPackages'],
-    queryFn: async () => {
+  // Function to fetch vacations
+  const fetchVacations = async () => {
+    setIsLoading(true);
+    try {
       const { data, error } = await supabase
-        .from('vacation_packages')
-        .select('*')
-        .eq('status', 'Active')
-        .order('featured', { ascending: false });
-      
-      if (error) throw error;
-      
-      // Convert the data to match our expected type
-      return (data || []).map(pkg => ({
-        ...pkg,
-        // Safely parse available_dates which might be a string or already an object
-        available_dates: typeof pkg.available_dates === 'string' 
-          ? JSON.parse(pkg.available_dates)
-          : (pkg.available_dates || { start_date: null, end_date: null })
-      })) as VacationPackage[];
-    },
-  });
+        .from('destinations')
+        .select('*');
 
-  // Handle opening the details modal
-  const handleOpenDetails = (vacation: VacationPackage) => {
+      if (error) {
+        throw error;
+      }
+
+      // Make sure we transform the data to match the expected interface
+      const transformedVacations = data.map((vacation: any) => ({
+        id: vacation.id,
+        title: vacation.destination_name || 'Untitled Vacation',
+        description: vacation.description_short || 'No description available',
+        price: vacation.price || 0,
+        duration: vacation.duration || '7 days',
+        destination: vacation.destination_name || 'Unknown',
+        package_type: vacation.package_type || 'Standard',
+        image_url: vacation.image_url || '/placeholder.svg',
+        amenities: vacation.amenities || [],
+        region: vacation.region || 'Unknown',
+        featured: vacation.featured || false
+      })) as VacationPackage[];
+
+      setVacations(transformedVacations);
+      applyFilters(transformedVacations);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to handle viewing vacation details
+  const handleViewDetails = (vacation: VacationPackage) => {
     setSelectedVacation(vacation);
     setIsModalOpen(true);
   };
 
-  // Filter packages based on all filters
-  const filteredPackages = vacationPackages?.filter(pkg => {
-    const matchesText = pkg.destination_name.toLowerCase().includes(filters.searchText.toLowerCase()) || 
-                        pkg.description_short.toLowerCase().includes(filters.searchText.toLowerCase()) ||
-                        pkg.region.toLowerCase().includes(filters.searchText.toLowerCase());
-    
-    const matchesPrice = pkg.price <= filters.maxPrice;
-    
-    const matchesRegion = filters.selectedRegions.length === 0 || filters.selectedRegions.includes(pkg.region);
-    
-    const matchesType = filters.activePackageType === 'all' || pkg.package_type.toLowerCase() === filters.activePackageType;
-    
-    return matchesText && matchesPrice && matchesRegion && matchesType;
-  });
+  // Function to apply filters
+  const applyFilters = (vacationsToFilter: VacationPackage[]) => {
+    let filtered = vacationsToFilter;
 
-  // Get unique regions and max price for filters
-  const allRegions = Array.from(new Set(vacationPackages?.map(pkg => pkg.region) || []));
-  const maxPossiblePrice = Math.max(...(vacationPackages?.map(pkg => pkg.price) || [10000]));
-  
-  // Featured packages for the carousel
-  const featuredPackages = vacationPackages?.filter(pkg => pkg.featured) || [];
+    if (searchTerm) {
+      filtered = filtered.filter(vacation =>
+        vacation.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        vacation.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        vacation.destination.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
 
-  // Handle search input change
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilters(prev => ({ ...prev, searchText: e.target.value }));
+    if (packageTypeFilter) {
+      filtered = filtered.filter(vacation => vacation.package_type === packageTypeFilter);
+    }
+
+    if (destinationFilter) {
+      filtered = filtered.filter(vacation => vacation.destination === destinationFilter);
+    }
+
+    if (priceRangeFilter) {
+      const [minPrice, maxPrice] = priceRangeFilter.split('-').map(Number);
+      filtered = filtered.filter(vacation => vacation.price >= minPrice && vacation.price <= maxPrice);
+    }
+
+    if (amenitiesFilter.length > 0) {
+      filtered = filtered.filter(vacation =>
+        amenitiesFilter.every(amenity => vacation.amenities.includes(amenity))
+      );
+    }
+
+    setFilteredVacations(filtered);
   };
 
-  // Handle price filter change
-  const handlePriceChange = (value: number[]) => {
-    setFilters(prev => ({ ...prev, maxPrice: value[0] }));
-  };
+  useEffect(() => {
+    fetchVacations();
+  }, []);
 
-  // Handle region filter change
-  const handleRegionChange = (region: string) => {
-    setFilters(prev => {
-      if (prev.selectedRegions.includes(region)) {
-        return { ...prev, selectedRegions: prev.selectedRegions.filter(r => r !== region) };
-      } else {
-        return { ...prev, selectedRegions: [...prev.selectedRegions, region] };
-      }
-    });
-  };
+  useEffect(() => {
+    applyFilters(vacations);
+  }, [searchTerm, packageTypeFilter, destinationFilter, priceRangeFilter, amenitiesFilter, vacations]);
 
-  const handleTabChange = (value: string) => {
-    setFilters(prev => ({ ...prev, activePackageType: value }));
-  };
-
-  if (error) {
+  if (isLoading) {
     return (
-      <Alert variant="destructive" className="mb-6">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          There was an error loading vacation packages. Please try again later.
-        </AlertDescription>
-      </Alert>
+      <Card className="w-full">
+        <CardContent className="flex items-center justify-center p-4">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Loading vacations...
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="space-y-8">
-      {/* Hero Banner with Search */}
-      <div className="relative w-full h-64 bg-cover bg-center rounded-lg overflow-hidden mb-8"
-           style={{ backgroundImage: 'linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("/placeholder.svg")' }}>
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-white p-6">
-          <h1 className="text-3xl font-bold mb-4">Discover Exclusive Getaways</h1>
-          <p className="text-lg mb-6 text-center max-w-2xl">Explore our curated vacation packages with special member pricing</p>
-          
-          <div className="relative w-full max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input 
-              placeholder="Search destinations, experiences..." 
-              className="pl-10 bg-white/90 text-black" 
-              value={filters.searchText}
-              onChange={handleSearchChange}
-            />
-          </div>
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center">
+          <Input
+            type="text"
+            placeholder="Search vacations..."
+            className="mr-2"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <Button variant="outline">
+            <Search className="h-4 w-4 mr-2" />
+            Search
+          </Button>
         </div>
+        <Button variant="secondary" onClick={() => setShowFilters(!showFilters)}>
+          <SlidersHorizontal className="h-4 w-4 mr-2" />
+          Filters
+        </Button>
       </div>
 
-      {/* Featured Packages Carousel */}
-      {!isLoading && featuredPackages.length > 0 && (
-        <div className="mb-10">
-          <h2 className="text-2xl font-semibold mb-4">Featured Experiences</h2>
-          <Carousel className="w-full">
-            <CarouselContent>
-              {featuredPackages.map((vacation) => (
-                <CarouselItem key={vacation.id} className="md:basis-1/2 lg:basis-1/3">
-                  <div className="p-1">
-                    <VacationCard 
-                      vacation={vacation} 
-                      onViewDetails={() => handleOpenDetails(vacation)}
-                    />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="left-0" />
-            <CarouselNext className="right-0" />
-          </Carousel>
-        </div>
-      )}
+      {showFilters && (
+        <Card className="mb-4">
+          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Select onValueChange={(value) => setPackageTypeFilter(value === 'all' ? null : value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Package Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="adventure">Adventure</SelectItem>
+                    <SelectItem value="luxury">Luxury</SelectItem>
+                    <SelectItem value="family">Family</SelectItem>
+                    <SelectItem value="romantic">Romantic</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
 
-      {/* Filters and Tabs */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <Tabs 
-          defaultValue="all" 
-          value={filters.activePackageType}
-          onValueChange={handleTabChange} 
-          className="w-full md:w-auto"
-        >
-          <TabsList className="grid grid-cols-3 md:grid-cols-6 w-full">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="beach">Beach</TabsTrigger>
-            <TabsTrigger value="mountain">Mountain</TabsTrigger>
-            <TabsTrigger value="city">City</TabsTrigger>
-            <TabsTrigger value="cruise">Cruise</TabsTrigger>
-            <TabsTrigger value="adventure">Adventure</TabsTrigger>
-          </TabsList>
-        </Tabs>
+            <div>
+              <Select onValueChange={(value) => setDestinationFilter(value === 'all' ? null : value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Destination" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="all">All Destinations</SelectItem>
+                    <SelectItem value="Paris">Paris</SelectItem>
+                    <SelectItem value="Rome">Rome</SelectItem>
+                    <SelectItem value="Tokyo">Tokyo</SelectItem>
+                    <SelectItem value="New York">New York</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <SlidersHorizontal className="h-4 w-4" />
-              <span>Filters</span>
-              {(filters.selectedRegions.length > 0 || filters.maxPrice < maxPossiblePrice) && (
-                <Badge variant="secondary" className="ml-1">{filters.selectedRegions.length + (filters.maxPrice < maxPossiblePrice ? 1 : 0)}</Badge>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80">
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-medium mb-3">Price Range</h4>
-                <div className="px-2">
-                  <Slider 
-                    defaultValue={[filters.maxPrice]} 
-                    max={maxPossiblePrice} 
-                    step={100} 
-                    onValueChange={handlePriceChange}
+            <div>
+              <Select onValueChange={(value) => setPriceRangeFilter(value === 'all' ? null : value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Price Range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="all">All Prices</SelectItem>
+                    <SelectItem value="0-500">$0 - $500</SelectItem>
+                    <SelectItem value="500-1000">$500 - $1000</SelectItem>
+                    <SelectItem value="1000-2000">$1000 - $2000</SelectItem>
+                    <SelectItem value="2000-5000">$2000 - $5000</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="md:col-span-3">
+              <p className="font-semibold mb-2">Amenities:</p>
+              <div className="flex flex-wrap gap-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="pool"
+                    checked={amenitiesFilter.includes('pool')}
+                    onCheckedChange={(checked) =>
+                      setAmenitiesFilter(checked ? [...amenitiesFilter, 'pool'] : amenitiesFilter.filter(item => item !== 'pool'))
+                    }
                   />
-                  <div className="flex justify-between mt-2 text-sm text-muted-foreground">
-                    <span>$0</span>
-                    <span>Max: ${filters.maxPrice}</span>
-                  </div>
+                  <Label htmlFor="pool">Pool</Label>
                 </div>
-              </div>
-              
-              <div>
-                <h4 className="font-medium mb-3">Regions</h4>
-                <div className="flex flex-wrap gap-2">
-                  {allRegions.map(region => (
-                    <Badge 
-                      key={region}
-                      variant={filters.selectedRegions.includes(region) ? "default" : "outline"}
-                      className="cursor-pointer"
-                      onClick={() => handleRegionChange(region)}
-                    >
-                      {region}
-                    </Badge>
-                  ))}
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="wifi"
+                    checked={amenitiesFilter.includes('wifi')}
+                    onCheckedChange={(checked) =>
+                      setAmenitiesFilter(checked ? [...amenitiesFilter, 'wifi'] : amenitiesFilter.filter(item => item !== 'wifi'))
+                    }
+                  />
+                  <Label htmlFor="wifi">WiFi</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="spa"
+                    checked={amenitiesFilter.includes('spa')}
+                    onCheckedChange={(checked) =>
+                      setAmenitiesFilter(checked ? [...amenitiesFilter, 'spa'] : amenitiesFilter.filter(item => item !== 'spa'))
+                    }
+                  />
+                  <Label htmlFor="spa">Spa</Label>
                 </div>
               </div>
             </div>
-          </PopoverContent>
-        </Popover>
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredVacations.map((vacation) => (
+          <VacationCard
+            key={vacation.id}
+            vacation={vacation}
+            onViewDetails={() => handleViewDetails(vacation)}
+          />
+        ))}
       </div>
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="flex flex-col space-y-3">
-              <Skeleton className="h-48 w-full rounded-lg" />
-              <Skeleton className="h-6 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-              <Skeleton className="h-4 w-5/6" />
-              <div className="flex justify-between">
-                <Skeleton className="h-8 w-20" />
-                <Skeleton className="h-8 w-24" />
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Vacation Listings */}
-      {!isLoading && filteredPackages && filteredPackages.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPackages.map((vacation) => (
-            <VacationCard 
-              key={vacation.id} 
-              vacation={vacation} 
-              onViewDetails={() => handleOpenDetails(vacation)}
-            />
-          ))}
-        </div>
-      ) : !isLoading ? (
-        <div className="text-center py-12">
-          <p className="text-lg text-muted-foreground">No vacation packages found for your selected filters.</p>
-          <p className="text-sm text-muted-foreground mt-2">Try adjusting your filters or check back later.</p>
-        </div>
-      ) : null}
-
-      {/* Details Modal */}
-      {selectedVacation && (
-        <VacationDetailsModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          vacation={selectedVacation}
-        />
-      )}
+      <VacationDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        vacation={selectedVacation}
+      />
     </div>
   );
 };

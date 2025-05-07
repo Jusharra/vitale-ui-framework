@@ -1,6 +1,4 @@
 
-// Add the formatCurrency function to the useRegionalPricing hook
-
 import { useState } from 'react';
 
 export interface RegionalPricingHook {
@@ -9,6 +7,8 @@ export interface RegionalPricingHook {
   formatCurrency: (amount: number) => string;
   region: string;
   setRegion: (region: string) => void;
+  updateRegion: (region: string) => void;
+  updateCurrency: (currency: string) => void;
 }
 
 export const useRegionalPricing = (): RegionalPricingHook => {
@@ -23,11 +23,22 @@ export const useRegionalPricing = (): RegionalPricingHook => {
     }).format(amount);
   };
 
+  // Add the required update methods
+  const updateRegion = (newRegion: string): void => {
+    setRegion(newRegion);
+  };
+
+  const updateCurrency = (newCurrency: string): void => {
+    setCurrency(newCurrency);
+  };
+
   return {
     currency,
     setCurrency,
     formatCurrency,
     region,
-    setRegion
+    setRegion,
+    updateRegion,
+    updateCurrency
   };
 };
