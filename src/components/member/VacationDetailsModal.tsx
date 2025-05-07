@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Dialog,
@@ -13,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { useRegionalPricing } from '@/hooks/useRegionalPricing';
 import { useAuth } from '@/context/AuthContext';
 import StripeCheckout from '@/components/payments/StripeCheckout';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { CalendarIcon, MapPinIcon, TagIcon, TimerIcon } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
@@ -41,6 +40,7 @@ const VacationDetailsModal: React.FC<VacationDetailsModalProps> = ({
 }) => {
   const { formatCurrency } = useRegionalPricing();
   const { userRole, membershipTier } = useAuth();
+  const { toast } = useToast();
 
   if (!vacation) {
     return null;

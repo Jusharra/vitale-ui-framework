@@ -6,33 +6,42 @@ import { useRegionalPricing } from '@/hooks/useRegionalPricing';
 import { useAuth } from '@/context/AuthContext';
 import { Badge } from '@/components/ui/badge';
 
-interface VacationCardProps {
+interface VacationPackage {
   id: string;
-  imageUrl: string;
   title: string;
   description: string;
   price: number;
   duration: string;
   destination: string;
-  packageType: string;
-  onViewDetailsClick: (id: string) => void;
+  package_type: string;
+  image_url: string;
+  amenities?: string[];
+  region?: string;
   featured?: boolean;
 }
 
+interface VacationCardProps {
+  vacation: VacationPackage;
+  onViewDetails: () => void;
+}
+
 const VacationCard: React.FC<VacationCardProps> = ({
-  id,
-  imageUrl,
-  title,
-  description,
-  price,
-  duration,
-  destination,
-  packageType,
-  onViewDetailsClick,
-  featured = false,
+  vacation,
+  onViewDetails
 }) => {
   const { formatCurrency } = useRegionalPricing();
   const { userRole, membershipTier } = useAuth();
+  const { 
+    id,
+    title,
+    description,
+    price,
+    duration,
+    destination,
+    package_type,
+    image_url,
+    featured = false 
+  } = vacation;
 
   // Determine discount based on membership tier and role
   const getDiscountedPrice = () => {
@@ -58,7 +67,7 @@ const VacationCard: React.FC<VacationCardProps> = ({
     <Card className={`overflow-hidden h-full flex flex-col ${featured ? 'border-primary' : ''}`}>
       <div className="relative">
         <img 
-          src={imageUrl || '/placeholder.svg'} 
+          src={image_url || '/placeholder.svg'} 
           alt={title} 
           className="w-full h-48 object-cover"
         />
@@ -84,7 +93,7 @@ const VacationCard: React.FC<VacationCardProps> = ({
           {description}
         </p>
         <div className="bg-muted/50 px-2 py-1 rounded inline-block text-xs">
-          {packageType}
+          {package_type}
         </div>
       </CardContent>
       
@@ -99,7 +108,7 @@ const VacationCard: React.FC<VacationCardProps> = ({
             <span className="text-xl font-semibold">{formatCurrency(price)}</span>
           )}
         </div>
-        <Button onClick={() => onViewDetailsClick(id)}>View Details</Button>
+        <Button onClick={onViewDetails}>View Details</Button>
       </CardFooter>
     </Card>
   );

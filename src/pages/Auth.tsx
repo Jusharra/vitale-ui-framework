@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -88,7 +87,7 @@ const Auth = () => {
       return;
     }
     
-    // Pass all three required arguments to signUp (email, password, fullName)
+    // Pass the full name as a string to signUp
     await signUp(values.email, values.password, values.fullName);
   };
 

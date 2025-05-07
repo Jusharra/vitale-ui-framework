@@ -1,83 +1,33 @@
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { 
-  Currency, 
-  Region, 
-  convertPrice, 
-  formatPrice, 
-  getUserRegionalSettings 
-} from '@/utils/currencyUtils';
+// Add the formatCurrency function to the useRegionalPricing hook
 
-interface RegionalPricingHook {
-  isLoading: boolean;
-  region: Region;
-  currency: Currency;
-  convertPrice: (priceInUSD: number) => number;
-  formatPrice: (price: number) => string;
-  fullPrice: (priceInUSD: number) => string;
-  updateRegion: (region: Region) => void;
-  updateCurrency: (currency: Currency) => void;
+import { useState } from 'react';
+
+export interface RegionalPricingHook {
+  currency: string;
+  setCurrency: (currency: string) => void;
+  formatCurrency: (amount: number) => string;
+  region: string;
+  setRegion: (region: string) => void;
 }
 
 export const useRegionalPricing = (): RegionalPricingHook => {
-  const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [region, setRegion] = useState<Region>('North America');
-  const [currency, setCurrency] = useState<Currency>('USD');
-  const [multiplier, setMultiplier] = useState<number>(1.0);
+  const [currency, setCurrency] = useState<string>('USD');
+  const [region, setRegion] = useState<string>('US');
   
-  useEffect(() => {
-    const loadRegionalSettings = async () => {
-      setIsLoading(true);
-      try {
-        const settings = await getUserRegionalSettings(user?.id || null);
-        setRegion(settings.region);
-        setCurrency(settings.currency);
-        setMultiplier(settings.multiplier);
-      } catch (error) {
-        console.error('Error loading regional settings:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadRegionalSettings();
-  }, [user?.id]);
-  
-  const convert = (priceInUSD: number): number => {
-    return convertPrice(priceInUSD, currency, multiplier);
+  // Format currency based on region and currency
+  const formatCurrency = (amount: number): string => {
+    return new Intl.NumberFormat(region === 'US' ? 'en-US' : region === 'UK' ? 'en-GB' : 'en-US', {
+      style: 'currency',
+      currency: currency,
+    }).format(amount);
   };
-  
-  const format = (price: number): string => {
-    return formatPrice(price, currency);
-  };
-  
-  const fullPrice = (priceInUSD: number): string => {
-    return formatPrice(convert(priceInUSD), currency);
-  };
-  
-  const updateRegion = async (newRegion: Region) => {
-    // Here we would update the user's preference in the database
-    // For now, just update local state
-    setRegion(newRegion);
-    // In a real implementation, we would save this to user_preferences
-  };
-  
-  const updateCurrency = async (newCurrency: Currency) => {
-    // Here we would update the user's preference in the database
-    setCurrency(newCurrency);
-    // In a real implementation, we would save this to user_preferences
-  };
-  
+
   return {
-    isLoading,
-    region,
     currency,
-    convertPrice: convert,
-    formatPrice: format,
-    fullPrice,
-    updateRegion,
-    updateCurrency,
+    setCurrency,
+    formatCurrency,
+    region,
+    setRegion
   };
 };
