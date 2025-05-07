@@ -81,7 +81,7 @@ export const useAuthPage = () => {
       return;
     }
     
-    // Fix: Pass fullName as an object in the metadata
+    // Pass full_name as part of an object
     await signUp(values.email, values.password, { full_name: values.fullName });
   };
 

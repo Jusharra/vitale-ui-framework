@@ -59,10 +59,10 @@ export function useAuthActions() {
   };
   
   // Sign up with email and password with enhanced validation
-  const signUp = async (email: string, password: string, fullName: string) => {
+  const signUp = async (email: string, password: string, userData: { full_name: string }) => {
     try {
       // Validate input
-      if (!email || !password || !fullName) {
+      if (!email || !password || !userData.full_name) {
         throw new Error("Email, password, and full name are required");
       }
       
@@ -76,7 +76,7 @@ export function useAuthActions() {
         password,
         options: {
           data: {
-            full_name: fullName,
+            full_name: userData.full_name,
             role: 'member',
           },
         },
