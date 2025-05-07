@@ -1112,7 +1112,6 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string | null
-          email: string | null
           first_name: string | null
           full_name: string | null
           id: string
@@ -1121,14 +1120,12 @@ export type Database = {
           referral_code: string | null
           referral_reward_earned: boolean | null
           referred_count: number | null
-          role: string | null
           status: string | null
           updated_at: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string | null
-          email?: string | null
           first_name?: string | null
           full_name?: string | null
           id: string
@@ -1137,14 +1134,12 @@ export type Database = {
           referral_code?: string | null
           referral_reward_earned?: boolean | null
           referred_count?: number | null
-          role?: string | null
           status?: string | null
           updated_at?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string | null
-          email?: string | null
           first_name?: string | null
           full_name?: string | null
           id?: string
@@ -1153,7 +1148,6 @@ export type Database = {
           referral_code?: string | null
           referral_reward_earned?: boolean | null
           referred_count?: number | null
-          role?: string | null
           status?: string | null
           updated_at?: string | null
         }
@@ -2248,21 +2242,18 @@ export type Database = {
       users: {
         Row: {
           created_at: string | null
-          email: string
           id: string
           role: string
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
-          email: string
           id: string
           role?: string
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
-          email?: string
           id?: string
           role?: string
           updated_at?: string | null

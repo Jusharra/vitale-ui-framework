@@ -88,8 +88,7 @@ const Auth = () => {
       return;
     }
     
-    // Fix: Update this line to pass the correct arguments based on the useAuthActions.ts implementation
-    // The error was here - signUp expects 3 arguments (email, password, fullName)
+    // Pass all three required arguments to signUp (email, password, fullName)
     await signUp(values.email, values.password, values.fullName);
   };
 
