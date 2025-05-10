@@ -7,9 +7,10 @@ import { CircleCheck, CircleX } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import MembershipBadge from '@/components/common/MembershipBadge';
 import StripeCheckout from '@/components/payments/StripeCheckout';
+import { MembershipTier } from '@/types/auth';
 
-export interface MembershipTier {
-  id: "smart" | "core" | "vip";
+export interface MembershipTierData {
+  id: MembershipTier;
   name: string;
   price: string;
   interval: string;
@@ -21,7 +22,7 @@ export interface MembershipTier {
 }
 
 interface MembershipTierCardProps {
-  tier: MembershipTier;
+  tier: MembershipTierData;
   isCurrent: boolean;
   hasSubscription: boolean;
 }

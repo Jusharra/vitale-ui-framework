@@ -1,38 +1,33 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
+import { MembershipTier } from '@/types/auth';
 
 interface StripeCheckoutProps {
-  amount?: number;
-  description?: string;
-  buttonText?: string;
-  onSuccess?: () => void;
-  onCancel?: () => void;
-  tier?: "smart" | "core" | "vip";
-  variant?: string;
+  tier: MembershipTier;
+  buttonText: string;
+  variant?: "default" | "outline";
 }
 
-const StripeCheckout: React.FC<StripeCheckoutProps> = ({
-  amount = 0,
-  description = 'Payment',
-  buttonText = 'Pay Now',
-  onSuccess,
-  onCancel,
-  tier,
-  variant = 'default'
+const StripeCheckout: React.FC<StripeCheckoutProps> = ({ 
+  tier, 
+  buttonText, 
+  variant = "default" 
 }) => {
-  const handleClick = () => {
-    console.log(`Stripe checkout would open here for tier: ${tier}`);
-    // In a real implementation, this would open the Stripe checkout
+  const handleCheckout = () => {
+    // This would normally connect to Stripe
+    console.log(`Checkout initiated for ${tier} tier`);
+    // Mock implementation - in real app, this would redirect to Stripe
+    window.location.href = `/dashboard/subscription-success?tier=${tier}`;
   };
 
   return (
     <Button 
-      onClick={handleClick} 
-      variant={variant as any}
-      className="w-full"
+      onClick={handleCheckout} 
+      className="w-full" 
+      variant={variant}
     >
-      {buttonText} {tier && tier.charAt(0).toUpperCase() + tier.slice(1)}
+      {buttonText} {tier.charAt(0).toUpperCase() + tier.slice(1)}
     </Button>
   );
 };

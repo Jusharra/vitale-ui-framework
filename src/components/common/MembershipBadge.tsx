@@ -14,7 +14,7 @@ const MembershipBadge: React.FC<MembershipBadgeProps> = ({
   size = 'md',
   className 
 }) => {
-  const labels = {
+  const labels: Record<MembershipTier, string> = {
     smart: 'Smart Access',
     core: 'Core Concierge',
     vip: 'VIP Executive'
