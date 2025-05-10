@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LoginFormValues, LoginForm } from './LoginForm';
-import { RegisterFormValues, RegisterForm } from './RegisterForm';
+import LoginForm, { LoginFormValues } from './LoginForm';
+import RegisterForm, { RegisterFormValues } from './RegisterForm';
 
 interface LoginRegisterTabsProps {
   activeTab: string;
