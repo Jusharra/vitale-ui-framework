@@ -534,12 +534,14 @@ const sidebarMenuButtonVariants = cva(
 const SidebarMenuButton = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<"button"> & {
+    asChild?: boolean;
     isActive?: boolean;
     tooltip?: string | React.ComponentProps<typeof TooltipContent>;
   } & VariantProps<typeof sidebarMenuButtonVariants>
 >(
   (
     {
+      asChild = false,
       isActive = false,
       variant = "default",
       size = "default",
@@ -550,11 +552,11 @@ const SidebarMenuButton = React.forwardRef<
     },
     ref
   ) => {
+    const Comp = asChild ? Slot : "button";
     const { isMobile, state } = useSidebar();
 
-    // Create the button element directly without using asChild
     const button = (
-      <button
+      <Comp
         ref={ref}
         data-sidebar="menu-button"
         data-size={size}
@@ -563,7 +565,7 @@ const SidebarMenuButton = React.forwardRef<
         {...props}
       >
         {children}
-      </button>
+      </Comp>
     );
 
     if (!tooltip) {
