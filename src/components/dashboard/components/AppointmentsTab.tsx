@@ -72,7 +72,7 @@ const AppointmentsTab: React.FC<AppointmentsTabProps> = ({ appointments }) => {
                       </span>
                     </div>
                   </div>
-                  <Button size="sm">Details</Button>
+                  <Button size="sm"><span>Details</span></Button>
                 </div>
               ))}
             </div>
@@ -84,7 +84,7 @@ const AppointmentsTab: React.FC<AppointmentsTabProps> = ({ appointments }) => {
                 Schedule your next healthcare appointment
               </p>
               <Button onClick={() => navigate("/dashboard/appointments")}>
-                Book Appointment
+                <span>Book Appointment</span>
               </Button>
             </div>
           )}
@@ -95,7 +95,7 @@ const AppointmentsTab: React.FC<AppointmentsTabProps> = ({ appointments }) => {
             className="w-full"
             onClick={() => navigate("/dashboard/appointments")}
           >
-            View All Appointments
+            <span>View All Appointments</span>
           </Button>
         </CardFooter>
       </Card>
@@ -119,7 +119,7 @@ const AppointmentsTab: React.FC<AppointmentsTabProps> = ({ appointments }) => {
               </p>
             </div>
             <Button variant="outline" size="sm" className="ml-auto">
-              Contact
+              <span>Contact</span>
             </Button>
           </div>
         </CardContent>
@@ -129,7 +129,7 @@ const AppointmentsTab: React.FC<AppointmentsTabProps> = ({ appointments }) => {
             className="w-full"
             onClick={() => navigate("/dashboard/messages")}
           >
-            Message Care Team
+            <span>Message Care Team</span>
           </Button>
         </CardFooter>
       </Card>
