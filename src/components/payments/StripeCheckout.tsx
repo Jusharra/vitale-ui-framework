@@ -31,16 +31,13 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
     }
   };
 
-  // Determine button text based on what's provided
-  const displayText = buttonText + (tier ? ` ${tier.charAt(0).toUpperCase() + tier.slice(1)}` : '');
-
   return (
     <Button 
       onClick={handleCheckout} 
       className="w-full" 
       variant={variant}
     >
-      {displayText}
+      {buttonText} {tier ? tier.charAt(0).toUpperCase() + tier.slice(1) : ''}
     </Button>
   );
 };
