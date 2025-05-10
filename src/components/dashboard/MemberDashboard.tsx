@@ -58,7 +58,7 @@ const healthMetrics = [
 
 const MemberDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { rewards, isLoading: rewardsLoading } = useRewards();
+  const { rewards, points, isLoading: rewardsLoading } = useRewards();
   const { profile, membershipTier } = useAuth();
   
   // Get user name from profile or use default
@@ -125,7 +125,7 @@ const MemberDashboard: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <Star className="h-4 w-4 text-yellow-500" />
                     <span className="font-semibold">
-                      {rewardsLoading ? '...' : rewards?.currentPoints || 0}
+                      {rewardsLoading ? '...' : points?.current || 0}
                     </span>
                   </div>
                 </div>
@@ -140,7 +140,7 @@ const MemberDashboard: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-primary" />
                     <span className="text-sm">
-                      {rewardsLoading ? 'Loading...' : `${rewards?.referralsCompleted || 0} of 5 referrals`}
+                      {rewardsLoading ? 'Loading...' : `${points?.referrals || 0} of 5 referrals`}
                     </span>
                   </div>
                   <Button 
