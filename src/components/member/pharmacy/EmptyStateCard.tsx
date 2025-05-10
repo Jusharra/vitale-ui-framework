@@ -27,7 +27,7 @@ const EmptyStateCard: React.FC<EmptyStateCardProps> = ({
         </p>
         {actionLabel && onAction && (
           <Button variant="outline" onClick={onAction}>
-            {actionLabel}
+            <span>{actionLabel}</span>
           </Button>
         )}
         {children}
