@@ -1,87 +1,73 @@
 
-// This is a secure, read-only implementation of membership tiers data
-// No sensitive information should be stored here
+import { MembershipTier } from '@/types/auth';
+import { MembershipTierData } from '@/components/member/membership/MembershipTierCard';
 
-import type { MembershipTier } from '@/components/member/membership/MembershipTierCard';
-
-// Create a frozen (immutable) object for membership tiers
-export const membershipTiers: ReadonlyArray<MembershipTier> = Object.freeze([
+// Define membership tiers with their features and pricing
+export const membershipTiers: MembershipTierData[] = [
   {
-    id: "smart",
-    name: "Smart Access",
-    price: "$12.99",
-    interval: "month",
-    yearlyPrice: "$129.99",
-    description: "Basic plan with essential health monitoring features",
+    id: 'smart' as MembershipTier,
+    name: 'Smart Access',
+    description: 'Essential healthcare tools for everyday wellness monitoring',
+    price: '$9.99',
+    interval: 'month',
+    yearlyPrice: '$99.99',
     features: [
-      "Basic health monitoring",
-      "Smart medication reminders",
-      "Pharmacy delivery coordination",
-      "Basic telehealth consultations"
+      'Basic health tracking tools',
+      'Access to health articles',
+      '10% off prescribed medications',
+      'Email support'
     ],
     notIncluded: [
-      "Premium health tools",
-      "Concierge care team",
-      "Priority appointment scheduling",
-      "VIP transport services"
+      'Personalized health insights',
+      'Telehealth consultations',
+      'Medical transportation',
+      'Concierge services'
     ]
   },
   {
-    id: "core",
-    name: "Core Concierge", 
-    price: "$24.99",
-    interval: "month",
-    yearlyPrice: "$249.99",
-    description: "Enhanced plan with premium care coordination",
+    id: 'core' as MembershipTier,
+    name: 'Core Concierge',
+    description: 'Comprehensive care with personalized health guidance',
+    price: '$24.99',
+    interval: 'month',
+    yearlyPrice: '$249.99',
     features: [
-      "All Smart Access features",
-      "Premium health assessments",
-      "Advanced analytics and insights",
-      "Priority appointment scheduling",
-      "Dedicated care coordinators"
+      'Everything in Smart Access',
+      'Personalized health insights',
+      'Up to 3 telehealth consultations/month',
+      '20% off prescribed medications',
+      'Medical transportation (3 rides/month)',
+      'Priority customer support'
     ],
     notIncluded: [
-      "Exclusive VIP services",
-      "Personal 24/7 concierge",
-      "White-glove medical transport"
+      'VIP concierge services',
+      'Premium vacation packages',
+      'Dedicated healthcare advisor'
     ],
     popular: true
   },
   {
-    id: "vip",
-    name: "VIP Experience",
-    price: "$49.99",
-    interval: "month",
-    yearlyPrice: "$499.99",
-    description: "All-inclusive luxury health concierge experience",
+    id: 'vip' as MembershipTier,
+    name: 'VIP Executive',
+    description: 'Elite healthcare experience with premium concierge services',
+    price: '$49.99',
+    interval: 'month',
+    yearlyPrice: '$499.99',
     features: [
-      "All Core Concierge features",
-      "24/7 personal health concierge",
-      "White-glove medical transport",
-      "Virtual and in-home care options",
-      "Exclusive wellness retreats access",
-      "Global health support and coordination",
-      "Family coverage options"
+      'Everything in Core Concierge',
+      'Unlimited telehealth consultations',
+      'Dedicated healthcare advisor',
+      '30% off prescribed medications',
+      'Unlimited medical transportation',
+      'VIP concierge services',
+      'Exclusive vacation package discounts',
+      '24/7 priority support'
     ],
     notIncluded: []
   }
-]);
+];
 
-// Helper function to safely get tier by ID
-export function getTierById(tierId: string): MembershipTier | undefined {
+// Function to get membership tier by ID
+export const getMembershipTier = (tierId: MembershipTier): MembershipTierData | undefined => {
   return membershipTiers.find(tier => tier.id === tierId);
-}
-
-// Helper function to safely check if a tier level is sufficient
-export function hasSufficientTier(userTier: string | null, requiredTier: string): boolean {
-  const tierLevels: Record<string, number> = {
-    "smart": 1,
-    "core": 2,
-    "vip": 3
-  };
-  
-  const userLevel = userTier ? tierLevels[userTier] || 0 : 0;
-  const requiredLevel = tierLevels[requiredTier] || 0;
-  
-  return userLevel >= requiredLevel;
-}
+};

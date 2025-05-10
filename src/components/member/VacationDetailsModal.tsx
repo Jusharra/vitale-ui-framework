@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Dialog,
@@ -15,6 +16,7 @@ import StripeCheckout from '@/components/payments/StripeCheckout';
 import { useToast } from '@/hooks/use-toast';
 import { CalendarIcon, MapPinIcon, TagIcon, TimerIcon } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { MembershipTier } from '@/types/auth';
 
 interface VacationDetailsModalProps {
   isOpen: boolean;
@@ -76,6 +78,9 @@ const VacationDetailsModal: React.FC<VacationDetailsModalProps> = ({
       description: `Your booking for ${vacation.title} is being processed.`,
     });
   };
+
+  // Default to 'smart' tier if no membership tier is available
+  const userTier = membershipTier || 'smart' as MembershipTier;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -162,11 +167,12 @@ const VacationDetailsModal: React.FC<VacationDetailsModalProps> = ({
               )}
             </div>
             
-            <StripeCheckout
-              amount={Math.round(discountedPrice)}
-              description={`Booking for ${vacation.title}`}
-              buttonText="Book Now"
-            />
+            <Button 
+              onClick={handleBookNowClick} 
+              className="w-full"
+            >
+              Book Now
+            </Button>
             
             <p className="text-xs text-center text-muted-foreground">
               Secure payment processed by Stripe

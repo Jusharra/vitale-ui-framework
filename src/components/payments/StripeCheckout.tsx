@@ -4,22 +4,35 @@ import { Button } from "@/components/ui/button";
 import { MembershipTier } from '@/types/auth';
 
 interface StripeCheckoutProps {
-  tier: MembershipTier;
+  tier?: MembershipTier;
+  amount?: number;
+  description?: string;
   buttonText: string;
   variant?: "default" | "outline";
 }
 
 const StripeCheckout: React.FC<StripeCheckoutProps> = ({ 
   tier, 
+  amount,
+  description,
   buttonText, 
   variant = "default" 
 }) => {
   const handleCheckout = () => {
     // This would normally connect to Stripe
-    console.log(`Checkout initiated for ${tier} tier`);
-    // Mock implementation - in real app, this would redirect to Stripe
-    window.location.href = `/dashboard/subscription-success?tier=${tier}`;
+    if (tier) {
+      console.log(`Subscription checkout initiated for ${tier} tier`);
+      // Mock implementation - in real app, this would redirect to Stripe
+      window.location.href = `/dashboard/subscription-success?tier=${tier}`;
+    } else if (amount) {
+      console.log(`One-time payment checkout initiated for $${amount/100}`);
+      // Mock implementation for one-time payments
+      window.location.href = `/dashboard/purchase-success?amount=${amount}`;
+    }
   };
+
+  // Determine button text based on what's provided
+  const displayText = buttonText + (tier ? ` ${tier.charAt(0).toUpperCase() + tier.slice(1)}` : '');
 
   return (
     <Button 
@@ -27,7 +40,7 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
       className="w-full" 
       variant={variant}
     >
-      {buttonText} {tier.charAt(0).toUpperCase() + tier.slice(1)}
+      {displayText}
     </Button>
   );
 };
