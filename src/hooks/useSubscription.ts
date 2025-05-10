@@ -45,16 +45,29 @@ export function useSubscription(userId: string | null) {
         .single();
       
       if (error) {
-        console.log("No subscription found, using default:", error);
-        // If no subscription data, use default values
-        setSubscription({
-          id: 'default',
-          status: 'active',
-          tier: 'smart' as MembershipTier,
+        console.log("No subscription found in database, generating dummy data");
+        // Generate deterministic dummy data based on user ID
+        const userIdSum = userId.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+        
+        // Assign tier based on user ID (deterministic but appears random)
+        const tiers: MembershipTier[] = ['smart', 'core', 'vip'];
+        const tierIndex = userIdSum % 3;
+        const dummyTier = tiers[tierIndex];
+        
+        // Set trial status for some users
+        const isInTrial = userIdSum % 5 === 0;
+        
+        // Create a subscription object with the dummy data
+        const dummySubscription: Subscription = {
+          id: `dummy-${userId.substring(0, 8)}`,
+          status: isInTrial ? 'trialing' : 'active',
+          tier: dummyTier,
           current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          cancel_at_period_end: false
-        });
-        setIsTrialing(false);
+          cancel_at_period_end: userIdSum % 7 === 0 // some users will have cancellation pending
+        };
+        
+        setSubscription(dummySubscription);
+        setIsTrialing(isInTrial);
         return;
       }
       
