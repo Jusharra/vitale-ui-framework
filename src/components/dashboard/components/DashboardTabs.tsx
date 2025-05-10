@@ -38,12 +38,15 @@ const DashboardTabs: React.FC = () => {
         <TabsTrigger value="health">Health</TabsTrigger>
         <TabsTrigger value="services">Services</TabsTrigger>
       </TabsList>
+      
       <TabsContent value="appointments" className="mt-4 space-y-4">
         <AppointmentsTab appointments={upcomingAppointments} />
       </TabsContent>
+      
       <TabsContent value="health" className="mt-4">
         <HealthTab healthMetrics={healthMetrics} />
       </TabsContent>
+      
       <TabsContent value="services" className="mt-4">
         <ServicesTab />
       </TabsContent>

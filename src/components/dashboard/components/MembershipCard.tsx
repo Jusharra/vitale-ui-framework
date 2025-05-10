@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import MembershipBadge from "@/components/common/MembershipBadge";
 import { Progress } from "@/components/ui/progress";
+import { MembershipTier } from "@/types/auth";
 
 interface MembershipCardProps {
   membershipTier: string;
@@ -17,6 +18,9 @@ interface MembershipCardProps {
 
 const MembershipCard: React.FC<MembershipCardProps> = ({ membershipTier }) => {
   const navigate = useNavigate();
+  
+  // Cast the string to MembershipTier type to fix the TypeScript error
+  const typedMembershipTier = membershipTier as MembershipTier;
   
   return (
     <Card>
@@ -28,11 +32,15 @@ const MembershipCard: React.FC<MembershipCardProps> = ({ membershipTier }) => {
           <div>
             <p className="text-sm font-medium">Current Tier</p>
             <div className="flex items-center gap-2">
-              <MembershipBadge type={membershipTier} />
+              <MembershipBadge type={typedMembershipTier} />
               <span className="font-semibold capitalize">{membershipTier}</span>
             </div>
           </div>
-          <Button variant="outline" size="sm" onClick={() => navigate('/dashboard/membership')}>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate('/dashboard/membership')}
+          >
             Upgrade
           </Button>
         </div>

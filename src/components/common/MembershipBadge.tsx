@@ -1,11 +1,10 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-
-type MembershipType = 'smart' | 'core' | 'vip';
+import { MembershipTier } from '@/types/auth';
 
 interface MembershipBadgeProps {
-  type: MembershipType;
+  type: MembershipTier;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
