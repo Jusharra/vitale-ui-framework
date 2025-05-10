@@ -1,33 +1,6 @@
 import React from "react";
 import { NavLink } from 'react-router-dom';
-import { 
-  CreditCard, 
-  LifeBuoy, 
-  LucideIcon, 
-  MessageSquare, 
-  PanelLeft, 
-  Settings, 
-  Users, 
-  User, 
-  Calendar, 
-  Activity, 
-  Home, 
-  Map, 
-  Pill, 
-  ShoppingCart, 
-  Truck, 
-  Palmtree,
-  Gift, 
-  Tag,
-  BarChart2 as BarChart,
-  Heart,
-  Clipboard,
-  BadgeDollarSign,
-  Gauge,
-  FileText,
-  Download,
-  Stethoscope
-} from 'lucide-react';
+import { CreditCard, LifeBuoy, DivideIcon as LucideIcon, MessageSquare, PanelLeft, Settings, Users, User, Calendar, Activity, Home, Map, Pill, ShoppingCart, Truck, Palmtree, Gift, Tag, BarChart2 as BarChart, Heart, Clipboard, BadgeDollarSign, Gauge, FileText, Download, Stethoscope } from 'lucide-react';
 import { 
   Sidebar as SidebarContainer, 
   SidebarContent, 
