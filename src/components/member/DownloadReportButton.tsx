@@ -36,7 +36,7 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({
   return (
     <Button onClick={handleClick} {...buttonProps}>
       <FileText />
-      {label}
+      <span>{label}</span>
     </Button>
   );
 };
