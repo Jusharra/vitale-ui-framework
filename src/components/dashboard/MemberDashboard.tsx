@@ -8,6 +8,7 @@ import WelcomeHeader from "./components/WelcomeHeader";
 import MembershipCard from "./components/MembershipCard";
 import RewardsCard from "./components/RewardsCard";
 import DashboardTabs from "./components/DashboardTabs";
+import { MembershipTier } from "@/types/auth";
 
 const MemberDashboard: React.FC = () => {
   const { rewards, points, isLoading: rewardsLoading } = useRewards();
@@ -17,7 +18,7 @@ const MemberDashboard: React.FC = () => {
   const userName = profile?.full_name || "Member";
   
   // Use membershipTier from auth context or default to "smart"
-  const userMembership = membershipTier || "smart";
+  const userMembership = membershipTier || "smart" as MembershipTier;
   
   return (
     <div className="space-y-8">
