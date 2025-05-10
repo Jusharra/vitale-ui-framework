@@ -28,6 +28,7 @@ const ResetPassword = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [hashError, setHashError] = useState<string | null>(null);
+  const [hasCheckedHash, setHasCheckedHash] = useState(false);
 
   // Reset password form
   const form = useForm<ResetPasswordFormValues>({
@@ -42,18 +43,42 @@ const ResetPassword = () => {
   useEffect(() => {
     const checkHash = async () => {
       try {
-        // Get the hash fragment from the URL
+        console.log("Checking hash and URL parameters for password reset");
+        
+        // First check URL hash (fragment part)
         const hash = window.location.hash.substring(1);
         const params = new URLSearchParams(hash);
-
-        // Check if there's a type and access_token
-        if (!params.get('type') || !params.get('access_token')) {
-          setHashError("Invalid or missing reset link parameters");
+        
+        // Also check URL search parameters
+        const queryParams = new URLSearchParams(window.location.search);
+        
+        // Debug logging
+        console.log("Hash parameters:", Object.fromEntries(params.entries()));
+        console.log("Query parameters:", Object.fromEntries(queryParams.entries()));
+        
+        // Check if there's a type and access_token in hash
+        if (params.get('type') === 'recovery' && params.get('access_token')) {
+          console.log("Found recovery parameters in hash");
+          setHasCheckedHash(true);
           return;
         }
+        
+        // Check if there's a token in search params (some email clients modify the URL)
+        if (queryParams.get('token')) {
+          console.log("Found token in query parameters");
+          setHasCheckedHash(true);
+          return;
+        }
+        
+        // No valid parameters found
+        console.error("No valid reset parameters found in URL");
+        setHashError("Invalid or missing reset link parameters. Please check your email and click the link again.");
+        setHasCheckedHash(true);
+        
       } catch (error) {
         console.error("Error parsing reset parameters:", error);
         setHashError("Unable to process password reset link");
+        setHasCheckedHash(true);
       }
     };
 
@@ -64,6 +89,8 @@ const ResetPassword = () => {
     try {
       setIsLoading(true);
       
+      console.log("Attempting to update password");
+      
       // Update the user's password
       const { error } = await supabase.auth.updateUser({
         password: values.password
@@ -72,6 +99,8 @@ const ResetPassword = () => {
       if (error) {
         throw error;
       }
+      
+      console.log("Password updated successfully");
       
       toast({
         title: "Password updated",
@@ -93,6 +122,26 @@ const ResetPassword = () => {
       setIsLoading(false);
     }
   };
+
+  if (!hasCheckedHash && !hashError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Processing Reset Link</CardTitle>
+            <CardDescription>
+              Please wait while we process your password reset link...
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-center py-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
