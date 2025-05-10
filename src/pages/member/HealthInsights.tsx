@@ -1,7 +1,7 @@
 
 import React from 'react';
 import MemberPageLayout from '@/components/layout/MemberPageLayout';
-import HealthInsightsContent from '@/components/member/HealthInsightsContent';
+import HealthInsightsContent from '@/components/member/health-insights';
 
 const HealthInsights = () => {
   return (

@@ -7,8 +7,8 @@ import RegisterForm, { RegisterFormValues } from './RegisterForm';
 interface LoginRegisterTabsProps {
   activeTab: string;
   onTabChange: (value: string) => void;
-  onLoginSubmit: (values: LoginFormValues) => void;
-  onRegisterSubmit: (values: RegisterFormValues) => void;
+  onLoginSubmit: (values: LoginFormValues) => Promise<void>;
+  onRegisterSubmit: (values: RegisterFormValues) => Promise<void>;
   isLoading: boolean;
   loginDisabled: boolean;
   loginAttempts: number;
