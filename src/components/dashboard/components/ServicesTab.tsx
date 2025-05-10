@@ -60,7 +60,7 @@ const ServicesTab: React.FC = () => {
           className="w-full"
           onClick={() => navigate("/dashboard/service-booking")}
         >
-          Browse All Services
+          <span>Browse All Services</span>
         </Button>
       </CardFooter>
     </Card>

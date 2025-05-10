@@ -64,10 +64,10 @@ const HealthTab: React.FC<HealthTabProps> = ({ healthMetrics }) => {
           variant="outline"
           onClick={() => navigate("/dashboard/health-insights")}
         >
-          View Health Insights
+          <span>View Health Insights</span>
         </Button>
         <Button onClick={() => navigate("/dashboard/health-tools")}>
-          Health Tools
+          <span>Health Tools</span>
         </Button>
       </CardFooter>
     </Card>

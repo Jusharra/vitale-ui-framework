@@ -79,9 +79,11 @@ const TransportPaymentSummary: React.FC<TransportPaymentSummaryProps> = ({
         </div>
       </CardContent>
       <CardFooter className="flex gap-4 justify-end">
-        <Button variant="outline" onClick={onBack}>Back</Button>
+        <Button variant="outline" onClick={onBack}>
+          <span>Back</span>
+        </Button>
         <Button onClick={onPayment}>
-          {membershipTier === "vip" ? "Confirm Booking" : "Complete Payment"}
+          <span>{membershipTier === "vip" ? "Confirm Booking" : "Complete Payment"}</span>
         </Button>
       </CardFooter>
     </Card>
