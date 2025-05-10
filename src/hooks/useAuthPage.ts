@@ -10,24 +10,30 @@ import { ForgotPasswordFormValues } from '@/components/auth/ForgotPasswordForm';
 
 export const useAuthPage = () => {
   const navigate = useNavigate();
-  const { signIn, signUp, isLoading, isAuthenticated } = useAuth();
+  const { signIn, signUp, isLoading: authLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>("login");
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Rate limiting for login attempts (security)
   const [loginAttempts, setLoginAttempts] = useState(0);
 
   const onLoginSubmit = async (values: LoginFormValues) => {
-    const success = await signIn(values.email, values.password);
-    
-    if (!success) {
-      setLoginAttempts(prev => prev + 1);
-    } else {
-      // Redirect to dashboard on success
-      navigate('/dashboard');
+    setIsLoading(true);
+    try {
+      const success = await signIn(values.email, values.password);
+      
+      if (!success) {
+        setLoginAttempts(prev => prev + 1);
+      } else {
+        // Redirect to dashboard on success
+        navigate('/dashboard');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -42,15 +48,20 @@ export const useAuthPage = () => {
       return;
     }
     
-    const success = await signUp(values.email, values.password, values.fullName);
-    
-    if (success) {
-      // Switch to login tab with a message
-      setActiveTab("login");
-      toast({
-        title: "Account created",
-        description: "Please check your email to verify your account",
-      });
+    setIsLoading(true);
+    try {
+      const success = await signUp(values.email, values.password, values.fullName);
+      
+      if (success) {
+        // Switch to login tab with a message
+        setActiveTab("login");
+        toast({
+          title: "Account created",
+          description: "Please check your email to verify your account",
+        });
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -89,7 +100,7 @@ export const useAuthPage = () => {
     showForgotPassword,
     setShowForgotPassword,
     resetEmailSent,
-    isLoading,
+    isLoading: isLoading || authLoading,
     forgotPasswordLoading,
     loginAttempts,
     onLoginSubmit,

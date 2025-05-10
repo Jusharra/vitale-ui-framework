@@ -45,6 +45,7 @@ export function useSubscription(userId: string | null) {
         .single();
       
       if (error) {
+        console.log("No subscription found, using default:", error);
         // If no subscription data, use default values
         setSubscription({
           id: 'default',

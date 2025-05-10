@@ -65,18 +65,10 @@ export function useAuthActions() {
       // If successful and we have a user, create a profile entry manually
       if (data.user) {
         try {
-          const { error: profileError } = await supabase.from('profiles').insert({
-            id: data.user.id,
-            email: email,
-            full_name: fullName,
-            role: 'member'
-          });
-          
-          if (profileError) {
-            console.error("Error creating profile during signup:", profileError);
-          }
+          // We don't need to manually create profiles anymore as the trigger function will handle it
+          console.log("Profile will be created by database trigger");
         } catch (profileCreateError) {
-          console.error("Exception creating profile:", profileCreateError);
+          console.error("Exception handling profile:", profileCreateError);
         }
       }
 

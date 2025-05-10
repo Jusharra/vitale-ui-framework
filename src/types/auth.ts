@@ -5,7 +5,7 @@ export type UserRole = 'member' | 'admin' | 'professional';
 
 export interface UserProfile {
   id: string;
-  email: string;
+  email?: string;
   full_name?: string;
   role: UserRole;
 }

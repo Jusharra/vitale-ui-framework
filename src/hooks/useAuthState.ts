@@ -71,13 +71,9 @@ export function useAuthState() {
         const userProfile: UserProfile = {
           id: userId,
           email: user?.email || '',
+          full_name: user?.user_metadata?.full_name,
           role: 'member' as UserRole
         };
-        
-        // Use user metadata if available
-        if (user?.user_metadata?.full_name) {
-          userProfile.full_name = user.user_metadata.full_name;
-        }
         
         setProfile(userProfile);
         
@@ -85,22 +81,20 @@ export function useAuthState() {
         try {
           await supabase.from('profiles').insert({
             id: userId,
-            email: user?.email,
             full_name: user?.user_metadata?.full_name,
-            role: 'member'
           });
         } catch (insertError) {
           console.error("Error creating profile:", insertError);
         }
       } else if (data) {
-        // Construct profile from data with default role if needed
+        // Construct profile from data
         const userProfile: UserProfile = {
           id: data.id,
           // Use the user's email from auth user object since it's not in profiles table
           email: user?.email || '', 
           full_name: data.full_name,
           // Set default role since it's not in profiles table
-          role: 'member' as UserRole
+          role: 'member' as UserRole 
         };
         
         setProfile(userProfile);
