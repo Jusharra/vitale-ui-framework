@@ -31,13 +31,18 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
     }
   };
 
+  // Create a single string for the button text
+  const displayText = tier 
+    ? `${buttonText} ${tier.charAt(0).toUpperCase() + tier.slice(1)}` 
+    : buttonText;
+
   return (
     <Button 
       onClick={handleCheckout} 
       className="w-full" 
       variant={variant}
     >
-      {buttonText} {tier ? tier.charAt(0).toUpperCase() + tier.slice(1) : ''}
+      {displayText}
     </Button>
   );
 };
