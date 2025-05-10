@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Session, User } from '@supabase/supabase-js';
-import type { UserProfile } from '@/types/auth';
+import type { UserProfile, UserRole } from '@/types/auth';
 import { useToast } from '@/hooks/use-toast';
 
 export function useAuthState() {
@@ -71,7 +71,7 @@ export function useAuthState() {
         const userProfile: UserProfile = {
           id: userId,
           email: user?.email || '',
-          role: 'member'
+          role: 'member' as UserRole
         };
         
         // Use user metadata if available
@@ -81,15 +81,37 @@ export function useAuthState() {
         
         setProfile(userProfile);
       } else if (data) {
-        // Construct profile from data
-        const userProfile: UserProfile = {
-          id: data.id,
-          email: user?.email || '', 
-          full_name: data.full_name,
-          role: (data.role as UserProfile['role']) || 'member'
-        };
-        
-        setProfile(userProfile);
+        // Get user role from the users table if available, otherwise use a default role
+        try {
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', userId)
+            .single();
+            
+          const userRole = userError ? 'member' as UserRole : (userData.role as UserRole);
+          
+          // Construct profile from data
+          const userProfile: UserProfile = {
+            id: data.id,
+            email: user?.email || '', 
+            full_name: data.full_name,
+            role: userRole
+          };
+          
+          setProfile(userProfile);
+        } catch (roleError) {
+          console.error("Error fetching user role:", roleError);
+          // Fallback to profile without role information
+          const userProfile: UserProfile = {
+            id: data.id,
+            email: user?.email || '', 
+            full_name: data.full_name,
+            role: 'member' as UserRole
+          };
+          
+          setProfile(userProfile);
+        }
       }
     } catch (error) {
       console.error("Error in fetchUserProfile:", error);

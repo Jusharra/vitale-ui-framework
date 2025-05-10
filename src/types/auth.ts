@@ -10,6 +10,16 @@ export interface UserProfile {
   role: UserRole;
 }
 
+export type MembershipTier = 'smart' | 'core' | 'vip';
+
+export interface Subscription {
+  id: string;
+  status: string;
+  tier: MembershipTier;
+  current_period_end: string | number;
+  cancel_at_period_end: boolean;
+}
+
 export interface AuthState {
   user: User | null;
   session: Session | null;
@@ -17,4 +27,7 @@ export interface AuthState {
   isLoading: boolean;
   isAuthenticated: boolean;
   userRole: UserRole | null;
+  membershipTier: MembershipTier | null;
+  subscription: Subscription | null;
+  isTrialing: boolean;
 }

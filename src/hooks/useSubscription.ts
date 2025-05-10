@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import type { Subscription } from '@/types/auth';
+import type { Subscription, MembershipTier } from '@/types/auth';
 
 export function useSubscription(userId: string | null) {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
@@ -43,7 +43,7 @@ export function useSubscription(userId: string | null) {
         const subscriptionData: Subscription = {
           id: data.id,
           status: data.status,
-          tier: data.tier,
+          tier: data.tier as MembershipTier,
           current_period_end: data.current_period_end,
           cancel_at_period_end: data.cancel_at_period_end
         };
