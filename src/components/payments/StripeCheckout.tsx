@@ -36,6 +36,7 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
     ? `${buttonText} ${tier.charAt(0).toUpperCase() + tier.slice(1)}` 
     : buttonText;
 
+  // Make sure we're only passing a single text node as the child to Button
   return (
     <Button 
       onClick={handleCheckout} 

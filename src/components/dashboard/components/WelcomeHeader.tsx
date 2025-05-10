@@ -21,7 +21,9 @@ const WelcomeHeader: React.FC<WelcomeHeaderProps> = ({ userName, userMembership 
       </div>
       <div className="flex items-center gap-2">
         <MembershipBadge type={userMembership} size="lg" />
-        <Button variant="outline" onClick={() => navigate('/dashboard/membership')}>View Benefits</Button>
+        <Button variant="outline" onClick={() => navigate('/dashboard/membership')}>
+          View Benefits
+        </Button>
       </div>
     </div>
   );
