@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Index from '@/pages/Index';
@@ -145,6 +144,22 @@ const App: React.FC = () => {
               
               {/* Admin routes */}
               <Route
+                path="/dashboard/admin"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/admin/vacations"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminVacationsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/dashboard/admin/promotions"
                 element={
                   <ProtectedRoute requiredRole="admin">
@@ -152,16 +167,48 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
-              
-              <Route path="/dashboard/admin" element={<ProtectedRoute requiredRole="admin"><AdminPage /></ProtectedRoute>} />
-              <Route path="/dashboard/admin/vacations" element={<ProtectedRoute requiredRole="admin"><AdminVacationsPage /></ProtectedRoute>} />
-              <Route path="/dashboard/admin/leads" element={<ProtectedRoute requiredRole="admin"><AdminLeadsPage /></ProtectedRoute>} />
-              <Route path="/dashboard/admin/care-teams" element={<ProtectedRoute requiredRole="admin"><AdminCareTeamsPage /></ProtectedRoute>} />
-              <Route path="/dashboard/admin/health-tools" element={<ProtectedRoute requiredRole="admin"><AdminHealthToolsPage /></ProtectedRoute>} />
-              <Route path="/dashboard/admin/settings" element={<ProtectedRoute requiredRole="admin"><AdminSettingsPage /></ProtectedRoute>} />
+              <Route
+                path="/dashboard/admin/leads"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminLeadsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/admin/care-teams"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminCareTeamsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/admin/health-tools"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminHealthToolsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/admin/settings"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminSettingsPage />
+                  </ProtectedRoute>
+                }
+              />
               
               {/* Professional routes */}
-              <Route path="/dashboard/professional" element={<ProtectedRoute requiredRole="professional"><ProfessionalPage /></ProtectedRoute>} />
+              <Route
+                path="/dashboard/professional"
+                element={
+                  <ProtectedRoute requiredRole="professional">
+                    <ProfessionalPage />
+                  </ProtectedRoute>
+                }
+              />
               
               <Route path="*" element={<NotFound />} />
             </Routes>

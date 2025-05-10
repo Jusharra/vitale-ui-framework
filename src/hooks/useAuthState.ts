@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Session, User } from '@supabase/supabase-js';
@@ -87,14 +86,21 @@ export function useAuthState() {
           console.error("Error creating profile:", insertError);
         }
       } else if (data) {
+        // Now try to get the user's role from the users table
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', userId)
+          .single();
+          
         // Construct profile from data
         const userProfile: UserProfile = {
           id: data.id,
           // Use the user's email from auth user object since it's not in profiles table
           email: user?.email || '', 
           full_name: data.full_name,
-          // Set default role since it's not in profiles table
-          role: 'member' as UserRole 
+          // Set role from users table if available, otherwise default to member
+          role: userData?.role || 'member' as UserRole 
         };
         
         setProfile(userProfile);
