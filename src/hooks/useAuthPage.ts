@@ -19,34 +19,12 @@ export const useAuthPage = () => {
   
   // Rate limiting for login attempts (security)
   const [loginAttempts, setLoginAttempts] = useState(0);
-  const [loginDisabled, setLoginDisabled] = useState(false);
 
   const onLoginSubmit = async (values: LoginFormValues) => {
-    if (loginDisabled) {
-      toast({
-        title: "Login temporarily disabled",
-        description: "Too many attempts. Please try again later.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     const success = await signIn(values.email, values.password);
     
     if (!success) {
-      setLoginAttempts(prev => {
-        const newAttempts = prev + 1;
-        // Disable login after 5 failed attempts
-        if (newAttempts >= 5) {
-          setLoginDisabled(true);
-          // Re-enable after 10 minutes
-          setTimeout(() => {
-            setLoginDisabled(false);
-            setLoginAttempts(0);
-          }, 10 * 60 * 1000);
-        }
-        return newAttempts;
-      });
+      setLoginAttempts(prev => prev + 1);
     } else {
       // Redirect to dashboard on success
       navigate('/dashboard');
@@ -54,16 +32,6 @@ export const useAuthPage = () => {
   };
 
   const onRegisterSubmit = async (values: RegisterFormValues) => {
-    // Add basic password strength validation
-    if (values.password.length < 8) {
-      toast({
-        title: "Weak password",
-        description: "Password must be at least 8 characters long",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     // Ensure passwords match
     if (values.password !== values.confirmPassword) {
       toast({
@@ -122,7 +90,6 @@ export const useAuthPage = () => {
     setShowForgotPassword,
     resetEmailSent,
     isLoading,
-    loginDisabled,
     forgotPasswordLoading,
     loginAttempts,
     onLoginSubmit,

@@ -10,7 +10,6 @@ interface LoginRegisterTabsProps {
   onLoginSubmit: (values: LoginFormValues) => Promise<void>;
   onRegisterSubmit: (values: RegisterFormValues) => Promise<void>;
   isLoading: boolean;
-  loginDisabled: boolean;
   loginAttempts: number;
   onForgotPassword: () => void;
 }
@@ -21,7 +20,6 @@ const LoginRegisterTabs: React.FC<LoginRegisterTabsProps> = ({
   onLoginSubmit,
   onRegisterSubmit,
   isLoading,
-  loginDisabled,
   loginAttempts,
   onForgotPassword,
 }) => {
@@ -40,7 +38,6 @@ const LoginRegisterTabs: React.FC<LoginRegisterTabsProps> = ({
         <LoginForm 
           onSubmit={onLoginSubmit} 
           isLoading={isLoading} 
-          disabled={loginDisabled}
           loginAttempts={loginAttempts}
           onForgotPassword={onForgotPassword}
         />

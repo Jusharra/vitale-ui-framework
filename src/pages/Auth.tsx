@@ -2,7 +2,6 @@
 import React, { useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { useAuthPage } from '@/hooks/useAuthPage';
-import { useTranslation } from '@/utils/i18n';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import AuthHeader from '@/components/auth/AuthHeader';
@@ -10,7 +9,6 @@ import ForgotPasswordCard from '@/components/auth/ForgotPasswordCard';
 import LoginRegisterTabs from '@/components/auth/LoginRegisterTabs';
 
 const Auth = () => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const { isAuthenticated, isLoading: authStateLoading } = useAuth();
   const {
@@ -20,7 +18,6 @@ const Auth = () => {
     setShowForgotPassword,
     resetEmailSent,
     isLoading,
-    loginDisabled,
     forgotPasswordLoading,
     loginAttempts,
     onLoginSubmit,
@@ -62,7 +59,6 @@ const Auth = () => {
             onLoginSubmit={onLoginSubmit}
             onRegisterSubmit={onRegisterSubmit}
             isLoading={isLoading}
-            loginDisabled={loginDisabled}
             loginAttempts={loginAttempts}
             onForgotPassword={() => setShowForgotPassword(true)}
           />

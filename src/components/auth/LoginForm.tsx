@@ -1,6 +1,5 @@
 
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,10 +19,11 @@ export type LoginFormValues = z.infer<typeof loginSchema>;
 interface LoginFormProps {
   onSubmit: (values: LoginFormValues) => Promise<void>;
   isLoading: boolean;
+  loginAttempts?: number;
   onForgotPassword: () => void;
 }
 
-const LoginForm = ({ onSubmit, isLoading, onForgotPassword }: LoginFormProps) => {
+const LoginForm = ({ onSubmit, isLoading, loginAttempts = 0, onForgotPassword }: LoginFormProps) => {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -62,6 +62,15 @@ const LoginForm = ({ onSubmit, isLoading, onForgotPassword }: LoginFormProps) =>
             </FormItem>
           )}
         />
+        
+        {loginAttempts > 0 && (
+          <div className="text-sm text-amber-500">
+            Failed attempts: {loginAttempts}
+            {loginAttempts >= 4 && (
+              <span className="block mt-1">Too many failed attempts may temporarily lock your account.</span>
+            )}
+          </div>
+        )}
         
         <div className="text-right">
           <Button 

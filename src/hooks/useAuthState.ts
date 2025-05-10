@@ -10,7 +10,6 @@ export function useAuthState() {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isTrialing, setIsTrialing] = useState(false);
   const { toast } = useToast();
 
   // Initialize auth state
@@ -20,15 +19,15 @@ export function useAuthState() {
       
       // Set up the auth state listener first
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (event, session) => {
+        async (event, currentSession) => {
           console.log("Auth state change event:", event);
-          setSession(session);
-          setUser(session?.user || null);
+          setSession(currentSession);
+          setUser(currentSession?.user || null);
           
           // If user logged in or token refreshed, fetch their profile
-          if (session?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+          if (currentSession?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
             // Use setTimeout to avoid potential deadlocks
-            setTimeout(() => fetchUserProfile(session.user.id), 0);
+            setTimeout(() => fetchUserProfile(currentSession.user.id), 0);
           } else if (event === 'SIGNED_OUT') {
             setProfile(null);
           }
@@ -36,13 +35,13 @@ export function useAuthState() {
       );
       
       // Check for existing session
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log("Initial session check:", session ? "Session exists" : "No session");
-      setSession(session);
-      setUser(session?.user || null);
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      console.log("Initial session check:", currentSession ? "Session exists" : "No session");
+      setSession(currentSession);
+      setUser(currentSession?.user || null);
       
-      if (session?.user) {
-        await fetchUserProfile(session.user.id);
+      if (currentSession?.user) {
+        await fetchUserProfile(currentSession.user.id);
       }
       
       setIsLoading(false);
@@ -59,69 +58,41 @@ export function useAuthState() {
   // Fetch user profile data
   const fetchUserProfile = async (userId: string) => {
     try {
-      console.log("Fetching profile for user:", userId);
-      // Fetch user data from our users table
-      const { data: userData, error: userError } = await supabase
-        .from('users')
+      // Try to get user data from profiles table
+      const { data, error } = await supabase
+        .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
       
-      if (userError) {
-        console.error("Error fetching user data:", userError);
-        // If we can't find the user in our users table, it might be a new registration
-        // We can still create a basic profile from auth data
+      if (error) {
+        console.error("Error fetching profile:", error);
+        // If we can't find the user in profiles table, create a basic profile
         const userProfile: UserProfile = {
           id: userId,
-          email: user?.email || '', 
-          role: 'member' as UserProfile['role']
+          email: user?.email || '',
+          role: 'member'
         };
         
+        // Use user metadata if available
         if (user?.user_metadata?.full_name) {
           userProfile.full_name = user.user_metadata.full_name;
         }
         
         setProfile(userProfile);
-        return;
-      }
-      
-      if (userData) {
+      } else if (data) {
+        // Construct profile from data
         const userProfile: UserProfile = {
-          id: userData.id,
-          email: user?.email || '', // Get email from auth user object
-          role: userData.role as UserProfile['role']
+          id: data.id,
+          email: user?.email || '', 
+          full_name: data.full_name,
+          role: (data.role as UserProfile['role']) || 'member'
         };
         
-        // Fetch additional profile info
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('id', userId)
-          .single();
-        
-        if (profileData) {
-          userProfile.full_name = profileData.full_name;
-        }
-        
         setProfile(userProfile);
-        
-        // Check if user is in trial period
-        const { data: subscriptionData } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', userId)
-          .single();
-        
-        if (subscriptionData) {
-          setIsTrialing(subscriptionData.status === 'trialing');
-        } else {
-          setIsTrialing(false);
-        }
-      } else {
-        console.log("No user data found for ID:", userId);
       }
     } catch (error) {
-      console.error("Error fetching user profile:", error);
+      console.error("Error in fetchUserProfile:", error);
       toast({
         title: "Error",
         description: "Failed to load user profile data",
@@ -135,8 +106,6 @@ export function useAuthState() {
     session,
     profile,
     isLoading,
-    isTrialing,
-    setProfile,
     fetchUserProfile,
   };
 }

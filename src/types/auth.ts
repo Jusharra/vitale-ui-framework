@@ -10,22 +10,11 @@ export interface UserProfile {
   role: UserRole;
 }
 
-export interface Subscription {
-  id: string;
-  status: string;
-  tier: string;
-  current_period_end: string;
-  cancel_at_period_end: boolean;
-}
-
 export interface AuthState {
   user: User | null;
   session: Session | null;
   profile: UserProfile | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  isTrialing: boolean;
   userRole: UserRole | null;
-  subscription: Subscription | null;
-  membershipTier: string | null;
 }

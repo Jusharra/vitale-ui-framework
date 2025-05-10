@@ -2,17 +2,13 @@
 import React, { createContext, useContext, useMemo, memo, useCallback } from "react";
 import { useAuthState } from '@/hooks/useAuthState';
 import { useAuthActions } from '@/hooks/useAuthActions';
-import { useSubscription } from '@/hooks/useSubscription';
-import { useToolAccess } from '@/hooks/useToolAccess';
-import type { UserProfile, AuthState, UserRole } from '@/types/auth';
+import type { UserProfile, AuthState } from '@/types/auth';
 
-interface AuthContextType extends AuthState {
+interface AuthContextType extends Omit<AuthState, 'isTrialing' | 'subscription' | 'membershipTier'> {
   signIn: (email: string, password: string) => Promise<boolean>;
   signUp: (email: string, password: string, fullName: string) => Promise<boolean>;
   signOut: () => Promise<boolean>;
   updateProfile: (data: Partial<UserProfile>) => Promise<boolean>;
-  refreshSubscription: () => Promise<void>;
-  hasToolAccess: (toolName: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,7 +20,6 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
     session,
     profile,
     isLoading,
-    isTrialing: authIsTrialing
   } = useAuthState();
 
   const {
@@ -34,31 +29,15 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
     updateProfile: updateUserProfile
   } = useAuthActions();
   
-  const {
-    subscription,
-    isTrialing,
-    refreshSubscription
-  } = useSubscription(user?.id || null);
-  
-  const { hasToolAccess: toolAccessCheck } = useToolAccess();
-
   // Determine user role and authentication status
   const userRole = profile?.role || null;
   const isAuthenticated = !!session;
   
-  // Get membership tier from subscription or default to null
-  const membershipTier = subscription?.tier || null;
-
   // Update profile wrapper - memoize to prevent recreation on every render
   const updateProfile = useCallback(async (data: Partial<UserProfile>) => {
     if (!user) return false;
     return await updateUserProfile(user.id, data);
   }, [user, updateUserProfile]);
-
-  // Cache the tool access check with user ID - memoize for performance
-  const checkToolAccess = useCallback(async (toolName: string): Promise<boolean> => {
-    return await toolAccessCheck(user?.id || null, toolName);
-  }, [user, toolAccessCheck]);
 
   // Create a stable context value with complete dependency array
   const value = useMemo(() => ({
@@ -68,15 +47,10 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
     isLoading,
     userRole,
     isAuthenticated,
-    isTrialing,
-    subscription,
-    membershipTier,
     signIn,
     signUp,
     signOut,
     updateProfile,
-    hasToolAccess: checkToolAccess,
-    refreshSubscription
   }), [
     user, 
     session, 
@@ -84,15 +58,10 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
     isLoading, 
     userRole,
     isAuthenticated,
-    isTrialing, 
-    subscription,
-    membershipTier,
     signIn,
     signUp,
     signOut,
     updateProfile,
-    checkToolAccess,
-    refreshSubscription
   ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
