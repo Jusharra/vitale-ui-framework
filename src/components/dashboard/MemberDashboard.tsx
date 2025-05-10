@@ -27,6 +27,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useRewards } from "@/hooks/useRewards";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from '@/context/AuthContext';
 
 // Mock data
 const upcomingAppointments = [
@@ -52,27 +53,21 @@ const healthMetrics = {
 
 const MemberDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { rewards, isLoading } = useRewards();
+  const { rewards, isLoading: rewardsLoading } = useRewards();
+  const { profile } = useAuth();
   
-  // Mock user data - in a real app this would come from auth context or API
-  const userData = {
-    name: "John Doe",
-    membership: "smart" as "smart" | "core" | "vip",
-    nextAppointment: upcomingAppointments[0],
-    points: 2450,
-    primaryDoctor: "Dr. Michael Chen",
-    rewardsTier: "Silver"
-  };
-
+  // Get user name from profile or use default
+  const userName = profile?.full_name || "Member";
+  
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Welcome back, {userData.name}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Welcome back, {userName}</h1>
           <p className="text-muted-foreground">Here's what's happening with your health today.</p>
         </div>
         <div className="flex items-center gap-2">
-          <MembershipBadge type={userData.membership} size="lg" />
+          <MembershipBadge type="smart" size="lg" />
           <Button variant="outline" onClick={() => navigate('/dashboard/membership')}>View Benefits</Button>
         </div>
       </div>
@@ -90,8 +85,8 @@ const MemberDashboard: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium">Current Tier</p>
                   <div className="flex items-center gap-2">
-                    <MembershipBadge type={userData.membership} />
-                    <span className="font-semibold capitalize">{userData.membership}</span>
+                    <MembershipBadge type="smart" />
+                    <span className="font-semibold capitalize">Smart</span>
                   </div>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => navigate('/dashboard/membership')}>
