@@ -11,6 +11,7 @@ export function useAuthActions() {
   // Sign in with email and password
   const signIn = async (email: string, password: string) => {
     try {
+      console.log("Attempting to sign in with:", email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -20,6 +21,7 @@ export function useAuthActions() {
         throw error;
       }
 
+      console.log("Sign in successful:", data);
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
@@ -41,6 +43,9 @@ export function useAuthActions() {
   // Sign up with email and password
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
+      console.log("Attempting to sign up with:", email);
+      
+      // First, create the auth user
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -53,6 +58,26 @@ export function useAuthActions() {
 
       if (error) {
         throw error;
+      }
+
+      console.log("Sign up successful, user created:", data);
+      
+      // If successful and we have a user, create a profile entry manually
+      if (data.user) {
+        try {
+          const { error: profileError } = await supabase.from('profiles').insert({
+            id: data.user.id,
+            email: email,
+            full_name: fullName,
+            role: 'member'
+          });
+          
+          if (profileError) {
+            console.error("Error creating profile during signup:", profileError);
+          }
+        } catch (profileCreateError) {
+          console.error("Exception creating profile:", profileCreateError);
+        }
       }
 
       toast({

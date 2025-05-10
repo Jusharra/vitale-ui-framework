@@ -44,7 +44,7 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
       <AuthHeader />
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md p-6">
         {showForgotPassword ? (
           <ForgotPasswordCard
             onSubmit={onForgotPasswordSubmit}

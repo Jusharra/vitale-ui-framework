@@ -80,38 +80,28 @@ export function useAuthState() {
         }
         
         setProfile(userProfile);
-      } else if (data) {
-        // Get user role from the users table if available, otherwise use a default role
+        
+        // Create a profile entry - this is a fallback
         try {
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('role')
-            .eq('id', userId)
-            .single();
-            
-          const userRole = userError ? 'member' as UserRole : (userData.role as UserRole);
-          
-          // Construct profile from data
-          const userProfile: UserProfile = {
-            id: data.id,
-            email: user?.email || '', 
-            full_name: data.full_name,
-            role: userRole
-          };
-          
-          setProfile(userProfile);
-        } catch (roleError) {
-          console.error("Error fetching user role:", roleError);
-          // Fallback to profile without role information
-          const userProfile: UserProfile = {
-            id: data.id,
-            email: user?.email || '', 
-            full_name: data.full_name,
-            role: 'member' as UserRole
-          };
-          
-          setProfile(userProfile);
+          await supabase.from('profiles').insert({
+            id: userId,
+            email: user?.email,
+            full_name: user?.user_metadata?.full_name,
+            role: 'member'
+          });
+        } catch (insertError) {
+          console.error("Error creating profile:", insertError);
         }
+      } else if (data) {
+        // Construct profile from data with default role if needed
+        const userProfile: UserProfile = {
+          id: data.id,
+          email: data.email || user?.email || '', 
+          full_name: data.full_name,
+          role: data.role || 'member' as UserRole
+        };
+        
+        setProfile(userProfile);
       }
     } catch (error) {
       console.error("Error in fetchUserProfile:", error);
