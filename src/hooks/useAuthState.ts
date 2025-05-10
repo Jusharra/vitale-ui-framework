@@ -96,9 +96,11 @@ export function useAuthState() {
         // Construct profile from data with default role if needed
         const userProfile: UserProfile = {
           id: data.id,
-          email: data.email || user?.email || '', 
+          // Use the user's email from auth user object since it's not in profiles table
+          email: user?.email || '', 
           full_name: data.full_name,
-          role: data.role || 'member' as UserRole
+          // Set default role since it's not in profiles table
+          role: 'member' as UserRole
         };
         
         setProfile(userProfile);
