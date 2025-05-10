@@ -1,12 +1,14 @@
-
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { format } from 'date-fns';
 
-// Extend the jsPDF types to include autoTable without redefining existing properties
+// Extend the jsPDF types to include autoTable
 declare module 'jspdf' {
   interface jsPDF {
     autoTable: (options: any) => jsPDF;
+    lastAutoTable: {
+      finalY: number;
+    };
   }
 }
 
@@ -101,7 +103,7 @@ export const generateHealthInsightsPDF = (healthData: HealthData): jsPDF => {
       margin: { left: 14, right: 14 }
     });
     
-    yPosition = (doc as any).lastAutoTable.finalY + 15;
+    yPosition = doc.lastAutoTable.finalY + 15;
   }
   
   // Weight Management Section
@@ -124,7 +126,7 @@ export const generateHealthInsightsPDF = (healthData: HealthData): jsPDF => {
       margin: { left: 14, right: 14 }
     });
     
-    yPosition = (doc as any).lastAutoTable.finalY + 15;
+    yPosition = doc.lastAutoTable.finalY + 15;
   }
   
   // Allergies Section
@@ -154,7 +156,7 @@ export const generateHealthInsightsPDF = (healthData: HealthData): jsPDF => {
       margin: { left: 14, right: 14 }
     });
     
-    yPosition = (doc as any).lastAutoTable.finalY + 15;
+    yPosition = doc.lastAutoTable.finalY + 15;
   }
   
   // Mental Health Section
@@ -185,7 +187,7 @@ export const generateHealthInsightsPDF = (healthData: HealthData): jsPDF => {
       margin: { left: 14, right: 14 }
     });
     
-    yPosition = (doc as any).lastAutoTable.finalY + 15;
+    yPosition = doc.lastAutoTable.finalY + 15;
   }
   
   // Treatment Plans Section

@@ -1,23 +1,14 @@
 
 import React from 'react';
-import { 
-  CardHeader, 
-  CardTitle, 
-  CardDescription, 
-  CardContent, 
-  CardFooter 
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useTranslation } from '@/utils/i18n';
-import LoginForm, { LoginFormValues } from '@/components/auth/LoginForm';
-import RegisterForm, { RegisterFormValues } from '@/components/auth/RegisterForm';
+import { LoginFormValues, LoginForm } from './LoginForm';
+import { RegisterFormValues, RegisterForm } from './RegisterForm';
 
 interface LoginRegisterTabsProps {
   activeTab: string;
   onTabChange: (value: string) => void;
-  onLoginSubmit: (values: LoginFormValues) => Promise<void>;
-  onRegisterSubmit: (values: RegisterFormValues) => Promise<void>;
+  onLoginSubmit: (values: LoginFormValues) => void;
+  onRegisterSubmit: (values: RegisterFormValues) => void;
   isLoading: boolean;
   loginDisabled: boolean;
   loginAttempts: number;
@@ -34,57 +25,32 @@ const LoginRegisterTabs: React.FC<LoginRegisterTabsProps> = ({
   loginAttempts,
   onForgotPassword,
 }) => {
-  const { t } = useTranslation();
-  
   return (
-    <Tabs defaultValue="login" value={activeTab} onValueChange={onTabChange}>
-      <TabsList className="grid grid-cols-2">
-        <TabsTrigger value="login">{t('auth.login')}</TabsTrigger>
-        <TabsTrigger value="register">{t('auth.register')}</TabsTrigger>
+    <Tabs 
+      defaultValue="login" 
+      value={activeTab} 
+      onValueChange={onTabChange}
+      className="w-full"
+    >
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="login">Login</TabsTrigger>
+        <TabsTrigger value="register">Register</TabsTrigger>
       </TabsList>
-      
-      <CardHeader>
-        <CardTitle>
-          {activeTab === "login" ? t('auth.welcomeBack') : t('auth.createAccount')}
-        </CardTitle>
-        <CardDescription>
-          {activeTab === "login" ? 
-            t('auth.signInDescription') : 
-            t('auth.registerDescription')}
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent>
-        <TabsContent value="login">
-          <LoginForm 
-            onSubmit={onLoginSubmit}
-            isLoading={isLoading || loginDisabled}
-            onForgotPassword={onForgotPassword}
-          />
-          {loginAttempts > 2 && !loginDisabled && (
-            <p className="text-amber-600 text-sm mt-2">
-              {t('auth.warningLoginAttempts', { count: 5 - loginAttempts })}
-            </p>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="register">
-          <RegisterForm 
-            onSubmit={onRegisterSubmit}
-            isLoading={isLoading}
-          />
-        </TabsContent>
-      </CardContent>
-      
-      <CardFooter className="flex justify-center">
-        <p className="text-sm text-muted-foreground">
-          {activeTab === "login" ? (
-            <>{t('auth.noAccount')} <Button variant="link" className="p-0 h-auto" onClick={() => onTabChange("register")}>{t('auth.registerLink')}</Button></>
-          ) : (
-            <>{t('auth.haveAccount')} <Button variant="link" className="p-0 h-auto" onClick={() => onTabChange("login")}>{t('auth.loginLink')}</Button></>
-          )}
-        </p>
-      </CardFooter>
+      <TabsContent value="login" className="py-4">
+        <LoginForm 
+          onSubmit={onLoginSubmit} 
+          isLoading={isLoading} 
+          disabled={loginDisabled}
+          loginAttempts={loginAttempts}
+          onForgotPassword={onForgotPassword}
+        />
+      </TabsContent>
+      <TabsContent value="register" className="py-4">
+        <RegisterForm 
+          onSubmit={onRegisterSubmit} 
+          isLoading={isLoading} 
+        />
+      </TabsContent>
     </Tabs>
   );
 };
