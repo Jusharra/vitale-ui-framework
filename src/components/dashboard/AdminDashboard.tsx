@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -113,8 +112,12 @@ const AdminDashboard: React.FC = () => {
           <p className="text-muted-foreground">Platform overview and management</p>
         </div>
         <div className="space-x-2">
-          <Button>Generate Reports</Button>
-          <Button variant="outline">System Settings</Button>
+          <Button>
+            <span>Generate Reports</span>
+          </Button>
+          <Button variant="outline">
+            <span>System Settings</span>
+          </Button>
         </div>
       </div>
 
@@ -223,7 +226,9 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button variant="outline" className="w-full">View Detailed Report</Button>
+                  <Button variant="outline" className="w-full">
+                    <span>View Detailed Report</span>
+                  </Button>
                 </CardFooter>
               </Card>
             </div>
@@ -289,7 +294,9 @@ const AdminDashboard: React.FC = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full">View All Activities</Button>
+              <Button variant="outline" className="w-full">
+                <span>View All Activities</span>
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>
@@ -342,7 +349,9 @@ const AdminDashboard: React.FC = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full">Generate Lead Report</Button>
+              <Button variant="outline" className="w-full">
+                <span>Generate Lead Report</span>
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>
@@ -408,15 +417,15 @@ const AdminDashboard: React.FC = () => {
                     <div className="grid grid-cols-3 gap-2 mt-4">
                       <Button variant="outline" size="sm">
                         <FileSpreadsheet className="h-4 w-4 mr-2" />
-                        Export Data
+                        <span>Export Data</span>
                       </Button>
                       <Button variant="outline" size="sm">
                         <CalendarPlus className="h-4 w-4 mr-2" />
-                        Last 30 Days
+                        <span>Last 30 Days</span>
                       </Button>
                       <Button variant="outline" size="sm">
                         <Users className="h-4 w-4 mr-2" />
-                        Manage Partners
+                        <span>Manage Partners</span>
                       </Button>
                     </div>
                   </div>
@@ -486,8 +495,12 @@ const AdminDashboard: React.FC = () => {
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button variant="outline">Add New Reward</Button>
-              <Button>Manage All Rewards</Button>
+              <Button variant="outline">
+                <span>Add New Reward</span>
+              </Button>
+              <Button>
+                <span>Manage All Rewards</span>
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>
@@ -546,7 +559,7 @@ const AdminDashboard: React.FC = () => {
             </CardContent>
             <CardFooter>
               <Button variant="outline" className="w-full" onClick={() => window.location.href = "/dashboard/admin/promotions"}>
-                Manage Promotions
+                <span>Manage Promotions</span>
               </Button>
             </CardFooter>
           </Card>

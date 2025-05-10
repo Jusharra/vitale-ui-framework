@@ -42,7 +42,7 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({
       className="w-full" 
       variant={variant}
     >
-      {displayText}
+      <span>{displayText}</span>
     </Button>
   );
 };

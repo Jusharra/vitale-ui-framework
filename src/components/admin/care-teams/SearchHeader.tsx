@@ -26,7 +26,7 @@ const SearchHeader = ({ searchTerm, onSearchChange, onAddClick, addButtonText }:
       </div>
       <Button onClick={onAddClick}>
         <Plus className="mr-2 h-4 w-4" />
-        {addButtonText}
+        <span>{addButtonText}</span>
       </Button>
     </div>
   );

@@ -20,7 +20,9 @@ const AccessDeniedCard: React.FC = () => {
           <p className="text-muted-foreground mb-4">
             Get access to medical transport services and coordination.
           </p>
-          <Button>Upgrade Membership</Button>
+          <Button>
+            <span>Upgrade Membership</span>
+          </Button>
         </div>
       </CardContent>
     </Card>

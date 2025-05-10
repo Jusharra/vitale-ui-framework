@@ -36,7 +36,7 @@ const RewardsCard: React.FC<RewardsCardProps> = ({ points, isLoading }) => {
             </div>
           </div>
           <Button variant="outline" size="sm" onClick={() => navigate('/dashboard/rewards')}>
-            Redeem
+            <span>Redeem</span>
           </Button>
         </div>
 
@@ -54,7 +54,7 @@ const RewardsCard: React.FC<RewardsCardProps> = ({ points, isLoading }) => {
               variant="ghost"
               onClick={() => navigate('/dashboard/share-and-earn')}
             >
-              Invite
+              <span>Invite</span>
             </Button>
           </div>
         </div>

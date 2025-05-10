@@ -87,7 +87,7 @@ const MembershipTierCard: React.FC<MembershipTierCardProps> = ({
       <CardFooter>
         {isCurrent ? (
           <Button variant="outline" className="w-full" disabled>
-            Current Plan
+            <span>Current Plan</span>
           </Button>
         ) : (
           <StripeCheckout 

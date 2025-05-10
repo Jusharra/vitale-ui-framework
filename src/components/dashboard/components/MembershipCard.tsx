@@ -38,7 +38,7 @@ const MembershipCard: React.FC<MembershipCardProps> = ({ membershipTier }) => {
             size="sm" 
             onClick={() => navigate('/dashboard/membership')}
           >
-            Upgrade
+            <span>Upgrade</span>
           </Button>
         </div>
 
