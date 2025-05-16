@@ -1,6 +1,5 @@
-
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom';
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,9 +23,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import LanguageSelector from "@/components/i18n/LanguageSelector";
 import { useTranslation } from "@/utils/i18n";
+import { useAuth } from "@/context/AuthContext";
 
 interface NavbarProps {
-  role?: "member" | "professional" | "admin";
+  role?: "member" | "professional" | "admin" | "partner";
   onToggleSidebar?: () => void;
   isMobile?: boolean;
 }
@@ -38,6 +38,8 @@ const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const { t } = useTranslation();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
   
   // Mock data
   const notifications = 3;
@@ -46,6 +48,23 @@ const Navbar: React.FC<NavbarProps> = ({
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Search for:", searchQuery);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
+  const getDashboardPath = () => {
+    switch(role) {
+      case 'admin':
+        return '/dashboard/admin';
+      case 'professional':
+      case 'partner':
+        return '/dashboard/professional';
+      default:
+        return '/dashboard';
+    }
   };
 
   return (
@@ -60,7 +79,7 @@ const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center md:gap-2 lg:gap-4">
           <div className="hidden md:block">
             <h1 className="text-xl font-semibold">
-              {role === "professional" ? t('navigation.professionalPortal') : 
+              {role === "professional" || role === "partner" ? t('navigation.professionalPortal') : 
                role === "admin" ? t('navigation.adminPortal') : 
                t('navigation.healthConcierge')}
             </h1>
@@ -73,7 +92,7 @@ const Navbar: React.FC<NavbarProps> = ({
             <input
               type="search"
               placeholder={t('actions.search')}
-              className="flex h-9 w-full rounded-md border border-input bg-background px-9 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex h-9 w-full rounded-md border border-input bg-background px-9 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -121,9 +140,12 @@ const Navbar: React.FC<NavbarProps> = ({
                   <Link to="/dashboard/membership">{t('user.membership')}</Link>
                 </DropdownMenuItem>
               )}
-              <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/">{t('auth.signOut')}</Link>
+                <Link to={getDashboardPath()}>Dashboard</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSignOut}>
+                {t('auth.signOut')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

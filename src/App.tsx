@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
 import Dashboard from '@/pages/Dashboard';
@@ -33,9 +33,33 @@ import HealthToolsPage from '@/pages/member/HealthTools';
 import AppointmentsPage from '@/pages/member/Appointments';
 import ProfilePage from '@/pages/ProfilePage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useAuth } from '@/context/AuthContext';
 
 // Create a client
 const queryClient = new QueryClient();
+
+// DashboardRouter component to handle routing based on user role
+const DashboardRouter = () => {
+  const { userRole, isAuthenticated, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  // Route based on user role
+  if (userRole === 'admin') {
+    return <Navigate to="/dashboard/admin" replace />;
+  } else if (userRole === 'professional' || userRole === 'partner') {
+    return <Navigate to="/dashboard/professional" replace />;
+  } else {
+    // Default to member dashboard
+    return <Dashboard />;
+  }
+};
 
 const App: React.FC = () => {
   return (
@@ -51,16 +75,13 @@ const App: React.FC = () => {
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 
-                {/* Member routes */}
+                {/* Dashboard router to handle role-based routing */}
                 <Route
                   path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
+                  element={<DashboardRouter />}
                 />
-                {/* Add the Share & Earn route */}
+                
+                {/* Member routes */}
                 <Route
                   path="/dashboard/share-and-earn"
                   element={
@@ -151,7 +172,6 @@ const App: React.FC = () => {
                   }
                 />
                 
-                {/* Add the Health Tools route */}
                 <Route
                   path="/dashboard/health-tools"
                   element={
@@ -161,7 +181,6 @@ const App: React.FC = () => {
                   }
                 />
                 
-                {/* Add the Appointments route */}
                 <Route
                   path="/dashboard/appointments"
                   element={
@@ -229,7 +248,7 @@ const App: React.FC = () => {
                   }
                 />
                 
-                {/* Professional routes */}
+                {/* Professional/Partner routes */}
                 <Route
                   path="/dashboard/professional"
                   element={
