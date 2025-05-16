@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -24,6 +24,7 @@ type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
 const ResetPassword = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [hashError, setHashError] = useState<string | null>(null);
@@ -54,10 +55,31 @@ const ResetPassword = () => {
         // Debug logging
         console.log("Hash parameters:", Object.fromEntries(params.entries()));
         console.log("Query parameters:", Object.fromEntries(queryParams.entries()));
+        console.log("Full URL:", window.location.href);
         
         // Check if there's a type and access_token in hash
         if (params.get('type') === 'recovery' && params.get('access_token')) {
           console.log("Found recovery parameters in hash");
+          
+          // Set the access token in session storage for Supabase
+          const accessToken = params.get('access_token');
+          const refreshToken = params.get('refresh_token');
+          
+          if (accessToken) {
+            // Set the session manually
+            const { error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken || '',
+            });
+            
+            if (error) {
+              console.error("Error setting session:", error);
+              setHashError("Error processing reset link. Please try again.");
+            } else {
+              console.log("Session set successfully");
+            }
+          }
+          
           setHasCheckedHash(true);
           return;
         }
@@ -65,6 +87,28 @@ const ResetPassword = () => {
         // Check if there's a token in search params (some email clients modify the URL)
         if (queryParams.get('token')) {
           console.log("Found token in query parameters");
+          
+          // Try to use the token to set the session
+          const token = queryParams.get('token');
+          if (token) {
+            try {
+              // This is a fallback approach - might not work with all Supabase configurations
+              const { error } = await supabase.auth.refreshSession({ refresh_token: token });
+              if (error) {
+                console.error("Error refreshing with token:", error);
+              }
+            } catch (tokenError) {
+              console.error("Error processing token:", tokenError);
+            }
+          }
+          
+          setHasCheckedHash(true);
+          return;
+        }
+        
+        // Check for type=recovery in query params (another possible format)
+        if (queryParams.get('type') === 'recovery') {
+          console.log("Found recovery type in query parameters");
           setHasCheckedHash(true);
           return;
         }
@@ -82,7 +126,7 @@ const ResetPassword = () => {
     };
 
     checkHash();
-  }, []);
+  }, [location]);
 
   const onSubmit = async (values: ResetPasswordFormValues) => {
     try {
