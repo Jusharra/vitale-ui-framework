@@ -30,6 +30,7 @@ import ResetPassword from '@/pages/ResetPassword';
 import { AuthProvider } from '@/context/AuthContext';
 import LanguageProvider from '@/components/i18n/LanguageProvider';
 import HealthToolsPage from '@/pages/member/HealthTools';
+import AppointmentsPage from '@/pages/member/Appointments';
 
 const App: React.FC = () => {
   return (
@@ -149,6 +150,16 @@ const App: React.FC = () => {
                 element={
                   <ProtectedRoute>
                     <HealthToolsPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Add the Appointments route */}
+              <Route
+                path="/dashboard/appointments"
+                element={
+                  <ProtectedRoute>
+                    <AppointmentsPage />
                   </ProtectedRoute>
                 }
               />
