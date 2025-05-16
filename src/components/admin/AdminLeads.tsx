@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -77,11 +76,17 @@ const AdminLeads: React.FC = () => {
   const { data: leadAssignments, isLoading: isLeadsLoading } = useQuery({
     queryKey: ['leadAssignments'],
     queryFn: async () => {
+      // Fixed query: Using auth.users instead of partners table
       const { data, error } = await supabase
         .from('lead_assignments')
         .select(`
-          *,
-          partner:partners(id, name, email),
+          id,
+          lead_id,
+          partner_id,
+          assigned_at,
+          status,
+          profile_id,
+          partner:auth.users(id, email),
           lead:leads(id, first_name, last_name, email, status)
         `)
         .limit(50);
@@ -177,7 +182,7 @@ const AdminLeads: React.FC = () => {
                             leadAssignments.map((assignment: any) => (
                               <TableRow key={assignment.id}>
                                 <TableCell>
-                                  {assignment.partner?.name || 'Unknown Partner'}
+                                  {assignment.partner?.email || 'Unknown Partner'}
                                 </TableCell>
                                 <TableCell>
                                   {assignment.lead ? 
