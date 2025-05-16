@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Layout from "./layout/Layout";
@@ -20,33 +20,50 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { user, isLoading, userRole, isAuthenticated, session } = useAuth();
   const location = useLocation();
   const { toast } = useToast();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastRefreshAttempt, setLastRefreshAttempt] = useState(0);
 
-  // Verify session validity
+  // Verify session validity with rate-limiting protection
   useEffect(() => {
     const verifySession = async () => {
-      if (session) {
+      if (session && !isRefreshing) {
+        // Check if we've attempted a refresh recently (within the last 30 seconds)
+        const now = Date.now();
+        if (now - lastRefreshAttempt < 30000) {
+          return; // Skip refresh if we've tried recently
+        }
+        
+        setIsRefreshing(true);
+        setLastRefreshAttempt(now);
+        
         try {
           // Try to refresh the session to verify it's still valid
           const { error } = await supabase.auth.refreshSession();
           if (error) {
-            console.error("Session refresh error:", error);
-            // Session is invalid, redirect to login
-            toast({
-              title: "Session Expired",
-              description: "Your session has expired. Please sign in again.",
-              variant: "destructive",
-            });
+            console.error("Session refresh error:", error.message);
+            
+            // Only show toast for non-rate-limit errors
+            if (!error.message.includes("rate limit")) {
+              toast({
+                title: "Session Expired",
+                description: "Your session has expired. Please sign in again.",
+                variant: "destructive",
+              });
+            }
+            
             // Store the attempted path for post-login redirect
             sessionStorage.setItem('redirectAfterLogin', location.pathname);
           }
         } catch (error) {
           console.error("Error verifying session:", error);
+        } finally {
+          setIsRefreshing(false);
         }
       }
     };
 
     verifySession();
-  }, [session, location.pathname, toast]);
+  }, [session, location.pathname, toast, isRefreshing, lastRefreshAttempt]);
 
   // Show loading state if auth is still being determined
   if (isLoading) {

@@ -62,10 +62,11 @@ export function useAuthState() {
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle(); // Use maybeSingle instead of single to handle no rows case
       
       if (error) {
         console.error("Error fetching profile:", error);
+        
         // If we can't find the user in profiles table, create a basic profile
         const userProfile: UserProfile = {
           id: userId,
@@ -78,11 +79,18 @@ export function useAuthState() {
         
         // Create a profile entry - this is a fallback
         try {
-          await supabase.from('profiles').insert({
-            id: userId,
-            full_name: user?.user_metadata?.full_name,
-            role: 'member' // Default role
-          });
+          // Use RLS-compatible insert by ensuring the id matches the authenticated user
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: userId,
+              full_name: user?.user_metadata?.full_name || 'New User',
+              role: 'member' // Default role
+            });
+            
+          if (insertError) {
+            console.error("Error creating profile:", insertError);
+          }
         } catch (insertError) {
           console.error("Error creating profile:", insertError);
         }
@@ -98,6 +106,33 @@ export function useAuthState() {
         };
         
         setProfile(userProfile);
+      } else {
+        // No data and no error - create a new profile
+        const userProfile: UserProfile = {
+          id: userId,
+          email: user?.email || '',
+          full_name: user?.user_metadata?.full_name || 'New User',
+          role: 'member' as UserRole
+        };
+        
+        setProfile(userProfile);
+        
+        // Create a profile entry
+        try {
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: userId,
+              full_name: user?.user_metadata?.full_name || 'New User',
+              role: 'member'
+            });
+            
+          if (insertError) {
+            console.error("Error creating profile:", insertError);
+          }
+        } catch (insertError) {
+          console.error("Error creating profile:", insertError);
+        }
       }
     } catch (error) {
       console.error("Error in fetchUserProfile:", error);
