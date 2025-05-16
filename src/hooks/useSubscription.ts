@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { MembershipTier } from '@/types/auth';
@@ -42,7 +41,7 @@ export function useSubscription(userId: string | null) {
         .from('subscriptions')
         .select('*')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle(); // Changed from single() to maybeSingle() to handle zero rows
       
       if (error) {
         console.log("No subscription found in database, generating dummy data");
