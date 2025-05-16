@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,10 +20,10 @@ export function useAdminStatus() {
           return;
         }
         
-        // Option 2: Check users table for admin role
+        // Option 2: Check profiles table for admin role
         try {
           const { data, error } = await supabase
-            .from('users')
+            .from('profiles')
             .select('role')
             .eq('id', user.id)
             .single();

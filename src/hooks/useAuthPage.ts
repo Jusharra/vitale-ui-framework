@@ -28,8 +28,12 @@ export const useAuthPage = () => {
       if (!success) {
         setLoginAttempts(prev => prev + 1);
       } else {
-        // Redirect to dashboard on success
-        navigate('/dashboard');
+        // Get the redirect path from session storage or default to dashboard
+        const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/dashboard';
+        sessionStorage.removeItem('redirectAfterLogin'); // Clear it after use
+        
+        // Redirect to the appropriate dashboard based on user role
+        navigate(redirectPath);
       }
     } finally {
       setIsLoading(false);

@@ -71,7 +71,7 @@ export function useAuthState() {
           id: userId,
           email: user?.email || '',
           full_name: user?.user_metadata?.full_name,
-          role: 'member' as UserRole
+          role: 'member' as UserRole // Default role
         };
         
         setProfile(userProfile);
@@ -81,26 +81,20 @@ export function useAuthState() {
           await supabase.from('profiles').insert({
             id: userId,
             full_name: user?.user_metadata?.full_name,
+            role: 'member' // Default role
           });
         } catch (insertError) {
           console.error("Error creating profile:", insertError);
         }
       } else if (data) {
-        // Now try to get the user's role from the users table
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('role')
-          .eq('id', userId)
-          .maybeSingle(); // Use maybeSingle instead of single to handle zero rows
-          
         // Construct profile from data
         const userProfile: UserProfile = {
           id: data.id,
           // Use the user's email from auth user object since it's not in profiles table
           email: user?.email || '', 
           full_name: data.full_name,
-          // Set role from users table if available, otherwise default to member
-          role: userData?.role || 'member' as UserRole 
+          // Get role directly from profiles table
+          role: data.role || 'member' as UserRole 
         };
         
         setProfile(userProfile);
