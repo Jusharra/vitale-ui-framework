@@ -33,6 +33,15 @@ import HealthToolsPage from '@/pages/member/HealthTools';
 import AppointmentsPage from '@/pages/member/Appointments';
 import ProfilePage from '@/pages/ProfilePage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// Professional routes
+import ProfessionalCalendarPage from '@/pages/professional/Calendar';
+import ProfessionalEarningsPage from '@/pages/professional/Earnings';
+import ProfessionalMemberManagerPage from '@/pages/professional/MemberManager';
+import ProfessionalMessageCenterPage from '@/pages/professional/MessageCenter';
+import ProfessionalPatientRequestsPage from '@/pages/professional/PatientRequests';
+import ProfessionalProfileSettingsPage from '@/pages/professional/ProfileSettings';
+import ProfessionalToolsOfTradePage from '@/pages/professional/ToolsOfTrade';
 import { useAuth } from '@/context/AuthContext';
 
 // Create a client
@@ -254,6 +263,64 @@ const App: React.FC = () => {
                   element={
                     <ProtectedRoute requiredRole="professional">
                       <ProfessionalPage />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                {/* Professional sub-routes */}
+                <Route
+                  path="/dashboard/professional/calendar"
+                  element={
+                    <ProtectedRoute requiredRole="professional">
+                      <ProfessionalCalendarPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/professional/earnings"
+                  element={
+                    <ProtectedRoute requiredRole="professional">
+                      <ProfessionalEarningsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/professional/member-manager"
+                  element={
+                    <ProtectedRoute requiredRole="professional">
+                      <ProfessionalMemberManagerPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/professional/message-center"
+                  element={
+                    <ProtectedRoute requiredRole="professional">
+                      <ProfessionalMessageCenterPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/professional/requests"
+                  element={
+                    <ProtectedRoute requiredRole="professional">
+                      <ProfessionalPatientRequestsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/professional/profile"
+                  element={
+                    <ProtectedRoute requiredRole="professional">
+                      <ProfessionalProfileSettingsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/professional/tools"
+                  element={
+                    <ProtectedRoute requiredRole="professional">
+                      <ProfessionalToolsOfTradePage />
                     </ProtectedRoute>
                   }
                 />
