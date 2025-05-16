@@ -92,6 +92,15 @@ export function useAuthActions() {
   // Sign out
   const signOut = async () => {
     try {
+      // Check if we have a session before attempting to sign out
+      const { data: sessionData } = await supabase.auth.getSession();
+      
+      if (!sessionData.session) {
+        console.log("No active session found, redirecting to login");
+        navigate('/auth');
+        return true;
+      }
+      
       const { error } = await supabase.auth.signOut();
       
       if (error) {
@@ -107,12 +116,16 @@ export function useAuthActions() {
       return true;
     } catch (error: any) {
       console.error("Sign out error:", error);
+      
+      // Even if there's an error, we should still redirect to the login page
+      // as the user likely wants to sign out regardless
       toast({
-        title: "Error",
-        description: "There was a problem signing you out.",
-        variant: "destructive",
+        title: "Sign out issue",
+        description: "There was a problem signing you out, but you've been redirected to the login page.",
       });
-      return false;
+      
+      navigate('/auth');
+      return true;
     }
   };
   
