@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Mail, Phone, Shield, Settings, Key } from 'lucide-react';
+import { User, Mail, Phone, Shield, Settings, Key, Calendar } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
   const { user, profile, updateProfile } = useAuth();
