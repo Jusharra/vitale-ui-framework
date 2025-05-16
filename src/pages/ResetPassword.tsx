@@ -5,6 +5,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import ResetPasswordCard from '@/components/auth/ResetPasswordCard';
 import { ResetPasswordFormValues } from '@/components/auth/ResetPasswordForm';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -151,7 +153,7 @@ const ResetPassword = () => {
               Please wait while we process your password reset link...
             </p>
             <div className="flex justify-center py-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+              <Loader2 className="h-12 w-12 animate-spin text-primary" />
             </div>
           </div>
         </Card>
