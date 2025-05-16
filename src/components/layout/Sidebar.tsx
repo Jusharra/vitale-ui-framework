@@ -112,7 +112,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
       <SidebarFooter className="p-4 border-t">
         <div className="flex flex-col gap-2">
           <SidebarLink to="/dashboard/support" icon={LifeBuoy}>Support</SidebarLink>
-          <SidebarTrigger asChild>
+          <SidebarTrigger>
             <Button variant="outline" className="w-full justify-start" size="sm">
               <PanelLeft className="h-4 w-4 mr-2" />
               Toggle Sidebar
