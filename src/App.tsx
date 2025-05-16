@@ -42,6 +42,7 @@ import ProfessionalMessageCenterPage from '@/pages/professional/MessageCenter';
 import ProfessionalPatientRequestsPage from '@/pages/professional/PatientRequests';
 import ProfessionalProfileSettingsPage from '@/pages/professional/ProfileSettings';
 import ProfessionalToolsOfTradePage from '@/pages/professional/ToolsOfTrade';
+import ProfessionalAnalyticsPage from '@/pages/professional/Analytics';
 import { useAuth } from '@/context/AuthContext';
 
 // Create a client
@@ -321,6 +322,14 @@ const App: React.FC = () => {
                   element={
                     <ProtectedRoute requiredRole="professional">
                       <ProfessionalToolsOfTradePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/professional/analytics"
+                  element={
+                    <ProtectedRoute requiredRole="professional">
+                      <ProfessionalAnalyticsPage />
                     </ProtectedRoute>
                   }
                 />
