@@ -29,6 +29,7 @@ import GlobalSettingsPage from '@/pages/member/GlobalSettingsPage';
 import ResetPassword from '@/pages/ResetPassword';
 import { AuthProvider } from '@/context/AuthContext';
 import LanguageProvider from '@/components/i18n/LanguageProvider';
+import HealthToolsPage from '@/pages/member/HealthTools';
 
 const App: React.FC = () => {
   return (
@@ -138,6 +139,16 @@ const App: React.FC = () => {
                 element={
                   <ProtectedRoute>
                     <GlobalSettingsPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Add the Health Tools route */}
+              <Route
+                path="/dashboard/health-tools"
+                element={
+                  <ProtectedRoute>
+                    <HealthToolsPage />
                   </ProtectedRoute>
                 }
               />
