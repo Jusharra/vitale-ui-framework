@@ -31,6 +31,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import LanguageProvider from '@/components/i18n/LanguageProvider';
 import HealthToolsPage from '@/pages/member/HealthTools';
 import AppointmentsPage from '@/pages/member/Appointments';
+import ProfilePage from '@/pages/ProfilePage';
 
 const App: React.FC = () => {
   return (
@@ -43,6 +44,7 @@ const App: React.FC = () => {
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/profile" element={<ProfilePage />} />
               
               {/* Member routes */}
               <Route
