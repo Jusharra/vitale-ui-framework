@@ -32,214 +32,220 @@ import LanguageProvider from '@/components/i18n/LanguageProvider';
 import HealthToolsPage from '@/pages/member/HealthTools';
 import AppointmentsPage from '@/pages/member/Appointments';
 import ProfilePage from '@/pages/ProfilePage';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// Create a client
+const queryClient = new QueryClient();
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <LanguageProvider>
-        <AuthProvider>
-          <ThemeProvider defaultTheme="light" storageKey="vitale-ui-theme">
-            <Toaster />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              
-              {/* Member routes */}
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-              {/* Add the Share & Earn route */}
-              <Route
-                path="/dashboard/share-and-earn"
-                element={
-                  <ProtectedRoute>
-                    <ShareAndEarn />
-                  </ProtectedRoute>
-                }
-              />
-              
-              <Route
-                path="/dashboard/concierge"
-                element={
-                  <ProtectedRoute>
-                    <MemberConciergePage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/pharmacy"
-                element={
-                  <ProtectedRoute>
-                    <MemberPharmacyPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/medical-transport"
-                element={
-                  <ProtectedRoute>
-                    <MemberMedicalTransportPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/service-booking"
-                element={
-                  <ProtectedRoute>
-                    <MemberServiceBookingPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/vacations"
-                element={
-                  <ProtectedRoute>
-                    <MemberVacationsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/health-insights"
-                element={
-                  <ProtectedRoute>
-                    <MemberHealthInsightsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/messages"
-                element={
-                  <ProtectedRoute>
-                    <MemberMessagesPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/membership"
-                element={
-                  <ProtectedRoute>
-                    <MemberMembershipPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/promotions"
-                element={
-                  <ProtectedRoute>
-                    <MemberPromotionsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/settings"
-                element={
-                  <ProtectedRoute>
-                    <GlobalSettingsPage />
-                  </ProtectedRoute>
-                }
-              />
-              
-              {/* Add the Health Tools route */}
-              <Route
-                path="/dashboard/health-tools"
-                element={
-                  <ProtectedRoute>
-                    <HealthToolsPage />
-                  </ProtectedRoute>
-                }
-              />
-              
-              {/* Add the Appointments route */}
-              <Route
-                path="/dashboard/appointments"
-                element={
-                  <ProtectedRoute>
-                    <AppointmentsPage />
-                  </ProtectedRoute>
-                }
-              />
-              
-              {/* Admin routes */}
-              <Route
-                path="/dashboard/admin"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/admin/vacations"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminVacationsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/admin/promotions"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminPromotionsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/admin/leads"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminLeadsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/admin/care-teams"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminCareTeamsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/admin/health-tools"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminHealthToolsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/admin/settings"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminSettingsPage />
-                  </ProtectedRoute>
-                }
-              />
-              
-              {/* Professional routes */}
-              <Route
-                path="/dashboard/professional"
-                element={
-                  <ProtectedRoute requiredRole="professional">
-                    <ProfessionalPage />
-                  </ProtectedRoute>
-                }
-              />
-              
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </ThemeProvider>
-        </AuthProvider>
-      </LanguageProvider>
-    </Router>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <LanguageProvider>
+          <AuthProvider>
+            <ThemeProvider defaultTheme="light" storageKey="vitale-ui-theme">
+              <Toaster />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                
+                {/* Member routes */}
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* Add the Share & Earn route */}
+                <Route
+                  path="/dashboard/share-and-earn"
+                  element={
+                    <ProtectedRoute>
+                      <ShareAndEarn />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                <Route
+                  path="/dashboard/concierge"
+                  element={
+                    <ProtectedRoute>
+                      <MemberConciergePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/pharmacy"
+                  element={
+                    <ProtectedRoute>
+                      <MemberPharmacyPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/medical-transport"
+                  element={
+                    <ProtectedRoute>
+                      <MemberMedicalTransportPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/service-booking"
+                  element={
+                    <ProtectedRoute>
+                      <MemberServiceBookingPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/vacations"
+                  element={
+                    <ProtectedRoute>
+                      <MemberVacationsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/health-insights"
+                  element={
+                    <ProtectedRoute>
+                      <MemberHealthInsightsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/messages"
+                  element={
+                    <ProtectedRoute>
+                      <MemberMessagesPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/membership"
+                  element={
+                    <ProtectedRoute>
+                      <MemberMembershipPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/promotions"
+                  element={
+                    <ProtectedRoute>
+                      <MemberPromotionsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/settings"
+                  element={
+                    <ProtectedRoute>
+                      <GlobalSettingsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                {/* Add the Health Tools route */}
+                <Route
+                  path="/dashboard/health-tools"
+                  element={
+                    <ProtectedRoute>
+                      <HealthToolsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                {/* Add the Appointments route */}
+                <Route
+                  path="/dashboard/appointments"
+                  element={
+                    <ProtectedRoute>
+                      <AppointmentsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                {/* Admin routes */}
+                <Route
+                  path="/dashboard/admin"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/vacations"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminVacationsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/promotions"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminPromotionsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/leads"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminLeadsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/care-teams"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminCareTeamsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/health-tools"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminHealthToolsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/settings"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminSettingsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                {/* Professional routes */}
+                <Route
+                  path="/dashboard/professional"
+                  element={
+                    <ProtectedRoute requiredRole="professional">
+                      <ProfessionalPage />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ThemeProvider>
+          </AuthProvider>
+        </LanguageProvider>
+      </Router>
+    </QueryClientProvider>
   );
 };
 
