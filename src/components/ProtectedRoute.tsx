@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Layout from "./layout/Layout";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProtectedRouteProps {
   requiredRole?: "member" | "admin" | "partner" | "professional";
@@ -16,9 +17,36 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   redirectPath = "/auth",
   children,
 }) => {
-  const { user, isLoading, userRole, isAuthenticated } = useAuth();
+  const { user, isLoading, userRole, isAuthenticated, session } = useAuth();
   const location = useLocation();
   const { toast } = useToast();
+
+  // Verify session validity
+  useEffect(() => {
+    const verifySession = async () => {
+      if (session) {
+        try {
+          // Try to refresh the session to verify it's still valid
+          const { error } = await supabase.auth.refreshSession();
+          if (error) {
+            console.error("Session refresh error:", error);
+            // Session is invalid, redirect to login
+            toast({
+              title: "Session Expired",
+              description: "Your session has expired. Please sign in again.",
+              variant: "destructive",
+            });
+            // Store the attempted path for post-login redirect
+            sessionStorage.setItem('redirectAfterLogin', location.pathname);
+          }
+        } catch (error) {
+          console.error("Error verifying session:", error);
+        }
+      }
+    };
+
+    verifySession();
+  }, [session, location.pathname, toast]);
 
   // Show loading state if auth is still being determined
   if (isLoading) {
