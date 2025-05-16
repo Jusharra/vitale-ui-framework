@@ -1,4 +1,3 @@
-
 import React, { ReactNode } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
@@ -7,18 +6,21 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 
 interface LayoutProps {
   children: ReactNode;
-  role?: 'member' | 'admin' | 'professional';
+  role?: 'member' | 'admin' | 'professional' | 'partner';
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, role = 'member' }) => {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
+  
+  // If a specific role is provided, use it; otherwise, use the user's role from auth context
+  const effectiveRole = role || userRole || 'member';
   
   return (
     <SidebarProvider>
       <div className="h-screen flex flex-col bg-background w-full">
-        <Navbar role={role} />
+        <Navbar role={effectiveRole} />
         <div className="flex flex-1 overflow-hidden">
-          {user && <Sidebar role={role} />}
+          {user && <Sidebar role={effectiveRole} />}
           <main className="flex-1 overflow-y-auto p-4 md:p-8">
             <div className="container mx-auto">
               {children}

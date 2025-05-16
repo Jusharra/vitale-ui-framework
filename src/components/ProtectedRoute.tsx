@@ -5,7 +5,7 @@ import Layout from "./layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 
 interface ProtectedRouteProps {
-  requiredRole?: "member" | "admin" | "professional";
+  requiredRole?: "member" | "admin" | "partner" | "professional";
   redirectPath?: string;
   children?: React.ReactNode;
 }
@@ -43,7 +43,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const hasRequiredRole =
     requiredRole === "member" ||
     (requiredRole === "admin" && userRole === "admin") ||
-    (requiredRole === "professional" && userRole === "professional");
+    (requiredRole === "professional" && (userRole === "professional" || userRole === "partner")) ||
+    (requiredRole === "partner" && userRole === "partner");
 
   if (!hasRequiredRole) {
     toast({

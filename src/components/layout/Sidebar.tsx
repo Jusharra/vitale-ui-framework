@@ -15,7 +15,7 @@ import { Button } from '../ui/button';
 import { useAuth } from '@/context/AuthContext';
 
 interface SidebarProps {
-  role?: 'member' | 'professional' | 'admin';
+  role?: 'member' | 'professional' | 'admin' | 'partner';
 }
 
 interface SidebarLinkProps {
@@ -105,7 +105,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
       <SidebarContent className="p-2">
         <SidebarMenu>
           {role === 'member' && renderMemberLinks()}
-          {role === 'professional' && renderProfessionalLinks()}
+          {(role === 'professional' || role === 'partner') && renderProfessionalLinks()}
           {role === 'admin' && renderAdminLinks()}
         </SidebarMenu>
       </SidebarContent>
