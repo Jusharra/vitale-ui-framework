@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Mail, Phone, Shield, Settings, Key, Calendar } from 'lucide-react';
+import { User, Mail, Phone, Shield, Settings, Key, Calendar as CalendarIcon } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
   const { user, profile, updateProfile } = useAuth();
@@ -193,7 +193,7 @@ const ProfilePage: React.FC = () => {
 
                   <div className="flex justify-between items-center pb-4 border-b">
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm font-medium">Member Since</span>
                     </div>
                     <span className="text-sm">
