@@ -91,7 +91,7 @@ export function useAuthState() {
           .from('users')
           .select('role')
           .eq('id', userId)
-          .single();
+          .maybeSingle(); // Use maybeSingle instead of single to handle zero rows
           
         // Construct profile from data
         const userProfile: UserProfile = {
