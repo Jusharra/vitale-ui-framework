@@ -1,11 +1,12 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { Medication, RefillRequest } from './types';
+import { useAuth } from '@/context/AuthContext';
 
 export const usePrescriptionData = () => {
   const { toast } = useToast();
+  const { user } = useAuth(); // Add this to get the current user
   const [medications, setMedications] = useState<Medication[]>([]);
   const [refillRequests, setRefillRequests] = useState<RefillRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,13 +50,24 @@ export const usePrescriptionData = () => {
     try {
       const { medication_id, delivery_type, notes } = values;
       
+      // Make sure we have a user ID
+      if (!user || !user.id) {
+        toast({
+          title: 'Error',
+          description: 'You must be logged in to request a refill',
+          variant: 'destructive',
+        });
+        return false;
+      }
+      
       const { data, error } = await supabase
         .from('refill_requests')
         .insert({
           medication_id,
           delivery_type,
           notes,
-          status: 'pending'
+          status: 'pending',
+          patient_id: user.id // Add the patient_id field with the current user's ID
         })
         .select()
         .single();
