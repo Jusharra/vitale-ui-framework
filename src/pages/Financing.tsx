@@ -1,7 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
 
 const Financing = () => {
+  const [loanAmount, setLoanAmount] = useState(5000);
+  const [interestRate, setInterestRate] = useState(5);
+  const [loanTerm, setLoanTerm] = useState(24);
+  
+  // Calculate monthly payment
+  const calculateMonthlyPayment = () => {
+    const monthlyRate = interestRate / 100 / 12;
+    const numPayments = loanTerm;
+    
+    if (monthlyRate === 0) return loanAmount / numPayments;
+    
+    const monthlyPayment = 
+      (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+      (Math.pow(1 + monthlyRate, numPayments) - 1);
+    
+    return monthlyPayment.toFixed(2);
+  };
+  
+  // Calculate total payment
+  const calculateTotalPayment = () => {
+    return (calculateMonthlyPayment() * loanTerm).toFixed(2);
+  };
+  
+  // Calculate total interest
+  const calculateTotalInterest = () => {
+    return (calculateTotalPayment() - loanAmount).toFixed(2);
+  };
+
   return (
     <MainLayout>
       <div className="bg-white py-12">
@@ -18,100 +51,6 @@ const Financing = () => {
 
           <div className="mt-16">
             <div className="space-y-12">
-              <div className="bg-gray-50 rounded-lg p-8 shadow-sm">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Monthly Membership Plans</h3>
-                <p className="text-gray-600 mb-6">
-                  Our tiered membership plans offer predictable monthly payments with no hidden fees. Choose the plan that best fits your healthcare needs and budget.
-                </p>
-                <div className="grid md:grid-cols-3 gap-6">
-                  <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <h4 className="text-lg font-semibold text-indigo-600">Smart Access</h4>
-                    <p className="text-3xl font-bold mt-2">$9.99<span className="text-sm text-gray-500">/month</span></p>
-                    <ul className="mt-4 space-y-2">
-                      <li className="flex items-center">
-                        <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        Basic health tracking
-                      </li>
-                      <li className="flex items-center">
-                        <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        Health articles access
-                      </li>
-                      <li className="flex items-center">
-                        <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        10% off medications
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="bg-white p-6 rounded-lg shadow-md border-2 border-indigo-500 relative">
-                    <div className="absolute top-0 right-0 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">POPULAR</div>
-                    <h4 className="text-lg font-semibold text-indigo-600">Core Concierge</h4>
-                    <p className="text-3xl font-bold mt-2">$24.99<span className="text-sm text-gray-500">/month</span></p>
-                    <ul className="mt-4 space-y-2">
-                      <li className="flex items-center">
-                        <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        Everything in Smart Access
-                      </li>
-                      <li className="flex items-center">
-                        <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        3 telehealth consultations/month
-                      </li>
-                      <li className="flex items-center">
-                        <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        20% off medications
-                      </li>
-                      <li className="flex items-center">
-                        <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        Medical transportation
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <h4 className="text-lg font-semibold text-indigo-600">VIP Executive</h4>
-                    <p className="text-3xl font-bold mt-2">$49.99<span className="text-sm text-gray-500">/month</span></p>
-                    <ul className="mt-4 space-y-2">
-                      <li className="flex items-center">
-                        <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        Everything in Core Concierge
-                      </li>
-                      <li className="flex items-center">
-                        <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        Unlimited telehealth
-                      </li>
-                      <li className="flex items-center">
-                        <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        30% off medications
-                      </li>
-                      <li className="flex items-center">
-                        <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        24/7 priority support
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
               <div className="bg-gray-50 rounded-lg p-8 shadow-sm">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Healthcare Financing</h3>
                 <p className="text-gray-600 mb-6">
@@ -144,6 +83,118 @@ const Financing = () => {
               </div>
 
               <div className="bg-gray-50 rounded-lg p-8 shadow-sm">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Finance Calculator</h3>
+                <p className="text-gray-600 mb-6">
+                  Use our calculator to estimate your monthly payments based on your treatment cost and preferred payment terms.
+                </p>
+                
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div className="space-y-6">
+                    <div>
+                      <Label htmlFor="loan-amount">Treatment Cost: ${loanAmount}</Label>
+                      <div className="mt-2">
+                        <Slider 
+                          value={[loanAmount]}
+                          min={1000}
+                          max={25000}
+                          step={500}
+                          onValueChange={(value) => setLoanAmount(value[0])}
+                          className="my-4"
+                        />
+                        <Input
+                          id="loan-amount"
+                          type="number"
+                          value={loanAmount}
+                          onChange={(e) => setLoanAmount(Number(e.target.value))}
+                          min={1000}
+                          max={25000}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="interest-rate">Interest Rate: {interestRate}%</Label>
+                      <div className="mt-2">
+                        <Slider 
+                          value={[interestRate]}
+                          min={0}
+                          max={15}
+                          step={0.25}
+                          onValueChange={(value) => setInterestRate(value[0])}
+                          className="my-4"
+                        />
+                        <Input
+                          id="interest-rate"
+                          type="number"
+                          value={interestRate}
+                          onChange={(e) => setInterestRate(Number(e.target.value))}
+                          min={0}
+                          max={15}
+                          step={0.25}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="loan-term">Loan Term: {loanTerm} months</Label>
+                      <div className="mt-2">
+                        <Slider 
+                          value={[loanTerm]}
+                          min={6}
+                          max={60}
+                          step={6}
+                          onValueChange={(value) => setLoanTerm(value[0])}
+                          className="my-4"
+                        />
+                        <Input
+                          id="loan-term"
+                          type="number"
+                          value={loanTerm}
+                          onChange={(e) => setLoanTerm(Number(e.target.value))}
+                          min={6}
+                          max={60}
+                          step={6}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <h4 className="text-lg font-semibold text-indigo-600 mb-4">Payment Summary</h4>
+                    
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center pb-2 border-b">
+                        <span className="font-medium">Monthly Payment:</span>
+                        <span className="text-2xl font-bold">${calculateMonthlyPayment()}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
+                        <span>Loan Amount:</span>
+                        <span>${loanAmount.toLocaleString()}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
+                        <span>Total Interest:</span>
+                        <span>${calculateTotalInterest()}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center pt-2 border-t">
+                        <span className="font-medium">Total Payment:</span>
+                        <span className="font-bold">${calculateTotalPayment()}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6">
+                      <Button className="w-full">Apply for Financing</Button>
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        This is just an estimate. Actual terms may vary based on credit approval.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-8 shadow-sm">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Insurance Coordination</h3>
                 <p className="text-gray-600 mb-6">
                   We work with most major insurance providers to maximize your benefits and minimize out-of-pocket expenses.
@@ -161,6 +212,16 @@ const Financing = () => {
                   <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-center">
                     <p className="font-medium text-gray-800">UnitedHealthcare</p>
                   </div>
+                </div>
+              </div>
+              
+              <div className="bg-indigo-50 rounded-lg p-8 text-center">
+                <h3 className="text-2xl font-bold text-gray-900">Need Help with Financing?</h3>
+                <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+                  Our financial counselors are available to discuss your options and help you find the best solution for your needs.
+                </p>
+                <div className="mt-8">
+                  <Button size="lg">Schedule a Consultation</Button>
                 </div>
               </div>
             </div>
