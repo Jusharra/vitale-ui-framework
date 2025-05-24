@@ -1,9 +1,9 @@
 import React from 'react';
-import Layout from '@/components/layout/Layout';
+import MainLayout from '@/components/layout/MainLayout';
 
 const Placements = () => {
   return (
-    <Layout>
+    <MainLayout>
       <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
         <div className="relative py-3 sm:max-w-xl sm:mx-auto">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-300 to-purple-300 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
@@ -50,7 +50,7 @@ const Placements = () => {
           </div>
         </div>
       </div>
-     </Layout>
+    </MainLayout>
   );
 };
 

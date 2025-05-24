@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import MainLayout from '@/components/layout/MainLayout';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -22,45 +23,8 @@ const Index = () => {
     }
   };
 
-  const menuItems = [
-    { name: 'About', path: '/about' },
-    { name: 'Financing', path: '/financing' },
-    { name: 'Membership', path: '/membership' },
-    { name: 'Placements', path: '/placements' },
-    { name: 'Partners', path: '/partners' },
-    { name: 'Contact', path: '/contact' },
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <header className="py-4 px-8 flex justify-between items-center bg-white shadow-sm">
-        <div className="flex items-center">
-          <div className="bg-indigo-600 text-white font-bold text-xl px-3 py-1 rounded mr-2">VH</div>
-          <h1 className="text-xl font-bold text-gray-800">Vitale Health Concierge</h1>
-        </div>
-        <nav className="hidden md:flex items-center space-x-6">
-          {menuItems.map((item, index) => (
-            <Link 
-              key={index} 
-              to={item.path} 
-              className="text-gray-600 hover:text-indigo-600 transition-colors"
-            >
-              {item.name}
-            </Link>
-          ))}
-        </nav>
-        <div>
-          {isAuthenticated ? (
-            <div className="flex gap-2">
-              <Button onClick={handleDashboardClick}>Dashboard</Button>
-              <Button variant="outline" onClick={signOut}>Sign Out</Button>
-            </div>
-          ) : (
-            <Button onClick={() => navigate('/auth')}>Sign In</Button>
-          )}
-        </div>
-      </header>
-
+    <MainLayout>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
@@ -120,42 +84,7 @@ const Index = () => {
           </div>
         </div>
       </main>
-
-      <footer className="bg-gray-800 text-white py-8 mt-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between">
-            <div className="mb-6 md:mb-0">
-              <div className="flex items-center">
-                <div className="bg-white text-indigo-600 font-bold text-xl px-3 py-1 rounded mr-2">VH</div>
-                <span className="text-xl font-bold">Vitale Health</span>
-              </div>
-              <p className="mt-2 text-gray-400 text-sm">Personalized healthcare at your fingertips</p>
-            </div>
-            <div className="grid grid-cols-2 gap-8 md:gap-20">
-              <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider">Membership</h3>
-                <ul className="mt-4 space-y-2">
-                  <li><a href="#" className="text-gray-400 hover:text-white">Smart Access</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white">Core Concierge</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white">VIP Executive</a></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider">Support</h3>
-                <ul className="mt-4 space-y-2">
-                  <li><a href="#" className="text-gray-400 hover:text-white">Contact</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white">FAQ</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white">Privacy</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div className="mt-8 border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between">
-            <p className="text-gray-400 text-sm">© 2025 Vitale Health Concierge. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </MainLayout>
   );
 };
 

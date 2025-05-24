@@ -2,6 +2,10 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Index from '@/pages/Index';
 import Placements from '@/pages/Placements';
+import About from '@/pages/About';
+import Financing from '@/pages/Financing';
+import Contact from '@/pages/Contact';
+import Partners from '@/pages/Partners';
 import Auth from '@/pages/Auth';
 import Dashboard from '@/pages/Dashboard';
 import NotFound from '@/pages/NotFound';
@@ -82,6 +86,10 @@ const App: React.FC = () => {
               <Toaster />
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/financing" element={<Financing />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/partners" element={<Partners />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/profile" element={<ProfilePage />} />
