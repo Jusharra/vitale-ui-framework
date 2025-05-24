@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,7 +10,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -19,20 +20,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { CheckCircle, Clock, AlertTriangle, ArrowRight, CreditCard, Loader2 } from 'lucide-react';
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+import { CheckCircle, AlertTriangle, ArrowRight, CreditCard, Loader2 } from 'lucide-react';
 
-// Define the schema for the placement request form
+// Schema for refill request form
 const placementRequestSchema = z.object({
   // Step 1: Urgency Selection
   urgency: z.enum(["standard", "expedited"], {
@@ -40,11 +41,11 @@ const placementRequestSchema = z.object({
   }),
   
   // Step 2: Intake Form
-  fullName: z.string().min(2, "Full name is required"),
+  fullName: z.string().min(2, { message: "Full name is required" }),
   email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number is required"),
-  careNeeds: z.string().min(5, "Please describe care needs"),
-  location: z.string().min(2, "Location is required"),
+  phone: z.string().min(10, { message: "Phone number is required" }),
+  careNeeds: z.string().min(5, { message: "Please describe care needs" }),
+  location: z.string().min(2, { message: "Location is required" }),
   notes: z.string().optional(),
   
   // Step 3: Payment (only if expedited)
