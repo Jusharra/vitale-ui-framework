@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Search, MapPin, Filter, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,7 +34,8 @@ const mockFacilities = [
       'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
       'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',
       'https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg'
-    ]
+    ],
+    virtual_tour_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
   },
   {
     id: '2',
@@ -54,7 +56,8 @@ const mockFacilities = [
       'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',
       'https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg',
       'https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg'
-    ]
+    ],
+    virtual_tour_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
   },
   {
     id: '3',
@@ -75,7 +78,8 @@ const mockFacilities = [
       'https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg',
       'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg',
       'https://images.pexels.com/photos/3184405/pexels-photo-3184405.jpeg'
-    ]
+    ],
+    virtual_tour_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
   },
   {
     id: '4',
@@ -96,7 +100,8 @@ const mockFacilities = [
       'https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg',
       'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
       'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg'
-    ]
+    ],
+    virtual_tour_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
   },
   {
     id: '5',
@@ -117,8 +122,28 @@ const mockFacilities = [
       'https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg',
       'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',
       'https://images.pexels.com/photos/3184405/pexels-photo-3184405.jpeg'
-    ]
+    ],
+    virtual_tour_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
   }
+];
+
+// Define care services for filtering
+const careServices = [
+  { id: 'ambulating', label: 'Ambulating' },
+  { id: 'bathing', label: 'Bathing' },
+  { id: 'dressing', label: 'Dressing' },
+  { id: 'eating', label: 'Eating' },
+  { id: 'hygiene', label: 'Hygiene/Grooming' },
+  { id: 'meal_prep', label: 'Meal Preparation' },
+  { id: 'showers', label: 'Showers' },
+  { id: 'transferring', label: 'Transferring' },
+  { id: 'medication', label: 'Medication Management' },
+  { id: 'cleaning', label: 'Cleaning' },
+  { id: 'laundry', label: 'Laundry' },
+  { id: 'declutter', label: 'Declutter/Organization' },
+  { id: 'transport', label: 'Transport to and from appointments' },
+  { id: 'errands', label: 'Personal Errands' },
+  { id: 'shopping', label: 'Grocery Shopping' }
 ];
 
 const Placements = () => {
@@ -128,6 +153,9 @@ const Placements = () => {
   const [facilities, setFacilities] = useState(mockFacilities);
   const [selectedFacility, setSelectedFacility] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [showServiceFilters, setShowServiceFilters] = useState(false);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const { toast } = useToast();
 
   // Fetch facilities from database (in a real implementation)
@@ -153,7 +181,7 @@ const Placements = () => {
     fetchFacilities();
   }, [toast]);
 
-  // Filter facilities based on search query, care type, and location
+  // Filter facilities based on search query, care type, location, and services
   const filteredFacilities = facilities.filter(facility => {
     const matchesSearch = 
       facility.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -163,8 +191,21 @@ const Placements = () => {
     const matchesCareType = careType === 'all' || facility.care_type === careType;
     const matchesLocation = location === 'all' || facility.location.includes(location);
     
-    return matchesSearch && matchesCareType && matchesLocation;
+    // For demo purposes, we'll assume all facilities match the selected services
+    // In a real implementation, you would check if the facility provides the selected services
+    const matchesServices = selectedServices.length === 0 || true;
+    
+    return matchesSearch && matchesCareType && matchesLocation && matchesServices;
   });
+
+  // Toggle service selection
+  const toggleService = (serviceId: string) => {
+    setSelectedServices(current => 
+      current.includes(serviceId) 
+        ? current.filter(id => id !== serviceId)
+        : [...current, serviceId]
+    );
+  };
 
   return (
     <MainLayout>
@@ -222,6 +263,48 @@ const Placements = () => {
                 </SelectContent>
               </Select>
             </div>
+            
+            <div className="mt-4 flex justify-between items-center">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowServiceFilters(!showServiceFilters)}
+                className="flex items-center gap-2"
+              >
+                <Filter className="h-4 w-4" />
+                {showServiceFilters ? 'Hide Services Filter' : 'Show Services Filter'}
+              </Button>
+              
+              <div className="text-sm text-gray-500">
+                {selectedServices.length > 0 && (
+                  <span>{selectedServices.length} services selected</span>
+                )}
+              </div>
+            </div>
+            
+            {showServiceFilters && (
+              <div className="mt-4 p-4 border rounded-md bg-white">
+                <h3 className="font-medium mb-3">Services Needed for Patient</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {careServices.map((service) => (
+                    <div key={service.id} className="flex items-start space-x-2">
+                      <Checkbox 
+                        id={service.id} 
+                        checked={selectedServices.includes(service.id)}
+                        onCheckedChange={() => toggleService(service.id)}
+                      />
+                      <div className="grid gap-1.5 leading-none">
+                        <label
+                          htmlFor={service.id}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {service.label}
+                        </label>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Concierge Placement Banner */}
@@ -342,6 +425,7 @@ const Placements = () => {
                     setSearchQuery('');
                     setCareType('all');
                     setLocation('all');
+                    setSelectedServices([]);
                   }}>
                     Clear Filters
                   </Button>
@@ -434,6 +518,7 @@ const Placements = () => {
                     setSearchQuery('');
                     setCareType('all');
                     setLocation('all');
+                    setSelectedServices([]);
                   }}>
                     Clear Filters
                   </Button>
