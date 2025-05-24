@@ -41,6 +41,23 @@ import AppointmentsPage from '@/pages/member/Appointments';
 import ProfilePage from '@/pages/ProfilePage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+// Blog pages
+import BlogIndex from '@/pages/blog/index';
+import SanMateoCountyBlog from '@/pages/blog/iv-therapy-hospice-san-mateo-county';
+import MarinCountyBlog from '@/pages/blog/iv-therapy-hospice-marin-county';
+import OrangeCountyBlog from '@/pages/blog/iv-therapy-hospice-orange-county';
+import SantaClaraCountyBlog from '@/pages/blog/iv-therapy-hospice-santa-clara-county';
+import CollinCountyBlog from '@/pages/blog/iv-therapy-hospice-collin-county';
+import WestlakeTarrantCountyBlog from '@/pages/blog/iv-therapy-hospice-westlake-tarrant-county';
+import LosAngelesCountyBlog from '@/pages/blog/iv-therapy-hospice-los-angeles-county';
+import WilliamsonCountyBlog from '@/pages/blog/iv-therapy-hospice-williamson-county';
+import TravisCountyBlog from '@/pages/blog/iv-therapy-hospice-travis-county';
+import MontgomeryCountyBlog from '@/pages/blog/iv-therapy-hospice-montgomery-county';
+import ContraCostaCountyBlog from '@/pages/blog/iv-therapy-hospice-contra-costa-county';
+import SanDiegoCountyBlog from '@/pages/blog/iv-therapy-hospice-san-diego-county';
+import VenturaCountyBlog from '@/pages/blog/iv-therapy-hospice-ventura-county';
+import FortBendCountyBlog from '@/pages/blog/iv-therapy-hospice-fort-bend-county';
+
 // Professional routes
 import ProfessionalCalendarPage from '@/pages/professional/Calendar';
 import ProfessionalEarningsPage from '@/pages/professional/Earnings';
@@ -92,12 +109,28 @@ const App: React.FC = () => {
                 <Route path="/financing" element={<Financing />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/partners" element={<Partners />} />
-                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog" element={<BlogIndex />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/placements" element={<Placements />} />
                 <Route path="/membership" element={<Membership />} />
+                
+                {/* Blog post routes */}
+                <Route path="/blog/iv-therapy-hospice-san-mateo-county" element={<SanMateoCountyBlog />} />
+                <Route path="/blog/iv-therapy-hospice-marin-county" element={<MarinCountyBlog />} />
+                <Route path="/blog/iv-therapy-hospice-orange-county" element={<OrangeCountyBlog />} />
+                <Route path="/blog/iv-therapy-hospice-santa-clara-county" element={<SantaClaraCountyBlog />} />
+                <Route path="/blog/iv-therapy-hospice-collin-county" element={<CollinCountyBlog />} />
+                <Route path="/blog/iv-therapy-hospice-westlake-tarrant-county" element={<WestlakeTarrantCountyBlog />} />
+                <Route path="/blog/iv-therapy-hospice-los-angeles-county" element={<LosAngelesCountyBlog />} />
+                <Route path="/blog/iv-therapy-hospice-williamson-county" element={<WilliamsonCountyBlog />} />
+                <Route path="/blog/iv-therapy-hospice-travis-county" element={<TravisCountyBlog />} />
+                <Route path="/blog/iv-therapy-hospice-montgomery-county" element={<MontgomeryCountyBlog />} />
+                <Route path="/blog/iv-therapy-hospice-contra-costa-county" element={<ContraCostaCountyBlog />} />
+                <Route path="/blog/iv-therapy-hospice-san-diego-county" element={<SanDiegoCountyBlog />} />
+                <Route path="/blog/iv-therapy-hospice-ventura-county" element={<VenturaCountyBlog />} />
+                <Route path="/blog/iv-therapy-hospice-fort-bend-county" element={<FortBendCountyBlog />} />
                 
                 {/* Dashboard router to handle role-based routing */}
                 <Route
