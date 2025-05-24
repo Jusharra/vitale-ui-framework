@@ -345,43 +345,66 @@ const Index = () => {
               <form className="space-y-4">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium mb-1">Full Name</label>
-                  <Input id="name" placeholder="Your name" className="bg-white/20 border-white/30 text-white placeholder:text-white/60" />
+                  <Input 
+                    id="name" 
+                    placeholder="Your name" 
+                    className="bg-white/20 border-white/30 text-white placeholder:text-white/70" 
+                  />
                 </div>
                 
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium mb-1">Email Address</label>
-                  <Input id="email" type="email" placeholder="your@email.com" className="bg-white/20 border-white/30 text-white placeholder:text-white/60" />
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="your@email.com" 
+                    className="bg-white/20 border-white/30 text-white placeholder:text-white/70" 
+                  />
                 </div>
                 
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium mb-1">Phone Number</label>
-                  <Input id="phone" placeholder="(555) 123-4567" className="bg-white/20 border-white/30 text-white placeholder:text-white/60" />
+                  <Input 
+                    id="phone" 
+                    placeholder="(555) 123-4567" 
+                    className="bg-white/20 border-white/30 text-white placeholder:text-white/70" 
+                  />
                 </div>
                 
                 <div>
                   <label htmlFor="zip" className="block text-sm font-medium mb-1">Zip Code</label>
-                  <Input id="zip" placeholder="90210" className="bg-white/20 border-white/30 text-white placeholder:text-white/60" />
+                  <Input 
+                    id="zip" 
+                    placeholder="90210" 
+                    className="bg-white/20 border-white/30 text-white placeholder:text-white/70" 
+                  />
                 </div>
                 
                 <div>
                   <label htmlFor="service" className="block text-sm font-medium mb-1">Service Needed</label>
-                  <select id="service" className="w-full rounded-md bg-white/20 border-white/30 text-white p-2">
-                    <option value="">Select a service</option>
-                    <option value="in-home-care">In-Home Care</option>
-                    <option value="iv-therapy">IV Therapy</option>
-                    <option value="hospice">Hospice Care</option>
-                    <option value="placement">Assisted Living Placement</option>
-                    <option value="other">Other</option>
+                  <select 
+                    id="service" 
+                    className="w-full rounded-md bg-white/20 border-white/30 text-white p-2 placeholder:text-white/70"
+                  >
+                    <option value="" className="bg-indigo-700 text-white">Select a service</option>
+                    <option value="in-home-care" className="bg-indigo-700 text-white">In-Home Care</option>
+                    <option value="iv-therapy" className="bg-indigo-700 text-white">IV Therapy</option>
+                    <option value="hospice" className="bg-indigo-700 text-white">Hospice Care</option>
+                    <option value="placement" className="bg-indigo-700 text-white">Assisted Living Placement</option>
+                    <option value="other" className="bg-indigo-700 text-white">Other</option>
                   </select>
                 </div>
                 
                 <div>
                   <label htmlFor="urgency" className="block text-sm font-medium mb-1">Urgency</label>
-                  <select id="urgency" className="w-full rounded-md bg-white/20 border-white/30 text-white p-2">
-                    <option value="">Select urgency</option>
-                    <option value="urgent">Urgent (24-48 hours)</option>
-                    <option value="soon">Soon (This week)</option>
-                    <option value="planning">Planning (Within a month)</option>
+                  <select 
+                    id="urgency" 
+                    className="w-full rounded-md bg-white/20 border-white/30 text-white p-2 placeholder:text-white/70"
+                  >
+                    <option value="" className="bg-indigo-700 text-white">Select urgency</option>
+                    <option value="urgent" className="bg-indigo-700 text-white">Urgent (24-48 hours)</option>
+                    <option value="soon" className="bg-indigo-700 text-white">Soon (This week)</option>
+                    <option value="planning" className="bg-indigo-700 text-white">Planning (Within a month)</option>
                   </select>
                 </div>
                 
