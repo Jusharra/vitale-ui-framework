@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from "react-router-dom";
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,7 +9,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   Form,
@@ -33,7 +31,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { CheckCircle, AlertTriangle, ArrowRight, CreditCard, Loader2 } from 'lucide-react';
 
-// Schema for refill request form
+// Schema for placement request form
 const placementRequestSchema = z.object({
   // Step 1: Urgency Selection
   urgency: z.enum(["standard", "expedited"], {
@@ -47,9 +45,6 @@ const placementRequestSchema = z.object({
   careNeeds: z.string().min(5, { message: "Please describe care needs" }),
   location: z.string().min(2, { message: "Location is required" }),
   notes: z.string().optional(),
-  
-  // Step 3: Payment (only if expedited)
-  // This will be handled separately with Stripe
 });
 
 type PlacementRequestFormValues = z.infer<typeof placementRequestSchema>;
@@ -69,7 +64,6 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
@@ -95,6 +89,8 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
   
   // Handle form submission for each step
   const onSubmit = async (values: PlacementRequestFormValues) => {
+    console.log("Form submitted with values:", values);
+    
     if (step === 1) {
       // Move to step 2 (intake form)
       setStep(2);
@@ -229,7 +225,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
       case 1:
         return (
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="urgency"
@@ -544,66 +540,64 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
   };
   
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>
-            {isComplete 
-              ? "Request Submitted" 
-              : step === 1 
-                ? "Request Placement" 
-                : step === 2 
-                  ? "Placement Details" 
-                  : "Complete Payment"}
-          </DialogTitle>
-          <DialogDescription>
-            {isComplete 
-              ? "Thank you for your placement request" 
-              : facilityName 
-                ? `Request placement at ${facilityName}` 
-                : "Find the perfect assisted living facility for your loved one"}
-          </DialogDescription>
-        </DialogHeader>
-        
-        {!isComplete && (
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                step >= 1 ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-500"
-              }`}>
-                1
-              </div>
-              <div className={`h-1 w-12 ${
-                step > 1 ? "bg-indigo-600" : "bg-gray-200"
-              }`}></div>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                step >= 2 ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-500"
-              }`}>
-                2
-              </div>
-              {isExpedited && (
-                <>
-                  <div className={`h-1 w-12 ${
-                    step > 2 ? "bg-indigo-600" : "bg-gray-200"
-                  }`}></div>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    step >= 3 ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-500"
-                  }`}>
-                    3
-                  </div>
-                </>
-              )}
+    <DialogContent className="sm:max-w-[600px]">
+      <DialogHeader>
+        <DialogTitle>
+          {isComplete 
+            ? "Request Submitted" 
+            : step === 1 
+              ? "Request Placement" 
+              : step === 2 
+                ? "Placement Details" 
+                : "Complete Payment"}
+        </DialogTitle>
+        <DialogDescription>
+          {isComplete 
+            ? "Thank you for your placement request" 
+            : facilityName 
+              ? `Request placement at ${facilityName}` 
+              : "Find the perfect assisted living facility for your loved one"}
+        </DialogDescription>
+      </DialogHeader>
+      
+      {!isComplete && (
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+              step >= 1 ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-500"
+            }`}>
+              1
             </div>
-            <div className="text-sm text-gray-500">
-              Step {step} of {isExpedited ? 3 : 2}
+            <div className={`h-1 w-12 ${
+              step > 1 ? "bg-indigo-600" : "bg-gray-200"
+            }`}></div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+              step >= 2 ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-500"
+            }`}>
+              2
             </div>
+            {isExpedited && (
+              <>
+                <div className={`h-1 w-12 ${
+                  step > 2 ? "bg-indigo-600" : "bg-gray-200"
+                }`}></div>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  step >= 3 ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-500"
+                }`}>
+                  3
+                </div>
+              </>
+            )}
           </div>
-        )}
-        
-        {renderStepContent()}
-        
-      </DialogContent>
-    </Dialog>
+          <div className="text-sm text-gray-500">
+            Step {step} of {isExpedited ? 3 : 2}
+          </div>
+        </div>
+      )}
+      
+      {renderStepContent()}
+      
+    </DialogContent>
   );
 };
 
