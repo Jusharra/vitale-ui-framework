@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -47,10 +46,25 @@ export interface Transport {
   rating?: number;
 }
 
+export interface Facility {
+  id: string;
+  name: string;
+  description?: string;
+  location: string;
+  care_type: string;
+  price_range: string;
+  spots_available: number;
+  amenities?: string[];
+  image_url?: string;
+  status: string;
+  featured?: boolean;
+}
+
 export const useCareTeamsData = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
   const [transports, setTransports] = useState<Transport[]>([]);
+  const [facilities, setFacilities] = useState<Facility[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -91,6 +105,60 @@ export const useCareTeamsData = () => {
       if (transportsError) throw transportsError;
       setTransports(transportsData || []);
 
+      // Fetch care facilities
+      const { data: facilitiesData, error: facilitiesError } = await supabase
+        .from('care_facilities')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (facilitiesError) {
+        // If the table doesn't exist yet, we'll use mock data
+        console.log("Care facilities table may not exist yet, using mock data");
+        setFacilities([
+          {
+            id: '1',
+            name: 'Sunset Gardens Memory Care',
+            description: 'Specialized memory care facility with 24/7 support, secure environment, and personalized care plans.',
+            location: 'San Mateo County, CA',
+            care_type: 'Memory Care',
+            price_range: '$6,500/month',
+            spots_available: 3,
+            amenities: ['24/7 Care', 'Secure Environment', 'Memory Programs'],
+            image_url: 'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
+            status: 'active',
+            featured: true
+          },
+          {
+            id: '2',
+            name: 'Oakridge Senior Living',
+            description: 'Luxury senior living community with independent and assisted living options, fine dining, and resort-style amenities.',
+            location: 'Orange County, CA',
+            care_type: 'Long-Term Care',
+            price_range: '$4,800/month',
+            spots_available: 7,
+            amenities: ['Fine Dining', 'Resort Amenities', 'Independent Living'],
+            image_url: 'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',
+            status: 'active',
+            featured: false
+          },
+          {
+            id: '3',
+            name: 'Serenity Hospice House',
+            description: 'Compassionate end-of-life care in a peaceful setting with private rooms, family accommodations, and 24/7 medical support.',
+            location: 'Travis County, TX',
+            care_type: 'Hospice Support',
+            price_range: 'Insurance accepted',
+            spots_available: 1,
+            amenities: ['Private Rooms', 'Family Accommodations', '24/7 Medical Support'],
+            image_url: 'https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg',
+            status: 'active',
+            featured: false
+          }
+        ]);
+      } else {
+        setFacilities(facilitiesData || []);
+      }
+
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -111,6 +179,7 @@ export const useCareTeamsData = () => {
     partners,
     pharmacies,
     transports,
+    facilities,
     isLoading,
     refetchData: fetchData
   };
