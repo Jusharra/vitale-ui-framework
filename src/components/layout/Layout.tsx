@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
+import Footer from './Footer';
 import { useAuth } from '@/context/AuthContext';
 import { SidebarProvider } from '@/components/ui/sidebar';
 
@@ -21,10 +22,11 @@ const Layout: React.FC<LayoutProps> = ({ children, role = 'member' }) => {
         <Navbar role={effectiveRole} />
         <div className="flex flex-1 overflow-hidden">
           {user && <Sidebar role={effectiveRole} />}
-          <main className="flex-1 overflow-y-auto p-4 md:p-8">
-            <div className="container mx-auto">
+          <main className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col">
+            <div className="container mx-auto flex-1">
               {children}
             </div>
+            {user && <Footer />}
           </main>
         </div>
       </div>

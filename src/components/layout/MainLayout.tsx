@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import Footer from './Footer';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -108,40 +109,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         {children}
       </main>
       
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="container mx-auto px-6 md:px-8">
-          <div className="flex flex-col md:flex-row justify-between">
-            <div className="mb-6 md:mb-0">
-              <div className="flex items-center">
-                <div className="bg-white text-indigo-600 font-bold text-xl px-3 py-1 rounded mr-2">VH</div>
-                <span className="text-xl font-bold">Vitale Health</span>
-              </div>
-              <p className="mt-2 text-gray-400 text-sm">Personalized healthcare at your fingertips</p>
-            </div>
-            <div className="grid grid-cols-2 gap-8 md:gap-20">
-              <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider">Membership</h3>
-                <ul className="mt-4 space-y-2">
-                  <li><Link to="/membership" className="text-gray-400 hover:text-white">Smart Access</Link></li>
-                  <li><Link to="/membership" className="text-gray-400 hover:text-white">Core Concierge</Link></li>
-                  <li><Link to="/membership" className="text-gray-400 hover:text-white">VIP Executive</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider">Support</h3>
-                <ul className="mt-4 space-y-2">
-                  <li><Link to="/contact" className="text-gray-400 hover:text-white">Contact</Link></li>
-                  <li><Link to="/about" className="text-gray-400 hover:text-white">FAQ</Link></li>
-                  <li><Link to="/about" className="text-gray-400 hover:text-white">Privacy</Link></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div className="mt-8 border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between">
-            <p className="text-gray-400 text-sm">© 2025 Vitale Health Concierge. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
