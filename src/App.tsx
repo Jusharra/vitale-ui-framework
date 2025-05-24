@@ -7,6 +7,7 @@ import Financing from '@/pages/Financing';
 import Contact from '@/pages/Contact';
 import Partners from '@/pages/Partners';
 import Membership from '@/pages/Membership';
+import Blog from '@/pages/Blog';
 import Auth from '@/pages/Auth';
 import Dashboard from '@/pages/Dashboard';
 import NotFound from '@/pages/NotFound';
@@ -91,6 +92,7 @@ const App: React.FC = () => {
                 <Route path="/financing" element={<Financing />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/partners" element={<Partners />} />
+                <Route path="/blog" element={<Blog />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/profile" element={<ProfilePage />} />

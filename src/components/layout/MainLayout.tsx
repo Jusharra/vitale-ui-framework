@@ -21,6 +21,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     { name: 'Membership', path: '/membership' },
     { name: 'Placements', path: '/placements' },
     { name: 'Partners', path: '/partners' },
+    { name: 'Blog', path: '/blog' },
     { name: 'Contact', path: '/contact' },
   ];
 
