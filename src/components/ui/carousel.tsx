@@ -135,7 +135,7 @@ const Carousel = React.forwardRef<
         <div
           ref={ref}
           onKeyDownCapture={handleKeyDown}
-          className={cn("relative", className)}
+          className={cn("relative z-10 flex max-w-max flex-1 items-center justify-center", className)}
           role="region"
           aria-roledescription="carousel"
           {...props}
@@ -258,5 +258,3 @@ export {
   CarouselPrevious,
   CarouselNext,
 }
-
-export { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious }
