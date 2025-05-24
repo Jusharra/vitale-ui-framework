@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
-import { Search, MapPin, Clock, CreditCard, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Search, MapPin, Clock, CreditCard, CheckCircle, AlertTriangle, Phone, Mail, Calendar, Home, Users, Bed, Utensils, Dumbbell } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/context/AuthContext'; // Import useAuth hook
 
@@ -30,7 +30,9 @@ const careTypes = [
   "Memory Care",
   "Hospice Support",
   "Respite / Short-Term",
-  "Long-Term Board & Care"
+  "Long-Term Board & Care",
+  "Assisted Living",
+  "Independent Living"
 ];
 
 // Budget ranges
@@ -40,6 +42,28 @@ const budgetRanges = [
   "$7,000 - $10,000",
   "$10,000+"
 ];
+
+// Facility interface
+interface Facility {
+  id: string;
+  name: string;
+  type: string;
+  location: string;
+  description: string;
+  price: string;
+  availability: number;
+  availabilityStatus: 'high' | 'medium' | 'low';
+  image: string;
+  address: string;
+  phone: string;
+  email: string;
+  website?: string;
+  amenities: string[];
+  staffRatio: string;
+  yearEstablished: string;
+  acceptedInsurance: string[];
+  virtualTourUrl?: string;
+}
 
 const Placements = () => {
   const { toast } = useToast();
@@ -70,6 +94,129 @@ const Placements = () => {
   
   // Thank you state
   const [showThankYou, setShowThankYou] = useState(false);
+  
+  // Facility details modal state
+  const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
+  const [showFacilityDetails, setShowFacilityDetails] = useState(false);
+  
+  // Sample facilities data
+  const facilities: Facility[] = [
+    {
+      id: "1",
+      name: "Sunset Gardens Memory Care",
+      type: "Memory Care",
+      location: "San Mateo County, CA",
+      description: "Specialized memory care facility with 24/7 support, secure environment, and personalized care plans.",
+      price: "$6,500/month",
+      availability: 3,
+      availabilityStatus: 'medium',
+      image: "https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg",
+      address: "123 Memory Lane, San Mateo, CA 94401",
+      phone: "(650) 555-1234",
+      email: "info@sunsetgardens.com",
+      website: "www.sunsetgardens.com",
+      amenities: ["Secure Memory Care Units", "Therapeutic Gardens", "Activity Programs", "Private Rooms", "Family Lounges"],
+      staffRatio: "1:5 during day, 1:8 at night",
+      yearEstablished: "2010",
+      acceptedInsurance: ["Medicare", "Long-term Care Insurance", "Private Pay"],
+      virtualTourUrl: "https://example.com/virtual-tour"
+    },
+    {
+      id: "2",
+      name: "Oakridge Senior Living",
+      type: "Long-Term Board & Care",
+      location: "Orange County, CA",
+      description: "Luxury senior living community with independent and assisted living options, fine dining, and resort-style amenities.",
+      price: "$4,800/month",
+      availability: 7,
+      availabilityStatus: 'high',
+      image: "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg",
+      address: "456 Oak Boulevard, Newport Beach, CA 92660",
+      phone: "(949) 555-6789",
+      email: "info@oakridgeliving.com",
+      website: "www.oakridgeliving.com",
+      amenities: ["Fine Dining", "Swimming Pool", "Fitness Center", "Movie Theater", "Concierge Services"],
+      staffRatio: "1:10 during day, 1:15 at night",
+      yearEstablished: "2015",
+      acceptedInsurance: ["Private Pay", "Long-term Care Insurance"],
+      virtualTourUrl: "https://example.com/virtual-tour"
+    },
+    {
+      id: "3",
+      name: "Serenity Hospice House",
+      type: "Hospice Support",
+      location: "Travis County, TX",
+      description: "Compassionate end-of-life care in a peaceful setting with private rooms, family accommodations, and 24/7 medical support.",
+      price: "Insurance accepted",
+      availability: 1,
+      availabilityStatus: 'low',
+      image: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg",
+      address: "789 Peaceful Way, Austin, TX 78701",
+      phone: "(512) 555-9012",
+      email: "care@serenityhospice.org",
+      amenities: ["Private Rooms", "Family Accommodations", "24/7 Medical Support", "Spiritual Care", "Grief Counseling"],
+      staffRatio: "1:3 during day, 1:4 at night",
+      yearEstablished: "2008",
+      acceptedInsurance: ["Medicare", "Medicaid", "Private Insurance", "VA Benefits"]
+    },
+    {
+      id: "4",
+      name: "Golden Years Assisted Living",
+      type: "Assisted Living",
+      location: "Los Angeles County, CA",
+      description: "Upscale assisted living community with personalized care plans, luxury amenities, and a vibrant social calendar.",
+      price: "$5,200/month",
+      availability: 5,
+      availabilityStatus: 'medium',
+      image: "https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg",
+      address: "567 Golden Avenue, Los Angeles, CA 90024",
+      phone: "(310) 555-3456",
+      email: "info@goldenyears.com",
+      website: "www.goldenyears.com",
+      amenities: ["24/7 Care Staff", "Restaurant-style Dining", "Wellness Programs", "Transportation Services", "Beauty Salon"],
+      staffRatio: "1:8 during day, 1:12 at night",
+      yearEstablished: "2012",
+      acceptedInsurance: ["Long-term Care Insurance", "Private Pay"]
+    },
+    {
+      id: "5",
+      name: "Lakeside Retirement Village",
+      type: "Independent Living",
+      location: "Collin County, TX",
+      description: "Active adult community with lakefront views, independent living cottages, and comprehensive wellness programs.",
+      price: "$3,800/month",
+      availability: 12,
+      availabilityStatus: 'high',
+      image: "https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg",
+      address: "123 Lakeside Drive, Plano, TX 75024",
+      phone: "(972) 555-7890",
+      email: "info@lakesideretirement.com",
+      website: "www.lakesideretirement.com",
+      amenities: ["Independent Cottages", "Clubhouse", "Fitness Center", "Walking Trails", "Community Events"],
+      staffRatio: "1:20 during day, on-call at night",
+      yearEstablished: "2018",
+      acceptedInsurance: ["Private Pay"]
+    },
+    {
+      id: "6",
+      name: "Harmony House Memory Care",
+      type: "Memory Care",
+      location: "Marin County, CA",
+      description: "Boutique memory care facility with innovative therapies, garden spaces, and high staff-to-resident ratio.",
+      price: "$7,200/month",
+      availability: 2,
+      availabilityStatus: 'low',
+      image: "https://images.pexels.com/photos/3768126/pexels-photo-3768126.jpeg",
+      address: "789 Harmony Lane, San Rafael, CA 94901",
+      phone: "(415) 555-2345",
+      email: "care@harmonyhouse.org",
+      website: "www.harmonyhouse.org",
+      amenities: ["Memory Care Programs", "Sensory Garden", "Private Suites", "Music Therapy", "Family Support"],
+      staffRatio: "1:4 during day, 1:6 at night",
+      yearEstablished: "2016",
+      acceptedInsurance: ["Long-term Care Insurance", "Private Pay", "Veterans Benefits"]
+    }
+  ];
   
   // Handle intake form input changes
   const handleIntakeInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -153,9 +300,12 @@ const Placements = () => {
     e.preventDefault();
     // In a real implementation, this would filter results based on search criteria
     console.log("Search criteria:", { county, location, careType, budget });
-    
-    // For demo purposes, we'll just show the intake form
-    setShowIntakeForm(true);
+  };
+  
+  // Handle view facility details
+  const handleViewFacilityDetails = (facility: Facility) => {
+    setSelectedFacility(facility);
+    setShowFacilityDetails(true);
   };
 
   return (
@@ -265,6 +415,176 @@ const Placements = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Facility Details Modal */}
+          <Dialog open={showFacilityDetails} onOpenChange={setShowFacilityDetails}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              {selectedFacility && (
+                <>
+                  <DialogHeader>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <DialogTitle className="text-2xl">{selectedFacility.name}</DialogTitle>
+                        <DialogDescription className="flex items-center gap-2 mt-1">
+                          <MapPin className="h-4 w-4" />
+                          {selectedFacility.location}
+                        </DialogDescription>
+                      </div>
+                      <Badge>{selectedFacility.type}</Badge>
+                    </div>
+                  </DialogHeader>
+                  
+                  <div className="mt-4">
+                    <img 
+                      src={selectedFacility.image} 
+                      alt={selectedFacility.name} 
+                      className="w-full h-64 object-cover rounded-lg"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                    <div className="md:col-span-2 space-y-6">
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">About {selectedFacility.name}</h3>
+                        <p className="text-gray-700">{selectedFacility.description}</p>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">Amenities</h3>
+                        <div className="grid grid-cols-2 gap-2">
+                          {selectedFacility.amenities.map((amenity, index) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                              <span>{amenity}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <h3 className="text-lg font-semibold mb-2">Facility Details</h3>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Home className="h-4 w-4 text-primary" />
+                              <span className="text-sm font-medium">Address:</span>
+                              <span className="text-sm">{selectedFacility.address}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-primary" />
+                              <span className="text-sm font-medium">Established:</span>
+                              <span className="text-sm">{selectedFacility.yearEstablished}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Users className="h-4 w-4 text-primary" />
+                              <span className="text-sm font-medium">Staff Ratio:</span>
+                              <span className="text-sm">{selectedFacility.staffRatio}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <h3 className="text-lg font-semibold mb-2">Contact Information</h3>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Phone className="h-4 w-4 text-primary" />
+                              <span className="text-sm font-medium">Phone:</span>
+                              <span className="text-sm">{selectedFacility.phone}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Mail className="h-4 w-4 text-primary" />
+                              <span className="text-sm font-medium">Email:</span>
+                              <span className="text-sm">{selectedFacility.email}</span>
+                            </div>
+                            {selectedFacility.website && (
+                              <div className="flex items-center gap-2">
+                                <Globe className="h-4 w-4 text-primary" />
+                                <span className="text-sm font-medium">Website:</span>
+                                <span className="text-sm">{selectedFacility.website}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {selectedFacility.acceptedInsurance && (
+                        <div>
+                          <h3 className="text-lg font-semibold mb-2">Accepted Insurance</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedFacility.acceptedInsurance.map((insurance, index) => (
+                              <Badge key={index} variant="outline">{insurance}</Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Availability</CardTitle>
+                          <CardDescription>Current openings and pricing</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium">Price:</span>
+                            <span>{selectedFacility.price}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium">Availability:</span>
+                            <Badge 
+                              variant={
+                                selectedFacility.availabilityStatus === 'high' ? 'default' : 
+                                selectedFacility.availabilityStatus === 'medium' ? 'outline' : 
+                                'secondary'
+                              }
+                              className={
+                                selectedFacility.availabilityStatus === 'low' ? 'bg-amber-100 text-amber-800' : ''
+                              }
+                            >
+                              {selectedFacility.availability} spots
+                            </Badge>
+                          </div>
+                          
+                          <div className="pt-4 border-t">
+                            <Button 
+                              className="w-full" 
+                              onClick={() => {
+                                setShowFacilityDetails(false);
+                                setShowIntakeForm(true);
+                              }}
+                            >
+                              Request Placement
+                            </Button>
+                            
+                            {selectedFacility.virtualTourUrl && (
+                              <Button variant="outline" className="w-full mt-2">
+                                Virtual Tour
+                              </Button>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card className="mt-4">
+                        <CardHeader>
+                          <CardTitle>Contact Facility</CardTitle>
+                          <CardDescription>Send a message to the facility</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Textarea 
+                            placeholder="Enter your message here..."
+                            className="mb-4"
+                          />
+                          <Button className="w-full">Send Message</Button>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                </>
+              )}
+            </DialogContent>
+          </Dialog>
 
           {/* Intake Form Dialog */}
           <Dialog open={showIntakeForm} onOpenChange={setShowIntakeForm}>
@@ -525,7 +845,7 @@ const Placements = () => {
               <Card className="overflow-hidden">
                 <div className="h-48 bg-gray-200">
                   <img 
-                    src="https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
+                    src="https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg" 
                     alt="Sunset Gardens Memory Care" 
                     className="w-full h-full object-cover"
                   />
@@ -549,8 +869,8 @@ const Placements = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" onClick={() => setShowIntakeForm(true)}>
-                    Request Placement
+                  <Button className="w-full" onClick={() => handleViewFacilityDetails(facilities[0])}>
+                    View Details
                   </Button>
                 </CardFooter>
               </Card>
@@ -559,7 +879,7 @@ const Placements = () => {
               <Card className="overflow-hidden">
                 <div className="h-48 bg-gray-200">
                   <img 
-                    src="https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
+                    src="https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg" 
                     alt="Oakridge Senior Living" 
                     className="w-full h-full object-cover"
                   />
@@ -583,8 +903,8 @@ const Placements = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" onClick={() => setShowIntakeForm(true)}>
-                    Request Placement
+                  <Button className="w-full" onClick={() => handleViewFacilityDetails(facilities[1])}>
+                    View Details
                   </Button>
                 </CardFooter>
               </Card>
@@ -593,7 +913,7 @@ const Placements = () => {
               <Card className="overflow-hidden">
                 <div className="h-48 bg-gray-200">
                   <img 
-                    src="https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
+                    src="https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg" 
                     alt="Serenity Hospice House" 
                     className="w-full h-full object-cover"
                   />
@@ -617,8 +937,8 @@ const Placements = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" onClick={() => setShowIntakeForm(true)}>
-                    Request Placement
+                  <Button className="w-full" onClick={() => handleViewFacilityDetails(facilities[2])}>
+                    View Details
                   </Button>
                 </CardFooter>
               </Card>
@@ -627,7 +947,7 @@ const Placements = () => {
               <Card className="overflow-hidden">
                 <div className="h-48 bg-gray-200">
                   <img 
-                    src="https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
+                    src="https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg" 
                     alt="Golden Years Assisted Living" 
                     className="w-full h-full object-cover"
                   />
@@ -651,8 +971,8 @@ const Placements = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" onClick={() => setShowIntakeForm(true)}>
-                    Request Placement
+                  <Button className="w-full" onClick={() => handleViewFacilityDetails(facilities[3])}>
+                    View Details
                   </Button>
                 </CardFooter>
               </Card>
@@ -661,7 +981,7 @@ const Placements = () => {
               <Card className="overflow-hidden">
                 <div className="h-48 bg-gray-200">
                   <img 
-                    src="https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
+                    src="https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg" 
                     alt="Lakeside Retirement Village" 
                     className="w-full h-full object-cover"
                   />
@@ -685,8 +1005,8 @@ const Placements = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" onClick={() => setShowIntakeForm(true)}>
-                    Request Placement
+                  <Button className="w-full" onClick={() => handleViewFacilityDetails(facilities[4])}>
+                    View Details
                   </Button>
                 </CardFooter>
               </Card>
@@ -695,7 +1015,7 @@ const Placements = () => {
               <Card className="overflow-hidden">
                 <div className="h-48 bg-gray-200">
                   <img 
-                    src="https://images.pexels.com/photos/3768126/pexels-photo-3768126.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
+                    src="https://images.pexels.com/photos/3768126/pexels-photo-3768126.jpeg" 
                     alt="Harmony House Memory Care" 
                     className="w-full h-full object-cover"
                   />
@@ -719,8 +1039,8 @@ const Placements = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" onClick={() => setShowIntakeForm(true)}>
-                    Request Placement
+                  <Button className="w-full" onClick={() => handleViewFacilityDetails(facilities[5])}>
+                    View Details
                   </Button>
                 </CardFooter>
               </Card>
