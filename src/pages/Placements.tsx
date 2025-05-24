@@ -9,9 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
-import { Search, MapPin, Clock, CreditCard, CheckCircle, AlertTriangle, Phone, Mail, Calendar, Home, Users, Bed, Utensils, Dumbbell } from 'lucide-react';
+import { Search, MapPin, Clock, CreditCard, CheckCircle, AlertTriangle, Phone, Mail, Globe, Calendar, Users, Home, Check } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from '@/context/AuthContext'; // Import useAuth hook
 
 // California counties
 const californiaCounties = [
@@ -30,9 +29,7 @@ const careTypes = [
   "Memory Care",
   "Hospice Support",
   "Respite / Short-Term",
-  "Long-Term Board & Care",
-  "Assisted Living",
-  "Independent Living"
+  "Long-Term Board & Care"
 ];
 
 // Budget ranges
@@ -47,27 +44,28 @@ const budgetRanges = [
 interface Facility {
   id: string;
   name: string;
-  type: string;
-  location: string;
   description: string;
-  price: string;
-  availability: number;
-  availabilityStatus: 'high' | 'medium' | 'low';
-  image: string;
-  address: string;
-  phone: string;
-  email: string;
-  website?: string;
+  location: string;
+  care_type: string;
+  price_range: string;
+  spots_available: number;
   amenities: string[];
-  staffRatio: string;
-  yearEstablished: string;
-  acceptedInsurance: string[];
-  virtualTourUrl?: string;
+  image_url: string;
+  status: string;
+  featured?: boolean;
+  address?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  year_established?: number;
+  staff_ratio?: string;
+  insurance_accepted?: string[];
+  virtual_tour_available?: boolean;
+  virtual_tour_url?: string;
 }
 
 const Placements = () => {
   const { toast } = useToast();
-  const { user } = useAuth(); // Use the useAuth hook to get the user
   
   // Search states
   const [county, setCounty] = useState("all"); // Initialize with 'all' instead of empty string
@@ -104,117 +102,111 @@ const Placements = () => {
     {
       id: "1",
       name: "Sunset Gardens Memory Care",
-      type: "Memory Care",
-      location: "San Mateo County, CA",
       description: "Specialized memory care facility with 24/7 support, secure environment, and personalized care plans.",
-      price: "$6,500/month",
-      availability: 3,
-      availabilityStatus: 'medium',
-      image: "https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg",
-      address: "123 Memory Lane, San Mateo, CA 94401",
+      location: "San Mateo County, CA",
+      care_type: "Memory Care",
+      price_range: "$6,500/month",
+      spots_available: 3,
+      amenities: ["24/7 Care", "Secure Environment", "Memory Programs", "Private Rooms", "Garden Access", "Music Therapy"],
+      image_url: "https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      status: "active",
+      featured: true,
+      address: "123 Sunset Boulevard, San Mateo, CA 94403",
       phone: "(650) 555-1234",
       email: "info@sunsetgardens.com",
       website: "www.sunsetgardens.com",
-      amenities: ["Secure Memory Care Units", "Therapeutic Gardens", "Activity Programs", "Private Rooms", "Family Lounges"],
-      staffRatio: "1:5 during day, 1:8 at night",
-      yearEstablished: "2010",
-      acceptedInsurance: ["Medicare", "Long-term Care Insurance", "Private Pay"],
-      virtualTourUrl: "https://example.com/virtual-tour"
+      year_established: 2010,
+      staff_ratio: "1:5",
+      insurance_accepted: ["Medicare", "Medicaid", "Blue Cross", "Aetna", "UnitedHealthcare"],
+      virtual_tour_available: true,
+      virtual_tour_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     },
     {
       id: "2",
       name: "Oakridge Senior Living",
-      type: "Long-Term Board & Care",
-      location: "Orange County, CA",
       description: "Luxury senior living community with independent and assisted living options, fine dining, and resort-style amenities.",
-      price: "$4,800/month",
-      availability: 7,
-      availabilityStatus: 'high',
-      image: "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg",
-      address: "456 Oak Boulevard, Newport Beach, CA 92660",
+      location: "Orange County, CA",
+      care_type: "Long-Term Care",
+      price_range: "$4,800/month",
+      spots_available: 7,
+      amenities: ["Fine Dining", "Resort Amenities", "Independent Living", "Fitness Center", "Swimming Pool", "Library"],
+      image_url: "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      status: "active",
+      featured: false,
+      address: "456 Oak Drive, Newport Beach, CA 92660",
       phone: "(949) 555-6789",
       email: "info@oakridgeliving.com",
       website: "www.oakridgeliving.com",
-      amenities: ["Fine Dining", "Swimming Pool", "Fitness Center", "Movie Theater", "Concierge Services"],
-      staffRatio: "1:10 during day, 1:15 at night",
-      yearEstablished: "2015",
-      acceptedInsurance: ["Private Pay", "Long-term Care Insurance"],
-      virtualTourUrl: "https://example.com/virtual-tour"
+      year_established: 2015,
+      staff_ratio: "1:8",
+      insurance_accepted: ["Medicare", "Blue Cross", "Aetna", "Cigna"],
+      virtual_tour_available: true,
+      virtual_tour_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     },
     {
       id: "3",
       name: "Serenity Hospice House",
-      type: "Hospice Support",
-      location: "Travis County, TX",
       description: "Compassionate end-of-life care in a peaceful setting with private rooms, family accommodations, and 24/7 medical support.",
-      price: "Insurance accepted",
-      availability: 1,
-      availabilityStatus: 'low',
-      image: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg",
-      address: "789 Peaceful Way, Austin, TX 78701",
+      location: "Travis County, TX",
+      care_type: "Hospice Support",
+      price_range: "Insurance accepted",
+      spots_available: 1,
+      amenities: ["Private Rooms", "Family Accommodations", "24/7 Medical Support", "Spiritual Care", "Grief Counseling", "Pain Management"],
+      image_url: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      status: "active",
+      featured: false,
+      address: "789 Serenity Lane, Austin, TX 78701",
       phone: "(512) 555-9012",
       email: "care@serenityhospice.org",
-      amenities: ["Private Rooms", "Family Accommodations", "24/7 Medical Support", "Spiritual Care", "Grief Counseling"],
-      staffRatio: "1:3 during day, 1:4 at night",
-      yearEstablished: "2008",
-      acceptedInsurance: ["Medicare", "Medicaid", "Private Insurance", "VA Benefits"]
+      website: "www.serenityhospice.org",
+      year_established: 2008,
+      staff_ratio: "1:3",
+      insurance_accepted: ["Medicare", "Medicaid", "Most Private Insurance"],
+      virtual_tour_available: false
     },
     {
       id: "4",
       name: "Golden Years Assisted Living",
-      type: "Assisted Living",
-      location: "Los Angeles County, CA",
       description: "Upscale assisted living community with personalized care plans, luxury amenities, and a vibrant social calendar.",
-      price: "$5,200/month",
-      availability: 5,
-      availabilityStatus: 'medium',
-      image: "https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg",
-      address: "567 Golden Avenue, Los Angeles, CA 90024",
+      location: "Los Angeles County, CA",
+      care_type: "Assisted Living",
+      price_range: "$5,200/month",
+      spots_available: 5,
+      amenities: ["Personalized Care", "Luxury Amenities", "Social Activities", "Gourmet Dining", "Transportation Services", "Wellness Programs"],
+      image_url: "https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg",
+      status: "active",
+      featured: true,
+      address: "1010 Golden Avenue, Beverly Hills, CA 90210",
       phone: "(310) 555-3456",
       email: "info@goldenyears.com",
       website: "www.goldenyears.com",
-      amenities: ["24/7 Care Staff", "Restaurant-style Dining", "Wellness Programs", "Transportation Services", "Beauty Salon"],
-      staffRatio: "1:8 during day, 1:12 at night",
-      yearEstablished: "2012",
-      acceptedInsurance: ["Long-term Care Insurance", "Private Pay"]
+      year_established: 2012,
+      staff_ratio: "1:6",
+      insurance_accepted: ["Medicare", "Blue Cross", "Aetna", "UnitedHealthcare"],
+      virtual_tour_available: true,
+      virtual_tour_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     },
     {
       id: "5",
       name: "Lakeside Retirement Village",
-      type: "Independent Living",
-      location: "Collin County, TX",
       description: "Active adult community with lakefront views, independent living cottages, and comprehensive wellness programs.",
-      price: "$3,800/month",
-      availability: 12,
-      availabilityStatus: 'high',
-      image: "https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg",
-      address: "123 Lakeside Drive, Plano, TX 75024",
+      location: "Collin County, TX",
+      care_type: "Independent Living",
+      price_range: "$3,800/month",
+      spots_available: 12,
+      amenities: ["Lakefront Views", "Private Cottages", "Wellness Programs", "Community Garden", "Fitness Center", "Arts Studio"],
+      image_url: "https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg",
+      status: "active",
+      featured: false,
+      address: "222 Lakeside Drive, Plano, TX 75024",
       phone: "(972) 555-7890",
-      email: "info@lakesideretirement.com",
-      website: "www.lakesideretirement.com",
-      amenities: ["Independent Cottages", "Clubhouse", "Fitness Center", "Walking Trails", "Community Events"],
-      staffRatio: "1:20 during day, on-call at night",
-      yearEstablished: "2018",
-      acceptedInsurance: ["Private Pay"]
-    },
-    {
-      id: "6",
-      name: "Harmony House Memory Care",
-      type: "Memory Care",
-      location: "Marin County, CA",
-      description: "Boutique memory care facility with innovative therapies, garden spaces, and high staff-to-resident ratio.",
-      price: "$7,200/month",
-      availability: 2,
-      availabilityStatus: 'low',
-      image: "https://images.pexels.com/photos/3768126/pexels-photo-3768126.jpeg",
-      address: "789 Harmony Lane, San Rafael, CA 94901",
-      phone: "(415) 555-2345",
-      email: "care@harmonyhouse.org",
-      website: "www.harmonyhouse.org",
-      amenities: ["Memory Care Programs", "Sensory Garden", "Private Suites", "Music Therapy", "Family Support"],
-      staffRatio: "1:4 during day, 1:6 at night",
-      yearEstablished: "2016",
-      acceptedInsurance: ["Long-term Care Insurance", "Private Pay", "Veterans Benefits"]
+      email: "info@lakesidevillage.com",
+      website: "www.lakesidevillage.com",
+      year_established: 2017,
+      staff_ratio: "1:10",
+      insurance_accepted: ["Medicare Advantage", "Private Insurance"],
+      virtual_tour_available: true,
+      virtual_tour_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     }
   ];
   
@@ -306,6 +298,29 @@ const Placements = () => {
   const handleViewFacilityDetails = (facility: Facility) => {
     setSelectedFacility(facility);
     setShowFacilityDetails(true);
+  };
+  
+  // Handle request placement from facility details
+  const handleRequestPlacementFromDetails = () => {
+    setShowFacilityDetails(false);
+    setShowIntakeForm(true);
+    
+    // Pre-fill care type if available
+    if (selectedFacility) {
+      setIntakeFormData(prev => ({
+        ...prev,
+        careNeeded: selectedFacility.care_type,
+        preferredLocation: selectedFacility.location
+      }));
+    }
+  };
+  
+  // Handle send message to facility
+  const handleSendMessageToFacility = () => {
+    toast({
+      title: "Message Sent",
+      description: `Your message to ${selectedFacility?.name} has been sent. They will contact you shortly.`,
+    });
   };
 
   return (
@@ -430,13 +445,13 @@ const Placements = () => {
                           {selectedFacility.location}
                         </DialogDescription>
                       </div>
-                      <Badge>{selectedFacility.type}</Badge>
+                      <Badge>{selectedFacility.care_type}</Badge>
                     </div>
                   </DialogHeader>
                   
                   <div className="mt-4">
                     <img 
-                      src={selectedFacility.image} 
+                      src={selectedFacility.image_url} 
                       alt={selectedFacility.name} 
                       className="w-full h-64 object-cover rounded-lg"
                     />
@@ -445,141 +460,109 @@ const Placements = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                     <div className="md:col-span-2 space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">About {selectedFacility.name}</h3>
-                        <p className="text-gray-700">{selectedFacility.description}</p>
+                        <h3 className="text-lg font-medium mb-2">About This Facility</h3>
+                        <p className="text-gray-600">{selectedFacility.description}</p>
                       </div>
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">Amenities</h3>
+                        <h3 className="text-lg font-medium mb-2">Amenities</h3>
                         <div className="grid grid-cols-2 gap-2">
                           {selectedFacility.amenities.map((amenity, index) => (
                             <div key={index} className="flex items-center gap-2">
-                              <CheckCircle className="h-4 w-4 text-green-500" />
+                              <Check className="h-4 w-4 text-green-500" />
                               <span>{amenity}</span>
                             </div>
                           ))}
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <h3 className="text-lg font-semibold mb-2">Facility Details</h3>
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                              <Home className="h-4 w-4 text-primary" />
-                              <span className="text-sm font-medium">Address:</span>
-                              <span className="text-sm">{selectedFacility.address}</span>
+                      <div>
+                        <h3 className="text-lg font-medium mb-2">Facility Details</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="flex items-center gap-2">
+                            <Home className="h-4 w-4 text-gray-500" />
+                            <div>
+                              <p className="text-sm font-medium">Address</p>
+                              <p className="text-sm text-gray-600">{selectedFacility.address}</p>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4 text-primary" />
-                              <span className="text-sm font-medium">Established:</span>
-                              <span className="text-sm">{selectedFacility.yearEstablished}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-gray-500" />
+                            <div>
+                              <p className="text-sm font-medium">Established</p>
+                              <p className="text-sm text-gray-600">{selectedFacility.year_established}</p>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Users className="h-4 w-4 text-primary" />
-                              <span className="text-sm font-medium">Staff Ratio:</span>
-                              <span className="text-sm">{selectedFacility.staffRatio}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4 text-gray-500" />
+                            <div>
+                              <p className="text-sm font-medium">Staff Ratio</p>
+                              <p className="text-sm text-gray-600">{selectedFacility.staff_ratio}</p>
                             </div>
                           </div>
                         </div>
-                        
-                        <div>
-                          <h3 className="text-lg font-semibold mb-2">Contact Information</h3>
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                              <Phone className="h-4 w-4 text-primary" />
-                              <span className="text-sm font-medium">Phone:</span>
-                              <span className="text-sm">{selectedFacility.phone}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Mail className="h-4 w-4 text-primary" />
-                              <span className="text-sm font-medium">Email:</span>
-                              <span className="text-sm">{selectedFacility.email}</span>
-                            </div>
-                            {selectedFacility.website && (
-                              <div className="flex items-center gap-2">
-                                <Globe className="h-4 w-4 text-primary" />
-                                <span className="text-sm font-medium">Website:</span>
-                                <span className="text-sm">{selectedFacility.website}</span>
-                              </div>
-                            )}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-6">
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h3 className="text-lg font-medium mb-2">Contact Information</h3>
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-4 w-4 text-gray-500" />
+                            <span>{selectedFacility.phone}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-4 w-4 text-gray-500" />
+                            <span>{selectedFacility.email}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Globe className="h-4 w-4 text-gray-500" />
+                            <span>{selectedFacility.website}</span>
                           </div>
                         </div>
                       </div>
                       
-                      {selectedFacility.acceptedInsurance && (
-                        <div>
-                          <h3 className="text-lg font-semibold mb-2">Accepted Insurance</h3>
-                          <div className="flex flex-wrap gap-2">
-                            {selectedFacility.acceptedInsurance.map((insurance, index) => (
-                              <Badge key={index} variant="outline">{insurance}</Badge>
-                            ))}
-                          </div>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h3 className="text-lg font-medium mb-2">Insurance</h3>
+                        <div className="space-y-1">
+                          {selectedFacility.insurance_accepted?.map((insurance, index) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <Check className="h-4 w-4 text-green-500" />
+                              <span>{insurance}</span>
+                            </div>
+                          ))}
                         </div>
-                      )}
-                    </div>
-                    
-                    <div>
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>Availability</CardTitle>
-                          <CardDescription>Current openings and pricing</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          <div className="flex justify-between items-center">
-                            <span className="font-medium">Price:</span>
-                            <span>{selectedFacility.price}</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="font-medium">Availability:</span>
-                            <Badge 
-                              variant={
-                                selectedFacility.availabilityStatus === 'high' ? 'default' : 
-                                selectedFacility.availabilityStatus === 'medium' ? 'outline' : 
-                                'secondary'
-                              }
-                              className={
-                                selectedFacility.availabilityStatus === 'low' ? 'bg-amber-100 text-amber-800' : ''
-                              }
-                            >
-                              {selectedFacility.availability} spots
-                            </Badge>
-                          </div>
-                          
-                          <div className="pt-4 border-t">
-                            <Button 
-                              className="w-full" 
-                              onClick={() => {
-                                setShowFacilityDetails(false);
-                                setShowIntakeForm(true);
-                              }}
-                            >
-                              Request Placement
-                            </Button>
-                            
-                            {selectedFacility.virtualTourUrl && (
-                              <Button variant="outline" className="w-full mt-2">
-                                Virtual Tour
-                              </Button>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
+                      </div>
                       
-                      <Card className="mt-4">
-                        <CardHeader>
-                          <CardTitle>Contact Facility</CardTitle>
-                          <CardDescription>Send a message to the facility</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <Textarea 
-                            placeholder="Enter your message here..."
-                            className="mb-4"
-                          />
-                          <Button className="w-full">Send Message</Button>
-                        </CardContent>
-                      </Card>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h3 className="text-lg font-medium mb-2">Availability</h3>
+                        <div className="flex justify-between items-center">
+                          <span>Current Spots:</span>
+                          <Badge variant={selectedFacility.spots_available > 0 ? "outline" : "secondary"} className={selectedFacility.spots_available > 0 ? "border-green-500 text-green-500" : ""}>
+                            {selectedFacility.spots_available > 0 ? `${selectedFacility.spots_available} available` : "Full"}
+                          </Badge>
+                        </div>
+                        <div className="flex justify-between items-center mt-2">
+                          <span>Price Range:</span>
+                          <span className="font-medium">{selectedFacility.price_range}</span>
+                        </div>
+                      </div>
                     </div>
+                  </div>
+                  
+                  <div className="mt-6 flex flex-col sm:flex-row gap-4">
+                    {selectedFacility.virtual_tour_available && (
+                      <Button variant="outline" className="flex-1" onClick={() => window.open(selectedFacility.virtual_tour_url, '_blank')}>
+                        Take Virtual Tour
+                      </Button>
+                    )}
+                    <Button variant="outline" className="flex-1" onClick={handleSendMessageToFacility}>
+                      Send Message
+                    </Button>
+                    <Button className="flex-1" onClick={handleRequestPlacementFromDetails}>
+                      Request Placement
+                    </Button>
                   </div>
                 </>
               )}
@@ -841,209 +824,42 @@ const Placements = () => {
           <div className="mt-16">
             <h2 className="text-2xl font-bold text-gray-900 mb-8">Featured Care Facilities</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Facility 1 */}
-              <Card className="overflow-hidden">
-                <div className="h-48 bg-gray-200">
-                  <img 
-                    src="https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg" 
-                    alt="Sunset Gardens Memory Care" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between">
-                    <CardTitle className="text-lg">Sunset Gardens Memory Care</CardTitle>
-                    <Badge>Memory Care</Badge>
+              {facilities.map((facility) => (
+                <Card key={facility.id} className="overflow-hidden">
+                  <div className="h-48 bg-gray-200">
+                    <img 
+                      src={facility.image_url} 
+                      alt={facility.name} 
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                  <CardDescription>San Mateo County, CA</CardDescription>
-                </CardHeader>
-                <CardContent className="pb-2">
-                  <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">
-                      Specialized memory care facility with 24/7 support, secure environment, and personalized care plans.
-                    </p>
-                    <div className="flex justify-between text-sm">
-                      <span>Starting at $6,500/month</span>
-                      <span className="text-green-600">3 spots available</span>
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between">
+                      <CardTitle className="text-lg">{facility.name}</CardTitle>
+                      <Badge>{facility.care_type}</Badge>
                     </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button className="w-full" onClick={() => handleViewFacilityDetails(facilities[0])}>
-                    View Details
-                  </Button>
-                </CardFooter>
-              </Card>
-              
-              {/* Facility 2 */}
-              <Card className="overflow-hidden">
-                <div className="h-48 bg-gray-200">
-                  <img 
-                    src="https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg" 
-                    alt="Oakridge Senior Living" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between">
-                    <CardTitle className="text-lg">Oakridge Senior Living</CardTitle>
-                    <Badge>Long-Term Care</Badge>
-                  </div>
-                  <CardDescription>Orange County, CA</CardDescription>
-                </CardHeader>
-                <CardContent className="pb-2">
-                  <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">
-                      Luxury senior living community with independent and assisted living options, fine dining, and resort-style amenities.
-                    </p>
-                    <div className="flex justify-between text-sm">
-                      <span>Starting at $4,800/month</span>
-                      <span className="text-green-600">7 spots available</span>
+                    <CardDescription>{facility.location}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pb-2">
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        {facility.description}
+                      </p>
+                      <div className="flex justify-between text-sm">
+                        <span>{facility.price_range}</span>
+                        <span className={facility.spots_available > 0 ? "text-green-600" : "text-amber-600"}>
+                          {facility.spots_available > 0 ? `${facility.spots_available} spots available` : "Limited availability"}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button className="w-full" onClick={() => handleViewFacilityDetails(facilities[1])}>
-                    View Details
-                  </Button>
-                </CardFooter>
-              </Card>
-              
-              {/* Facility 3 */}
-              <Card className="overflow-hidden">
-                <div className="h-48 bg-gray-200">
-                  <img 
-                    src="https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg" 
-                    alt="Serenity Hospice House" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between">
-                    <CardTitle className="text-lg">Serenity Hospice House</CardTitle>
-                    <Badge>Hospice Support</Badge>
-                  </div>
-                  <CardDescription>Travis County, TX</CardDescription>
-                </CardHeader>
-                <CardContent className="pb-2">
-                  <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">
-                      Compassionate end-of-life care in a peaceful setting with private rooms, family accommodations, and 24/7 medical support.
-                    </p>
-                    <div className="flex justify-between text-sm">
-                      <span>Insurance accepted</span>
-                      <span className="text-amber-600">Limited availability</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button className="w-full" onClick={() => handleViewFacilityDetails(facilities[2])}>
-                    View Details
-                  </Button>
-                </CardFooter>
-              </Card>
-              
-              {/* Facility 4 */}
-              <Card className="overflow-hidden">
-                <div className="h-48 bg-gray-200">
-                  <img 
-                    src="https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg" 
-                    alt="Golden Years Assisted Living" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between">
-                    <CardTitle className="text-lg">Golden Years Assisted Living</CardTitle>
-                    <Badge>Assisted Living</Badge>
-                  </div>
-                  <CardDescription>Los Angeles County, CA</CardDescription>
-                </CardHeader>
-                <CardContent className="pb-2">
-                  <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">
-                      Upscale assisted living community with personalized care plans, luxury amenities, and a vibrant social calendar.
-                    </p>
-                    <div className="flex justify-between text-sm">
-                      <span>Starting at $5,200/month</span>
-                      <span className="text-green-600">5 spots available</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button className="w-full" onClick={() => handleViewFacilityDetails(facilities[3])}>
-                    View Details
-                  </Button>
-                </CardFooter>
-              </Card>
-              
-              {/* Facility 5 */}
-              <Card className="overflow-hidden">
-                <div className="h-48 bg-gray-200">
-                  <img 
-                    src="https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg" 
-                    alt="Lakeside Retirement Village" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between">
-                    <CardTitle className="text-lg">Lakeside Retirement Village</CardTitle>
-                    <Badge>Independent Living</Badge>
-                  </div>
-                  <CardDescription>Collin County, TX</CardDescription>
-                </CardHeader>
-                <CardContent className="pb-2">
-                  <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">
-                      Active adult community with lakefront views, independent living cottages, and comprehensive wellness programs.
-                    </p>
-                    <div className="flex justify-between text-sm">
-                      <span>Starting at $3,800/month</span>
-                      <span className="text-green-600">12 spots available</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button className="w-full" onClick={() => handleViewFacilityDetails(facilities[4])}>
-                    View Details
-                  </Button>
-                </CardFooter>
-              </Card>
-              
-              {/* Facility 6 */}
-              <Card className="overflow-hidden">
-                <div className="h-48 bg-gray-200">
-                  <img 
-                    src="https://images.pexels.com/photos/3768126/pexels-photo-3768126.jpeg" 
-                    alt="Harmony House Memory Care" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between">
-                    <CardTitle className="text-lg">Harmony House Memory Care</CardTitle>
-                    <Badge>Memory Care</Badge>
-                  </div>
-                  <CardDescription>Marin County, CA</CardDescription>
-                </CardHeader>
-                <CardContent className="pb-2">
-                  <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">
-                      Boutique memory care facility with innovative therapies, garden spaces, and high staff-to-resident ratio.
-                    </p>
-                    <div className="flex justify-between text-sm">
-                      <span>Starting at $7,200/month</span>
-                      <span className="text-amber-600">2 spots available</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button className="w-full" onClick={() => handleViewFacilityDetails(facilities[5])}>
-                    View Details
-                  </Button>
-                </CardFooter>
-              </Card>
+                  </CardContent>
+                  <CardFooter>
+                    <Button className="w-full" onClick={() => handleViewFacilityDetails(facility)}>
+                      View Details
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
             </div>
           </div>
 
