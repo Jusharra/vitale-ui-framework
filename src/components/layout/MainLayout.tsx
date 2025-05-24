@@ -17,8 +17,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const menuItems = [
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
-    { name: 'Services', path: '/services' },
+    { name: 'Financing', path: '/financing' },
+    { name: 'Membership', path: '/membership' },
     { name: 'Placements', path: '/placements' },
+    { name: 'Partners', path: '/partners' },
     { name: 'Blog', path: '/blog' },
     { name: 'Contact', path: '/contact' },
   ];
@@ -37,13 +39,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="py-4 px-6 md:px-8 bg-white shadow-sm sticky top-0 z-50">
+      <header className="py-4 px-6 md:px-8 bg-white shadow-sm">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center">
-              <div className="bg-indigo-600 text-white font-bold text-xl px-3 py-1 rounded mr-2">VH</div>
-              <h1 className="text-xl font-bold text-gray-800 hidden sm:block">Vitale Health Concierge</h1>
-            </Link>
+            <div className="bg-indigo-600 text-white font-bold text-xl px-3 py-1 rounded mr-2">VH</div>
+            <h1 className="text-xl font-bold text-gray-800">Vitale Health Concierge</h1>
           </div>
           
           {/* Desktop Navigation */}
@@ -68,10 +68,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 <Button variant="outline" onClick={signOut}>Sign Out</Button>
               </div>
             ) : (
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => navigate('/auth')}>Sign In</Button>
-                <Button onClick={() => navigate('/auth?tab=register')}>Get Started</Button>
-              </div>
+              <Button onClick={() => navigate('/auth')}>Sign In</Button>
             )}
             
             {/* Mobile menu button */}
