@@ -44,10 +44,10 @@ const Placements = () => {
   const { toast } = useToast();
   
   // Search states
-  const [county, setCounty] = useState("");
+  const [county, setCounty] = useState("all"); // Initialize with 'all' instead of empty string
   const [location, setLocation] = useState("");
-  const [careType, setCareType] = useState("");
-  const [budget, setBudget] = useState("");
+  const [careType, setCareType] = useState("all"); // Initialize with 'all'
+  const [budget, setBudget] = useState("all"); // Initialize with 'all'
   
   // Intake form states
   const [showIntakeForm, setShowIntakeForm] = useState(false);
@@ -188,7 +188,7 @@ const Placements = () => {
                           <SelectValue placeholder="Select county" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Counties</SelectItem>
+                          <SelectItem value="all">All Counties</SelectItem>
                           <SelectItem value="california" disabled className="font-semibold">California</SelectItem>
                           {californiaCounties.map((county) => (
                             <SelectItem key={county} value={county}>{county} County</SelectItem>
@@ -222,7 +222,7 @@ const Placements = () => {
                           <SelectValue placeholder="Select care type" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Care Types</SelectItem>
+                          <SelectItem value="all">All Care Types</SelectItem>
                           {careTypes.map((type) => (
                             <SelectItem key={type} value={type}>{type}</SelectItem>
                           ))}
@@ -237,7 +237,7 @@ const Placements = () => {
                           <SelectValue placeholder="Select budget range" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Budget Ranges</SelectItem>
+                          <SelectItem value="all">All Budget Ranges</SelectItem>
                           {budgetRanges.map((range) => (
                             <SelectItem key={range} value={range}>{range}</SelectItem>
                           ))}
