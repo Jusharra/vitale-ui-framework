@@ -26,6 +26,9 @@ const mockFacilities = [
     image_url: 'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
     status: 'active',
     featured: true,
+    phone: '(555) 123-4567',
+    email: 'info@sunsetgardens.com',
+    hours: 'Open 24/7 for tours by appointment',
     images: [
       'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
       'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',
@@ -44,6 +47,9 @@ const mockFacilities = [
     image_url: 'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',
     status: 'active',
     featured: false,
+    phone: '(555) 234-5678',
+    email: 'info@oakridgesenior.com',
+    hours: '8:00 AM - 8:00 PM',
     images: [
       'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',
       'https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg',
@@ -62,6 +68,9 @@ const mockFacilities = [
     image_url: 'https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg',
     status: 'active',
     featured: false,
+    phone: '(555) 345-6789',
+    email: 'care@serenityhospice.org',
+    hours: 'Open 24/7',
     images: [
       'https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg',
       'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg',
@@ -80,6 +89,9 @@ const mockFacilities = [
     image_url: 'https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg',
     status: 'active',
     featured: true,
+    phone: '(555) 456-7890',
+    email: 'info@goldenyears.com',
+    hours: '9:00 AM - 7:00 PM',
     images: [
       'https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg',
       'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
@@ -98,6 +110,9 @@ const mockFacilities = [
     image_url: 'https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg',
     status: 'active',
     featured: false,
+    phone: '(555) 567-8901',
+    email: 'info@lakesideretirement.com',
+    hours: '8:00 AM - 6:00 PM',
     images: [
       'https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg',
       'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',

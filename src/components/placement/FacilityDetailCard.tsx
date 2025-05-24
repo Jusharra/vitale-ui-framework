@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { MapPin, Phone, Mail, Clock, CheckCircle, Info } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, CheckCircle, Info, MessageSquare, Video } from 'lucide-react';
 import PlacementRequestButton from './PlacementRequestButton';
 
 interface FacilityDetailCardProps {
@@ -154,7 +154,20 @@ const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => 
       </CardContent>
       
       <CardFooter className="flex justify-between">
-        <Button variant="outline">Contact Facility</Button>
+        <div className="flex gap-2">
+          <Button variant="outline">
+            <Phone className="h-4 w-4 mr-2" />
+            Contact Facility
+          </Button>
+          <Button variant="outline">
+            <MessageSquare className="h-4 w-4 mr-2" />
+            Message
+          </Button>
+          <Button variant="outline">
+            <Video className="h-4 w-4 mr-2" />
+            Virtual Tour
+          </Button>
+        </div>
         <PlacementRequestButton 
           facilityId={facility.id}
           facilityName={facility.name}
