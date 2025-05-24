@@ -130,16 +130,16 @@ const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => 
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <div className="flex items-center text-sm">
-              <Info className="h-4 w-4 mr-2 text-indigo-600" />
+            <div className="flex items-center gap-1 text-sm">
+              <Info className="h-4 w-4 text-indigo-600" />
               <span className="font-medium">Price Range:</span>
-              <span className="ml-2">{facility.price_range}</span>
+              <span>{facility.price_range}</span>
             </div>
             
-            <div className="flex items-center text-sm">
-              <CheckCircle className="h-4 w-4 mr-2 text-indigo-600" />
+            <div className="flex items-center gap-1 text-sm">
+              <CheckCircle className="h-4 w-4 text-indigo-600" />
               <span className="font-medium">Availability:</span>
-              <span className="ml-2">
+              <span>
                 {facility.spots_available > 0 
                   ? `${facility.spots_available} spots available` 
                   : "Currently full"}
@@ -147,26 +147,26 @@ const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => 
             </div>
             
             {facility.phone && (
-              <div className="flex items-center text-sm">
-                <Phone className="h-4 w-4 mr-2 text-indigo-600" />
+              <div className="flex items-center gap-1 text-sm">
+                <Phone className="h-4 w-4 text-indigo-600" />
                 <span className="font-medium">Phone:</span>
-                <span className="ml-2">{facility.phone}</span>
+                <span>{facility.phone}</span>
               </div>
             )}
             
             {facility.email && (
-              <div className="flex items-center text-sm">
-                <Mail className="h-4 w-4 mr-2 text-indigo-600" />
+              <div className="flex items-center gap-1 text-sm">
+                <Mail className="h-4 w-4 text-indigo-600" />
                 <span className="font-medium">Email:</span>
-                <span className="ml-2">{facility.email}</span>
+                <span>{facility.email}</span>
               </div>
             )}
             
             {facility.hours && (
-              <div className="flex items-center text-sm">
-                <Clock className="h-4 w-4 mr-2 text-indigo-600" />
+              <div className="flex items-center gap-1 text-sm">
+                <Clock className="h-4 w-4 text-indigo-600" />
                 <span className="font-medium">Hours:</span>
-                <span className="ml-2">{facility.hours}</span>
+                <span>{facility.hours}</span>
               </div>
             )}
           </div>
@@ -174,10 +174,8 @@ const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => 
           <div>
             <h3 className="text-sm font-medium mb-2">Amenities</h3>
             <div className="flex flex-wrap gap-2">
-              {facility.amenities && facility.amenities.map((amenity, index) => (
-                <Badge key={index} variant="secondary" className="text-xs">
-                  {amenity}
-                </Badge>
+              {facility.amenities && facility.amenities.map((amenity, idx) => (
+                <Badge key={idx} variant="outline">{amenity}</Badge>
               ))}
               {(!facility.amenities || facility.amenities.length === 0) && (
                 <p className="text-sm text-muted-foreground">No amenities listed</p>

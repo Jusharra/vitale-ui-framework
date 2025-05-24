@@ -146,16 +146,56 @@ const careServices = [
   { id: 'shopping', label: 'Grocery Shopping' }
 ];
 
+// California and Texas counties
+const counties = {
+  California: [
+    'San Mateo County',
+    'Marin County',
+    'Santa Clara County',
+    'San Francisco County',
+    'Contra Costa County',
+    'Alameda County',
+    'Alpine County',
+    'Napa County',
+    'Santa Cruz County',
+    'Orange County',
+    'Placer County',
+    'El Dorado County',
+    'Ventura County',
+    'Sonoma County',
+    'San Benito County',
+    'Santa Barbara County',
+    'San Diego County',
+    'Monterey County',
+    'San Luis Obispo County',
+    'Los Angeles County'
+  ],
+  Texas: [
+    'Travis County',
+    'Collin County',
+    'Tarrant County',
+    'Williamson County',
+    'Fort Bend County',
+    'Montgomery County',
+    'Denton County',
+    'Harris County',
+    'Dallas County',
+    'Bexar County'
+  ]
+};
+
 const Placements = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [careType, setCareType] = useState('all');
-  const [location, setLocation] = useState('all');
+  const [careType, setCareType] = useState<string>('all');
+  const [location, setLocation] = useState<string>('all');
   const [facilities, setFacilities] = useState(mockFacilities);
   const [selectedFacility, setSelectedFacility] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showServiceFilters, setShowServiceFilters] = useState(false);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [selectedState, setSelectedState] = useState<string>('all');
+  const [selectedCounty, setSelectedCounty] = useState<string>('all');
   const { toast } = useToast();
 
   // Fetch facilities from database (in a real implementation)
@@ -189,7 +229,18 @@ const Placements = () => {
       facility.location.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesCareType = careType === 'all' || facility.care_type === careType;
-    const matchesLocation = location === 'all' || facility.location.includes(location);
+    
+    // Match by state and county
+    let matchesLocation = true;
+    if (selectedState !== 'all') {
+      matchesLocation = facility.location.includes(selectedState);
+      
+      if (selectedCounty !== 'all') {
+        matchesLocation = facility.location.includes(selectedCounty);
+      }
+    } else if (location !== 'all') {
+      matchesLocation = facility.location.includes(location);
+    }
     
     // For demo purposes, we'll assume all facilities match the selected services
     // In a real implementation, you would check if the facility provides the selected services
@@ -205,6 +256,12 @@ const Placements = () => {
         ? current.filter(id => id !== serviceId)
         : [...current, serviceId]
     );
+  };
+
+  // Handle state change
+  const handleStateChange = (state: string) => {
+    setSelectedState(state);
+    setSelectedCounty('all');
   };
 
   return (
@@ -247,39 +304,64 @@ const Placements = () => {
                 </SelectContent>
               </Select>
               
-              <Select value={location} onValueChange={setLocation}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Location" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Locations</SelectItem>
-                  <SelectItem value="CA">California</SelectItem>
-                  <SelectItem value="TX">Texas</SelectItem>
-                  <SelectItem value="San Mateo County">San Mateo County, CA</SelectItem>
-                  <SelectItem value="Orange County">Orange County, CA</SelectItem>
-                  <SelectItem value="Los Angeles County">Los Angeles County, CA</SelectItem>
-                  <SelectItem value="Travis County">Travis County, TX</SelectItem>
-                  <SelectItem value="Collin County">Collin County, TX</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="mt-4 flex justify-between items-center">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowServiceFilters(!showServiceFilters)}
-                className="flex items-center gap-2"
-              >
-                <Filter className="h-4 w-4" />
-                {showServiceFilters ? 'Hide Services Filter' : 'Show Services Filter'}
-              </Button>
-              
-              <div className="text-sm text-gray-500">
-                {selectedServices.length > 0 && (
-                  <span>{selectedServices.length} services selected</span>
-                )}
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center gap-2"
+                >
+                  <Filter className="h-4 w-4" />
+                  {showFilters ? 'Hide Filters' : 'More Filters'}
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowServiceFilters(!showServiceFilters)}
+                  className="flex items-center gap-2"
+                >
+                  <Filter className="h-4 w-4" />
+                  {showServiceFilters ? 'Hide Services' : 'Services Needed'}
+                </Button>
               </div>
             </div>
+            
+            {showFilters && (
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Select value={selectedState} onValueChange={handleStateChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select State" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All States</SelectItem>
+                    <SelectItem value="California">California</SelectItem>
+                    <SelectItem value="Texas">Texas</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select 
+                  value={selectedCounty} 
+                  onValueChange={setSelectedCounty}
+                  disabled={selectedState === 'all'}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={selectedState === 'all' ? "Select State First" : "Select County"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Counties</SelectItem>
+                    {selectedState === 'California' && 
+                      counties.California.map(county => (
+                        <SelectItem key={county} value={county}>{county}</SelectItem>
+                      ))
+                    }
+                    {selectedState === 'Texas' && 
+                      counties.Texas.map(county => (
+                        <SelectItem key={county} value={county}>{county}</SelectItem>
+                      ))
+                    }
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             
             {showServiceFilters && (
               <div className="mt-4 p-4 border rounded-md bg-white">
@@ -302,6 +384,23 @@ const Placements = () => {
                       </div>
                     </div>
                   ))}
+                </div>
+                
+                <div className="mt-4 flex justify-between items-center">
+                  <div className="text-sm text-gray-500">
+                    {selectedServices.length > 0 && (
+                      <span>{selectedServices.length} services selected</span>
+                    )}
+                  </div>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setSelectedServices([])}
+                    disabled={selectedServices.length === 0}
+                  >
+                    Clear Services
+                  </Button>
                 </div>
               </div>
             )}
@@ -419,17 +518,21 @@ const Placements = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                  <p className="text-gray-600">No facilities found matching your criteria.</p>
-                  <Button className="mt-4" onClick={() => {
-                    setSearchQuery('');
-                    setCareType('all');
-                    setLocation('all');
-                    setSelectedServices([]);
-                  }}>
-                    Clear Filters
-                  </Button>
-                </div>
+                <Card>
+                  <CardContent className="text-center py-12">
+                    <p className="text-gray-600">No facilities found matching your criteria.</p>
+                    <Button className="mt-4" onClick={() => {
+                      setSearchQuery('');
+                      setCareType('all');
+                      setLocation('all');
+                      setSelectedServices([]);
+                      setSelectedState('all');
+                      setSelectedCounty('all');
+                    }}>
+                      Clear Filters
+                    </Button>
+                  </CardContent>
+                </Card>
               )}
             </TabsContent>
             
@@ -512,17 +615,21 @@ const Placements = () => {
                     ))}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                  <p className="text-gray-600">No featured facilities found matching your criteria.</p>
-                  <Button className="mt-4" onClick={() => {
-                    setSearchQuery('');
-                    setCareType('all');
-                    setLocation('all');
-                    setSelectedServices([]);
-                  }}>
-                    Clear Filters
-                  </Button>
-                </div>
+                <Card>
+                  <CardContent className="text-center py-12">
+                    <p className="text-gray-600">No featured facilities found matching your criteria.</p>
+                    <Button className="mt-4" onClick={() => {
+                      setSearchQuery('');
+                      setCareType('all');
+                      setLocation('all');
+                      setSelectedServices([]);
+                      setSelectedState('all');
+                      setSelectedCounty('all');
+                    }}>
+                      Clear Filters
+                    </Button>
+                  </CardContent>
+                </Card>
               )}
             </TabsContent>
           </Tabs>
