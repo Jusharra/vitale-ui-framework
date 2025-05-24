@@ -74,7 +74,7 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
     try {
       // Convert amenities string to array
       const amenitiesArray = values.amenities 
-        ? values.amenities.split(',').map(item => item.trim()) 
+        ? values.amenities.split(',').map(item => item.trim()).filter(Boolean) 
         : [];
 
       // Check if the care_facilities table exists

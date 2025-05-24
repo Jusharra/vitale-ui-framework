@@ -153,6 +153,32 @@ export const useCareTeamsData = () => {
             image_url: 'https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg',
             status: 'active',
             featured: false
+          },
+          {
+            id: '4',
+            name: 'Golden Years Assisted Living',
+            description: 'Upscale assisted living community with personalized care plans, luxury amenities, and a vibrant social calendar.',
+            location: 'Los Angeles County, CA',
+            care_type: 'Assisted Living',
+            price_range: '$5,200/month',
+            spots_available: 5,
+            amenities: ['Personalized Care', 'Luxury Amenities', 'Social Activities'],
+            image_url: 'https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg',
+            status: 'active',
+            featured: true
+          },
+          {
+            id: '5',
+            name: 'Lakeside Retirement Village',
+            description: 'Active adult community with lakefront views, independent living cottages, and comprehensive wellness programs.',
+            location: 'Collin County, TX',
+            care_type: 'Independent Living',
+            price_range: '$3,800/month',
+            spots_available: 12,
+            amenities: ['Lakefront Views', 'Private Cottages', 'Wellness Programs'],
+            image_url: 'https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg',
+            status: 'active',
+            featured: false
           }
         ]);
       } else {
