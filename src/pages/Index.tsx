@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 
 const Index = () => {
@@ -22,6 +22,15 @@ const Index = () => {
     }
   };
 
+  const menuItems = [
+    { name: 'About', path: '/about' },
+    { name: 'Financing', path: '/financing' },
+    { name: 'Membership', path: '/membership' },
+    { name: 'Placements', path: '/placements' },
+    { name: 'Partners', path: '/partners' },
+    { name: 'Contact', path: '/contact' },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       <header className="py-4 px-8 flex justify-between items-center bg-white shadow-sm">
@@ -29,6 +38,17 @@ const Index = () => {
           <div className="bg-indigo-600 text-white font-bold text-xl px-3 py-1 rounded mr-2">VH</div>
           <h1 className="text-xl font-bold text-gray-800">Vitale Health Concierge</h1>
         </div>
+        <nav className="hidden md:flex items-center space-x-6">
+          {menuItems.map((item, index) => (
+            <Link 
+              key={index} 
+              to={item.path} 
+              className="text-gray-600 hover:text-indigo-600 transition-colors"
+            >
+              {item.name}
+            </Link>
+          ))}
+        </nav>
         <div>
           {isAuthenticated ? (
             <div className="flex gap-2">
