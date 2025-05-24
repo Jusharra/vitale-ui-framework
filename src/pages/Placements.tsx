@@ -9,9 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
-import { Search, MapPin, Clock, CreditCard, CheckCircle, AlertTriangle, Phone, Mail, Calendar, Users, Bed, Star, Heart } from 'lucide-react';
+import { Search, MapPin, Clock, CreditCard, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from '@/context/AuthContext'; // Import useAuth hook
 
 // California counties
 const californiaCounties = [
@@ -30,9 +30,7 @@ const careTypes = [
   "Memory Care",
   "Hospice Support",
   "Respite / Short-Term",
-  "Long-Term Board & Care",
-  "Assisted Living",
-  "Independent Living"
+  "Long-Term Board & Care"
 ];
 
 // Budget ranges
@@ -43,265 +41,15 @@ const budgetRanges = [
   "$10,000+"
 ];
 
-// Facility data
-const facilities = [
-  {
-    id: 1,
-    name: "Sunset Gardens Memory Care",
-    type: "Memory Care",
-    location: "San Mateo County, CA",
-    address: "123 Sunset Blvd, San Mateo, CA 94403",
-    description: "Specialized memory care facility with 24/7 support, secure environment, and personalized care plans.",
-    longDescription: "Sunset Gardens Memory Care is a premier memory care community designed specifically for individuals living with Alzheimer's disease, dementia, and other memory impairments. Our secure, purpose-built environment promotes independence while providing the specialized care your loved one needs. Our highly trained staff delivers personalized care plans that focus on maintaining dignity, fostering engagement, and enhancing quality of life through innovative memory care programming.",
-    price: 6500,
-    spotsAvailable: 3,
-    image: "https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg",
-    amenities: ["24/7 Specialized Care", "Secure Environment", "Memory Enhancement Programs", "Private Suites", "Chef-Prepared Meals", "Therapeutic Garden"],
-    contactName: "Sarah Johnson",
-    contactPhone: "(650) 555-1234",
-    contactEmail: "info@sunsetgardens.com",
-    rating: 4.8,
-    reviews: 42,
-    virtualTour: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    county: "San Mateo"
-  },
-  {
-    id: 2,
-    name: "Oakridge Senior Living",
-    type: "Long-Term Care",
-    location: "Orange County, CA",
-    address: "456 Oak Drive, Newport Beach, CA 92660",
-    description: "Luxury senior living community with independent and assisted living options, fine dining, and resort-style amenities.",
-    longDescription: "Oakridge Senior Living offers an unparalleled luxury retirement experience in the heart of Newport Beach. Our community features spacious apartments, gourmet dining experiences, and a comprehensive suite of amenities designed for active seniors. With both independent and assisted living options, residents can age in place with dignity while enjoying our resort-style environment. Our professional staff provides personalized care tailored to each resident's unique needs and preferences.",
-    price: 4800,
-    spotsAvailable: 7,
-    image: "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg",
-    amenities: ["Fine Dining", "Resort-Style Pool", "Fitness Center", "Concierge Services", "Housekeeping", "Transportation Services", "Social Activities"],
-    contactName: "Michael Chen",
-    contactPhone: "(949) 555-6789",
-    contactEmail: "info@oakridgeseniorliving.com",
-    rating: 4.9,
-    reviews: 68,
-    virtualTour: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    county: "Orange"
-  },
-  {
-    id: 3,
-    name: "Serenity Hospice House",
-    type: "Hospice Support",
-    location: "Travis County, TX",
-    address: "789 Peaceful Lane, Austin, TX 78701",
-    description: "Compassionate end-of-life care in a peaceful setting with private rooms, family accommodations, and 24/7 medical support.",
-    longDescription: "Serenity Hospice House provides compassionate, dignified end-of-life care in a tranquil environment designed to comfort both patients and their families. Our facility features private suites with family accommodation areas, allowing loved ones to remain close during this important time. Our specialized medical team provides 24/7 pain management and symptom control, while our emotional and spiritual support staff helps families navigate this challenging journey with grace and understanding.",
-    price: 0,
-    priceNote: "Insurance accepted",
-    spotsAvailable: 1,
-    image: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg",
-    amenities: ["Private Rooms", "Family Accommodations", "24/7 Medical Support", "Pain Management", "Spiritual Support", "Bereavement Services"],
-    contactName: "Dr. Robert Williams",
-    contactPhone: "(512) 555-9012",
-    contactEmail: "care@serenityhospice.org",
-    rating: 4.9,
-    reviews: 56,
-    virtualTour: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    county: "Travis"
-  },
-  {
-    id: 4,
-    name: "Golden Years Assisted Living",
-    type: "Assisted Living",
-    location: "Los Angeles County, CA",
-    address: "1010 Golden Ave, Los Angeles, CA 90024",
-    description: "Upscale assisted living community with personalized care plans, luxury amenities, and a vibrant social calendar.",
-    longDescription: "Golden Years Assisted Living offers the perfect balance of independence and support in an elegant setting. Our dedicated care staff provides personalized assistance with daily activities while respecting residents' autonomy and preferences. The community features spacious apartments, gourmet dining options, and a rich calendar of social events and cultural outings. Our wellness programs promote physical and mental well-being, ensuring residents enjoy a fulfilling lifestyle in their golden years.",
-    price: 5200,
-    spotsAvailable: 5,
-    image: "https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg",
-    amenities: ["Personalized Care Plans", "Medication Management", "Gourmet Dining", "Fitness Center", "Beauty Salon", "Transportation Services"],
-    contactName: "Jennifer Lopez",
-    contactPhone: "(310) 555-3456",
-    contactEmail: "info@goldenyears.com",
-    rating: 4.7,
-    reviews: 89,
-    virtualTour: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    county: "Los Angeles"
-  },
-  {
-    id: 5,
-    name: "Lakeside Retirement Village",
-    type: "Independent Living",
-    location: "Collin County, TX",
-    address: "555 Lakeside Drive, Plano, TX 75024",
-    description: "Active adult community with lakefront views, independent living cottages, and comprehensive wellness programs.",
-    longDescription: "Lakeside Retirement Village is a premier active adult community situated on the shores of beautiful Lake Plano. Our independent living cottages and apartments offer privacy and autonomy while providing access to a vibrant community of like-minded seniors. Residents enjoy our state-of-the-art wellness center, gourmet dining options, and extensive social calendar. With optional services available as needs change, Lakeside provides the perfect setting for an active, engaged retirement lifestyle.",
-    price: 3800,
-    spotsAvailable: 12,
-    image: "https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg",
-    amenities: ["Lakefront Views", "Private Cottages", "Wellness Center", "Gourmet Dining", "Social Events", "Gardening Areas"],
-    contactName: "David Thompson",
-    contactPhone: "(972) 555-7890",
-    contactEmail: "info@lakesidevillage.com",
-    rating: 4.6,
-    reviews: 74,
-    virtualTour: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    county: "Collin"
-  },
-  {
-    id: 6,
-    name: "Harmony Memory Care",
-    type: "Memory Care",
-    location: "Santa Clara County, CA",
-    address: "222 Harmony Way, Palo Alto, CA 94301",
-    description: "Specialized memory care facility with innovative therapies, secure outdoor spaces, and family support programs.",
-    longDescription: "Harmony Memory Care is dedicated to providing exceptional care for individuals living with Alzheimer's disease and other forms of dementia. Our innovative approach combines the latest evidence-based therapies with a secure, homelike environment designed to reduce confusion and anxiety. Our specially trained staff delivers personalized care that honors each resident's life story and preferences. Family involvement is encouraged through our comprehensive support programs, education resources, and regular care conferences.",
-    price: 7200,
-    spotsAvailable: 4,
-    image: "https://images.pexels.com/photos/7551741/pexels-photo-7551741.jpeg",
-    amenities: ["Secure Memory Gardens", "Innovative Therapies", "Life Enrichment Programs", "Family Support", "Specialized Dining", "24/7 Monitoring"],
-    contactName: "Dr. Emily Chang",
-    contactPhone: "(650) 555-2345",
-    contactEmail: "care@harmonymemorycare.com",
-    rating: 4.9,
-    reviews: 51,
-    virtualTour: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    county: "Santa Clara"
-  },
-  {
-    id: 7,
-    name: "Magnolia Gardens",
-    type: "Assisted Living",
-    location: "Harris County, TX",
-    address: "333 Magnolia Blvd, Houston, TX 77024",
-    description: "Elegant assisted living community with spacious suites, personalized care, and Southern hospitality.",
-    longDescription: "Magnolia Gardens embodies the warmth of Southern hospitality in an elegant assisted living setting. Our spacious suites offer privacy and comfort, while our attentive staff provides personalized assistance with daily activities. Residents enjoy chef-prepared Southern cuisine, engaging social activities, and beautiful garden spaces for relaxation and reflection. Our wellness programs focus on maintaining independence and enhancing quality of life, all within a supportive community atmosphere.",
-    price: 4500,
-    spotsAvailable: 8,
-    image: "https://images.pexels.com/photos/1643384/pexels-photo-1643384.jpeg",
-    amenities: ["Spacious Suites", "Southern Cuisine", "Garden Spaces", "Wellness Programs", "Transportation Services", "24-Hour Assistance"],
-    contactName: "Margaret Johnson",
-    contactPhone: "(713) 555-8901",
-    contactEmail: "welcome@magnoliagardens.com",
-    rating: 4.7,
-    reviews: 63,
-    virtualTour: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    county: "Harris"
-  },
-  {
-    id: 8,
-    name: "Pacific Heights Care Center",
-    type: "Long-Term Care",
-    location: "San Francisco County, CA",
-    address: "444 Pacific Avenue, San Francisco, CA 94115",
-    description: "Comprehensive long-term care facility with skilled nursing, rehabilitation services, and panoramic city views.",
-    longDescription: "Pacific Heights Care Center provides exceptional long-term care and skilled nursing services in the heart of San Francisco. Our facility offers stunning panoramic views of the city and bay, creating an uplifting environment for residents. Our multidisciplinary team includes skilled nurses, therapists, and care specialists who develop comprehensive care plans for each resident. With a focus on both physical health and emotional well-being, we strive to enhance quality of life while providing the highest level of medical care.",
-    price: 8500,
-    spotsAvailable: 6,
-    image: "https://images.pexels.com/photos/1692693/pexels-photo-1692693.jpeg",
-    amenities: ["Skilled Nursing", "Rehabilitation Services", "Panoramic Views", "Specialized Diets", "Therapy Programs", "Social Activities"],
-    contactName: "Dr. James Wilson",
-    contactPhone: "(415) 555-6789",
-    contactEmail: "info@pacificheightscare.com",
-    rating: 4.6,
-    reviews: 47,
-    virtualTour: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    county: "San Francisco"
-  },
-  {
-    id: 9,
-    name: "Tranquil Pines Respite Care",
-    type: "Respite / Short-Term",
-    location: "Marin County, CA",
-    address: "555 Pine Road, Mill Valley, CA 94941",
-    description: "Short-term respite care in a serene setting, providing caregivers with a break while ensuring quality care for loved ones.",
-    longDescription: "Tranquil Pines offers exceptional respite care services in the peaceful surroundings of Mill Valley. Our short-term stays provide family caregivers with a much-needed break while ensuring their loved ones receive professional, compassionate care. Guests enjoy all the amenities and services of our full-time residents, including personalized care plans, engaging activities, and nutritious meals. Our tranquil setting among the redwoods creates a restorative environment for both guests and their families.",
-    price: 350,
-    priceNote: "per day",
-    spotsAvailable: 4,
-    image: "https://images.pexels.com/photos/2098405/pexels-photo-2098405.jpeg",
-    amenities: ["Short-Term Stays", "Personalized Care", "Medication Management", "Engaging Activities", "Nutritious Meals", "Peaceful Environment"],
-    contactName: "Lisa Martinez",
-    contactPhone: "(415) 555-9012",
-    contactEmail: "respite@tranquilpines.com",
-    rating: 4.8,
-    reviews: 39,
-    virtualTour: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    county: "Marin"
-  },
-  {
-    id: 10,
-    name: "Lone Star Senior Living",
-    type: "Independent Living",
-    location: "Dallas County, TX",
-    address: "777 Lone Star Way, Dallas, TX 75201",
-    description: "Vibrant independent living community with luxury apartments, chef-prepared meals, and a full calendar of Texas-sized activities.",
-    longDescription: "Lone Star Senior Living offers a vibrant, independent lifestyle for active seniors in the heart of Dallas. Our luxury apartments provide privacy and comfort, while our community spaces foster connection and engagement. Residents enjoy chef-prepared meals featuring Texas favorites and international cuisine, a comprehensive wellness program, and a full calendar of social events, cultural outings, and educational opportunities. Our location provides easy access to Dallas's world-class shopping, dining, and entertainment options.",
-    price: 3200,
-    spotsAvailable: 15,
-    image: "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg",
-    amenities: ["Luxury Apartments", "Chef-Prepared Meals", "Fitness Center", "Social Events", "Transportation Services", "Concierge"],
-    contactName: "Robert Johnson",
-    contactPhone: "(214) 555-3456",
-    contactEmail: "live@lonestarsenior.com",
-    rating: 4.7,
-    reviews: 82,
-    virtualTour: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    county: "Dallas"
-  },
-  {
-    id: 11,
-    name: "Coastal Breeze Memory Care",
-    type: "Memory Care",
-    location: "San Diego County, CA",
-    address: "888 Coastal Highway, La Jolla, CA 92037",
-    description: "Oceanfront memory care community with specialized programs, secure walking paths, and therapeutic ocean views.",
-    longDescription: "Coastal Breeze Memory Care offers a unique therapeutic environment for individuals with memory impairments. Our oceanfront location provides calming views and fresh sea air that have proven beneficial for cognitive well-being. Our purpose-built facility features secure walking paths, sensory gardens, and specially designed living spaces that reduce confusion while promoting independence. Our memory care specialists deliver innovative programs tailored to each resident's cognitive abilities and personal history, focusing on creating moments of joy and connection every day.",
-    price: 7800,
-    spotsAvailable: 5,
-    image: "https://images.pexels.com/photos/2506990/pexels-photo-2506990.jpeg",
-    amenities: ["Oceanfront Views", "Secure Walking Paths", "Sensory Gardens", "Memory Enhancement Programs", "Specialized Dining", "Family Support Groups"],
-    contactName: "Dr. Amanda Rivera",
-    contactPhone: "(858) 555-7890",
-    contactEmail: "care@coastalbreezememory.com",
-    rating: 4.9,
-    reviews: 45,
-    virtualTour: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    county: "San Diego"
-  },
-  {
-    id: 12,
-    name: "Hill Country Hospice Retreat",
-    type: "Hospice Support",
-    location: "Williamson County, TX",
-    address: "999 Hill Country Road, Georgetown, TX 78628",
-    description: "Peaceful hospice facility nestled in the Texas Hill Country, offering dignified end-of-life care with scenic natural surroundings.",
-    longDescription: "Hill Country Hospice Retreat provides compassionate end-of-life care in the serene beauty of the Texas Hill Country. Our facility is designed to create a peaceful, homelike environment where patients and their families can find comfort during a difficult time. Private suites with outdoor views, family gathering spaces, and meditation gardens offer various settings for meaningful moments together. Our specialized medical team provides expert pain management and symptom control, while our emotional and spiritual support staff helps families navigate this journey with dignity and grace.",
-    price: 0,
-    priceNote: "Medicare and insurance accepted",
-    spotsAvailable: 3,
-    image: "https://images.pexels.com/photos/2387079/pexels-photo-2387079.jpeg",
-    amenities: ["Private Suites", "Family Gathering Spaces", "Meditation Gardens", "Pain Management", "Spiritual Support", "Bereavement Services"],
-    contactName: "Dr. Thomas Garcia",
-    contactPhone: "(512) 555-2345",
-    contactEmail: "care@hillcountryhospice.org",
-    rating: 4.9,
-    reviews: 37,
-    virtualTour: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    county: "Williamson"
-  }
-];
-
 const Placements = () => {
   const { toast } = useToast();
+  const { user } = useAuth(); // Use the useAuth hook to get the user
   
   // Search states
-  const [county, setCounty] = useState("all");
+  const [county, setCounty] = useState("all"); // Initialize with 'all' instead of empty string
   const [location, setLocation] = useState("");
-  const [careType, setCareType] = useState("all");
-  const [budget, setBudget] = useState("all");
-  
-  // Facility detail modal state
-  const [selectedFacility, setSelectedFacility] = useState(null);
-  const [facilityDetailOpen, setFacilityDetailOpen] = useState(false);
+  const [careType, setCareType] = useState("all"); // Initialize with 'all'
+  const [budget, setBudget] = useState("all"); // Initialize with 'all'
   
   // Intake form states
   const [showIntakeForm, setShowIntakeForm] = useState(false);
@@ -318,16 +66,13 @@ const Placements = () => {
   
   // Payment selection states
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
-  const [selectedSpeed, setSelectedSpeed] = useState(null);
+  const [selectedSpeed, setSelectedSpeed] = useState<string | null>(null);
   
   // Thank you state
   const [showThankYou, setShowThankYou] = useState(false);
   
-  // Contact form state
-  const [contactMessage, setContactMessage] = useState("");
-  
   // Handle intake form input changes
-  const handleIntakeInputChange = (e) => {
+  const handleIntakeInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setIntakeFormData(prev => ({
       ...prev,
@@ -336,7 +81,7 @@ const Placements = () => {
   };
   
   // Handle intake form submission
-  const handleIntakeSubmit = (e) => {
+  const handleIntakeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate form
@@ -355,7 +100,7 @@ const Placements = () => {
   };
   
   // Handle payment selection
-  const handlePaymentSelect = (speed) => {
+  const handlePaymentSelect = (speed: string) => {
     setSelectedSpeed(speed);
   };
   
@@ -404,69 +149,14 @@ const Placements = () => {
   };
   
   // Handle search submission
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real implementation, this would filter results based on search criteria
     console.log("Search criteria:", { county, location, careType, budget });
+    
+    // For demo purposes, we'll just show the intake form
+    setShowIntakeForm(true);
   };
-  
-  // Handle facility selection
-  const handleFacilitySelect = (facility) => {
-    setSelectedFacility(facility);
-    setFacilityDetailOpen(true);
-  };
-  
-  // Handle contact form submission
-  const handleContactSubmit = (e) => {
-    e.preventDefault();
-    
-    if (!contactMessage.trim()) {
-      toast({
-        title: "Message required",
-        description: "Please enter a message to send",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    toast({
-      title: "Message sent",
-      description: "Your message has been sent to the facility administrator",
-    });
-    
-    setContactMessage("");
-  };
-  
-  // Filter facilities based on search criteria
-  const filteredFacilities = facilities.filter(facility => {
-    // Filter by county
-    if (county !== "all" && facility.county !== county) {
-      return false;
-    }
-    
-    // Filter by location (city or address)
-    if (location && !facility.location.toLowerCase().includes(location.toLowerCase()) && 
-        !facility.address.toLowerCase().includes(location.toLowerCase())) {
-      return false;
-    }
-    
-    // Filter by care type
-    if (careType !== "all" && facility.type !== careType) {
-      return false;
-    }
-    
-    // Filter by budget
-    if (budget !== "all") {
-      const [minStr, maxStr] = budget.replace('$', '').split(' - ');
-      const min = parseInt(minStr.replace(',', ''));
-      const max = parseInt(maxStr.replace(',', '').replace('+', ''));
-      
-      if (facility.price < min) return false;
-      if (!maxStr.includes('+') && facility.price > max) return false;
-    }
-    
-    return true;
-  });
 
   return (
     <MainLayout>
@@ -501,11 +191,11 @@ const Placements = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">All Counties</SelectItem>
-                          <SelectItem value="california-group" disabled>California</SelectItem>
+                          <SelectItem value="california" disabled className="font-semibold">California</SelectItem>
                           {californiaCounties.map((county) => (
                             <SelectItem key={county} value={county}>{county} County</SelectItem>
                           ))}
-                          <SelectItem value="texas-group" disabled>Texas</SelectItem>
+                          <SelectItem value="texas" disabled className="font-semibold">Texas</SelectItem>
                           {texasCounties.map((county) => (
                             <SelectItem key={county} value={county}>{county} County</SelectItem>
                           ))}
@@ -827,257 +517,214 @@ const Placements = () => {
             </DialogContent>
           </Dialog>
 
-          {/* Facility Detail Modal */}
-          <Dialog open={facilityDetailOpen} onOpenChange={setFacilityDetailOpen}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-              {selectedFacility && (
-                <>
-                  <DialogHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <DialogTitle className="text-2xl">{selectedFacility.name}</DialogTitle>
-                        <DialogDescription className="flex items-center gap-2 mt-1">
-                          <MapPin className="h-4 w-4" />
-                          {selectedFacility.address}
-                        </DialogDescription>
-                      </div>
-                      <Badge>{selectedFacility.type}</Badge>
-                    </div>
-                  </DialogHeader>
-                  
-                  <div className="mt-4">
-                    <img 
-                      src={selectedFacility.image} 
-                      alt={selectedFacility.name} 
-                      className="w-full h-64 object-cover rounded-lg"
-                    />
-                  </div>
-                  
-                  <Tabs defaultValue="overview" className="mt-6">
-                    <TabsList>
-                      <TabsTrigger value="overview">Overview</TabsTrigger>
-                      <TabsTrigger value="amenities">Amenities</TabsTrigger>
-                      <TabsTrigger value="contact">Contact</TabsTrigger>
-                      <TabsTrigger value="availability">Availability</TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="overview" className="mt-4">
-                      <div className="space-y-4">
-                        <div>
-                          <h3 className="text-lg font-semibold mb-2">About {selectedFacility.name}</h3>
-                          <p className="text-gray-700">{selectedFacility.longDescription}</p>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center">
-                            <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-                            <span className="ml-1 font-medium">{selectedFacility.rating}</span>
-                          </div>
-                          <span className="text-gray-500">({selectedFacility.reviews} reviews)</span>
-                        </div>
-                        
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <h4 className="font-medium">Monthly Cost</h4>
-                              {selectedFacility.price > 0 ? (
-                                <p className="text-2xl font-bold">${selectedFacility.price.toLocaleString()}</p>
-                              ) : (
-                                <p className="text-lg">{selectedFacility.priceNote}</p>
-                              )}
-                            </div>
-                            <Button onClick={() => {
-                              setFacilityDetailOpen(false);
-                              setShowIntakeForm(true);
-                            }}>
-                              Request Placement
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="amenities" className="mt-4">
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Amenities & Services</h3>
-                        <div className="grid grid-cols-2 gap-3">
-                          {selectedFacility.amenities.map((amenity, index) => (
-                            <div key={index} className="flex items-center gap-2">
-                              <CheckCircle className="h-5 w-5 text-green-500" />
-                              <span>{amenity}</span>
-                            </div>
-                          ))}
-                        </div>
-                        
-                        {selectedFacility.virtualTour && (
-                          <div className="mt-6">
-                            <h3 className="text-lg font-semibold mb-2">Virtual Tour</h3>
-                            <Button variant="outline" className="w-full">
-                              View Virtual Tour
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="contact" className="mt-4">
-                      <div className="space-y-6">
-                        <div>
-                          <h3 className="text-lg font-semibold mb-2">Contact Information</h3>
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-2">
-                              <User className="h-5 w-5 text-gray-500" />
-                              <span>{selectedFacility.contactName}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Phone className="h-5 w-5 text-gray-500" />
-                              <span>{selectedFacility.contactPhone}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Mail className="h-5 w-5 text-gray-500" />
-                              <span>{selectedFacility.contactEmail}</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="border-t pt-6">
-                          <h3 className="text-lg font-semibold mb-2">Send a Message</h3>
-                          <form onSubmit={handleContactSubmit}>
-                            <div className="space-y-4">
-                              <Textarea 
-                                placeholder="Type your message here..." 
-                                className="min-h-[120px]"
-                                value={contactMessage}
-                                onChange={(e) => setContactMessage(e.target.value)}
-                                required
-                              />
-                              <Button type="submit">Send Message</Button>
-                            </div>
-                          </form>
-                        </div>
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="availability" className="mt-4">
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-center">
-                          <h3 className="text-lg font-semibold">Current Availability</h3>
-                          <Badge className={selectedFacility.spotsAvailable > 0 ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
-                            {selectedFacility.spotsAvailable > 0 
-                              ? `${selectedFacility.spotsAvailable} spots available` 
-                              : "No availability"}
-                          </Badge>
-                        </div>
-                        
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <div className="flex items-center gap-3 mb-4">
-                            <Calendar className="h-5 w-5 text-gray-500" />
-                            <div>
-                              <h4 className="font-medium">Typical Wait Time</h4>
-                              <p className="text-sm text-gray-500">
-                                {selectedFacility.spotsAvailable > 5 
-                                  ? "Immediate availability" 
-                                  : selectedFacility.spotsAvailable > 0 
-                                    ? "1-2 weeks" 
-                                    : "2-3 months"}
-                              </p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-3">
-                            <Users className="h-5 w-5 text-gray-500" />
-                            <div>
-                              <h4 className="font-medium">Resident Population</h4>
-                              <p className="text-sm text-gray-500">
-                                {selectedFacility.type === "Memory Care" 
-                                  ? "Specialized memory care for individuals with Alzheimer's and dementia" 
-                                  : selectedFacility.type === "Assisted Living"
-                                    ? "Seniors needing assistance with daily activities"
-                                    : selectedFacility.type === "Independent Living"
-                                      ? "Active seniors seeking community living"
-                                      : "Individuals requiring specialized care"}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="mt-6">
-                          <Button 
-                            className="w-full"
-                            onClick={() => {
-                              setFacilityDetailOpen(false);
-                              setShowIntakeForm(true);
-                            }}
-                          >
-                            Request Placement at {selectedFacility.name}
-                          </Button>
-                        </div>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </>
-              )}
-            </DialogContent>
-          </Dialog>
-
           {/* Featured Facilities Section */}
           <div className="mt-16">
             <h2 className="text-2xl font-bold text-gray-900 mb-8">Featured Care Facilities</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {filteredFacilities.slice(0, 6).map((facility) => (
-                <Card key={facility.id} className="overflow-hidden">
-                  <div className="h-48 bg-gray-200">
-                    <img 
-                      src={facility.image} 
-                      alt={facility.name} 
-                      className="w-full h-full object-cover"
-                    />
+              {/* Facility 1 */}
+              <Card className="overflow-hidden">
+                <div className="h-48 bg-gray-200">
+                  <img 
+                    src="https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
+                    alt="Sunset Gardens Memory Care" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between">
+                    <CardTitle className="text-lg">Sunset Gardens Memory Care</CardTitle>
+                    <Badge>Memory Care</Badge>
                   </div>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between">
-                      <CardTitle className="text-lg">{facility.name}</CardTitle>
-                      <Badge>{facility.type}</Badge>
+                  <CardDescription>San Mateo County, CA</CardDescription>
+                </CardHeader>
+                <CardContent className="pb-2">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      Specialized memory care facility with 24/7 support, secure environment, and personalized care plans.
+                    </p>
+                    <div className="flex justify-between text-sm">
+                      <span>Starting at $6,500/month</span>
+                      <span className="text-green-600">3 spots available</span>
                     </div>
-                    <CardDescription>{facility.location}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pb-2">
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">
-                        {facility.description}
-                      </p>
-                      <div className="flex justify-between text-sm">
-                        {facility.price > 0 ? (
-                          <span>Starting at ${facility.price.toLocaleString()}/month</span>
-                        ) : (
-                          <span>{facility.priceNote}</span>
-                        )}
-                        <span className={facility.spotsAvailable > 0 ? "text-green-600" : "text-amber-600"}>
-                          {facility.spotsAvailable > 0 
-                            ? `${facility.spotsAvailable} spots available` 
-                            : "Limited availability"}
-                        </span>
-                      </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full" onClick={() => setShowIntakeForm(true)}>
+                    Request Placement
+                  </Button>
+                </CardFooter>
+              </Card>
+              
+              {/* Facility 2 */}
+              <Card className="overflow-hidden">
+                <div className="h-48 bg-gray-200">
+                  <img 
+                    src="https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
+                    alt="Oakridge Senior Living" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between">
+                    <CardTitle className="text-lg">Oakridge Senior Living</CardTitle>
+                    <Badge>Long-Term Care</Badge>
+                  </div>
+                  <CardDescription>Orange County, CA</CardDescription>
+                </CardHeader>
+                <CardContent className="pb-2">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      Luxury senior living community with independent and assisted living options, fine dining, and resort-style amenities.
+                    </p>
+                    <div className="flex justify-between text-sm">
+                      <span>Starting at $4,800/month</span>
+                      <span className="text-green-600">7 spots available</span>
                     </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button 
-                      className="w-full" 
-                      onClick={() => handleFacilitySelect(facility)}
-                    >
-                      View Details
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full" onClick={() => setShowIntakeForm(true)}>
+                    Request Placement
+                  </Button>
+                </CardFooter>
+              </Card>
+              
+              {/* Facility 3 */}
+              <Card className="overflow-hidden">
+                <div className="h-48 bg-gray-200">
+                  <img 
+                    src="https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
+                    alt="Serenity Hospice House" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between">
+                    <CardTitle className="text-lg">Serenity Hospice House</CardTitle>
+                    <Badge>Hospice Support</Badge>
+                  </div>
+                  <CardDescription>Travis County, TX</CardDescription>
+                </CardHeader>
+                <CardContent className="pb-2">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      Compassionate end-of-life care in a peaceful setting with private rooms, family accommodations, and 24/7 medical support.
+                    </p>
+                    <div className="flex justify-between text-sm">
+                      <span>Insurance accepted</span>
+                      <span className="text-amber-600">Limited availability</span>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full" onClick={() => setShowIntakeForm(true)}>
+                    Request Placement
+                  </Button>
+                </CardFooter>
+              </Card>
+              
+              {/* Facility 4 */}
+              <Card className="overflow-hidden">
+                <div className="h-48 bg-gray-200">
+                  <img 
+                    src="https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
+                    alt="Golden Years Assisted Living" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between">
+                    <CardTitle className="text-lg">Golden Years Assisted Living</CardTitle>
+                    <Badge>Assisted Living</Badge>
+                  </div>
+                  <CardDescription>Los Angeles County, CA</CardDescription>
+                </CardHeader>
+                <CardContent className="pb-2">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      Upscale assisted living community with personalized care plans, luxury amenities, and a vibrant social calendar.
+                    </p>
+                    <div className="flex justify-between text-sm">
+                      <span>Starting at $5,200/month</span>
+                      <span className="text-green-600">5 spots available</span>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full" onClick={() => setShowIntakeForm(true)}>
+                    Request Placement
+                  </Button>
+                </CardFooter>
+              </Card>
+              
+              {/* Facility 5 */}
+              <Card className="overflow-hidden">
+                <div className="h-48 bg-gray-200">
+                  <img 
+                    src="https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
+                    alt="Lakeside Retirement Village" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between">
+                    <CardTitle className="text-lg">Lakeside Retirement Village</CardTitle>
+                    <Badge>Independent Living</Badge>
+                  </div>
+                  <CardDescription>Collin County, TX</CardDescription>
+                </CardHeader>
+                <CardContent className="pb-2">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      Active adult community with lakefront views, independent living cottages, and comprehensive wellness programs.
+                    </p>
+                    <div className="flex justify-between text-sm">
+                      <span>Starting at $3,800/month</span>
+                      <span className="text-green-600">12 spots available</span>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full" onClick={() => setShowIntakeForm(true)}>
+                    Request Placement
+                  </Button>
+                </CardFooter>
+              </Card>
+              
+              {/* Facility 6 */}
+              <Card className="overflow-hidden">
+                <div className="h-48 bg-gray-200">
+                  <img 
+                    src="https://images.pexels.com/photos/3768126/pexels-photo-3768126.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
+                    alt="Harmony House Memory Care" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between">
+                    <CardTitle className="text-lg">Harmony House Memory Care</CardTitle>
+                    <Badge>Memory Care</Badge>
+                  </div>
+                  <CardDescription>Marin County, CA</CardDescription>
+                </CardHeader>
+                <CardContent className="pb-2">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      Boutique memory care facility with innovative therapies, garden spaces, and high staff-to-resident ratio.
+                    </p>
+                    <div className="flex justify-between text-sm">
+                      <span>Starting at $7,200/month</span>
+                      <span className="text-amber-600">2 spots available</span>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full" onClick={() => setShowIntakeForm(true)}>
+                    Request Placement
+                  </Button>
+                </CardFooter>
+              </Card>
             </div>
-            
-            {filteredFacilities.length > 6 && (
-              <div className="mt-8 text-center">
-                <Button variant="outline" size="lg">
-                  View All {filteredFacilities.length} Facilities
-                </Button>
-              </div>
-            )}
           </div>
 
           {/* Why Choose Us Section */}
