@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
-import { Search, MapPin, Clock, CreditCard, CheckCircle, AlertTriangle, Phone, Mail, Globe, Calendar, Users, Home, Check } from 'lucide-react';
+import { Search, MapPin, Clock, CreditCard, CheckCircle, AlertTriangle, Phone, Mail, Globe, Calendar, Users, Home, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 
 // California counties
@@ -62,6 +62,7 @@ interface Facility {
   insurance_accepted?: string[];
   virtual_tour_available?: boolean;
   virtual_tour_url?: string;
+  images?: string[]; // Array of image URLs for the carousel
 }
 
 const Placements = () => {
@@ -97,6 +98,9 @@ const Placements = () => {
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
   const [showFacilityDetails, setShowFacilityDetails] = useState(false);
   
+  // Image carousel state
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
   // Sample facilities data
   const facilities: Facility[] = [
     {
@@ -119,7 +123,13 @@ const Placements = () => {
       staff_ratio: "1:5",
       insurance_accepted: ["Medicare", "Medicaid", "Blue Cross", "Aetna", "UnitedHealthcare"],
       virtual_tour_available: true,
-      virtual_tour_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      virtual_tour_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      images: [
+        "https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "https://images.pexels.com/photos/3662803/pexels-photo-3662803.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "https://images.pexels.com/photos/3662850/pexels-photo-3662850.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+      ]
     },
     {
       id: "2",
@@ -141,7 +151,13 @@ const Placements = () => {
       staff_ratio: "1:8",
       insurance_accepted: ["Medicare", "Blue Cross", "Aetna", "Cigna"],
       virtual_tour_available: true,
-      virtual_tour_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      virtual_tour_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      images: [
+        "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "https://images.pexels.com/photos/1571463/pexels-photo-1571463.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "https://images.pexels.com/photos/1571468/pexels-photo-1571468.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+      ]
     },
     {
       id: "3",
@@ -162,7 +178,12 @@ const Placements = () => {
       year_established: 2008,
       staff_ratio: "1:3",
       insurance_accepted: ["Medicare", "Medicaid", "Most Private Insurance"],
-      virtual_tour_available: false
+      virtual_tour_available: false,
+      images: [
+        "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "https://images.pexels.com/photos/3768170/pexels-photo-3768170.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "https://images.pexels.com/photos/3768169/pexels-photo-3768169.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+      ]
     },
     {
       id: "4",
@@ -184,7 +205,13 @@ const Placements = () => {
       staff_ratio: "1:6",
       insurance_accepted: ["Medicare", "Blue Cross", "Aetna", "UnitedHealthcare"],
       virtual_tour_available: true,
-      virtual_tour_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      virtual_tour_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      images: [
+        "https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg",
+        "https://images.pexels.com/photos/7551741/pexels-photo-7551741.jpeg",
+        "https://images.pexels.com/photos/7551801/pexels-photo-7551801.jpeg",
+        "https://images.pexels.com/photos/7551859/pexels-photo-7551859.jpeg"
+      ]
     },
     {
       id: "5",
@@ -206,7 +233,13 @@ const Placements = () => {
       staff_ratio: "1:10",
       insurance_accepted: ["Medicare Advantage", "Private Insurance"],
       virtual_tour_available: true,
-      virtual_tour_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      virtual_tour_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      images: [
+        "https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg",
+        "https://images.pexels.com/photos/2736387/pexels-photo-2736387.jpeg",
+        "https://images.pexels.com/photos/2736386/pexels-photo-2736386.jpeg",
+        "https://images.pexels.com/photos/2736385/pexels-photo-2736385.jpeg"
+      ]
     }
   ];
   
@@ -297,6 +330,7 @@ const Placements = () => {
   // Handle view facility details
   const handleViewFacilityDetails = (facility: Facility) => {
     setSelectedFacility(facility);
+    setCurrentImageIndex(0); // Reset carousel to first image
     setShowFacilityDetails(true);
   };
   
@@ -321,6 +355,23 @@ const Placements = () => {
       title: "Message Sent",
       description: `Your message to ${selectedFacility?.name} has been sent. They will contact you shortly.`,
     });
+  };
+  
+  // Handle carousel navigation
+  const nextImage = () => {
+    if (selectedFacility?.images) {
+      setCurrentImageIndex((prevIndex) => 
+        prevIndex === selectedFacility.images!.length - 1 ? 0 : prevIndex + 1
+      );
+    }
+  };
+  
+  const prevImage = () => {
+    if (selectedFacility?.images) {
+      setCurrentImageIndex((prevIndex) => 
+        prevIndex === 0 ? selectedFacility.images!.length - 1 : prevIndex - 1
+      );
+    }
   };
 
   return (
@@ -449,12 +500,67 @@ const Placements = () => {
                     </div>
                   </DialogHeader>
                   
-                  <div className="mt-4">
-                    <img 
-                      src={selectedFacility.image_url} 
-                      alt={selectedFacility.name} 
-                      className="w-full h-64 object-cover rounded-lg"
-                    />
+                  <div className="mt-4 relative">
+                    {/* Image Carousel */}
+                    <div className="relative h-64 overflow-hidden rounded-lg">
+                      {selectedFacility.images && selectedFacility.images.length > 0 ? (
+                        <>
+                          <img 
+                            src={selectedFacility.images[currentImageIndex]} 
+                            alt={`${selectedFacility.name} - Image ${currentImageIndex + 1}`} 
+                            className="w-full h-full object-cover transition-opacity duration-300"
+                          />
+                          
+                          {/* Carousel Navigation */}
+                          <div className="absolute inset-0 flex items-center justify-between p-4">
+                            <Button 
+                              variant="outline" 
+                              size="icon" 
+                              className="rounded-full bg-white/70 hover:bg-white/90"
+                              onClick={prevImage}
+                            >
+                              <ChevronLeft className="h-6 w-6" />
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="icon" 
+                              className="rounded-full bg-white/70 hover:bg-white/90"
+                              onClick={nextImage}
+                            >
+                              <ChevronRight className="h-6 w-6" />
+                            </Button>
+                          </div>
+                          
+                          {/* Image Counter */}
+                          <div className="absolute bottom-4 left-0 right-0 flex justify-center">
+                            <div className="bg-black/50 text-white px-2 py-1 rounded-full text-xs">
+                              {currentImageIndex + 1} / {selectedFacility.images.length}
+                            </div>
+                          </div>
+                          
+                          {/* Dot Indicators */}
+                          <div className="absolute bottom-4 left-0 right-0">
+                            <div className="flex justify-center gap-2">
+                              {selectedFacility.images.map((_, index) => (
+                                <button
+                                  key={index}
+                                  className={`w-2 h-2 rounded-full ${
+                                    index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                                  }`}
+                                  onClick={() => setCurrentImageIndex(index)}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <img 
+                          src={selectedFacility.image_url} 
+                          alt={selectedFacility.name} 
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
