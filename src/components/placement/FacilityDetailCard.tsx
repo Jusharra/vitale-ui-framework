@@ -5,6 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { MapPin, Phone, Mail, Clock, CheckCircle, Info, MessageSquare, Video } from 'lucide-react';
 import PlacementRequestButton from './PlacementRequestButton';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from '@/hooks/use-toast';
 
 interface FacilityDetailCardProps {
   facility: {
@@ -23,17 +26,59 @@ interface FacilityDetailCardProps {
     email?: string;
     hours?: string;
     images?: string[]; // Array of image URLs for the carousel
+    virtual_tour_url?: string; // URL for virtual tour
   };
 }
 
 const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => {
   // Use the images array if available, otherwise create an array with the single image_url
   const imageUrls = facility.images || (facility.image_url ? [facility.image_url] : []);
+  const { toast } = useToast();
+  const [messageText, setMessageText] = useState('');
   
   // If no images are available, use a placeholder
   if (imageUrls.length === 0) {
     imageUrls.push('https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg');
   }
+
+  const handleCallFacility = () => {
+    if (facility.phone) {
+      window.location.href = `tel:${facility.phone}`;
+    } else {
+      toast({
+        title: "No phone number available",
+        description: "This facility hasn't provided a phone number.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSendMessage = () => {
+    if (messageText.trim()) {
+      toast({
+        title: "Message sent",
+        description: "Your message has been sent to the facility administrator.",
+      });
+      setMessageText('');
+    } else {
+      toast({
+        title: "Empty message",
+        description: "Please enter a message before sending.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleVirtualTour = () => {
+    if (facility.virtual_tour_url) {
+      window.open(facility.virtual_tour_url, '_blank');
+    } else {
+      toast({
+        title: "Virtual tour not available",
+        description: "This facility doesn't have a virtual tour available yet.",
+      });
+    }
+  };
 
   return (
     <Card className="overflow-hidden">
@@ -153,21 +198,47 @@ const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => 
         </div>
       </CardContent>
       
-      <CardFooter className="flex justify-between">
-        <div className="flex gap-2">
-          <Button variant="outline">
+      <CardFooter className="flex flex-wrap gap-2 justify-between">
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={handleCallFacility}>
             <Phone className="h-4 w-4 mr-2" />
             Contact Facility
           </Button>
-          <Button variant="outline">
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Message
-          </Button>
-          <Button variant="outline">
+          
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Message
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Message {facility.name}</DialogTitle>
+                <DialogDescription>
+                  Send a message to the facility administrator. They will respond to you directly.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="py-4">
+                <Textarea 
+                  placeholder="Type your message here..."
+                  className="min-h-[150px]"
+                  value={messageText}
+                  onChange={(e) => setMessageText(e.target.value)}
+                />
+              </div>
+              <DialogFooter>
+                <Button onClick={handleSendMessage}>Send Message</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          
+          <Button variant="outline" onClick={handleVirtualTour}>
             <Video className="h-4 w-4 mr-2" />
             Virtual Tour
           </Button>
         </div>
+        
         <PlacementRequestButton 
           facilityId={facility.id}
           facilityName={facility.name}

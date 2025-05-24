@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, ButtonProps } from '@/components/ui/button';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import PlacementRequestFlow from './PlacementRequestFlow';
 
 interface PlacementRequestButtonProps extends ButtonProps {
@@ -21,16 +22,18 @@ const PlacementRequestButton: React.FC<PlacementRequestButtonProps> = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
-    <>
-      <Button
-        variant={variant}
-        size={size}
-        className={className}
-        onClick={() => setIsDialogOpen(true)}
-        {...props}
-      >
-        {children || "Request Placement"}
-      </Button>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <DialogTrigger asChild>
+        <Button
+          variant={variant}
+          size={size}
+          className={className}
+          onClick={() => setIsDialogOpen(true)}
+          {...props}
+        >
+          {children || "Request Placement"}
+        </Button>
+      </DialogTrigger>
       
       <PlacementRequestFlow
         open={isDialogOpen}
@@ -38,7 +41,7 @@ const PlacementRequestButton: React.FC<PlacementRequestButtonProps> = ({
         facilityId={facilityId}
         facilityName={facilityName}
       />
-    </>
+    </Dialog>
   );
 };
 
