@@ -94,6 +94,7 @@ const App: React.FC = () => {
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/placements" element={<Placements />} />
+                <Route path="/membership" element={<MemberMembershipPage />} />
                 
                 {/* Dashboard router to handle role-based routing */}
                 <Route
