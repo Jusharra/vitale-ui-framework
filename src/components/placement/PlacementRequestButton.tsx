@@ -28,7 +28,6 @@ const PlacementRequestButton: React.FC<PlacementRequestButtonProps> = ({
           variant={variant}
           size={size}
           className={className}
-          onClick={() => setIsDialogOpen(true)}
           {...props}
         >
           {children || "Request Placement"}

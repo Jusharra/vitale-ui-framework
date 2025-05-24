@@ -47,7 +47,7 @@ const placementRequestSchema = z.object({
   notes: z.string().optional(),
 });
 
-type PlacementRequestFormValues = z.infer<typeof placementRequestSchema>;
+export type PlacementRequestFormValues = z.infer<typeof placementRequestSchema>;
 
 interface PlacementRequestFlowProps {
   open: boolean;
@@ -540,64 +540,65 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
   };
   
   return (
-    <DialogContent className="sm:max-w-[600px]">
-      <DialogHeader>
-        <DialogTitle>
-          {isComplete 
-            ? "Request Submitted" 
-            : step === 1 
-              ? "Request Placement" 
-              : step === 2 
-                ? "Placement Details" 
-                : "Complete Payment"}
-        </DialogTitle>
-        <DialogDescription>
-          {isComplete 
-            ? "Thank you for your placement request" 
-            : facilityName 
-              ? `Request placement at ${facilityName}` 
-              : "Find the perfect assisted living facility for your loved one"}
-        </DialogDescription>
-      </DialogHeader>
-      
-      {!isComplete && (
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              step >= 1 ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-500"
-            }`}>
-              1
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[600px]">
+        <DialogHeader>
+          <DialogTitle>
+            {isComplete 
+              ? "Request Submitted" 
+              : step === 1 
+                ? "Request Placement" 
+                : step === 2 
+                  ? "Placement Details" 
+                  : "Complete Payment"}
+          </DialogTitle>
+          <DialogDescription>
+            {isComplete 
+              ? "Thank you for your placement request" 
+              : facilityName 
+                ? `Request placement at ${facilityName}` 
+                : "Find the perfect assisted living facility for your loved one"}
+          </DialogDescription>
+        </DialogHeader>
+        
+        {!isComplete && (
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                step >= 1 ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-500"
+              }`}>
+                1
+              </div>
+              <div className={`h-1 w-12 ${
+                step > 1 ? "bg-indigo-600" : "bg-gray-200"
+              }`}></div>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                step >= 2 ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-500"
+              }`}>
+                2
+              </div>
+              {isExpedited && (
+                <>
+                  <div className={`h-1 w-12 ${
+                    step > 2 ? "bg-indigo-600" : "bg-gray-200"
+                  }`}></div>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    step >= 3 ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-500"
+                  }`}>
+                    3
+                  </div>
+                </>
+              )}
             </div>
-            <div className={`h-1 w-12 ${
-              step > 1 ? "bg-indigo-600" : "bg-gray-200"
-            }`}></div>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              step >= 2 ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-500"
-            }`}>
-              2
+            <div className="text-sm text-gray-500">
+              Step {step} of {isExpedited ? 3 : 2}
             </div>
-            {isExpedited && (
-              <>
-                <div className={`h-1 w-12 ${
-                  step > 2 ? "bg-indigo-600" : "bg-gray-200"
-                }`}></div>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  step >= 3 ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-500"
-                }`}>
-                  3
-                </div>
-              </>
-            )}
           </div>
-          <div className="text-sm text-gray-500">
-            Step {step} of {isExpedited ? 3 : 2}
-          </div>
-        </div>
-      )}
-      
-      {renderStepContent()}
-      
-    </DialogContent>
+        )}
+        
+        {renderStepContent()}
+      </DialogContent>
+    </Dialog>
   );
 };
 
