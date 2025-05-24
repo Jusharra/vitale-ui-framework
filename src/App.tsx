@@ -6,6 +6,7 @@ import About from '@/pages/About';
 import Financing from '@/pages/Financing';
 import Contact from '@/pages/Contact';
 import Partners from '@/pages/Partners';
+import Membership from '@/pages/Membership';
 import Auth from '@/pages/Auth';
 import Dashboard from '@/pages/Dashboard';
 import NotFound from '@/pages/NotFound';
@@ -94,7 +95,7 @@ const App: React.FC = () => {
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/placements" element={<Placements />} />
-                <Route path="/membership" element={<MemberMembershipPage />} />
+                <Route path="/membership" element={<Membership />} />
                 
                 {/* Dashboard router to handle role-based routing */}
                 <Route
