@@ -159,7 +159,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
       // Reset form after submission
       form.reset();
       
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting placement request:", error);
       toast({
         title: "Error",
@@ -185,7 +185,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
       // After successful payment, submit the placement request
       await submitPlacementRequest(values);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error processing payment:", error);
       toast({
         title: "Payment Error",
@@ -313,7 +313,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
       case 2:
         return (
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -447,7 +447,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
           <div className="space-y-6">
             <div className="bg-gray-50 p-4 rounded-lg">
               <h3 className="font-medium text-lg mb-2">Placement Request Summary</h3>
-              <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="grid grid-cols-2 gap-2">
                 <div className="text-gray-500">Name:</div>
                 <div>{form.getValues("fullName")}</div>
                 
