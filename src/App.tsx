@@ -21,6 +21,7 @@ import AdminLeadsPage from '@/pages/admin/AdminLeadsPage';
 import AdminCareTeamsPage from '@/pages/admin/AdminCareTeamsPage';
 import AdminHealthToolsPage from '@/pages/admin/AdminHealthToolsPage';
 import AdminSettingsPage from '@/pages/admin/AdminSettingsPage';
+import AdminBlogPostsPage from '@/pages/admin/AdminBlogPostsPage';
 import ProfessionalPage from '@/pages/ProfessionalDashboard';
 import MemberConciergePage from '@/pages/member/Concierge';
 import MemberPharmacyPage from '@/pages/member/Pharmacy';
@@ -301,6 +302,14 @@ const App: React.FC = () => {
                   element={
                     <ProtectedRoute requiredRole="admin">
                       <AdminSettingsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin/blog"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminBlogPostsPage />
                     </ProtectedRoute>
                   }
                 />
