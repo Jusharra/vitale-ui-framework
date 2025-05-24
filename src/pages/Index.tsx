@@ -4,10 +4,24 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import MainLayout from '@/components/layout/MainLayout';
+import { Input } from '@/components/ui/input';
+import { 
+  Home, 
+  Droplet, 
+  Heart, 
+  Activity, 
+  Brain, 
+  AlertTriangle, 
+  CheckCircle, 
+  ArrowRight, 
+  Star, 
+  Phone, 
+  MessageSquare 
+} from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, userRole, signOut } = useAuth();
+  const { isAuthenticated, userRole } = useAuth();
 
   const handleDashboardClick = () => {
     if (isAuthenticated) {
@@ -25,65 +39,418 @@ const Index = () => {
 
   return (
     <MainLayout>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-            <span className="block">Premium Healthcare</span>
-            <span className="block text-indigo-600">At Your Fingertips</span>
-          </h1>
-          <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-            Experience personalized care with our tiered membership plans. Connect with healthcare professionals, access digital health tools, and more.
-          </p>
-          <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-            <div className="rounded-md shadow">
-              <Button className="w-full" size="lg" onClick={handleDashboardClick}>
-                {isAuthenticated ? 'Go to Dashboard' : 'Start Free Trial'}
-              </Button>
+      {/* 1. Hero Section */}
+      <section className="relative bg-gradient-to-r from-indigo-50 to-blue-50 py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
+                Concierge In-Home Health & Wellness for Aging Loved Ones
+              </h1>
+              <p className="text-xl text-gray-600">
+                Premium IV therapy, private nursing, hospice care, and assisted living placements—trusted, vetted, delivered to your door.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700">
+                  Book In-Home Care Now
+                </Button>
+                <Button size="lg" variant="outline" className="border-indigo-600 text-indigo-600 hover:bg-indigo-50">
+                  Explore Concierge Services
+                </Button>
+              </div>
             </div>
-            <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-              <Button variant="outline" className="w-full" size="lg" onClick={() => navigate('/auth')}>
-                Learn More
-              </Button>
+            <div className="rounded-lg overflow-hidden shadow-xl">
+              <img 
+                src="https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg" 
+                alt="Professional nurse helping an elder at home" 
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
         </div>
+      </section>
 
-        <div className="mt-24 grid gap-8 md:grid-cols-3">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="bg-indigo-100 text-indigo-600 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-medium text-gray-900">Smart Access</h3>
-            <p className="mt-2 text-gray-500">
-              Get started with essential healthcare features. Book services, access basic health tools, and engage with our AI assistant.
+      {/* 2. What We Offer */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900">What We Offer</h2>
+            <p className="mt-4 text-xl text-gray-600">
+              One trusted platform. Vetted providers. Nationwide access starting in CA & TX.
             </p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-md border border-indigo-200">
-            <div className="bg-indigo-600 text-white p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-indigo-100 w-14 h-14 rounded-full flex items-center justify-center mb-4">
+                <Home className="h-7 w-7 text-indigo-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">In-Home Elder Care</h3>
+              <p className="text-gray-600">Professional caregivers providing personalized support in the comfort of home.</p>
             </div>
-            <h3 className="text-xl font-medium text-gray-900">Core Concierge</h3>
-            <p className="mt-2 text-gray-500">
-              Upgrade to priority scheduling with specialists, unlock more health tools, and enjoy 15% off all bookings.
-            </p>
-          </div>
-          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-lg shadow-md border border-purple-200">
-            <div className="bg-purple-600 text-white p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
-              </svg>
+            
+            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-blue-100 w-14 h-14 rounded-full flex items-center justify-center mb-4">
+                <Droplet className="h-7 w-7 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Concierge IV Therapy</h3>
+              <p className="text-gray-600">Mobile hydration and vitamin infusions delivered by licensed nurses.</p>
             </div>
-            <h3 className="text-xl font-medium text-gray-900">VIP Executive</h3>
-            <p className="mt-2 text-gray-500">
-              Our premium tier offers all features plus telehealth services, a personal primary care physician, and 20% off bookings.
-            </p>
+            
+            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-green-100 w-14 h-14 rounded-full flex items-center justify-center mb-4">
+                <Heart className="h-7 w-7 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Private Hospice Services</h3>
+              <p className="text-gray-600">Compassionate end-of-life care with dignity and personalized attention.</p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-purple-100 w-14 h-14 rounded-full flex items-center justify-center mb-4">
+                <Activity className="h-7 w-7 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Wellness & Recovery Plans</h3>
+              <p className="text-gray-600">Customized health programs for post-surgery recovery and ongoing wellness.</p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-amber-100 w-14 h-14 rounded-full flex items-center justify-center mb-4">
+                <Brain className="h-7 w-7 text-amber-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Memory & Cognitive Support</h3>
+              <p className="text-gray-600">Specialized care for those with Alzheimer's, dementia, and cognitive challenges.</p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div className="bg-red-100 w-14 h-14 rounded-full flex items-center justify-center mb-4">
+                <AlertTriangle className="h-7 w-7 text-red-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Emergency Placement Matching</h3>
+              <p className="text-gray-600">Rapid response placement services for urgent care needs and transitions.</p>
+            </div>
           </div>
         </div>
-      </main>
+      </section>
+
+      {/* 3. Offer Stack */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-indigo-900 text-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-10">
+            <span className="inline-block px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-semibold mb-3">
+              EXCLUSIVE OFFERS
+            </span>
+            <h2 className="text-3xl font-bold">The Vitale Advantage</h2>
+            <p className="mt-3 text-indigo-200 text-lg">
+              Unlock premium benefits with our concierge health services
+            </p>
+          </div>
+          
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 shadow-lg border border-indigo-700">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-lg">First-time Clients: Get up to $250 off</h3>
+                  <p className="text-indigo-200">Your first concierge booking with Vitale Health</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-lg">Free 8-Day/7-Night Vacation</h3>
+                  <p className="text-indigo-200">With select care plans for qualifying members</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-lg">Free Meal Vouchers + Hotel Credits</h3>
+                  <p className="text-indigo-200">For caregivers supporting your loved ones</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-lg">AI-Powered 24/7 Nurse Assistant</h3>
+                  <p className="text-indigo-200">Included in select plans for round-the-clock support</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-lg">VIP Fast-Track Placement</h3>
+                  <p className="text-indigo-200">24–48hr turnarounds for urgent care needs</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-8 text-center">
+              <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white px-8">
+                Claim My Concierge Offer
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. How It Works */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900">How It Works</h2>
+            <p className="mt-4 text-xl text-gray-600">
+              Your path to premium care is simple and streamlined
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-lg shadow-md relative">
+              <div className="absolute -top-5 -left-5 w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xl font-bold">
+                1
+              </div>
+              <h3 className="text-xl font-semibold mb-4 mt-4">Tell Us Your Need</h3>
+              <p className="text-gray-600">Share your requirements for in-home nursing, IV therapy, hospice care, or assisted living placement.</p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-lg shadow-md relative">
+              <div className="absolute -top-5 -left-5 w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xl font-bold">
+                2
+              </div>
+              <h3 className="text-xl font-semibold mb-4 mt-4">We Match You</h3>
+              <p className="text-gray-600">Our concierge team pairs you with the perfect provider from our vetted private network.</p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-lg shadow-md relative">
+              <div className="absolute -top-5 -left-5 w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xl font-bold">
+                3
+              </div>
+              <h3 className="text-xl font-semibold mb-4 mt-4">Care Delivered Fast</h3>
+              <p className="text-gray-600">Book, track, and access support through our platform with 24/7 concierge assistance.</p>
+            </div>
+          </div>
+          
+          <div className="text-center mt-12">
+            <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700">
+              Get Started Today
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Testimonials */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900">What Our Clients Say</h2>
+            <p className="mt-4 text-xl text-gray-600">
+              Trusted by families across California & Texas
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-gray-50 p-8 rounded-lg shadow-sm">
+              <div className="flex items-center mb-4">
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                  ))}
+                </div>
+              </div>
+              <p className="text-gray-700 mb-6">
+                "The IV therapy service was exceptional. The nurse arrived promptly, was professional, and made my mother feel comfortable. The hydration therapy made a noticeable difference in her energy levels."
+              </p>
+              <div className="flex items-center">
+                <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold">
+                  JM
+                </div>
+                <div className="ml-4">
+                  <p className="font-semibold">Jennifer M.</p>
+                  <p className="text-sm text-gray-500">San Mateo County, CA</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 p-8 rounded-lg shadow-sm">
+              <div className="flex items-center mb-4">
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                  ))}
+                </div>
+              </div>
+              <p className="text-gray-700 mb-6">
+                "When my father needed hospice care, Vitale matched us with the most compassionate team. Their attention to detail and 24/7 availability gave our family peace of mind during a difficult time."
+              </p>
+              <div className="flex items-center">
+                <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold">
+                  RW
+                </div>
+                <div className="ml-4">
+                  <p className="font-semibold">Robert W.</p>
+                  <p className="text-sm text-gray-500">Travis County, TX</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 p-8 rounded-lg shadow-sm">
+              <div className="flex items-center mb-4">
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                  ))}
+                </div>
+              </div>
+              <p className="text-gray-700 mb-6">
+                "The VIP Fast-Track Placement service was worth every penny. Within 36 hours, they found the perfect assisted living facility for my mother, handled all the paperwork, and coordinated the move."
+              </p>
+              <div className="flex items-center">
+                <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-semibold">
+                  SL
+                </div>
+                <div className="ml-4">
+                  <p className="font-semibold">Sarah L.</p>
+                  <p className="text-sm text-gray-500">Orange County, CA</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Lead Capture / Booking CTA */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-indigo-600 to-blue-700 text-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl font-bold mb-4">Ready to Experience Concierge Healthcare?</h2>
+              <p className="text-xl text-indigo-100 mb-6">
+                Schedule a free consultation with our concierge team to discuss your needs and discover how we can help.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button size="lg" className="bg-white text-indigo-700 hover:bg-indigo-50">
+                  Schedule My Concierge Call
+                </Button>
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                  Book Urgent Care Now
+                </Button>
+              </div>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg shadow-lg">
+              <h3 className="text-xl font-semibold mb-4">Quick Intake Form</h3>
+              <form className="space-y-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium mb-1">Full Name</label>
+                  <Input id="name" placeholder="Your name" className="bg-white/20 border-white/30 text-white placeholder:text-white/60" />
+                </div>
+                
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium mb-1">Email Address</label>
+                  <Input id="email" type="email" placeholder="your@email.com" className="bg-white/20 border-white/30 text-white placeholder:text-white/60" />
+                </div>
+                
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium mb-1">Phone Number</label>
+                  <Input id="phone" placeholder="(555) 123-4567" className="bg-white/20 border-white/30 text-white placeholder:text-white/60" />
+                </div>
+                
+                <div>
+                  <label htmlFor="zip" className="block text-sm font-medium mb-1">Zip Code</label>
+                  <Input id="zip" placeholder="90210" className="bg-white/20 border-white/30 text-white placeholder:text-white/60" />
+                </div>
+                
+                <div>
+                  <label htmlFor="service" className="block text-sm font-medium mb-1">Service Needed</label>
+                  <select id="service" className="w-full rounded-md bg-white/20 border-white/30 text-white p-2">
+                    <option value="">Select a service</option>
+                    <option value="in-home-care">In-Home Care</option>
+                    <option value="iv-therapy">IV Therapy</option>
+                    <option value="hospice">Hospice Care</option>
+                    <option value="placement">Assisted Living Placement</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label htmlFor="urgency" className="block text-sm font-medium mb-1">Urgency</label>
+                  <select id="urgency" className="w-full rounded-md bg-white/20 border-white/30 text-white p-2">
+                    <option value="">Select urgency</option>
+                    <option value="urgent">Urgent (24-48 hours)</option>
+                    <option value="soon">Soon (This week)</option>
+                    <option value="planning">Planning (Within a month)</option>
+                  </select>
+                </div>
+                
+                <Button type="submit" className="w-full bg-white text-indigo-700 hover:bg-indigo-50">
+                  Submit Request
+                </Button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Enhanced Footer */}
+      <section className="bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="col-span-1 md:col-span-2">
+              <div className="flex items-center mb-4">
+                <div className="bg-white text-indigo-600 font-bold text-xl px-3 py-1 rounded mr-2">VH</div>
+                <span className="text-xl font-bold">Vitale Health Concierge</span>
+              </div>
+              <p className="text-gray-400 mb-6">
+                Premium healthcare services delivered with compassion and expertise. Serving families across California and Texas.
+              </p>
+              <div className="flex gap-4">
+                <Button variant="outline" size="sm" className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  <span>1-800-VITALE</span>
+                </Button>
+                <Button variant="outline" size="sm" className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  <span>Text Us</span>
+                </Button>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Services</h3>
+              <ul className="space-y-2">
+                <li><Link to="/services/in-home-care" className="text-gray-400 hover:text-white">In-Home Care</Link></li>
+                <li><Link to="/services/iv-therapy" className="text-gray-400 hover:text-white">IV Therapy</Link></li>
+                <li><Link to="/services/hospice" className="text-gray-400 hover:text-white">Hospice Care</Link></li>
+                <li><Link to="/services/placements" className="text-gray-400 hover:text-white">Assisted Living Placements</Link></li>
+                <li><Link to="/services/wellness" className="text-gray-400 hover:text-white">Wellness Programs</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Company</h3>
+              <ul className="space-y-2">
+                <li><Link to="/about" className="text-gray-400 hover:text-white">About Us</Link></li>
+                <li><Link to="/blog" className="text-gray-400 hover:text-white">Blog</Link></li>
+                <li><Link to="/careers" className="text-gray-400 hover:text-white">Careers</Link></li>
+                <li><Link to="/contact" className="text-gray-400 hover:text-white">Contact</Link></li>
+                <li><Link to="/partners" className="text-gray-400 hover:text-white">For Providers</Link></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p className="text-sm text-gray-500">© 2025 Vitale Health Concierge. All rights reserved.</p>
+            <div className="flex gap-6 mt-4 md:mt-0">
+              <Link to="/privacy" className="text-sm text-gray-500 hover:text-gray-400">Privacy Policy</Link>
+              <Link to="/terms" className="text-sm text-gray-500 hover:text-gray-400">Terms of Service</Link>
+              <Link to="/accessibility" className="text-sm text-gray-500 hover:text-gray-400">Accessibility</Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </MainLayout>
   );
 };
