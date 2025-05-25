@@ -639,7 +639,7 @@ const Placements = () => {
             <div className="text-center mb-10">
               <h2 className="text-2xl font-bold text-gray-900">How Our Placement Service Works</h2>
               <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-                Unlike traditional agencies, Vitale offers families concierge placement options with the power of perks, speed, and advocacy. We only work with trusted homes and ensure you get the best care—and we get paid only when we've earned it.
+                Unlike traditional agencies, Vitalé offers families concierge placement options with the power of perks, speed, and advocacy. We only work with trusted homes and ensure you get the best care—and we get paid only when we've earned it.
               </p>
             </div>
             
@@ -660,7 +660,7 @@ const Placements = () => {
                 </div>
                 <h3 className="text-lg font-semibold mb-3 mt-2">We Match & Advocate</h3>
                 <p className="text-gray-600">
-                  Our team matches your needs with trusted facilities and advocates for the best possible care and pricing.
+                  Our team matches your needs with trusted communities and advocates for the best possible care and pricing.
                 </p>
               </div>
               
