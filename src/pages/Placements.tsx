@@ -410,7 +410,7 @@ const Placements = () => {
           <div className="mb-8 bg-indigo-50 border border-indigo-100 p-6 rounded-lg">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div>
-                <h2 className="text-2xl font-bold text-indigo-900 mb-2">Need Help Finding the Perfect Facility?</h2>
+                <h2 className="text-2xl font-bold text-indigo-900 mb-2">Need Help Finding the Perfect Community?</h2>
                 <p className="text-indigo-700">
                   Our concierge placement service matches your loved one with the ideal care facility based on their unique needs.
                 </p>
