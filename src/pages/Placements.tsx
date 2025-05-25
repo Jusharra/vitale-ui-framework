@@ -440,8 +440,8 @@ const Placements = () => {
           {/* Tabs for Featured vs All Facilities */}
           <Tabs defaultValue="all" className="mb-8">
             <TabsList className="grid w-full grid-cols-2 max-w-md">
-              <TabsTrigger value="all">All Facilities</TabsTrigger>
-              <TabsTrigger value="featured">Featured Facilities</TabsTrigger>
+              <TabsTrigger value="all">All Communities</TabsTrigger>
+              <TabsTrigger value="featured">Featured Communities</TabsTrigger>
             </TabsList>
             
             <TabsContent value="all" className="mt-6">
