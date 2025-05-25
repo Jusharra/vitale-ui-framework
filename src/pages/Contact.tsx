@@ -91,7 +91,7 @@ const Contact = () => {
                     </div>
                     <div className="ml-3">
                       <p className="text-sm font-medium text-gray-900">Phone</p>
-                      <p className="mt-1 text-sm text-gray-600">+1 (800) VITALE-HEALTH</p>
+                      <p className="mt-1 text-sm text-gray-600">+1 (661) 489-8106</p>
                       <p className="mt-1 text-sm text-gray-500">Mon-Fri from 8am to 8pm</p>
                     </div>
                   </div>
