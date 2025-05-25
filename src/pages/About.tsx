@@ -12,7 +12,7 @@ const About = () => {
               Revolutionizing Healthcare Access
             </p>
             <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-              Vitale Health Concierge is dedicated to making premium healthcare accessible, personalized, and convenient.
+            Vitalé Health Concierge is dedicated to making premium healthcare accessible, personalized, and convenient.
             </p>
           </div>
 
