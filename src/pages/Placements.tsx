@@ -520,7 +520,7 @@ const Placements = () => {
               ) : (
                 <Card>
                   <CardContent className="text-center py-12">
-                    <p className="text-gray-600">No facilities found matching your criteria.</p>
+                    <p className="text-gray-600">No communities found matching your criteria.</p>
                     <Button className="mt-4" onClick={() => {
                       setSearchQuery('');
                       setCareType('all');
