@@ -412,7 +412,7 @@ const Placements = () => {
               <div>
                 <h2 className="text-2xl font-bold text-indigo-900 mb-2">Need Help Finding the Perfect Community?</h2>
                 <p className="text-indigo-700">
-                  Our concierge placement service matches your loved one with the ideal care facility based on their unique needs.
+                  Our concierge placement service matches your loved one with the ideal care community based on their unique needs.
                 </p>
                 <div className="mt-4 space-y-2">
                   <div className="flex items-center">
@@ -425,7 +425,7 @@ const Placements = () => {
                   </div>
                   <div className="flex items-center">
                     <CheckCircle className="h-5 w-5 text-indigo-600 mr-2" />
-                    <span className="text-indigo-800">Personalized matching with trusted facilities</span>
+                    <span className="text-indigo-800">Personalized matching with trusted communities</span>
                   </div>
                 </div>
               </div>
