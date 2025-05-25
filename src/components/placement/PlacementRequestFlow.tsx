@@ -9,7 +9,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+  DialogClose
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -18,14 +19,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -39,11 +40,11 @@ const placementRequestSchema = z.object({
   }),
   
   // Step 2: Intake Form
-  fullName: z.string().min(2, { message: "Full name is required" }),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, { message: "Phone number is required" }),
-  careNeeds: z.string().min(5, { message: "Please describe care needs" }),
-  location: z.string().min(2, { message: "Location is required" }),
+  fullName: z.string().min(2, { message: "Full name is required" }).optional(),
+  email: z.string().email("Invalid email address").optional(),
+  phone: z.string().min(10, { message: "Phone number is required" }).optional(),
+  careNeeds: z.string().min(5, { message: "Please describe care needs" }).optional(),
+  location: z.string().min(2, { message: "Location is required" }).optional(),
   notes: z.string().optional(),
 });
 
@@ -81,6 +82,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
       location: "",
       notes: "",
     },
+    mode: "onChange"
   });
   
   // Watch the urgency field to determine if payment is needed
@@ -225,7 +227,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
       case 1:
         return (
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form id="urgency-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="urgency"
@@ -309,7 +311,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
       case 2:
         return (
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form id="intake-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
