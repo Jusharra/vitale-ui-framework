@@ -692,14 +692,14 @@ const Placements = () => {
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <h3 className="text-lg font-semibold mb-2">How does your placement fee work?</h3>
                 <p className="text-gray-600">
-                  Our standard placement service has no upfront fee for families. We're paid by the facility after a successful placement. For expedited service, a $497 concierge deposit unlocks priority matching and additional benefits.
+                  Our standard placement service has no upfront fee for families. We're paid by the community after a successful placement. For expedited service, a $497 concierge deposit unlocks priority matching and additional benefits.
                 </p>
               </div>
               
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <h3 className="text-lg font-semibold mb-2">How long does the placement process take?</h3>
                 <p className="text-gray-600">
-                  Standard placements typically take 72-96 hours from initial request to facility recommendations. Our expedited concierge service provides matches within 24-48 hours for urgent situations.
+                  Standard placements typically take 72-96 hours from initial request to community recommendations. Our expedited concierge service provides matches within 24-48 hours for urgent situations.
                 </p>
               </div>
               
@@ -713,7 +713,7 @@ const Placements = () => {
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <h3 className="text-lg font-semibold mb-2">What types of facilities do you work with?</h3>
                 <p className="text-gray-600">
-                  We partner with a wide range of senior living options including memory care, assisted living, independent living, skilled nursing facilities, and hospice care providers.
+                  We partner with a wide range of senior living options, including memory care, assisted living, independent living, skilled nursing communities, and hospice care providers.
                 </p>
               </div>
             </div>
