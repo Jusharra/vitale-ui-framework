@@ -11,17 +11,17 @@ const Footer: React.FC = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center mb-4">
               <div className="bg-white text-indigo-600 font-bold text-xl px-3 py-1 rounded mr-2">VH</div>
-              <span className="text-xl font-bold">Vitale Health Concierge</span>
+              <span className="text-xl font-bold">Vitalé Health Concierge</span>
             </div>
             <p className="text-gray-400 mb-6">
               Premium healthcare services delivered with compassion and expertise. Serving families across California and Texas.
             </p>
             <div className="flex gap-4">
-              <Button variant="outline" size="sm" className="flex items-center gap-2 text-white border-gray-600 hover:bg-gray-800">
+              <Button variant="outline" size="sm" className="flex items-center gap-2 text-indigo-700 border-gray-600 hover:bg-indigo-50">
                 <Phone className="h-4 w-4" />
-                <span>1-800-VITALE</span>
+                <span>Call Us</span>
               </Button>
-              <Button variant="outline" size="sm" className="flex items-center gap-2 text-white border-gray-600 hover:bg-gray-800">
+              <Button variant="outline" size="sm" className="flex items-center gap-2 text-indigo-700 border-gray-600 hover:bg-indigo-50">
                 <MessageSquare className="h-4 w-4" />
                 <span>Text Us</span>
               </Button>
@@ -34,7 +34,7 @@ const Footer: React.FC = () => {
               <li><Link to="/services/in-home-care" className="text-gray-400 hover:text-white">In-Home Care</Link></li>
               <li><Link to="/services/iv-therapy" className="text-gray-400 hover:text-white">IV Therapy</Link></li>
               <li><Link to="/services/hospice" className="text-gray-400 hover:text-white">Hospice Care</Link></li>
-              <li><Link to="/placements" className="text-gray-400 hover:text-white">Assisted Living Placements</Link></li>
+              <li><Link to="/placements" className="text-gray-400 hover:text-white">Assisted Living Communities</Link></li>
               <li><Link to="/services/wellness" className="text-gray-400 hover:text-white">Wellness Programs</Link></li>
             </ul>
           </div>
@@ -52,7 +52,7 @@ const Footer: React.FC = () => {
         </div>
         
         <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-gray-500">© {new Date().getFullYear()} Vitale Health Concierge. All rights reserved.</p>
+          <p className="text-sm text-gray-500">© {new Date().getFullYear()} Vitalé Health Concierge. All rights reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
             <Link to="/privacy" className="text-sm text-gray-500 hover:text-gray-400">Privacy Policy</Link>
             <Link to="/terms" className="text-sm text-gray-500 hover:text-gray-400">Terms of Service</Link>
