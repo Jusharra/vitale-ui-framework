@@ -9,7 +9,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogClose
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -30,7 +29,7 @@ import { Badge } from "@/components/ui/badge";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { CheckCircle, AlertTriangle, ArrowRight, CreditCard, Loader2 } from 'lucide-react';
+import { CheckCircle, ArrowRight, CreditCard, Loader2, CheckCircle2 } from 'lucide-react';
 
 // Schema for placement request form
 const placementRequestSchema = z.object({
@@ -203,6 +202,54 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
     setIsComplete(false);
     onOpenChange(false);
   };
+
+  // Render progress steps
+  const renderProgressSteps = () => {
+    return (
+      <div className="relative mb-8">
+        {/* Progress bar background */}
+        <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -translate-y-1/2"></div>
+        
+        {/* Progress bar fill */}
+        <div 
+          className="absolute top-1/2 left-0 h-1 bg-primary -translate-y-1/2 transition-all duration-300"
+          style={{ width: `${((step - 1) / (isExpedited ? 2 : 1)) * 100}%` }}
+        ></div>
+        
+        {/* Step circles */}
+        <div className="relative flex justify-between">
+          <div className="flex flex-col items-center">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${
+              step >= 1 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
+            }`}>
+              {step > 1 ? <CheckCircle2 className="h-5 w-5" /> : 1}
+            </div>
+            <span className="text-xs mt-2">Urgency</span>
+          </div>
+          
+          <div className="flex flex-col items-center">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${
+              step >= 2 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
+            }`}>
+              {step > 2 ? <CheckCircle2 className="h-5 w-5" /> : 2}
+            </div>
+            <span className="text-xs mt-2">Details</span>
+          </div>
+          
+          {isExpedited && (
+            <div className="flex flex-col items-center">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${
+                step >= 3 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
+              }`}>
+                {step > 3 ? <CheckCircle2 className="h-5 w-5" /> : 3}
+              </div>
+              <span className="text-xs mt-2">Payment</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
   
   // Render step content
   const renderStepContent = () => {
@@ -243,7 +290,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
                         defaultValue={field.value}
                         className="space-y-4"
                       >
-                        <div className="flex items-start space-x-2 border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                        <div className={`flex items-start space-x-2 border rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors ${field.value === 'standard' ? 'border-primary bg-primary/5' : ''}`}>
                           <RadioGroupItem value="standard" id="standard" className="mt-1" />
                           <div className="grid gap-1.5">
                             <Label htmlFor="standard" className="font-medium flex items-center">
@@ -256,7 +303,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
                           </div>
                         </div>
                         
-                        <div className="flex items-start space-x-2 border rounded-lg p-4 hover:bg-gray-50 cursor-pointer border-indigo-200 bg-indigo-50/50">
+                        <div className={`flex items-start space-x-2 border rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors ${field.value === 'expedited' ? 'border-primary bg-primary/5' : ''}`}>
                           <RadioGroupItem value="expedited" id="expedited" className="mt-1" />
                           <div className="grid gap-1.5">
                             <Label htmlFor="expedited" className="font-medium flex items-center">
@@ -299,9 +346,9 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
               />
               
               <div className="pt-4 flex justify-end">
-                <Button type="submit">
+                <Button type="submit" className="group">
                   Continue
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
             </form>
@@ -420,7 +467,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
                 <Button type="button" variant="outline" onClick={() => setStep(1)}>
                   Back
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting} className="group">
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -429,7 +476,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
                   ) : isExpedited ? (
                     <>
                       Continue to Payment
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </>
                   ) : (
                     "Submit Request"
@@ -443,23 +490,23 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
       case 3:
         return (
           <div className="space-y-6">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-medium text-lg mb-2">Placement Request Summary</h3>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <h3 className="font-medium text-lg mb-4">Placement Request Summary</h3>
+              <div className="grid grid-cols-2 gap-y-3">
                 <div className="text-gray-500">Name:</div>
-                <div>{form.getValues("fullName")}</div>
+                <div className="font-medium">{form.getValues("fullName")}</div>
                 
                 <div className="text-gray-500">Email:</div>
-                <div>{form.getValues("email")}</div>
+                <div className="font-medium">{form.getValues("email")}</div>
                 
                 <div className="text-gray-500">Phone:</div>
-                <div>{form.getValues("phone")}</div>
+                <div className="font-medium">{form.getValues("phone")}</div>
                 
                 <div className="text-gray-500">Location:</div>
-                <div>{form.getValues("location")}</div>
+                <div className="font-medium">{form.getValues("location")}</div>
                 
                 <div className="text-gray-500">Care Needs:</div>
-                <div>{form.getValues("careNeeds")}</div>
+                <div className="font-medium">{form.getValues("careNeeds")}</div>
                 
                 <div className="text-gray-500">Urgency:</div>
                 <div className="flex items-center">
@@ -468,67 +515,61 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
               </div>
             </div>
             
-            <div className="border rounded-lg p-4">
-              <h3 className="font-medium text-lg mb-2">Payment Details</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Your $497 concierge deposit unlocks expedited placement services and premium benefits.
-              </p>
+            <div className="border rounded-lg p-6">
+              <h3 className="font-medium text-lg mb-4">Payment Details</h3>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <p className="font-medium text-lg">Concierge Deposit</p>
+                  <p className="text-sm text-gray-500">One-time payment</p>
+                </div>
+                <p className="font-bold text-xl">$497.00</p>
+              </div>
               
-              <div className="bg-indigo-50 p-3 rounded-md mb-4">
+              <div className="bg-indigo-50 p-4 rounded-md mb-6">
                 <p className="text-sm text-indigo-800 font-medium">Concierge Benefits Include:</p>
-                <ul className="text-sm text-indigo-700 mt-1 space-y-1">
+                <ul className="text-sm text-indigo-700 mt-2 space-y-2">
                   <li className="flex items-center">
-                    <CheckCircle className="h-3.5 w-3.5 mr-1.5 text-indigo-600" />
+                    <CheckCircle className="h-4 w-4 mr-2 text-indigo-600" />
                     24-48 hour expedited placement
                   </li>
                   <li className="flex items-center">
-                    <CheckCircle className="h-3.5 w-3.5 mr-1.5 text-indigo-600" />
+                    <CheckCircle className="h-4 w-4 mr-2 text-indigo-600" />
                     Dedicated concierge agent
                   </li>
                   <li className="flex items-center">
-                    <CheckCircle className="h-3.5 w-3.5 mr-1.5 text-indigo-600" />
+                    <CheckCircle className="h-4 w-4 mr-2 text-indigo-600" />
                     Priority facility matching
                   </li>
                   <li className="flex items-center">
-                    <CheckCircle className="h-3.5 w-3.5 mr-1.5 text-indigo-600" />
+                    <CheckCircle className="h-4 w-4 mr-2 text-indigo-600" />
                     Exclusive perks package
                   </li>
                 </ul>
               </div>
               
-              <div className="border-t pt-4 flex justify-between items-center">
-                <div>
-                  <p className="font-medium">Concierge Deposit</p>
-                  <p className="text-sm text-gray-500">One-time payment</p>
-                </div>
-                <p className="font-bold text-lg">$497.00</p>
-              </div>
-              
-              <div className="mt-6">
-                <Button 
-                  className="w-full flex items-center justify-center" 
-                  onClick={() => form.handleSubmit(onSubmit)()}
-                  disabled={isPaymentProcessing}
-                >
-                  {isPaymentProcessing ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing Payment...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      Pay $497 & Submit Request
-                    </>
-                  )}
-                </Button>
-                <p className="text-xs text-center text-gray-500 mt-2">
-                  Secure payment processed by Stripe
-                </p>
-              </div>
+              <Button 
+                className="w-full flex items-center justify-center" 
+                onClick={() => form.handleSubmit(onSubmit)()}
+                disabled={isPaymentProcessing}
+              >
+                {isPaymentProcessing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing Payment...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Complete Payment & Submit Request
+                  </>
+                )}
+              </Button>
+              <p className="text-xs text-center text-gray-500 mt-2">
+                Secure payment processed by Stripe
+              </p>
             </div>
             
-            <div className="pt-4 flex justify-between">
+            <div className="flex justify-between">
               <Button type="button" variant="outline" onClick={() => setStep(2)} disabled={isPaymentProcessing}>
                 Back
               </Button>
@@ -543,16 +584,12 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isComplete 
               ? "Request Submitted" 
-              : step === 1 
-                ? "Request Placement" 
-                : step === 2 
-                  ? "Placement Details" 
-                  : "Complete Payment"}
+              : "Request Placement"}
           </DialogTitle>
           <DialogDescription>
             {isComplete 
@@ -563,40 +600,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
           </DialogDescription>
         </DialogHeader>
         
-        {!isComplete && (
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                step >= 1 ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-500"
-              }`}>
-                1
-              </div>
-              <div className={`h-1 w-12 ${
-                step > 1 ? "bg-indigo-600" : "bg-gray-200"
-              }`}></div>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                step >= 2 ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-500"
-              }`}>
-                2
-              </div>
-              {isExpedited && (
-                <>
-                  <div className={`h-1 w-12 ${
-                    step > 2 ? "bg-indigo-600" : "bg-gray-200"
-                  }`}></div>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    step >= 3 ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-500"
-                  }`}>
-                    3
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="text-sm text-gray-500">
-              Step {step} of {isExpedited ? 3 : 2}
-            </div>
-          </div>
-        )}
+        {!isComplete && renderProgressSteps()}
         
         {renderStepContent()}
       </DialogContent>
