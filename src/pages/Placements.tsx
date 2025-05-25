@@ -273,7 +273,7 @@ const Placements = () => {
               Assisted Living & Care Communities
             </h1>
             <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-              Find the perfect care facility for your loved one with our concierge placement service.
+              Find the perfect care community for your loved one with our concierge placement service.
             </p>
           </div>
 
