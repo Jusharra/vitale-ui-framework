@@ -670,7 +670,7 @@ const Placements = () => {
                 </div>
                 <h3 className="text-lg font-semibold mb-3 mt-2">Seamless Transition</h3>
                 <p className="text-gray-600">
-                  We coordinate tours, handle paperwork, and ensure a smooth transition to the selected facility.
+                  We coordinate tours, handle paperwork, and ensure a smooth transition to the selected community.
                 </p>
               </div>
             </div>
