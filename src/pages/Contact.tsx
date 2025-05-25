@@ -116,8 +116,8 @@ const Contact = () => {
                     </div>
                     <div className="ml-3">
                       <p className="text-sm font-medium text-gray-900">Office</p>
-                      <p className="mt-1 text-sm text-gray-600">123 Health Avenue</p>
-                      <p className="mt-1 text-sm text-gray-600">San Francisco, CA 94103</p>
+                      <p className="mt-1 text-sm text-gray-600">6077 Coffee Rd Ste 4 #1129</p>
+                      <p className="mt-1 text-sm text-gray-600">Bakersfield, CA 94103</p>
                       <p className="mt-1 text-sm text-gray-500">Mon-Fri from 9am to 5pm</p>
                     </div>
                   </div>
