@@ -103,7 +103,7 @@ const Contact = () => {
                     </div>
                     <div className="ml-3">
                       <p className="text-sm font-medium text-gray-900">Email</p>
-                      <p className="mt-1 text-sm text-gray-600">support@vitalehealth.com</p>
+                      <p className="mt-1 text-sm text-gray-600">vitalehealthconcierge@gmail.com</p>
                       <p className="mt-1 text-sm text-gray-500">We aim to respond within 24 hours</p>
                     </div>
                   </div>
