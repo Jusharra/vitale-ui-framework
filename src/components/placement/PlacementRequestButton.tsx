@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, ButtonProps } from '@/components/ui/button';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog';
-import PlacementRequestFlow from './PlacementRequestFlow';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import SimplePlacementForm from './SimplePlacementForm';
 
 interface PlacementRequestButtonProps extends ButtonProps {
   facilityId?: string;
@@ -34,12 +34,18 @@ const PlacementRequestButton: React.FC<PlacementRequestButtonProps> = ({
         </Button>
       </DialogTrigger>
       
-      <PlacementRequestFlow
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        facilityId={facilityId}
-        facilityName={facilityName}
-      />
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <SimplePlacementForm 
+          facilityId={facilityId}
+          facilityName={facilityName}
+          onSuccess={() => {
+            // Close the dialog after a short delay to allow the success message to be seen
+            setTimeout(() => {
+              setIsDialogOpen(false);
+            }, 3000);
+          }}
+        />
+      </DialogContent>
     </Dialog>
   );
 };
