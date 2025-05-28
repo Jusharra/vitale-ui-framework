@@ -3,11 +3,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { MapPin, Phone, Mail, Clock, CheckCircle, Info, MessageSquare, Video } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, CheckCircle, Info, MessageSquare, Video, Calendar } from 'lucide-react';
 import PlacementRequestButton from './PlacementRequestButton';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
+import ScheduleTourModal from './ScheduleTourModal';
 
 interface FacilityDetailCardProps {
   facility: {
@@ -35,6 +36,7 @@ const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => 
   const imageUrls = facility.images || (facility.image_url ? [facility.image_url] : []);
   const { toast } = useToast();
   const [messageText, setMessageText] = useState('');
+  const [isTourModalOpen, setIsTourModalOpen] = useState(false);
   
   // If no images are available, use a placeholder
   if (imageUrls.length === 0) {
@@ -81,50 +83,44 @@ const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => 
   };
 
   return (
-    <Card className="overflow-hidden">
-      <div className="relative">
-        <Carousel className="w-full">
-          <CarouselContent>
-            {imageUrls.map((url, index) => (
-              <CarouselItem key={index}>
-                <div className="h-64 w-full">
-                  <img 
-                    src={url} 
-                    alt={`${facility.name} - Image ${index + 1}`} 
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="left-2" />
-          <CarouselNext className="right-2" />
-        </Carousel>
-        
-        {facility.featured && (
-          <Badge className="absolute top-4 right-4 bg-indigo-600">
-            Featured
-          </Badge>
-        )}
-      </div>
-      
+    <Card>
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="text-2xl">{facility.name}</CardTitle>
-            <CardDescription className="flex items-center mt-1">
-              <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
-              {facility.location}
+            <CardTitle>{facility.name}</CardTitle>
+            <CardDescription>
+              <div className="flex items-center mt-1">
+                <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
+                {facility.location}
+              </div>
             </CardDescription>
           </div>
-          <Badge variant="outline" className="text-sm">
-            {facility.care_type}
-          </Badge>
+          <Badge variant="outline">{facility.care_type}</Badge>
         </div>
       </CardHeader>
-      
       <CardContent className="space-y-6">
+        <div className="relative">
+          <Carousel className="w-full">
+            <CarouselContent>
+              {imageUrls.map((url, index) => (
+                <CarouselItem key={index}>
+                  <div className="h-64 w-full">
+                    <img 
+                      src={url} 
+                      alt={`${facility.name} - Image ${index + 1}`} 
+                      className="h-full w-full object-cover rounded-lg"
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="left-2" />
+            <CarouselNext className="right-2" />
+          </Carousel>
+        </div>
+
         <div>
+          <h3 className="text-lg font-semibold mb-2">About {facility.name}</h3>
           <p className="text-gray-700">{facility.description}</p>
         </div>
         
@@ -195,7 +191,6 @@ const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => 
           </div>
         </div>
       </CardContent>
-      
       <CardFooter className="flex flex-wrap gap-2 justify-between">
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={handleCallFacility}>
@@ -235,6 +230,11 @@ const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => 
             <Video className="h-4 w-4 mr-2" />
             Virtual Tour
           </Button>
+
+          <Button variant="outline" onClick={() => setIsTourModalOpen(true)}>
+            <Calendar className="h-4 w-4 mr-2" />
+            Schedule Tour
+          </Button>
         </div>
         
         <PlacementRequestButton 
@@ -242,6 +242,12 @@ const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => 
           facilityName={facility.name}
         />
       </CardFooter>
+
+      <ScheduleTourModal 
+        isOpen={isTourModalOpen}
+        onClose={() => setIsTourModalOpen(false)}
+        facility={facility}
+      />
     </Card>
   );
 };
