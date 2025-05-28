@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, ButtonProps } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import SimplePlacementForm from './SimplePlacementForm';
 
 interface PlacementRequestButtonProps extends ButtonProps {
@@ -35,6 +35,9 @@ const PlacementRequestButton: React.FC<PlacementRequestButtonProps> = ({
       </DialogTrigger>
       
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Request Placement</DialogTitle>
+        </DialogHeader>
         <SimplePlacementForm 
           facilityId={facilityId}
           facilityName={facilityName}
