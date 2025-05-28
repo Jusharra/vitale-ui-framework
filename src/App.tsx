@@ -88,7 +88,7 @@ const DashboardRouter = () => {
   
   // Route based on user role
   if (userRole === 'admin') {
-    return <Navigate to="/dashboard/admin" replace />;
+    return <Navigate to="/dashboard/admin\" replace />;
   } else if (userRole === 'professional' || userRole === 'partner') {
     return <Navigate to="/dashboard/professional" replace />;
   } else {
