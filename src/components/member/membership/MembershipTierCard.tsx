@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { CircleCheck, CircleX } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import MembershipBadge from '@/components/common/MembershipBadge';
-import StripeCheckout from '@/components/payments/StripeCheckout';
+import StripeSubscriptionButton from '@/components/payments/StripeSubscriptionButton';
 import { MembershipTier } from '@/types/auth';
 
 export interface MembershipTierData {
@@ -90,10 +89,11 @@ const MembershipTierCard: React.FC<MembershipTierCardProps> = ({
             <span>Current Plan</span>
           </Button>
         ) : (
-          <StripeCheckout 
+          <StripeSubscriptionButton 
             tier={tier.id}
             buttonText={hasSubscription ? "Switch to" : "Upgrade to"}
             variant={tier.id === "core" || tier.id === "vip" ? "default" : "outline"}
+            className="w-full"
           />
         )}
       </CardFooter>

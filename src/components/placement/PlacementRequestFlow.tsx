@@ -29,7 +29,8 @@ import { Badge } from "@/components/ui/badge";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { CheckCircle, ArrowRight, CreditCard, Loader2, CheckCircle2 } from 'lucide-react';
+import { CheckCircle, ArrowRight, PiggyBank, Users, Activity } from 'lucide-react';
+import StripeCheckoutButton from '@/components/payments/StripeCheckoutButton';
 
 // Schema for placement request form
 const placementRequestSchema = z.object({
@@ -108,11 +109,6 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
         await submitPlacementRequest(values);
       }
     }
-    
-    if (step === 3) {
-      // Process payment and submit form
-      await processPaymentAndSubmit(values);
-    }
   };
   
   // Submit placement request to database
@@ -168,30 +164,10 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
     }
   };
   
-  // Process payment with Stripe and submit form
-  const processPaymentAndSubmit = async (values: PlacementRequestFormValues) => {
-    setIsPaymentProcessing(true);
-    
-    try {
-      // In a real implementation, this would call a Supabase Edge Function to create a Stripe Checkout session
-      // For now, we'll simulate a successful payment
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // After successful payment, submit the placement request
-      await submitPlacementRequest(values);
-      
-    } catch (error: any) {
-      console.error("Error processing payment:", error);
-      toast({
-        title: "Payment Error",
-        description: "There was a problem processing your payment. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsPaymentProcessing(false);
-    }
+  // Handle payment success
+  const handlePaymentSuccess = async () => {
+    const values = form.getValues();
+    await submitPlacementRequest(values);
   };
   
   // Handle dialog close
@@ -222,7 +198,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
             <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${
               step >= 1 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
             }`}>
-              {step > 1 ? <CheckCircle2 className="h-5 w-5" /> : 1}
+              {step > 1 ? <CheckCircle className="h-5 w-5" /> : 1}
             </div>
             <span className="text-xs mt-2">Urgency</span>
           </div>
@@ -231,7 +207,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
             <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${
               step >= 2 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
             }`}>
-              {step > 2 ? <CheckCircle2 className="h-5 w-5" /> : 2}
+              {step > 2 ? <CheckCircle className="h-5 w-5" /> : 2}
             </div>
             <span className="text-xs mt-2">Details</span>
           </div>
@@ -241,7 +217,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
               <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${
                 step >= 3 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
               }`}>
-                {step > 3 ? <CheckCircle2 className="h-5 w-5" /> : 3}
+                {step > 3 ? <CheckCircle className="h-5 w-5" /> : 3}
               </div>
               <span className="text-xs mt-2">Payment</span>
             </div>
@@ -470,7 +446,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
                 <Button type="submit" disabled={isSubmitting} className="group">
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Activity className="mr-2 h-4 w-4 animate-spin" />
                       Submitting...
                     </>
                   ) : isExpedited ? (
@@ -547,23 +523,13 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
                 </ul>
               </div>
               
-              <Button 
-                className="w-full flex items-center justify-center" 
-                onClick={() => form.handleSubmit(onSubmit)()}
-                disabled={isPaymentProcessing}
-              >
-                {isPaymentProcessing ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Processing Payment...
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    Complete Payment & Submit Request
-                  </>
-                )}
-              </Button>
+              <StripeCheckoutButton 
+                amount={49700} 
+                description="Expedited Placement Concierge Deposit"
+                buttonText="Complete Payment & Submit Request"
+                className="w-full"
+                onSuccess={handlePaymentSuccess}
+              />
               <p className="text-xs text-center text-gray-500 mt-2">
                 Secure payment processed by Stripe
               </p>

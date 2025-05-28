@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import Stripe from "https://esm.sh/stripe@14.21.0";
@@ -43,7 +42,7 @@ serve(async (req) => {
     }
 
     // Parse request body
-    const { tier, interval, price, trial = false } = await req.json();
+    const { amount, description, tier, interval = "monthly" } = await req.json();
     
     // Initialize Stripe
     const stripe = new Stripe(stripeKey, {
@@ -53,14 +52,10 @@ serve(async (req) => {
     // Check if customer already exists
     let customerId;
     const { data: userData } = await supabase
-      .from("users")
-      .select("stripe_customer_id, trial_status, trial_end_date")
+      .from("profiles")
+      .select("stripe_customer_id")
       .eq("id", user.id)
       .single();
-      
-    const isInTrial = userData?.trial_status === 'active' && 
-                      userData?.trial_end_date && 
-                      new Date(userData.trial_end_date) > new Date();
       
     if (userData?.stripe_customer_id) {
       customerId = userData.stripe_customer_id;
@@ -76,63 +71,85 @@ serve(async (req) => {
       
       // Update user record with Stripe customer ID
       await supabase
-        .from("users")
+        .from("profiles")
         .update({ stripe_customer_id: customer.id })
         .eq("id", user.id);
     }
 
-    // Define product names based on tier
-    const productNames = {
-      smart: "Smart Access Membership",
-      core: "Core Concierge Membership",
-      vip: "VIP Executive Membership"
-    };
+    // Create Stripe checkout session based on whether it's a subscription or one-time payment
+    let session;
+    
+    if (tier) {
+      // Subscription checkout
+      const productNames = {
+        smart: "Smart Access Membership",
+        core: "Core Concierge Membership",
+        vip: "VIP Executive Membership"
+      };
 
-    // Create pricing info based on tier and interval
-    const priceData = {
-      currency: "usd",
-      unit_amount: price * 100, // Convert to cents
-      recurring: {
-        interval: interval === "yearly" ? "year" : "month",
-      },
-      product_data: {
-        name: productNames[tier as keyof typeof productNames],
-        metadata: {
-          tier,
+      // Create pricing info based on tier and interval
+      const priceData = {
+        currency: "usd",
+        unit_amount: amount || 19700, // Default to $197.00 if no amount provided
+        recurring: {
+          interval: interval === "yearly" ? "year" : "month",
         },
-      },
-    };
-
-    // Set up subscription trial if user is eligible
-    const trialPeriodDays = (isInTrial && trial) ? 14 : undefined;
-    const trialEnd = userData?.trial_end_date ? new Date(userData.trial_end_date).getTime() / 1000 : undefined;
-
-    // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price_data: priceData,
-          quantity: 1,
+        product_data: {
+          name: "Premium Membership",
+          metadata: {
+            tier,
+          },
         },
-      ],
-      mode: "subscription",
-      success_url: `${req.headers.get("Origin") || "https://vitalehealth.app"}/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("Origin") || "https://vitalehealth.app"}/dashboard/membership`,
-      subscription_data: {
+      };
+
+      session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price_data: priceData,
+            quantity: 1,
+          },
+        ],
+        mode: "subscription",
+        success_url: `${req.headers.get("Origin") || "https://vitalehealthconcierge.doctor"}/dashboard/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.headers.get("Origin") || "https://vitalehealthconcierge.doctor"}/dashboard/membership`,
+        subscription_data: {
+          metadata: {
+            user_id: user.id,
+            tier,
+          },
+        },
         metadata: {
           user_id: user.id,
           tier,
         },
-        trial_period_days: trialPeriodDays,
-        trial_end: trialEnd,
-      },
-      metadata: {
-        user_id: user.id,
-        tier,
-      },
-    });
+      });
+    } else {
+      // One-time payment checkout
+      session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: description || "Payment",
+              },
+              unit_amount: amount,
+            },
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        success_url: `${req.headers.get("Origin") || "https://vitalehealthconcierge.doctor"}/dashboard/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.headers.get("Origin") || "https://vitalehealthconcierge.doctor"}/dashboard`,
+        metadata: {
+          user_id: user.id,
+        },
+      });
+    }
 
     // Return the checkout URL
     return new Response(JSON.stringify({ url: session.url }), {

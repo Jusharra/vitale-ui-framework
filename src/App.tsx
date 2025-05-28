@@ -41,6 +41,7 @@ import HealthToolsPage from '@/pages/member/HealthTools';
 import AppointmentsPage from '@/pages/member/Appointments';
 import ProfilePage from '@/pages/ProfilePage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import StripeProvider from '@/components/payments/StripeProvider';
 
 // Blog pages
 import BlogIndex from '@/pages/blog/index';
@@ -103,295 +104,297 @@ const App: React.FC = () => {
         <LanguageProvider>
           <AuthProvider>
             <ThemeProvider defaultTheme="light" storageKey="vitale-ui-theme">
-              <Toaster />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/financing" element={<Financing />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/partners" element={<Partners />} />
-                <Route path="/blog" element={<BlogIndex />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/placements" element={<Placements />} />
-                <Route path="/membership" element={<Membership />} />
-                
-                {/* Blog post routes */}
-                <Route path="/blog/iv-therapy-hospice-san-mateo-county" element={<SanMateoCountyBlog />} />
-                <Route path="/blog/iv-therapy-hospice-marin-county" element={<MarinCountyBlog />} />
-                <Route path="/blog/iv-therapy-hospice-orange-county" element={<OrangeCountyBlog />} />
-                <Route path="/blog/iv-therapy-hospice-santa-clara-county" element={<SantaClaraCountyBlog />} />
-                <Route path="/blog/iv-therapy-hospice-collin-county" element={<CollinCountyBlog />} />
-                <Route path="/blog/iv-therapy-hospice-westlake-tarrant-county" element={<WestlakeTarrantCountyBlog />} />
-                <Route path="/blog/iv-therapy-hospice-los-angeles-county" element={<LosAngelesCountyBlog />} />
-                <Route path="/blog/iv-therapy-hospice-williamson-county" element={<WilliamsonCountyBlog />} />
-                <Route path="/blog/iv-therapy-hospice-travis-county" element={<TravisCountyBlog />} />
-                <Route path="/blog/iv-therapy-hospice-montgomery-county" element={<MontgomeryCountyBlog />} />
-                <Route path="/blog/iv-therapy-hospice-contra-costa-county" element={<ContraCostaCountyBlog />} />
-                <Route path="/blog/iv-therapy-hospice-san-diego-county" element={<SanDiegoCountyBlog />} />
-                <Route path="/blog/iv-therapy-hospice-ventura-county" element={<VenturaCountyBlog />} />
-                <Route path="/blog/iv-therapy-hospice-fort-bend-county" element={<FortBendCountyBlog />} />
-                
-                {/* Dashboard router to handle role-based routing */}
-                <Route
-                  path="/dashboard"
-                  element={<DashboardRouter />}
-                />
-                
-                {/* Member routes */}
-                <Route
-                  path="/dashboard/share-and-earn"
-                  element={
-                    <ProtectedRoute>
-                      <ShareAndEarn />
-                    </ProtectedRoute>
-                  }
-                />
-                
-                <Route
-                  path="/dashboard/concierge"
-                  element={
-                    <ProtectedRoute>
-                      <MemberConciergePage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/pharmacy"
-                  element={
-                    <ProtectedRoute>
-                      <MemberPharmacyPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/medical-transport"
-                  element={
-                    <ProtectedRoute>
-                      <MemberMedicalTransportPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/service-booking"
-                  element={
-                    <ProtectedRoute>
-                      <MemberServiceBookingPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/vacations"
-                  element={
-                    <ProtectedRoute>
-                      <MemberVacationsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/health-insights"
-                  element={
-                    <ProtectedRoute>
-                      <MemberHealthInsightsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/messages"
-                  element={
-                    <ProtectedRoute>
-                      <MemberMessagesPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/membership"
-                  element={
-                    <ProtectedRoute>
-                      <MemberMembershipPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/promotions"
-                  element={
-                    <ProtectedRoute>
-                      <MemberPromotionsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/settings"
-                  element={
-                    <ProtectedRoute>
-                      <GlobalSettingsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                
-                <Route
-                  path="/dashboard/health-tools"
-                  element={
-                    <ProtectedRoute>
-                      <HealthToolsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                
-                <Route
-                  path="/dashboard/appointments"
-                  element={
-                    <ProtectedRoute>
-                      <AppointmentsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                
-                {/* Admin routes */}
-                <Route
-                  path="/dashboard/admin"
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/admin/vacations"
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminVacationsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/admin/promotions"
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminPromotionsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/admin/leads"
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminLeadsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/admin/care-teams"
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminCareTeamsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/admin/health-tools"
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminHealthToolsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/admin/settings"
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminSettingsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/admin/blog"
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminBlogPostsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                
-                {/* Professional/Partner routes */}
-                <Route
-                  path="/dashboard/professional"
-                  element={
-                    <ProtectedRoute requiredRole="professional">
-                      <ProfessionalPage />
-                    </ProtectedRoute>
-                  }
-                />
-                
-                {/* Professional sub-routes */}
-                <Route
-                  path="/dashboard/professional/calendar"
-                  element={
-                    <ProtectedRoute requiredRole="professional">
-                      <ProfessionalCalendarPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/professional/earnings"
-                  element={
-                    <ProtectedRoute requiredRole="professional">
-                      <ProfessionalEarningsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/professional/member-manager"
-                  element={
-                    <ProtectedRoute requiredRole="professional">
-                      <ProfessionalMemberManagerPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/professional/message-center"
-                  element={
-                    <ProtectedRoute requiredRole="professional">
-                      <ProfessionalMessageCenterPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/professional/requests"
-                  element={
-                    <ProtectedRoute requiredRole="professional">
-                      <ProfessionalPatientRequestsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/professional/profile"
-                  element={
-                    <ProtectedRoute requiredRole="professional">
-                      <ProfessionalProfileSettingsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/professional/tools"
-                  element={
-                    <ProtectedRoute requiredRole="professional">
-                      <ProfessionalToolsOfTradePage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/professional/analytics"
-                  element={
-                    <ProtectedRoute requiredRole="professional">
-                      <ProfessionalAnalyticsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <StripeProvider>
+                <Toaster />
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/financing" element={<Financing />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/partners" element={<Partners />} />
+                  <Route path="/blog" element={<BlogIndex />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/placements" element={<Placements />} />
+                  <Route path="/membership" element={<Membership />} />
+                  
+                  {/* Blog post routes */}
+                  <Route path="/blog/iv-therapy-hospice-san-mateo-county" element={<SanMateoCountyBlog />} />
+                  <Route path="/blog/iv-therapy-hospice-marin-county" element={<MarinCountyBlog />} />
+                  <Route path="/blog/iv-therapy-hospice-orange-county" element={<OrangeCountyBlog />} />
+                  <Route path="/blog/iv-therapy-hospice-santa-clara-county" element={<SantaClaraCountyBlog />} />
+                  <Route path="/blog/iv-therapy-hospice-collin-county" element={<CollinCountyBlog />} />
+                  <Route path="/blog/iv-therapy-hospice-westlake-tarrant-county" element={<WestlakeTarrantCountyBlog />} />
+                  <Route path="/blog/iv-therapy-hospice-los-angeles-county" element={<LosAngelesCountyBlog />} />
+                  <Route path="/blog/iv-therapy-hospice-williamson-county" element={<WilliamsonCountyBlog />} />
+                  <Route path="/blog/iv-therapy-hospice-travis-county" element={<TravisCountyBlog />} />
+                  <Route path="/blog/iv-therapy-hospice-montgomery-county" element={<MontgomeryCountyBlog />} />
+                  <Route path="/blog/iv-therapy-hospice-contra-costa-county" element={<ContraCostaCountyBlog />} />
+                  <Route path="/blog/iv-therapy-hospice-san-diego-county" element={<SanDiegoCountyBlog />} />
+                  <Route path="/blog/iv-therapy-hospice-ventura-county" element={<VenturaCountyBlog />} />
+                  <Route path="/blog/iv-therapy-hospice-fort-bend-county" element={<FortBendCountyBlog />} />
+                  
+                  {/* Dashboard router to handle role-based routing */}
+                  <Route
+                    path="/dashboard"
+                    element={<DashboardRouter />}
+                  />
+                  
+                  {/* Member routes */}
+                  <Route
+                    path="/dashboard/share-and-earn"
+                    element={
+                      <ProtectedRoute>
+                        <ShareAndEarn />
+                      </ProtectedRoute>
+                    }
+                  />
+                  
+                  <Route
+                    path="/dashboard/concierge"
+                    element={
+                      <ProtectedRoute>
+                        <MemberConciergePage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/pharmacy"
+                    element={
+                      <ProtectedRoute>
+                        <MemberPharmacyPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/medical-transport"
+                    element={
+                      <ProtectedRoute>
+                        <MemberMedicalTransportPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/service-booking"
+                    element={
+                      <ProtectedRoute>
+                        <MemberServiceBookingPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/vacations"
+                    element={
+                      <ProtectedRoute>
+                        <MemberVacationsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/health-insights"
+                    element={
+                      <ProtectedRoute>
+                        <MemberHealthInsightsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/messages"
+                    element={
+                      <ProtectedRoute>
+                        <MemberMessagesPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/membership"
+                    element={
+                      <ProtectedRoute>
+                        <MemberMembershipPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/promotions"
+                    element={
+                      <ProtectedRoute>
+                        <MemberPromotionsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/settings"
+                    element={
+                      <ProtectedRoute>
+                        <GlobalSettingsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  
+                  <Route
+                    path="/dashboard/health-tools"
+                    element={
+                      <ProtectedRoute>
+                        <HealthToolsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  
+                  <Route
+                    path="/dashboard/appointments"
+                    element={
+                      <ProtectedRoute>
+                        <AppointmentsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  
+                  {/* Admin routes */}
+                  <Route
+                    path="/dashboard/admin"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/admin/vacations"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminVacationsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/admin/promotions"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminPromotionsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/admin/leads"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminLeadsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/admin/care-teams"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminCareTeamsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/admin/health-tools"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminHealthToolsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/admin/settings"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminSettingsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/admin/blog"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminBlogPostsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  
+                  {/* Professional/Partner routes */}
+                  <Route
+                    path="/dashboard/professional"
+                    element={
+                      <ProtectedRoute requiredRole="professional">
+                        <ProfessionalPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  
+                  {/* Professional sub-routes */}
+                  <Route
+                    path="/dashboard/professional/calendar"
+                    element={
+                      <ProtectedRoute requiredRole="professional">
+                        <ProfessionalCalendarPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/professional/earnings"
+                    element={
+                      <ProtectedRoute requiredRole="professional">
+                        <ProfessionalEarningsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/professional/member-manager"
+                    element={
+                      <ProtectedRoute requiredRole="professional">
+                        <ProfessionalMemberManagerPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/professional/message-center"
+                    element={
+                      <ProtectedRoute requiredRole="professional">
+                        <ProfessionalMessageCenterPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/professional/requests"
+                    element={
+                      <ProtectedRoute requiredRole="professional">
+                        <ProfessionalPatientRequestsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/professional/profile"
+                    element={
+                      <ProtectedRoute requiredRole="professional">
+                        <ProfessionalProfileSettingsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/professional/tools"
+                    element={
+                      <ProtectedRoute requiredRole="professional">
+                        <ProfessionalToolsOfTradePage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/professional/analytics"
+                    element={
+                      <ProtectedRoute requiredRole="professional">
+                        <ProfessionalAnalyticsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </StripeProvider>
             </ThemeProvider>
           </AuthProvider>
         </LanguageProvider>
