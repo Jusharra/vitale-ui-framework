@@ -30,7 +30,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { CheckCircle, ArrowRight, PiggyBank, Users, Activity } from 'lucide-react';
-import StripeCheckoutButton from '@/components/payments/StripeCheckoutButton';
 
 // Schema for placement request form
 const placementRequestSchema = z.object({
@@ -40,11 +39,11 @@ const placementRequestSchema = z.object({
   }),
   
   // Step 2: Intake Form
-  fullName: z.string().min(2, { message: "Full name is required" }).optional(),
-  email: z.string().email("Invalid email address").optional(),
-  phone: z.string().min(10, { message: "Phone number is required" }).optional(),
-  careNeeds: z.string().min(5, { message: "Please describe care needs" }).optional(),
-  location: z.string().min(2, { message: "Location is required" }).optional(),
+  fullName: z.string().min(2, { message: "Full name is required" }),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(10, { message: "Phone number is required" }),
+  careNeeds: z.string().min(5, { message: "Please describe care needs" }),
+  location: z.string().min(2, { message: "Location is required" }),
   notes: z.string().optional(),
 });
 
@@ -67,7 +66,6 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   
   // Initialize form
@@ -91,8 +89,6 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
   
   // Handle form submission for each step
   const onSubmit = async (values: PlacementRequestFormValues) => {
-    console.log("Form submitted with values:", values);
-    
     if (step === 1) {
       // Move to step 2 (intake form)
       setStep(2);
@@ -100,14 +96,8 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
     }
     
     if (step === 2) {
-      if (isExpedited) {
-        // Move to step 3 (payment) if expedited
-        setStep(3);
-        return;
-      } else {
-        // Submit the form directly if standard
-        await submitPlacementRequest(values);
-      }
+      // Submit the form directly
+      await submitPlacementRequest(values);
     }
   };
   
@@ -132,9 +122,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
           status: 'new',
           deposit_paid: isExpedited,
           deposit_amount: isExpedited ? 497 : 0,
-        })
-        .select()
-        .single();
+        });
       
       if (error) throw error;
       
@@ -163,13 +151,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
       setIsSubmitting(false);
     }
   };
-  
-  // Handle payment success
-  const handlePaymentSuccess = async () => {
-    const values = form.getValues();
-    await submitPlacementRequest(values);
-  };
-  
+
   // Handle dialog close
   const handleClose = () => {
     // Reset form and step when dialog is closed
@@ -189,7 +171,7 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
         {/* Progress bar fill */}
         <div 
           className="absolute top-1/2 left-0 h-1 bg-primary -translate-y-1/2 transition-all duration-300"
-          style={{ width: `${((step - 1) / (isExpedited ? 2 : 1)) * 100}%` }}
+          style={{ width: `${((step - 1) / 1) * 100}%` }}
         ></div>
         
         {/* Step circles */}
@@ -211,17 +193,6 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
             </div>
             <span className="text-xs mt-2">Details</span>
           </div>
-          
-          {isExpedited && (
-            <div className="flex flex-col items-center">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 ${
-                step >= 3 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500'
-              }`}>
-                {step > 3 ? <CheckCircle className="h-5 w-5" /> : 3}
-              </div>
-              <span className="text-xs mt-2">Payment</span>
-            </div>
-          )}
         </div>
       </div>
     );
@@ -449,11 +420,6 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
                       <Activity className="mr-2 h-4 w-4 animate-spin" />
                       Submitting...
                     </>
-                  ) : isExpedited ? (
-                    <>
-                      Continue to Payment
-                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </>
                   ) : (
                     "Submit Request"
                   )}
@@ -461,86 +427,6 @@ const PlacementRequestFlow: React.FC<PlacementRequestFlowProps> = ({
               </div>
             </form>
           </Form>
-        );
-        
-      case 3:
-        return (
-          <div className="space-y-6">
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <h3 className="font-medium text-lg mb-4">Placement Request Summary</h3>
-              <div className="grid grid-cols-2 gap-y-3">
-                <div className="text-gray-500">Name:</div>
-                <div className="font-medium">{form.getValues("fullName")}</div>
-                
-                <div className="text-gray-500">Email:</div>
-                <div className="font-medium">{form.getValues("email")}</div>
-                
-                <div className="text-gray-500">Phone:</div>
-                <div className="font-medium">{form.getValues("phone")}</div>
-                
-                <div className="text-gray-500">Location:</div>
-                <div className="font-medium">{form.getValues("location")}</div>
-                
-                <div className="text-gray-500">Care Needs:</div>
-                <div className="font-medium">{form.getValues("careNeeds")}</div>
-                
-                <div className="text-gray-500">Urgency:</div>
-                <div className="flex items-center">
-                  <Badge className="bg-indigo-100 text-indigo-800">Expedited</Badge>
-                </div>
-              </div>
-            </div>
-            
-            <div className="border rounded-lg p-6">
-              <h3 className="font-medium text-lg mb-4">Payment Details</h3>
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <p className="font-medium text-lg">Concierge Deposit</p>
-                  <p className="text-sm text-gray-500">One-time payment</p>
-                </div>
-                <p className="font-bold text-xl">$497.00</p>
-              </div>
-              
-              <div className="bg-indigo-50 p-4 rounded-md mb-6">
-                <p className="text-sm text-indigo-800 font-medium">Concierge Benefits Include:</p>
-                <ul className="text-sm text-indigo-700 mt-2 space-y-2">
-                  <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-indigo-600" />
-                    24-48 hour expedited placement
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-indigo-600" />
-                    Dedicated concierge agent
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-indigo-600" />
-                    Priority facility matching
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-indigo-600" />
-                    Exclusive perks package
-                  </li>
-                </ul>
-              </div>
-              
-              <StripeCheckoutButton 
-                amount={49700} 
-                description="Expedited Placement Concierge Deposit"
-                buttonText="Complete Payment & Submit Request"
-                className="w-full"
-                onSuccess={handlePaymentSuccess}
-              />
-              <p className="text-xs text-center text-gray-500 mt-2">
-                Secure payment processed by Stripe
-              </p>
-            </div>
-            
-            <div className="flex justify-between">
-              <Button type="button" variant="outline" onClick={() => setStep(2)} disabled={isPaymentProcessing}>
-                Back
-              </Button>
-            </div>
-          </div>
         );
         
       default:
