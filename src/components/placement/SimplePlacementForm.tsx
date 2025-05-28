@@ -69,23 +69,34 @@ const SimplePlacementForm: React.FC<SimplePlacementFormProps> = ({
     setIsSubmitting(true);
     
     try {
+      // Create the request data object
+      const requestData: any = {
+        full_name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        care_needs: formData.careNeeds,
+        location: formData.location,
+        notes: formData.notes,
+        urgency_level: formData.urgencyLevel,
+        status: 'new',
+        deposit_paid: formData.urgencyLevel === 'expedited',
+        deposit_amount: formData.urgencyLevel === 'expedited' ? 497 : 0,
+      };
+      
+      // Only add user_id if it's a valid UUID
+      if (user?.id && typeof user.id === 'string' && user.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+        requestData.user_id = user.id;
+      }
+      
+      // Only add facility_id if it's provided and valid
+      if (facilityId && typeof facilityId === 'string' && facilityId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+        requestData.facility_id = facilityId;
+      }
+      
       // Submit to Supabase
       const { data, error } = await supabase
         .from('placement_requests')
-        .insert({
-          user_id: user?.id,
-          facility_id: facilityId,
-          full_name: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          care_needs: formData.careNeeds,
-          location: formData.location,
-          notes: formData.notes,
-          urgency_level: formData.urgencyLevel,
-          status: 'new',
-          deposit_paid: formData.urgencyLevel === 'expedited',
-          deposit_amount: formData.urgencyLevel === 'expedited' ? 497 : 0,
-        })
+        .insert(requestData)
         .select()
         .single();
       
@@ -120,7 +131,7 @@ const SimplePlacementForm: React.FC<SimplePlacementFormProps> = ({
       console.error("Error submitting placement request:", error);
       toast({
         title: "Error",
-        description: "There was a problem submitting your request. Please try again.",
+        description: error.message || "There was a problem submitting your request. Please try again.",
         variant: "destructive",
       });
     } finally {
