@@ -70,7 +70,7 @@ const SimplePlacementForm: React.FC<SimplePlacementFormProps> = ({
     
     try {
       // Submit to Supabase
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('placement_requests')
         .insert({
           user_id: user?.id,
@@ -85,9 +85,21 @@ const SimplePlacementForm: React.FC<SimplePlacementFormProps> = ({
           status: 'new',
           deposit_paid: formData.urgencyLevel === 'expedited',
           deposit_amount: formData.urgencyLevel === 'expedited' ? 497 : 0,
-        });
+        })
+        .select()
+        .single();
       
       if (error) throw error;
+      
+      // Send email notifications
+      try {
+        await supabase.functions.invoke('send-placement-email', {
+          body: { requestId: data.id }
+        });
+      } catch (emailError) {
+        console.error("Error sending notification emails:", emailError);
+        // Continue despite email error - don't fail the whole submission
+      }
       
       // Show success message
       toast({
