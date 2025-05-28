@@ -334,7 +334,7 @@ const Index = () => {
                 <Button size="lg" className="bg-white text-indigo-700 hover:bg-indigo-50">
                   Schedule My Concierge Call
                 </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-indigo-50">
+                <Button size="lg" variant="outline" className="border-white text-indigo-700 hover:bg-indigo-50">
                   Book Urgent Care Now
                 </Button>
               </div>
