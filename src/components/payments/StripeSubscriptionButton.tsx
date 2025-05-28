@@ -32,7 +32,7 @@ const StripeSubscriptionButton: React.FC<StripeSubscriptionButtonProps> = ({
   // Define pricing based on tier and interval
   const getPriceForTier = (tier: MembershipTier, interval: 'monthly' | 'yearly'): number => {
     const prices = {
-      smart: { monthly: 997, yearly: 9970 },
+      smart: { monthly: 999, yearly: 9990 },
       core: { monthly: 2499, yearly: 24990 },
       vip: { monthly: 4999, yearly: 49990 },
     };
@@ -102,7 +102,7 @@ const StripeSubscriptionButton: React.FC<StripeSubscriptionButtonProps> = ({
           Processing...
         </>
       ) : (
-        buttonText
+        `${buttonText} ${tier.charAt(0).toUpperCase() + tier.slice(1)}`
       )}
     </Button>
   );

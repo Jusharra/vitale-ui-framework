@@ -2,6 +2,7 @@ import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { CheckIcon } from 'lucide-react';
+import StripeSubscriptionButton from '@/components/payments/StripeSubscriptionButton';
 
 const Membership = () => {
   return (
@@ -82,7 +83,11 @@ const Membership = () => {
                     </li>
                   </ul>
                   <div className="mt-8">
-                    <Button className="w-full">Get Started</Button>
+                    <StripeSubscriptionButton 
+                      tier="vip"
+                      buttonText="Get Started"
+                      className="w-full"
+                    />
                   </div>
                 </div>
               </div>
@@ -139,7 +144,11 @@ const Membership = () => {
               Join thousands of members who are taking control of their healthcare experience with Vitalé Health Concierge.
             </p>
             <div className="mt-8">
-              <Button size="lg">Sign Up Today</Button>
+              <StripeSubscriptionButton 
+                tier="vip"
+                buttonText="Sign Up Today"
+                size="lg"
+              />
             </div>
           </div>
         </div>

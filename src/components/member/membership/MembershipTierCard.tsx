@@ -33,7 +33,7 @@ const MembershipTierCard: React.FC<MembershipTierCardProps> = ({
 }) => {
   return (
     <Card 
-      className={`relative overflow-hidden ${tier.popular ? 'border-primary shadow-md' : ''} ${isCurrent ? 'border-green-500 shadow-md' : ''}`}
+      className={`relative overflow-hidden h-full flex flex-col ${tier.popular ? 'border-primary shadow-md' : ''} ${isCurrent ? 'border-green-500 shadow-md' : ''}`}
     >
       {tier.popular && !isCurrent && (
         <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-xs font-medium">
@@ -45,7 +45,7 @@ const MembershipTierCard: React.FC<MembershipTierCardProps> = ({
           Current Plan
         </div>
       )}
-      <CardHeader>
+      <CardHeader className="pb-2">
         <MembershipBadge type={tier.id} className="mb-2" />
         <CardTitle>{tier.name}</CardTitle>
         <CardDescription>{tier.description}</CardDescription>
@@ -57,7 +57,7 @@ const MembershipTierCard: React.FC<MembershipTierCardProps> = ({
           <p className="text-sm text-muted-foreground">or {tier.yearlyPrice}/year (save 16%)</p>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 flex-grow">
         <p className="font-medium text-sm">Includes:</p>
         <ul className="space-y-2">
           {tier.features.map((feature, index) => (
@@ -85,7 +85,7 @@ const MembershipTierCard: React.FC<MembershipTierCardProps> = ({
       </CardContent>
       <CardFooter>
         {isCurrent ? (
-          <Button variant="outline\" className="w-full\" disabled>
+          <Button variant="outline" className="w-full" disabled>
             <span>Current Plan</span>
           </Button>
         ) : (
