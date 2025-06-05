@@ -154,59 +154,65 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
           )}
 
           {activeMediaType === 'images' && imageUrls.length > 0 && (
-            <Carousel className="w-full">
-              <CarouselContent>
-                {imageUrls.map((url, index) => (
-                  <CarouselItem key={index}>
-                    <div className="h-64 w-full flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden">
-                      <img 
-                        src={url} 
-                        alt={`${facility.name} - Image ${index + 1}`} 
-                        className="max-h-full max-w-full object-contain"
-                      />
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="left-2" />
-              <CarouselNext className="right-2" />
-            </Carousel>
+            <div className="rounded-lg overflow-hidden bg-gray-100">
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {imageUrls.map((url, index) => (
+                    <CarouselItem key={index}>
+                      <div className="h-64 w-full flex items-center justify-center">
+                        <img 
+                          src={url} 
+                          alt={`${facility.name} - Image ${index + 1}`} 
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="left-2" />
+                <CarouselNext className="right-2" />
+              </Carousel>
+            </div>
           )}
 
           {activeMediaType === 'videos' && videoUrls.length > 0 && (
-            <Carousel className="w-full">
-              <CarouselContent>
-                {videoUrls.map((url, index) => (
-                  <CarouselItem key={index}>
-                    <div className="h-64 w-full flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden">
-                      <video 
-                        src={url} 
-                        controls
-                        className="max-h-full max-w-full"
-                      />
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="left-2" />
-              <CarouselNext className="right-2" />
-            </Carousel>
+            <div className="rounded-lg overflow-hidden bg-gray-100">
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {videoUrls.map((url, index) => (
+                    <CarouselItem key={index}>
+                      <div className="h-64 w-full flex items-center justify-center">
+                        <video 
+                          src={url} 
+                          controls
+                          className="max-h-full max-w-full"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="left-2" />
+                <CarouselNext className="right-2" />
+              </Carousel>
+            </div>
           )}
 
           {activeMediaType === 'videos' && videoUrls.length === 0 && (
             <div className="h-64 w-full bg-muted flex items-center justify-center rounded-lg">
               <div className="text-center">
-                <Video className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+                <Video className="h-12 w-12 text-muted-foreground mb-2" />
                 <p className="text-muted-foreground">No videos available</p>
               </div>
             </div>
           )}
         </div>
 
-        <div>
-          <h3 className="text-lg font-medium mb-2">About {facility.name}</h3>
-          <p className="text-gray-700">{facility.description}</p>
-        </div>
+        {facility.description && (
+          <div>
+            <h3 className="text-lg font-medium mb-2">About {facility.name}</h3>
+            <p className="text-gray-700">{facility.description}</p>
+          </div>
+        )}
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
