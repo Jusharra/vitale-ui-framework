@@ -91,9 +91,9 @@ const DashboardRouter = () => {
   
   // Route based on user role
   if (userRole === 'admin') {
-    return <Navigate to="/dashboard/admin\" replace />;
+    return <Navigate to="/dashboard/admin" replace />;
   } else if (userRole === 'professional' || userRole === 'partner') {
-    return <Navigate to="/dashboard/professional\" replace />;
+    return <Navigate to="/dashboard/professional" replace />;
   } else {
     // Default to member dashboard
     return <Dashboard />;
@@ -121,6 +121,9 @@ const App: React.FC = () => {
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/placements" element={<Placements />} />
                   <Route path="/membership" element={<Membership />} />
+                  
+                  {/* Facility routes - order matters, more specific routes first */}
+                  <Route path="/care/care-homes/:city/:slug" element={<FacilityPage />} />
                   <Route path="/care/:slug" element={<FacilityPage />} />
                   
                   {/* Blog post routes */}
