@@ -51,6 +51,7 @@ const FacilityPage = () => {
           throw new Error('No slug provided');
         }
 
+        // First try to fetch by exact slug
         const { data, error } = await supabase
           .from('care_facilities')
           .select('*')
@@ -58,10 +59,31 @@ const FacilityPage = () => {
           .eq('status', 'active')
           .maybeSingle();
 
-        if (error) throw error;
-        if (!data) throw new Error('Facility not found');
-
-        setFacility(data);
+        if (error) {
+          console.error('Error fetching facility by slug:', error);
+          // If there's an error with the exact slug query, try a more flexible approach
+          const { data: alternativeData, error: alternativeError } = await supabase
+            .from('care_facilities')
+            .select('*')
+            .eq('status', 'active')
+            .ilike('slug', `%${slug}%`)
+            .limit(1)
+            .maybeSingle();
+            
+          if (alternativeError) {
+            throw alternativeError;
+          }
+          
+          if (alternativeData) {
+            setFacility(alternativeData);
+          } else {
+            throw new Error('Facility not found');
+          }
+        } else if (data) {
+          setFacility(data);
+        } else {
+          throw new Error('Facility not found');
+        }
       } catch (error: any) {
         console.error('Error fetching facility:', error);
         setError(error.message);
@@ -187,10 +209,10 @@ const FacilityPage = () => {
       <Helmet>
         <title>{facility.name} | Premium Care Services</title>
         <meta name="description" content={metaDescription} />
-        {metaKeywords && <meta name="keywords\" content={metaKeywords} />}
+        {metaKeywords && <meta name="keywords" content={metaKeywords} />}
         <meta property="og:title" content={`${facility.name} | Premium Care Services`} />
         <meta property="og:description" content={metaDescription} />
-        {facility.image_url && <meta property="og:image\" content={facility.image_url} />}
+        {facility.image_url && <meta property="og:image" content={facility.image_url} />}
         <meta property="og:type" content="website" />
         <link rel="canonical" href={`${window.location.origin}/care/${facility.slug}`} />
         <script type="application/ld+json">
