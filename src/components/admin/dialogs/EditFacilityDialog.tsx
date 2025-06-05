@@ -70,6 +70,7 @@ const formSchema = z.object({
   })).default([]),
   featured: z.boolean().default(false),
   status: z.enum(['active', 'draft']).default('draft'),
+  slug: z.string().min(2, 'Slug is required'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -130,6 +131,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
       media: [],
       featured: false,
       status: 'draft',
+      slug: '',
     },
   });
 
@@ -182,6 +184,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
             media: existingMedia,
             featured: data.featured || false,
             status: data.status as 'active' | 'draft' || 'draft',
+            slug: data.slug || '',
           });
         }
       } catch (error) {
@@ -328,6 +331,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
           services: values.services,
           status: values.status,
           featured: values.featured,
+          slug: values.slug,
           updated_at: new Date().toISOString(),
         })
         .eq('id', facilityId);
@@ -454,6 +458,23 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
                     <FormControl>
                       <Input placeholder="Sunset Gardens Memory Care" {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="slug"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>URL Slug</FormLabel>
+                    <FormControl>
+                      <Input placeholder="sunset-gardens-memory-care" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      This will be used in the URL: /care/{field.value}
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

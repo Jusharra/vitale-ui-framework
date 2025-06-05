@@ -32,6 +32,7 @@ interface FacilityDetailCardProps {
     hours?: string;
     virtual_tour_url?: string;
     services?: string[];
+    slug?: string;
   };
 }
 
@@ -332,7 +333,7 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
           </div>
         </div>
         
-        <div className="bg-indigo-50 p-4 rounded-lg">
+        <div className="bg-indigo-50 p-6 rounded-lg">
           <h3 className="font-medium text-indigo-800 mb-2">Placement Information</h3>
           <p className="text-sm text-indigo-700 mb-3">
             Unlike traditional agencies, Vitale offers families concierge placement options with the power of perks, speed, and advocacy. We only work with trusted homes and ensure you get the best care.

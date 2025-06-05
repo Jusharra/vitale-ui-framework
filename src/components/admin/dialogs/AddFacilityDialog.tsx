@@ -59,6 +59,7 @@ const formSchema = z.object({
   })).default([]),
   featured: z.boolean().default(false),
   status: z.enum(['active', 'draft']).default('draft'),
+  slug: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -116,8 +117,24 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
       media: [],
       featured: false,
       status: 'draft',
+      slug: '',
     },
   });
+
+  // Generate slug from name
+  useEffect(() => {
+    const name = form.watch('name');
+    if (name) {
+      const slug = name
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+      
+      form.setValue('slug', slug);
+    }
+  }, [form.watch('name')]);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
     const files = event.target.files;
@@ -229,6 +246,7 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
                 hours text,
                 virtual_tour_url text,
                 services text[] DEFAULT '{}',
+                slug text,
                 created_at timestamptz DEFAULT now(),
                 updated_at timestamptz DEFAULT now()
               );
@@ -278,6 +296,7 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
           services: values.services,
           status: values.status,
           featured: values.featured,
+          slug: values.slug || undefined,
         })
         .select('id')
         .single();
@@ -369,6 +388,23 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
                     <FormControl>
                       <Input placeholder="Sunset Gardens Memory Care" {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="slug"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>URL Slug</FormLabel>
+                    <FormControl>
+                      <Input placeholder="sunset-gardens-memory-care" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      This will be used in the URL: /care/{field.value}
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

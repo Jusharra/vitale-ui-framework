@@ -9,6 +9,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { MapPin, Phone, Mail, Clock, CheckCircle, Globe, Calendar } from 'lucide-react';
 import PlacementRequestButton from '@/components/placement/PlacementRequestButton';
 import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface Facility {
   id: string;
@@ -20,6 +21,7 @@ interface Facility {
   price_range: string;
   spots_available: number;
   amenities?: string[];
+  services?: string[];
   image_url?: string;
   images?: string[];
   videos?: string[];
@@ -34,7 +36,7 @@ interface Facility {
 }
 
 const FacilityPage = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug } = useParams<{ slug: string; city?: string }>();
   const [facility, setFacility] = useState<Facility | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -112,6 +114,34 @@ const FacilityPage = () => {
     }
   };
 
+  // Map service IDs to human-readable labels
+  const getServiceLabel = (serviceId: string) => {
+    const serviceMap: Record<string, string> = {
+      "24h_care": "24/7 Care",
+      "memory_care": "Memory Care",
+      "medication_management": "Medication Management",
+      "physical_therapy": "Physical Therapy",
+      "occupational_therapy": "Occupational Therapy",
+      "speech_therapy": "Speech Therapy",
+      "skilled_nursing": "Skilled Nursing",
+      "hospice": "Hospice Care",
+      "respite_care": "Respite Care",
+      "transportation": "Transportation",
+      "meals": "Meals & Nutrition",
+      "housekeeping": "Housekeeping",
+      "laundry": "Laundry Services",
+      "social_activities": "Social Activities",
+      "wellness_programs": "Wellness Programs",
+      "personal_care": "Personal Care Assistance",
+      "bathing_assistance": "Bathing Assistance",
+      "dressing_assistance": "Dressing Assistance",
+      "mobility_assistance": "Mobility Assistance",
+      "incontinence_care": "Incontinence Care",
+    };
+    
+    return serviceMap[serviceId] || serviceId;
+  };
+
   if (isLoading) {
     return (
       <MainLayout>
@@ -157,10 +187,10 @@ const FacilityPage = () => {
       <Helmet>
         <title>{facility.name} | Premium Care Services</title>
         <meta name="description" content={metaDescription} />
-        {metaKeywords && <meta name="keywords\" content={metaKeywords} />}
+        {metaKeywords && <meta name="keywords" content={metaKeywords} />}
         <meta property="og:title" content={`${facility.name} | Premium Care Services`} />
         <meta property="og:description" content={metaDescription} />
-        {facility.image_url && <meta property="og:image\" content={facility.image_url} />}
+        {facility.image_url && <meta property="og:image" content={facility.image_url} />}
         <meta property="og:type" content="website" />
         <link rel="canonical" href={`${window.location.origin}/care/${facility.slug}`} />
         <script type="application/ld+json">
@@ -231,19 +261,44 @@ const FacilityPage = () => {
               <div className="rich-content" dangerouslySetInnerHTML={{ __html: facility.description }} />
             </div>
 
-            {facility.amenities && facility.amenities.length > 0 && (
-              <div className="mt-8">
-                <h3 className="text-xl font-semibold mb-4">Amenities & Features</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {facility.amenities.map((amenity, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                      <span>{amenity}</span>
+            <div className="mt-8">
+              <Tabs defaultValue="amenities">
+                <TabsList className="w-full">
+                  <TabsTrigger value="amenities">Amenities</TabsTrigger>
+                  <TabsTrigger value="services">Services</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="amenities" className="pt-4">
+                  {facility.amenities && facility.amenities.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      {facility.amenities.map((amenity, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <CheckCircle className="h-5 w-5 text-green-500" />
+                          <span>{amenity}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                  ) : (
+                    <p className="text-muted-foreground">No amenities listed for this facility.</p>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="services" className="pt-4">
+                  {facility.services && facility.services.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      {facility.services.map((service, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <CheckCircle className="h-5 w-5 text-green-500" />
+                          <span>{getServiceLabel(service)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground">No services listed for this facility.</p>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </div>
           </div>
 
           {/* Sidebar */}
