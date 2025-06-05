@@ -21,25 +21,28 @@ interface FacilityDetailCardProps {
     spots_available: number;
     amenities?: string[];
     image_url?: string;
+    images?: string[]; // Array of image URLs
+    videos?: string[]; // Array of video URLs
     status: string;
     featured?: boolean;
     phone?: string;
     email?: string;
     hours?: string;
-    images?: string[]; // Array of image URLs for the carousel
-    virtual_tour_url?: string; // URL for virtual tour
+    virtual_tour_url?: string;
   };
 }
 
 const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => {
   // Use the images array if available, otherwise create an array with the single image_url
-  const imageUrls = facility.images || (facility.image_url ? [facility.image_url] : []);
+  const imageUrls = facility.images?.length ? facility.images : (facility.image_url ? [facility.image_url] : []);
+  const videoUrls = facility.videos || [];
   const { toast } = useToast();
   const [messageText, setMessageText] = useState('');
   const [isTourModalOpen, setIsTourModalOpen] = useState(false);
+  const [activeMediaType, setActiveMediaType] = useState<'images' | 'videos'>('images');
   
-  // If no images are available, use a placeholder
-  if (imageUrls.length === 0) {
+  // If no images or videos are available, use a placeholder
+  if (imageUrls.length === 0 && videoUrls.length === 0) {
     imageUrls.push('https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg');
   }
 
@@ -100,27 +103,82 @@ const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => 
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="relative">
-          <Carousel className="w-full">
-            <CarouselContent>
-              {imageUrls.map((url, index) => (
-                <CarouselItem key={index}>
-                  <div className="h-64 w-full">
-                    <img 
-                      src={url} 
-                      alt={`${facility.name} - Image ${index + 1}`} 
-                      className="h-full w-full object-cover rounded-lg"
-                    />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="left-2" />
-            <CarouselNext className="right-2" />
-          </Carousel>
+          {/* Media type selector */}
+          {videoUrls.length > 0 && (
+            <div className="absolute top-2 right-2 z-10 bg-black/50 rounded-lg p-1">
+              <div className="flex space-x-1">
+                <Button 
+                  size="sm" 
+                  variant={activeMediaType === 'images' ? 'default' : 'outline'} 
+                  onClick={() => setActiveMediaType('images')}
+                  className="h-8 px-2 py-1"
+                >
+                  Photos
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant={activeMediaType === 'videos' ? 'default' : 'outline'} 
+                  onClick={() => setActiveMediaType('videos')}
+                  className="h-8 px-2 py-1"
+                >
+                  Videos
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {activeMediaType === 'images' && imageUrls.length > 0 && (
+            <Carousel className="w-full">
+              <CarouselContent>
+                {imageUrls.map((url, index) => (
+                  <CarouselItem key={index}>
+                    <div className="h-64 w-full">
+                      <img 
+                        src={url} 
+                        alt={`${facility.name} - Image ${index + 1}`} 
+                        className="h-full w-full object-cover rounded-lg"
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-2" />
+              <CarouselNext className="right-2" />
+            </Carousel>
+          )}
+
+          {activeMediaType === 'videos' && videoUrls.length > 0 && (
+            <Carousel className="w-full">
+              <CarouselContent>
+                {videoUrls.map((url, index) => (
+                  <CarouselItem key={index}>
+                    <div className="h-64 w-full">
+                      <video 
+                        src={url} 
+                        controls
+                        className="h-full w-full object-cover rounded-lg"
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-2" />
+              <CarouselNext className="right-2" />
+            </Carousel>
+          )}
+
+          {activeMediaType === 'videos' && videoUrls.length === 0 && (
+            <div className="h-64 w-full bg-muted flex items-center justify-center rounded-lg">
+              <div className="text-center">
+                <Video className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+                <p className="text-muted-foreground">No videos available</p>
+              </div>
+            </div>
+          )}
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold mb-2">About {facility.name}</h3>
+          <h3 className="text-lg font-medium mb-2">About {facility.name}</h3>
           <p className="text-gray-700">{facility.description}</p>
         </div>
         

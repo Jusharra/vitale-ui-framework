@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Upload, X, Plus, Image, FileVideo, Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -41,7 +42,14 @@ const formSchema = z.object({
   price_range: z.string().min(2, 'Price range is required'),
   spots_available: z.coerce.number().min(0, 'Spots available must be a positive number'),
   amenities: z.string().optional(),
-  image_url: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
+  media: z.array(z.object({
+    file: z.instanceof(File).optional(),
+    url: z.string().optional(),
+    type: z.enum(['image', 'video']),
+    isUploading: z.boolean().default(false),
+    isUploaded: z.boolean().default(false),
+    path: z.string().optional(),
+  })).default([]),
   featured: z.boolean().default(false),
 });
 
@@ -55,6 +63,8 @@ interface AddFacilityDialogProps {
 
 const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogProps) => {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -65,13 +75,79 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
       price_range: '',
       spots_available: 0,
       amenities: '',
-      image_url: '',
+      media: [],
       featured: false,
     },
   });
 
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const newMedia = Array.from(files).map(file => ({
+      file,
+      type,
+      isUploading: false,
+      isUploaded: false,
+    }));
+
+    const currentMedia = form.getValues('media') || [];
+    form.setValue('media', [...currentMedia, ...newMedia]);
+    
+    // Reset the input value so the same file can be selected again if needed
+    event.target.value = '';
+  };
+
+  const removeMedia = (index: number) => {
+    const currentMedia = [...form.getValues('media')];
+    currentMedia.splice(index, 1);
+    form.setValue('media', currentMedia);
+  };
+
+  const uploadMediaToStorage = async (file: File, facilityId: string, index: number): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${facilityId}/${Date.now()}.${fileExt}`;
+    const filePath = `facilities/${fileName}`;
+    
+    // Update the media item to show it's uploading
+    const currentMedia = [...form.getValues('media')];
+    currentMedia[index] = {
+      ...currentMedia[index],
+      isUploading: true,
+    };
+    form.setValue('media', currentMedia);
+
+    // Upload the file to Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from('facility_media')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    // Get the public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('facility_media')
+      .getPublicUrl(filePath);
+
+    // Update the media item to show it's uploaded
+    currentMedia[index] = {
+      ...currentMedia[index],
+      isUploading: false,
+      isUploaded: true,
+      path: filePath,
+      url: publicUrl,
+    };
+    form.setValue('media', currentMedia);
+
+    return publicUrl;
+  };
+
   const onSubmit = async (values: FormValues) => {
     try {
+      setIsSubmitting(true);
+      
       // Convert amenities string to array
       const amenitiesArray = values.amenities 
         ? values.amenities.split(',').map(item => item.trim()).filter(Boolean) 
@@ -103,6 +179,8 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
                 price_range text NOT NULL,
                 spots_available integer DEFAULT 0,
                 amenities text[],
+                images text[],
+                videos text[],
                 image_url text,
                 status text DEFAULT 'active',
                 featured boolean DEFAULT false,
@@ -134,8 +212,8 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
         }
       }
 
-      // Insert the new facility
-      const { error } = await supabase
+      // Insert the new facility to get its ID
+      const { data: facilityData, error: insertError } = await supabase
         .from('care_facilities')
         .insert({
           name: values.name,
@@ -145,12 +223,59 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
           price_range: values.price_range,
           spots_available: values.spots_available,
           amenities: amenitiesArray,
-          image_url: values.image_url || null,
+          images: [],
+          videos: [],
           status: 'active',
           featured: values.featured,
-        });
+        })
+        .select('id')
+        .single();
 
-      if (error) throw error;
+      if (insertError) throw insertError;
+      
+      const facilityId = facilityData.id;
+      
+      // Upload all media files
+      const imageUrls: string[] = [];
+      const videoUrls: string[] = [];
+      
+      for (let i = 0; i < values.media.length; i++) {
+        const mediaItem = values.media[i];
+        if (mediaItem.file) {
+          try {
+            const publicUrl = await uploadMediaToStorage(mediaItem.file, facilityId, i);
+            if (mediaItem.type === 'image') {
+              imageUrls.push(publicUrl);
+            } else {
+              videoUrls.push(publicUrl);
+            }
+          } catch (error) {
+            console.error(`Error uploading media ${i}:`, error);
+            toast({
+              title: 'Upload Error',
+              description: `Failed to upload ${mediaItem.type} ${i + 1}`,
+              variant: 'destructive',
+            });
+          }
+        }
+      }
+      
+      // Update the facility with the media URLs
+      if (imageUrls.length > 0 || videoUrls.length > 0) {
+        const { error: updateError } = await supabase
+          .from('care_facilities')
+          .update({
+            images: imageUrls,
+            videos: videoUrls,
+            image_url: imageUrls.length > 0 ? imageUrls[0] : null, // For backward compatibility
+          })
+          .eq('id', facilityId);
+          
+        if (updateError) {
+          console.error("Error updating facility with media:", updateError);
+          // Continue anyway since the facility was created
+        }
+      }
 
       toast({
         title: 'Facility created',
@@ -167,12 +292,14 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
         description: 'Failed to create care facility',
         variant: 'destructive',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Care Facility</DialogTitle>
           <DialogDescription>
@@ -306,13 +433,131 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
             
             <FormField
               control={form.control}
-              name="image_url"
-              render={({ field }) => (
+              name="media"
+              render={() => (
                 <FormItem>
-                  <FormLabel>Image URL</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://example.com/image.jpg" {...field} />
-                  </FormControl>
+                  <FormLabel>Facility Media</FormLabel>
+                  <FormDescription>
+                    Upload photos and videos of the facility
+                  </FormDescription>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Image className="h-4 w-4" />
+                        <span className="text-sm font-medium">Photos</span>
+                      </div>
+                      <div className="border border-dashed rounded-lg p-4 text-center">
+                        <input
+                          type="file"
+                          id="image-upload"
+                          multiple
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handleFileChange(e, 'image')}
+                        />
+                        <label 
+                          htmlFor="image-upload" 
+                          className="flex flex-col items-center justify-center cursor-pointer"
+                        >
+                          <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                          <p className="text-sm text-muted-foreground">
+                            Click to upload photos
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            JPG, PNG, WEBP up to 10MB
+                          </p>
+                        </label>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <FileVideo className="h-4 w-4" />
+                        <span className="text-sm font-medium">Videos</span>
+                      </div>
+                      <div className="border border-dashed rounded-lg p-4 text-center">
+                        <input
+                          type="file"
+                          id="video-upload"
+                          multiple
+                          accept="video/*"
+                          className="hidden"
+                          onChange={(e) => handleFileChange(e, 'video')}
+                        />
+                        <label 
+                          htmlFor="video-upload" 
+                          className="flex flex-col items-center justify-center cursor-pointer"
+                        >
+                          <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                          <p className="text-sm text-muted-foreground">
+                            Click to upload videos
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            MP4, MOV up to 50MB
+                          </p>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Preview of uploaded media */}
+                  {form.watch('media').length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="text-sm font-medium mb-2">Uploaded Media</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {form.watch('media').map((media, index) => (
+                          <div key={index} className="relative group">
+                            <div className="border rounded-md p-2 h-24 flex items-center justify-center overflow-hidden">
+                              {media.file && media.type === 'image' && (
+                                <img 
+                                  src={URL.createObjectURL(media.file)} 
+                                  alt={`Preview ${index}`}
+                                  className="max-h-full max-w-full object-contain"
+                                />
+                              )}
+                              {media.file && media.type === 'video' && (
+                                <video 
+                                  src={URL.createObjectURL(media.file)} 
+                                  className="max-h-full max-w-full object-contain"
+                                />
+                              )}
+                              {media.isUploading && (
+                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                                </div>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeMedia(index)}
+                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                            <p className="text-xs truncate mt-1">
+                              {media.file?.name || 'Uploaded file'}
+                            </p>
+                          </div>
+                        ))}
+                        
+                        {/* Add more button */}
+                        <div className="border rounded-md p-2 h-24 flex flex-col items-center justify-center">
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-full w-full flex flex-col items-center justify-center"
+                            onClick={() => document.getElementById('image-upload')?.click()}
+                          >
+                            <Plus className="h-6 w-6 mb-1" />
+                            <span className="text-xs">Add More</span>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   <FormMessage />
                 </FormItem>
               )}
@@ -340,10 +585,17 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
             />
             
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button type="submit">Create Facility</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : 'Create Facility'}
+              </Button>
             </DialogFooter>
           </form>
         </Form>
