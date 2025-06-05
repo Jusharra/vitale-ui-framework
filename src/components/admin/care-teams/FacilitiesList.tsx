@@ -115,7 +115,7 @@ const FacilitiesList = ({ facilities, isLoading, searchTerm, refetchData }: Faci
               <TableHead>Location</TableHead>
               <TableHead>Care Type</TableHead>
               <TableHead>Price Range</TableHead>
-              <TableHead className="text-center">Availability</TableHead>
+              <TableHead className="text-center">Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -152,8 +152,8 @@ const FacilitiesList = ({ facilities, isLoading, searchTerm, refetchData }: Faci
                   </TableCell>
                   <TableCell className="text-center">
                     <div className="flex flex-col items-center">
-                      <Badge variant={facility.spots_available > 0 ? "outline" : "secondary"} className={facility.spots_available > 0 ? "border-green-500 text-green-500" : ""}>
-                        {facility.spots_available > 0 ? `${facility.spots_available} spots` : "Full"}
+                      <Badge variant={facility.status === 'active' ? "default" : "secondary"} className={facility.status === 'active' ? "border-green-500 text-green-500" : ""}>
+                        {facility.status === 'active' ? 'Published' : 'Draft'}
                       </Badge>
                     </div>
                   </TableCell>

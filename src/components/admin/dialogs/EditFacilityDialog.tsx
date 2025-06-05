@@ -53,6 +53,10 @@ const formSchema = z.object({
   price_range: z.string().min(2, 'Price range is required'),
   spots_available: z.coerce.number().min(0, 'Spots available must be a positive number'),
   amenities: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.string().email('Invalid email').optional().or(z.literal('')),
+  website: z.string().url('Invalid URL').optional().or(z.literal('')),
+  hours: z.string().optional(),
   media: z.array(z.object({
     file: z.instanceof(File).optional(),
     url: z.string().optional(),
@@ -63,6 +67,7 @@ const formSchema = z.object({
     isExisting: z.boolean().optional(),
   })).default([]),
   featured: z.boolean().default(false),
+  status: z.enum(['active', 'draft']).default('draft'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -90,8 +95,13 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
       price_range: '',
       spots_available: 0,
       amenities: '',
+      phone: '',
+      email: '',
+      website: '',
+      hours: '',
       media: [],
       featured: false,
+      status: 'draft',
     },
   });
 
@@ -139,8 +149,13 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
             price_range: data.price_range,
             spots_available: data.spots_available || 0,
             amenities: amenitiesString,
+            phone: data.phone || '',
+            email: data.email || '',
+            website: data.website || '',
+            hours: data.hours || '',
             media: existingMedia,
             featured: data.featured || false,
+            status: data.status as 'active' | 'draft' || 'draft',
           });
         }
       } catch (error) {
@@ -287,9 +302,14 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
           price_range: values.price_range,
           spots_available: values.spots_available,
           amenities: amenitiesArray,
+          phone: values.phone,
+          email: values.email,
+          website: values.website,
+          hours: values.hours,
           images: allImageUrls,
           videos: allVideoUrls,
           image_url: allImageUrls.length > 0 ? allImageUrls[0] : null, // For backward compatibility
+          status: values.status,
           featured: values.featured,
           updated_at: new Date().toISOString(),
         })
@@ -299,7 +319,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
 
       toast({
         title: 'Facility updated',
-        description: 'Care facility has been updated successfully',
+        description: `Care facility has been updated and is now ${values.status === 'active' ? 'published' : 'saved as draft'}`,
       });
       
       onSuccess();
@@ -513,6 +533,66 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
                 )}
               />
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contact Phone</FormLabel>
+                    <FormControl>
+                      <Input placeholder="(555) 123-4567" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contact Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="contact@facility.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="website"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Website URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://www.facility.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="hours"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Operating Hours</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Mon-Fri 9am-5pm, Sat-Sun 10am-4pm" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             
             <FormField
               control={form.control}
@@ -671,6 +751,31 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
                     </div>
                   )}
                   
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Publication Status</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="draft">Draft (Not visible on Placements page)</SelectItem>
+                      <SelectItem value="active">Active (Visible on Placements page)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Draft facilities are only visible to admins until published
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

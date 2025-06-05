@@ -13,119 +13,27 @@ import { supabase } from '@/integrations/supabase/client';
 import FacilityDetailCard from '@/components/placement/FacilityDetailCard';
 import PlacementRequestButton from '@/components/placement/PlacementRequestButton';
 
-// Mock data for facilities
-const mockFacilities = [
-  {
-    id: '1',
-    name: 'Sunset Gardens Memory Care',
-    description: 'Specialized memory care facility with 24/7 support, secure environment, and personalized care plans.',
-    location: 'San Mateo County, CA',
-    care_type: 'Memory Care',
-    price_range: '$6,500/month',
-    spots_available: 3,
-    amenities: ['24/7 Care', 'Secure Environment', 'Memory Programs'],
-    image_url: 'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
-    status: 'active',
-    featured: true,
-    phone: '(555) 123-4567',
-    email: 'info@sunsetgardens.com',
-    hours: 'Open 24/7 for tours by appointment',
-    images: [
-      'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
-      'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',
-      'https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg'
-    ],
-    virtual_tour_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-  },
-  {
-    id: '2',
-    name: 'Oakridge Senior Living',
-    description: 'Luxury senior living community with independent and assisted living options, fine dining, and resort-style amenities.',
-    location: 'Orange County, CA',
-    care_type: 'Long-Term Care',
-    price_range: '$4,800/month',
-    spots_available: 7,
-    amenities: ['Fine Dining', 'Resort Amenities', 'Independent Living'],
-    image_url: 'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',
-    status: 'active',
-    featured: false,
-    phone: '(555) 234-5678',
-    email: 'info@oakridgesenior.com',
-    hours: '8:00 AM - 8:00 PM',
-    images: [
-      'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',
-      'https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg',
-      'https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg'
-    ],
-    virtual_tour_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-  },
-  {
-    id: '3',
-    name: 'Serenity Hospice House',
-    description: 'Compassionate end-of-life care in a peaceful setting with private rooms, family accommodations, and 24/7 medical support.',
-    location: 'Travis County, TX',
-    care_type: 'Hospice Support',
-    price_range: 'Insurance accepted',
-    spots_available: 1,
-    amenities: ['Private Rooms', 'Family Accommodations', '24/7 Medical Support'],
-    image_url: 'https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg',
-    status: 'active',
-    featured: false,
-    phone: '(555) 345-6789',
-    email: 'care@serenityhospice.org',
-    hours: 'Open 24/7',
-    images: [
-      'https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg',
-      'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg',
-      'https://images.pexels.com/photos/3184405/pexels-photo-3184405.jpeg'
-    ],
-    virtual_tour_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-  },
-  {
-    id: '4',
-    name: 'Golden Years Assisted Living',
-    description: 'Upscale assisted living community with personalized care plans, luxury amenities, and a vibrant social calendar.',
-    location: 'Los Angeles County, CA',
-    care_type: 'Assisted Living',
-    price_range: '$5,200/month',
-    spots_available: 5,
-    amenities: ['Personalized Care', 'Luxury Amenities', 'Social Activities'],
-    image_url: 'https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg',
-    status: 'active',
-    featured: true,
-    phone: '(555) 456-7890',
-    email: 'info@goldenyears.com',
-    hours: '9:00 AM - 7:00 PM',
-    images: [
-      'https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg',
-      'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
-      'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg'
-    ],
-    virtual_tour_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-  },
-  {
-    id: '5',
-    name: 'Lakeside Retirement Village',
-    description: 'Active adult community with lakefront views, independent living cottages, and comprehensive wellness programs.',
-    location: 'Collin County, TX',
-    care_type: 'Independent Living',
-    price_range: '$3,800/month',
-    spots_available: 12,
-    amenities: ['Lakefront Views', 'Private Cottages', 'Wellness Programs'],
-    image_url: 'https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg',
-    status: 'active',
-    featured: false,
-    phone: '(555) 567-8901',
-    email: 'info@lakesideretirement.com',
-    hours: '8:00 AM - 6:00 PM',
-    images: [
-      'https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg',
-      'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',
-      'https://images.pexels.com/photos/3184405/pexels-photo-3184405.jpeg'
-    ],
-    virtual_tour_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-  }
-];
+// Define the Facility interface
+interface Facility {
+  id: string;
+  name: string;
+  description?: string;
+  location: string;
+  care_type: string;
+  price_range: string;
+  spots_available: number;
+  amenities?: string[];
+  image_url?: string;
+  images?: string[]; // Array of image URLs
+  videos?: string[]; // Array of video URLs
+  status: string;
+  featured?: boolean;
+  phone?: string;
+  email?: string;
+  website?: string;
+  hours?: string;
+  virtual_tour_url?: string;
+}
 
 // Define care services for filtering
 const careServices = [
@@ -188,8 +96,8 @@ const Placements = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [careType, setCareType] = useState<string>('all');
   const [location, setLocation] = useState<string>('all');
-  const [facilities, setFacilities] = useState(mockFacilities);
-  const [selectedFacility, setSelectedFacility] = useState<any>(null);
+  const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showServiceFilters, setShowServiceFilters] = useState(false);
@@ -198,14 +106,138 @@ const Placements = () => {
   const [selectedCounty, setSelectedCounty] = useState<string>('all');
   const { toast } = useToast();
 
-  // Fetch facilities from database (in a real implementation)
+  // Fetch facilities from database
   useEffect(() => {
     const fetchFacilities = async () => {
       setIsLoading(true);
       try {
-        // In a real implementation, this would fetch from the database
-        // For now, we'll use the mock data
-        setFacilities(mockFacilities);
+        // Fetch active facilities from the database
+        const { data, error } = await supabase
+          .from('care_facilities')
+          .select('*')
+          .eq('status', 'active')
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          setFacilities(data);
+        } else {
+          // If no facilities found in the database, use mock data
+          console.log("No facilities found in database, using mock data");
+          setFacilities([
+            {
+              id: '1',
+              name: 'Sunset Gardens Memory Care',
+              description: 'Specialized memory care facility with 24/7 support, secure environment, and personalized care plans.',
+              location: 'San Mateo County, CA',
+              care_type: 'Memory Care',
+              price_range: '$6,500/month',
+              spots_available: 3,
+              amenities: ['24/7 Care', 'Secure Environment', 'Memory Programs'],
+              image_url: 'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
+              status: 'active',
+              featured: true,
+              phone: '(555) 123-4567',
+              email: 'info@sunsetgardens.com',
+              hours: 'Open 24/7 for tours by appointment',
+              images: [
+                'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
+                'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',
+                'https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg'
+              ],
+              virtual_tour_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+            },
+            {
+              id: '2',
+              name: 'Oakridge Senior Living',
+              description: 'Luxury senior living community with independent and assisted living options, fine dining, and resort-style amenities.',
+              location: 'Orange County, CA',
+              care_type: 'Long-Term Care',
+              price_range: '$4,800/month',
+              spots_available: 7,
+              amenities: ['Fine Dining', 'Resort Amenities', 'Independent Living'],
+              image_url: 'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',
+              status: 'active',
+              featured: false,
+              phone: '(555) 234-5678',
+              email: 'info@oakridgesenior.com',
+              hours: '8:00 AM - 8:00 PM',
+              images: [
+                'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',
+                'https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg',
+                'https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg'
+              ],
+              virtual_tour_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+            },
+            {
+              id: '3',
+              name: 'Serenity Hospice House',
+              description: 'Compassionate end-of-life care in a peaceful setting with private rooms, family accommodations, and 24/7 medical support.',
+              location: 'Travis County, TX',
+              care_type: 'Hospice Support',
+              price_range: 'Insurance accepted',
+              spots_available: 1,
+              amenities: ['Private Rooms', 'Family Accommodations', '24/7 Medical Support'],
+              image_url: 'https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg',
+              status: 'active',
+              featured: false,
+              phone: '(555) 345-6789',
+              email: 'care@serenityhospice.org',
+              hours: 'Open 24/7',
+              images: [
+                'https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg',
+                'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg',
+                'https://images.pexels.com/photos/3184405/pexels-photo-3184405.jpeg'
+              ],
+              virtual_tour_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+            },
+            {
+              id: '4',
+              name: 'Golden Years Assisted Living',
+              description: 'Upscale assisted living community with personalized care plans, luxury amenities, and a vibrant social calendar.',
+              location: 'Los Angeles County, CA',
+              care_type: 'Assisted Living',
+              price_range: '$5,200/month',
+              spots_available: 5,
+              amenities: ['Personalized Care', 'Luxury Amenities', 'Social Activities'],
+              image_url: 'https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg',
+              status: 'active',
+              featured: true,
+              phone: '(555) 456-7890',
+              email: 'info@goldenyears.com',
+              hours: '9:00 AM - 7:00 PM',
+              images: [
+                'https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg',
+                'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
+                'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg'
+              ],
+              virtual_tour_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+            },
+            {
+              id: '5',
+              name: 'Lakeside Retirement Village',
+              description: 'Active adult community with lakefront views, independent living cottages, and comprehensive wellness programs.',
+              location: 'Collin County, TX',
+              care_type: 'Independent Living',
+              price_range: '$3,800/month',
+              spots_available: 12,
+              amenities: ['Lakefront Views', 'Private Cottages', 'Wellness Programs'],
+              image_url: 'https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg',
+              status: 'active',
+              featured: false,
+              phone: '(555) 567-8901',
+              email: 'info@lakesideretirement.com',
+              hours: '8:00 AM - 6:00 PM',
+              images: [
+                'https://images.pexels.com/photos/2736388/pexels-photo-2736388.jpeg',
+                'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg',
+                'https://images.pexels.com/photos/3184405/pexels-photo-3184405.jpeg'
+              ],
+              virtual_tour_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+            }
+          ]);
+        }
       } catch (error) {
         console.error('Error fetching facilities:', error);
         toast({

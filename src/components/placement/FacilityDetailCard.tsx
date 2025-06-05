@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { MapPin, Phone, Mail, Clock, CheckCircle, Info, MessageSquare, Video, Calendar } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, CheckCircle, Info, MessageSquare, Video, Calendar, Globe } from 'lucide-react';
 import PlacementRequestButton from './PlacementRequestButton';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,12 +28,13 @@ interface FacilityDetailCardProps {
     featured?: boolean;
     phone?: string;
     email?: string;
+    website?: string;
     hours?: string;
     virtual_tour_url?: string;
   };
 }
 
-const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => {
+const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
   // Use the images array if available, otherwise create an array with the single image_url
   const imageUrls = facility.images?.length ? facility.images : (facility.image_url ? [facility.image_url] : []);
   const videoUrls = facility.videos || [];
@@ -54,6 +55,30 @@ const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => 
       toast({
         title: "No phone number available",
         description: "This facility hasn't provided a phone number.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEmailFacility = () => {
+    if (facility.email) {
+      window.location.href = `mailto:${facility.email}`;
+    } else {
+      toast({
+        title: "No email available",
+        description: "This facility hasn't provided an email address.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleVisitWebsite = () => {
+    if (facility.website) {
+      window.open(facility.website, '_blank');
+    } else {
+      toast({
+        title: "No website available",
+        description: "This facility hasn't provided a website URL.",
         variant: "destructive",
       });
     }
@@ -196,8 +221,8 @@ const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => 
               <span className="font-medium">Availability:</span>
               <span>
                 {facility.spots_available > 0 
-                  ? `${facility.spots_available} spots available` 
-                  : "Currently full"}
+                  ? `${facility.spots_available} spots` 
+                  : "Full"}
               </span>
             </div>
             
@@ -214,6 +239,14 @@ const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => 
                 <Mail className="h-4 w-4 text-indigo-600" />
                 <span className="font-medium">Email:</span>
                 <span>{facility.email}</span>
+              </div>
+            )}
+            
+            {facility.website && (
+              <div className="flex items-center gap-1 text-sm">
+                <Globe className="h-4 w-4 text-indigo-600" />
+                <span className="font-medium">Website:</span>
+                <span className="truncate">{facility.website}</span>
               </div>
             )}
             
@@ -254,8 +287,20 @@ const FacilityDetailCard: React.FC<FacilityDetailCardProps> = ({ facility }) => 
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={handleCallFacility}>
             <Phone className="h-4 w-4 mr-2" />
-            Contact Facility
+            Call Facility
           </Button>
+          
+          <Button variant="outline" onClick={handleEmailFacility}>
+            <Mail className="h-4 w-4 mr-2" />
+            Email Facility
+          </Button>
+          
+          {facility.website && (
+            <Button variant="outline" onClick={handleVisitWebsite}>
+              <Globe className="h-4 w-4 mr-2" />
+              Visit Website
+            </Button>
+          )}
           
           <Dialog>
             <DialogTrigger asChild>
