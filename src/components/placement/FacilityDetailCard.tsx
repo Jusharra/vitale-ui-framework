@@ -168,11 +168,6 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
                             className="max-w-full max-h-full object-contain"
                           />
                         </div>
-                        {index === 0 && facility.price_range && (
-                          <div className="absolute bottom-4 right-4 bg-black/70 text-white px-4 py-2 rounded-md text-xl font-bold">
-                            {facility.price_range}
-                          </div>
-                        )}
                       </div>
                     </CarouselItem>
                   ))}
@@ -277,7 +272,7 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
           </div>
           
           <div>
-            <h3 className="text-sm font-medium mb-2">Amenities</h3>
+            <h4 className="text-sm font-medium mb-2">Amenities</h4>
             <div className="flex flex-wrap gap-2">
               {facility.amenities && facility.amenities.map((amenity, idx) => (
                 <Badge key={idx} variant="outline">{amenity}</Badge>
