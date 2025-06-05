@@ -57,6 +57,7 @@ const formSchema = z.object({
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   website: z.string().url('Invalid URL').optional().or(z.literal('')),
   hours: z.string().optional(),
+  virtual_tour_url: z.string().url('Invalid URL').optional().or(z.literal('')),
   media: z.array(z.object({
     file: z.instanceof(File).optional(),
     url: z.string().optional(),
@@ -99,6 +100,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
       email: '',
       website: '',
       hours: '',
+      virtual_tour_url: '',
       media: [],
       featured: false,
       status: 'draft',
@@ -153,6 +155,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
             email: data.email || '',
             website: data.website || '',
             hours: data.hours || '',
+            virtual_tour_url: data.virtual_tour_url || '',
             media: existingMedia,
             featured: data.featured || false,
             status: data.status as 'active' | 'draft' || 'draft',
@@ -306,6 +309,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
           email: values.email,
           website: values.website,
           hours: values.hours,
+          virtual_tour_url: values.virtual_tour_url,
           images: allImageUrls,
           videos: allVideoUrls,
           image_url: allImageUrls.length > 0 ? allImageUrls[0] : null, // For backward compatibility
@@ -593,6 +597,23 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
                 )}
               />
             </div>
+            
+            <FormField
+              control={form.control}
+              name="virtual_tour_url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Virtual Tour URL</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://www.youtube.com/watch?v=example" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Enter a URL to a virtual tour video or 360° tour of the facility
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             
             <FormField
               control={form.control}

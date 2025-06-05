@@ -46,6 +46,7 @@ const formSchema = z.object({
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   website: z.string().url('Invalid URL').optional().or(z.literal('')),
   hours: z.string().optional(),
+  virtual_tour_url: z.string().url('Invalid URL').optional().or(z.literal('')),
   media: z.array(z.object({
     file: z.instanceof(File).optional(),
     url: z.string().optional(),
@@ -84,6 +85,7 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
       email: '',
       website: '',
       hours: '',
+      virtual_tour_url: '',
       media: [],
       featured: false,
       status: 'draft',
@@ -198,6 +200,7 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
                 email text,
                 website text,
                 hours text,
+                virtual_tour_url text,
                 created_at timestamptz DEFAULT now(),
                 updated_at timestamptz DEFAULT now()
               );
@@ -241,6 +244,7 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
           email: values.email,
           website: values.website,
           hours: values.hours,
+          virtual_tour_url: values.virtual_tour_url,
           images: [],
           videos: [],
           status: values.status,
@@ -297,7 +301,7 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
 
       toast({
         title: 'Facility created',
-        description: `New care facility has been added as ${values.status === 'active' ? 'active' : 'draft'}`,
+        description: `New care facility has been added as ${values.status === 'active' ? 'published' : 'draft'}`,
       });
       
       form.reset();
@@ -491,6 +495,23 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
                 )}
               />
             </div>
+            
+            <FormField
+              control={form.control}
+              name="virtual_tour_url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Virtual Tour URL</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://www.youtube.com/watch?v=example" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Enter a URL to a virtual tour video or 360° tour of the facility
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             
             <FormField
               control={form.control}
