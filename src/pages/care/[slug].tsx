@@ -187,10 +187,10 @@ const FacilityPage = () => {
       <Helmet>
         <title>{facility.name} | Premium Care Services</title>
         <meta name="description" content={metaDescription} />
-        {metaKeywords && <meta name="keywords" content={metaKeywords} />}
+        {metaKeywords && <meta name="keywords\" content={metaKeywords} />}
         <meta property="og:title" content={`${facility.name} | Premium Care Services`} />
         <meta property="og:description" content={metaDescription} />
-        {facility.image_url && <meta property="og:image" content={facility.image_url} />}
+        {facility.image_url && <meta property="og:image\" content={facility.image_url} />}
         <meta property="og:type" content="website" />
         <link rel="canonical" href={`${window.location.origin}/care/${facility.slug}`} />
         <script type="application/ld+json">
