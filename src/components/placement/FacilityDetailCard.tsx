@@ -31,6 +31,7 @@ interface FacilityDetailCardProps {
     website?: string;
     hours?: string;
     virtual_tour_url?: string;
+    services?: string[];
   };
 }
 
@@ -109,6 +110,34 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
         description: "This facility doesn't have a virtual tour available yet.",
       });
     }
+  };
+
+  // Map service IDs to human-readable labels
+  const getServiceLabel = (serviceId: string) => {
+    const serviceMap: Record<string, string> = {
+      "24h_care": "24/7 Care",
+      "memory_care": "Memory Care",
+      "medication_management": "Medication Management",
+      "physical_therapy": "Physical Therapy",
+      "occupational_therapy": "Occupational Therapy",
+      "speech_therapy": "Speech Therapy",
+      "skilled_nursing": "Skilled Nursing",
+      "hospice": "Hospice Care",
+      "respite_care": "Respite Care",
+      "transportation": "Transportation",
+      "meals": "Meals & Nutrition",
+      "housekeeping": "Housekeeping",
+      "laundry": "Laundry Services",
+      "social_activities": "Social Activities",
+      "wellness_programs": "Wellness Programs",
+      "personal_care": "Personal Care Assistance",
+      "bathing_assistance": "Bathing Assistance",
+      "dressing_assistance": "Dressing Assistance",
+      "mobility_assistance": "Mobility Assistance",
+      "incontinence_care": "Incontinence Care",
+    };
+    
+    return serviceMap[serviceId] || serviceId;
   };
 
   return (
@@ -272,15 +301,34 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
           </div>
           
           <div>
-            <h4 className="text-sm font-medium mb-2">Amenities</h4>
-            <div className="flex flex-wrap gap-2">
-              {facility.amenities && facility.amenities.map((amenity, idx) => (
-                <Badge key={idx} variant="outline">{amenity}</Badge>
-              ))}
-              {(!facility.amenities || facility.amenities.length === 0) && (
-                <p className="text-sm text-muted-foreground">No amenities listed</p>
-              )}
-            </div>
+            <Tabs defaultValue="amenities">
+              <TabsList className="w-full">
+                <TabsTrigger value="amenities">Amenities</TabsTrigger>
+                <TabsTrigger value="services">Services</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="amenities" className="pt-2">
+                <div className="flex flex-wrap gap-2">
+                  {facility.amenities && facility.amenities.map((amenity, idx) => (
+                    <Badge key={idx} variant="outline">{amenity}</Badge>
+                  ))}
+                  {(!facility.amenities || facility.amenities.length === 0) && (
+                    <p className="text-sm text-muted-foreground">No amenities listed</p>
+                  )}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="services" className="pt-2">
+                <div className="flex flex-wrap gap-2">
+                  {facility.services && facility.services.map((service, idx) => (
+                    <Badge key={idx} variant="outline">{getServiceLabel(service)}</Badge>
+                  ))}
+                  {(!facility.services || facility.services.length === 0) && (
+                    <p className="text-sm text-muted-foreground">No services listed</p>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
         

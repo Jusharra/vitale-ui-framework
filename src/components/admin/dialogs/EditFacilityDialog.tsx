@@ -43,6 +43,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Checkbox } from '@/components/ui/checkbox';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -57,6 +58,7 @@ const formSchema = z.object({
   website: z.string().url('Invalid URL').optional().or(z.literal('')),
   hours: z.string().optional(),
   virtual_tour_url: z.string().url('Invalid URL').optional().or(z.literal('')),
+  services: z.array(z.string()).default([]),
   media: z.array(z.object({
     file: z.instanceof(File).optional(),
     url: z.string().optional(),
@@ -79,6 +81,30 @@ interface EditFacilityDialogProps {
   facilityId: string | null;
 }
 
+// Available services for facilities
+const availableServices = [
+  { id: "24h_care", label: "24/7 Care" },
+  { id: "memory_care", label: "Memory Care" },
+  { id: "medication_management", label: "Medication Management" },
+  { id: "physical_therapy", label: "Physical Therapy" },
+  { id: "occupational_therapy", label: "Occupational Therapy" },
+  { id: "speech_therapy", label: "Speech Therapy" },
+  { id: "skilled_nursing", label: "Skilled Nursing" },
+  { id: "hospice", label: "Hospice Care" },
+  { id: "respite_care", label: "Respite Care" },
+  { id: "transportation", label: "Transportation" },
+  { id: "meals", label: "Meals & Nutrition" },
+  { id: "housekeeping", label: "Housekeeping" },
+  { id: "laundry", label: "Laundry Services" },
+  { id: "social_activities", label: "Social Activities" },
+  { id: "wellness_programs", label: "Wellness Programs" },
+  { id: "personal_care", label: "Personal Care Assistance" },
+  { id: "bathing_assistance", label: "Bathing Assistance" },
+  { id: "dressing_assistance", label: "Dressing Assistance" },
+  { id: "mobility_assistance", label: "Mobility Assistance" },
+  { id: "incontinence_care", label: "Incontinence Care" },
+];
+
 const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditFacilityDialogProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,6 +126,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
       website: '',
       hours: '',
       virtual_tour_url: '',
+      services: [],
       media: [],
       featured: false,
       status: 'draft',
@@ -151,6 +178,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
             website: data.website || '',
             hours: data.hours || '',
             virtual_tour_url: data.virtual_tour_url || '',
+            services: data.services || [],
             media: existingMedia,
             featured: data.featured || false,
             status: data.status as 'active' | 'draft' || 'draft',
@@ -297,6 +325,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
           images: allImageUrls,
           videos: allVideoUrls,
           image_url: allImageUrls.length > 0 ? allImageUrls[0] : null,
+          services: values.services,
           status: values.status,
           featured: values.featured,
           updated_at: new Date().toISOString(),
@@ -610,6 +639,55 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
                   <FormDescription>
                     Enter amenities separated by commas
                   </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="services"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Services Offered</FormLabel>
+                  <FormDescription>
+                    Select all services that this facility provides
+                  </FormDescription>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                    {availableServices.map((service) => (
+                      <FormField
+                        key={service.id}
+                        control={form.control}
+                        name="services"
+                        render={({ field }) => {
+                          return (
+                            <FormItem
+                              key={service.id}
+                              className="flex flex-row items-start space-x-3 space-y-0"
+                            >
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(service.id)}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? field.onChange([...field.value, service.id])
+                                      : field.onChange(
+                                          field.value?.filter(
+                                            (value) => value !== service.id
+                                          )
+                                        )
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="text-sm font-normal">
+                                {service.label}
+                              </FormLabel>
+                            </FormItem>
+                          )
+                        }}
+                      />
+                    ))}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
