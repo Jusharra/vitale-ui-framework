@@ -29,17 +29,6 @@ const StripeSubscriptionButton: React.FC<StripeSubscriptionButtonProps> = ({
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Define pricing based on tier and interval
-  const getPriceForTier = (tier: MembershipTier, interval: 'monthly' | 'yearly'): number => {
-    const prices = {
-      smart: { monthly: 999, yearly: 9990 },
-      core: { monthly: 2499, yearly: 24990 },
-      vip: { monthly: 4999, yearly: 49990 },
-    };
-    
-    return prices[tier][interval];
-  };
-
   const handleSubscribe = async () => {
     if (!user) {
       toast({
@@ -53,16 +42,12 @@ const StripeSubscriptionButton: React.FC<StripeSubscriptionButtonProps> = ({
     setIsLoading(true);
 
     try {
-      // Get price based on tier and interval
-      const price = getPriceForTier(tier, interval);
-      
       // Call Supabase Edge Function to create a Stripe checkout session
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
           tier,
-          interval,
-          price,
-          trial: true, // Enable trial if applicable
+          interval: interval === 'yearly' ? 'year' : 'month',
+          trial: true, // Enable trial for new subscriptions
         },
       });
 

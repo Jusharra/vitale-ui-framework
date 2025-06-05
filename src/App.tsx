@@ -42,6 +42,7 @@ import AppointmentsPage from '@/pages/member/Appointments';
 import ProfilePage from '@/pages/ProfilePage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import StripeProvider from '@/components/payments/StripeProvider';
+import SubscriptionSuccess from '@/pages/member/SubscriptionSuccess';
 
 // Blog pages
 import BlogIndex from '@/pages/blog/index';
@@ -246,6 +247,15 @@ const App: React.FC = () => {
                     element={
                       <ProtectedRoute>
                         <AppointmentsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  
+                  <Route
+                    path="/dashboard/subscription-success"
+                    element={
+                      <ProtectedRoute>
+                        <SubscriptionSuccess />
                       </ProtectedRoute>
                     }
                   />
