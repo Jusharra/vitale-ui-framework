@@ -153,18 +153,24 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
             </div>
           )}
 
+          {/* Images Carousel */}
           {activeMediaType === 'images' && imageUrls.length > 0 && (
-            <div className="rounded-lg overflow-hidden bg-gray-100">
-              <Carousel className="w-full">
-                <CarouselContent>
+            <div className="relative w-full h-[400px] overflow-hidden rounded-lg bg-black">
+              <Carousel className="w-full h-full">
+                <CarouselContent className="h-full">
                   {imageUrls.map((url, index) => (
-                    <CarouselItem key={index}>
-                      <div className="h-64 w-full flex items-center justify-center">
+                    <CarouselItem key={index} className="h-full">
+                      <div className="relative w-full h-full flex items-center justify-center">
                         <img 
                           src={url} 
                           alt={`${facility.name} - Image ${index + 1}`} 
                           className="max-h-full max-w-full object-contain"
                         />
+                        {index === 0 && facility.price_range && (
+                          <div className="absolute bottom-4 right-4 bg-black/70 text-white px-4 py-2 rounded-md text-xl font-bold">
+                            {facility.price_range}
+                          </div>
+                        )}
                       </div>
                     </CarouselItem>
                   ))}
@@ -175,13 +181,14 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
             </div>
           )}
 
+          {/* Videos Carousel */}
           {activeMediaType === 'videos' && videoUrls.length > 0 && (
-            <div className="rounded-lg overflow-hidden bg-gray-100">
-              <Carousel className="w-full">
-                <CarouselContent>
+            <div className="relative w-full h-[400px] overflow-hidden rounded-lg bg-black">
+              <Carousel className="w-full h-full">
+                <CarouselContent className="h-full">
                   {videoUrls.map((url, index) => (
-                    <CarouselItem key={index}>
-                      <div className="h-64 w-full flex items-center justify-center">
+                    <CarouselItem key={index} className="h-full">
+                      <div className="w-full h-full flex items-center justify-center">
                         <video 
                           src={url} 
                           controls
@@ -197,6 +204,7 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
             </div>
           )}
 
+          {/* No Videos Placeholder */}
           {activeMediaType === 'videos' && videoUrls.length === 0 && (
             <div className="h-64 w-full bg-muted flex items-center justify-center rounded-lg">
               <div className="text-center">
@@ -207,6 +215,7 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
           )}
         </div>
 
+        {/* Facility Description */}
         {facility.description && (
           <div>
             <h3 className="text-lg font-medium mb-2">About {facility.name}</h3>
