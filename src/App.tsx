@@ -22,6 +22,7 @@ import AdminCareTeamsPage from '@/pages/admin/AdminCareTeamsPage';
 import AdminHealthToolsPage from '@/pages/admin/AdminHealthToolsPage';
 import AdminSettingsPage from '@/pages/admin/AdminSettingsPage';
 import AdminBlogPostsPage from '@/pages/admin/AdminBlogPostsPage';
+import AdminFacilitiesPage from '@/pages/admin/AdminFacilitiesPage';
 import ProfessionalPage from '@/pages/ProfessionalDashboard';
 import MemberConciergePage from '@/pages/member/Concierge';
 import MemberPharmacyPage from '@/pages/member/Pharmacy';
@@ -43,6 +44,7 @@ import ProfilePage from '@/pages/ProfilePage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import StripeProvider from '@/components/payments/StripeProvider';
 import SubscriptionSuccess from '@/pages/member/SubscriptionSuccess';
+import FacilityPage from '@/pages/care/[slug]';
 
 // Blog pages
 import BlogIndex from '@/pages/blog/index';
@@ -119,6 +121,7 @@ const App: React.FC = () => {
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/placements" element={<Placements />} />
                   <Route path="/membership" element={<Membership />} />
+                  <Route path="/care/:slug" element={<FacilityPage />} />
                   
                   {/* Blog post routes */}
                   <Route path="/blog/iv-therapy-hospice-san-mateo-county" element={<SanMateoCountyBlog />} />
@@ -322,6 +325,14 @@ const App: React.FC = () => {
                     element={
                       <ProtectedRoute requiredRole="admin">
                         <AdminBlogPostsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/admin/facilities"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminFacilitiesPage />
                       </ProtectedRoute>
                     }
                   />

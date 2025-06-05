@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from 'react-router-dom';
-import { CreditCard, LifeBuoy, DivideIcon as LucideIcon, MessageSquare, PanelLeft, Settings, Users, User, Calendar, Activity, Home, Map, Pill, ShoppingCart, Truck, Palmtree, Gift, Tag, BarChart2 as BarChart, Heart, Clipboard, BadgeDollarSign, Gauge, FileText, Download, Stethoscope } from 'lucide-react';
+import { CreditCard, LifeBuoy, DivideIcon as LucideIcon, MessageSquare, PanelLeft, Settings, Users, User, Calendar, Activity, Home, Map, Pill, ShoppingCart, Truck, Palmtree, Gift, Tag, BarChart2 as BarChart, Heart, Clipboard, BadgeDollarSign, Gauge, FileText, Download, Stethoscope, Building } from 'lucide-react';
 import { 
   Sidebar as SidebarContainer, 
   SidebarContent, 
@@ -83,6 +83,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
       <SidebarLink to="/dashboard/admin/promotions" icon={Gift}>Promotions</SidebarLink>
       <SidebarLink to="/dashboard/admin/leads" icon={BarChart}>Leads & Analytics</SidebarLink>
       <SidebarLink to="/dashboard/admin/care-teams" icon={Users}>Care Teams</SidebarLink>
+      <SidebarLink to="/dashboard/admin/facilities" icon={Building}>Care Facilities</SidebarLink>
       <SidebarLink to="/dashboard/admin/health-tools" icon={Heart}>Health Tools</SidebarLink>
       <SidebarLink to="/dashboard/admin/blog" icon={FileText}>Blog Posts</SidebarLink>
       <SidebarLink to="/dashboard/admin/settings" icon={Settings}>System Settings</SidebarLink>
