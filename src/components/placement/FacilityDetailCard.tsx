@@ -158,11 +158,11 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
               <CarouselContent>
                 {imageUrls.map((url, index) => (
                   <CarouselItem key={index}>
-                    <div className="h-64 w-full">
+                    <div className="h-64 w-full flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden">
                       <img 
                         src={url} 
                         alt={`${facility.name} - Image ${index + 1}`} 
-                        className="h-full w-full object-cover rounded-lg"
+                        className="max-h-full max-w-full object-contain"
                       />
                     </div>
                   </CarouselItem>
@@ -178,11 +178,11 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
               <CarouselContent>
                 {videoUrls.map((url, index) => (
                   <CarouselItem key={index}>
-                    <div className="h-64 w-full">
+                    <div className="h-64 w-full flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden">
                       <video 
                         src={url} 
                         controls
-                        className="h-full w-full object-cover rounded-lg"
+                        className="max-h-full max-w-full"
                       />
                     </div>
                   </CarouselItem>

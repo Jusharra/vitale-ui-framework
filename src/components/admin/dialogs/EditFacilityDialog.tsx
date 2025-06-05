@@ -42,7 +42,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
 const formSchema = z.object({
@@ -76,7 +75,7 @@ type FormValues = z.infer<typeof formSchema>;
 interface EditFacilityDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
+  onSuccess?: () => void;
   facilityId: string | null;
 }
 
@@ -107,7 +106,6 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
     },
   });
 
-  // Fetch facility data when the dialog opens
   useEffect(() => {
     const fetchFacility = async () => {
       if (!facilityId || !open) return;
@@ -123,10 +121,8 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
         if (error) throw error;
         
         if (data) {
-          // Convert amenities array to comma-separated string
           const amenitiesString = data.amenities ? data.amenities.join(', ') : '';
           
-          // Prepare media array from existing images and videos
           const existingMedia = [
             ...(data.images || []).map(url => ({
               url,
@@ -142,7 +138,6 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
             }))
           ];
           
-          // Set form values
           form.reset({
             name: data.name,
             description: data.description || '',
@@ -190,7 +185,6 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
     const currentMedia = form.getValues('media') || [];
     form.setValue('media', [...currentMedia, ...newMedia]);
     
-    // Reset the input value so the same file can be selected again if needed
     event.target.value = '';
   };
 
@@ -205,7 +199,6 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
     const fileName = `${facilityId}/${Date.now()}.${fileExt}`;
     const filePath = `facilities/${fileName}`;
     
-    // Update the media item to show it's uploading
     const currentMedia = [...form.getValues('media')];
     currentMedia[index] = {
       ...currentMedia[index],
@@ -213,7 +206,6 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
     };
     form.setValue('media', currentMedia);
 
-    // Upload the file to Supabase Storage
     const { error: uploadError } = await supabase.storage
       .from('facility_media')
       .upload(filePath, file);
@@ -222,12 +214,10 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
       throw uploadError;
     }
 
-    // Get the public URL
     const { data: { publicUrl } } = supabase.storage
       .from('facility_media')
       .getPublicUrl(filePath);
 
-    // Update the media item to show it's uploaded
     currentMedia[index] = {
       ...currentMedia[index],
       isUploading: false,
@@ -246,18 +236,15 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
     try {
       setIsSubmitting(true);
       
-      // Convert amenities string to array
       const amenitiesArray = values.amenities 
         ? values.amenities.split(',').map(item => item.trim()).filter(Boolean) 
         : [];
       
-      // Upload new media files
       const existingImageUrls: string[] = [];
       const existingVideoUrls: string[] = [];
       const newImageUrls: string[] = [];
       const newVideoUrls: string[] = [];
       
-      // First, collect existing media URLs
       values.media.forEach(mediaItem => {
         if (mediaItem.isExisting && mediaItem.url) {
           if (mediaItem.type === 'image') {
@@ -268,7 +255,6 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
         }
       });
       
-      // Then upload new media files
       for (let i = 0; i < values.media.length; i++) {
         const mediaItem = values.media[i];
         if (mediaItem.file && !mediaItem.isExisting) {
@@ -290,11 +276,9 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
         }
       }
       
-      // Combine existing and new media URLs
       const allImageUrls = [...existingImageUrls, ...newImageUrls];
       const allVideoUrls = [...existingVideoUrls, ...newVideoUrls];
       
-      // Update the facility
       const { error } = await supabase
         .from('care_facilities')
         .update({
@@ -312,7 +296,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
           virtual_tour_url: values.virtual_tour_url,
           images: allImageUrls,
           videos: allVideoUrls,
-          image_url: allImageUrls.length > 0 ? allImageUrls[0] : null, // For backward compatibility
+          image_url: allImageUrls.length > 0 ? allImageUrls[0] : null,
           status: values.status,
           featured: values.featured,
           updated_at: new Date().toISOString(),
@@ -326,7 +310,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
         description: `Care facility has been updated and is now ${values.status === 'active' ? 'published' : 'saved as draft'}`,
       });
       
-      onSuccess();
+      onSuccess?.();
       onOpenChange(false);
     } catch (error: any) {
       console.error('Error updating facility:', error);
@@ -346,7 +330,6 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
     try {
       setIsSubmitting(true);
       
-      // Delete the facility
       const { error } = await supabase
         .from('care_facilities')
         .delete()
@@ -360,7 +343,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
       });
       
       setIsDeleteDialogOpen(false);
-      onSuccess();
+      onSuccess?.();
       onOpenChange(false);
     } catch (error: any) {
       console.error('Error deleting facility:', error);
@@ -702,7 +685,6 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
                     </div>
                   </div>
                   
-                  {/* Preview of uploaded media */}
                   {form.watch('media').length > 0 && (
                     <div className="mt-4">
                       <h4 className="text-sm font-medium mb-2">Media Files</h4>
@@ -755,7 +737,6 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
                           </div>
                         ))}
                         
-                        {/* Add more button */}
                         <div className="border rounded-md p-2 h-24 flex flex-col items-center justify-center">
                           <Button 
                             type="button" 
