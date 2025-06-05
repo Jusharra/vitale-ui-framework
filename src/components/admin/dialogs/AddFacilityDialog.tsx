@@ -285,7 +285,7 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
       form.reset();
       onSuccess();
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating facility:', error);
       toast({
         title: 'Error',
