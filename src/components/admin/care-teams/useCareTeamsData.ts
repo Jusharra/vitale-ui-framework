@@ -56,8 +56,13 @@ export interface Facility {
   spots_available: number;
   amenities?: string[];
   image_url?: string;
+  images?: string[];
+  videos?: string[];
   status: string;
   featured?: boolean;
+  phone?: string;
+  email?: string;
+  hours?: string;
 }
 
 export const useCareTeamsData = () => {
