@@ -94,7 +94,7 @@ const DashboardRouter = () => {
   if (userRole === 'admin') {
     return <Navigate to="/dashboard/admin\" replace />;
   } else if (userRole === 'professional' || userRole === 'partner') {
-    return <Navigate to="/dashboard/professional" replace />;
+    return <Navigate to="/dashboard/professional\" replace />;
   } else {
     // Default to member dashboard
     return <Dashboard />;

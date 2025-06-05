@@ -17,7 +17,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   redirectPath = "/auth",
   children,
 }) => {
-  const { user, isLoading, userRole, isAuthenticated, session } = useAuth();
+  const { user, isLoading, userRole, isAuthenticated, session, signOut } = useAuth();
   const location = useLocation();
   const { toast } = useToast();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -39,20 +39,36 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         try {
           // Try to refresh the session to verify it's still valid
           const { error } = await supabase.auth.refreshSession();
+          
           if (error) {
             console.error("Session refresh error:", error.message);
             
-            // Only show toast for non-rate-limit errors
-            if (!error.message.includes("rate limit")) {
+            // Handle invalid refresh token specifically
+            if (error.message.includes("Invalid Refresh Token") || 
+                error.message.includes("Refresh Token Not Found")) {
+              // Store the attempted path for post-login redirect
+              sessionStorage.setItem('redirectAfterLogin', location.pathname);
+              
+              // Sign out the user to clear the invalid session
+              await signOut();
+              
               toast({
                 title: "Session Expired",
                 description: "Your session has expired. Please sign in again.",
                 variant: "destructive",
               });
+              
+              return;
             }
             
-            // Store the attempted path for post-login redirect
-            sessionStorage.setItem('redirectAfterLogin', location.pathname);
+            // Only show toast for non-rate-limit errors
+            if (!error.message.includes("rate limit")) {
+              toast({
+                title: "Session Error",
+                description: "There was a problem with your session. Please try again.",
+                variant: "destructive",
+              });
+            }
           }
         } catch (error) {
           console.error("Error verifying session:", error);
@@ -63,7 +79,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     };
 
     verifySession();
-  }, [session, location.pathname, toast, isRefreshing, lastRefreshAttempt]);
+  }, [session, location.pathname, toast, isRefreshing, lastRefreshAttempt, signOut]);
 
   // Show loading state if auth is still being determined
   if (isLoading) {
