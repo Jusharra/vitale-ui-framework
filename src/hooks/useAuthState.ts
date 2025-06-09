@@ -33,14 +33,38 @@ export function useAuthState() {
         }
       );
       
-      // Check for existing session
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      console.log("Initial session check:", currentSession ? "Session exists" : "No session");
-      setSession(currentSession);
-      setUser(currentSession?.user || null);
-      
-      if (currentSession?.user) {
-        await fetchUserProfile(currentSession.user.id);
+      try {
+        // Check for existing session
+        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Error getting session:", error);
+          
+          // If it's a refresh token error, clear the session
+          if (error.message.includes("Invalid Refresh Token") || 
+              error.message.includes("Refresh Token Not Found") ||
+              error.message.includes("refresh_token_not_found")) {
+            console.log("Invalid refresh token detected, clearing session");
+            await supabase.auth.signOut();
+            setSession(null);
+            setUser(null);
+            setProfile(null);
+          }
+        } else {
+          console.log("Initial session check:", currentSession ? "Session exists" : "No session");
+          setSession(currentSession);
+          setUser(currentSession?.user || null);
+          
+          if (currentSession?.user) {
+            await fetchUserProfile(currentSession.user.id);
+          }
+        }
+      } catch (error) {
+        console.error("Error during session initialization:", error);
+        // Clear any potentially corrupted session data
+        setSession(null);
+        setUser(null);
+        setProfile(null);
       }
       
       setIsLoading(false);

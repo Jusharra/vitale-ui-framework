@@ -22,64 +22,97 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { toast } = useToast();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastRefreshAttempt, setLastRefreshAttempt] = useState(0);
+  const [hasInvalidToken, setHasInvalidToken] = useState(false);
 
-  // Verify session validity with rate-limiting protection
+  // Verify session validity with improved error handling
   useEffect(() => {
     const verifySession = async () => {
-      if (session && !isRefreshing) {
-        // Check if we've attempted a refresh recently (within the last 30 seconds)
-        const now = Date.now();
-        if (now - lastRefreshAttempt < 30000) {
-          return; // Skip refresh if we've tried recently
-        }
+      // Don't attempt refresh if we already know the token is invalid
+      if (hasInvalidToken || !session || isRefreshing) {
+        return;
+      }
+
+      // Check if we've attempted a refresh recently (within the last 30 seconds)
+      const now = Date.now();
+      if (now - lastRefreshAttempt < 30000) {
+        return; // Skip refresh if we've tried recently
+      }
+      
+      setIsRefreshing(true);
+      setLastRefreshAttempt(now);
+      
+      try {
+        // Try to refresh the session to verify it's still valid
+        const { error } = await supabase.auth.refreshSession();
         
-        setIsRefreshing(true);
-        setLastRefreshAttempt(now);
-        
-        try {
-          // Try to refresh the session to verify it's still valid
-          const { error } = await supabase.auth.refreshSession();
+        if (error) {
+          console.error("Session refresh error:", error.message);
           
-          if (error) {
-            console.error("Session refresh error:", error.message);
+          // Handle invalid refresh token specifically
+          if (error.message.includes("Invalid Refresh Token") || 
+              error.message.includes("Refresh Token Not Found") ||
+              error.message.includes("refresh_token_not_found")) {
             
-            // Handle invalid refresh token specifically
-            if (error.message.includes("Invalid Refresh Token") || 
-                error.message.includes("Refresh Token Not Found")) {
-              // Store the attempted path for post-login redirect
-              sessionStorage.setItem('redirectAfterLogin', location.pathname);
-              
-              // Sign out the user to clear the invalid session
-              await signOut();
-              
-              toast({
-                title: "Session Expired",
-                description: "Your session has expired. Please sign in again.",
-                variant: "destructive",
-              });
-              
-              return;
-            }
+            // Mark token as invalid to prevent further refresh attempts
+            setHasInvalidToken(true);
             
-            // Only show toast for non-rate-limit errors
-            if (!error.message.includes("rate limit")) {
-              toast({
-                title: "Session Error",
-                description: "There was a problem with your session. Please try again.",
-                variant: "destructive",
-              });
-            }
+            // Store the attempted path for post-login redirect
+            sessionStorage.setItem('redirectAfterLogin', location.pathname);
+            
+            // Sign out the user to clear the invalid session
+            await signOut();
+            
+            toast({
+              title: "Session Expired",
+              description: "Your session has expired. Please sign in again.",
+              variant: "destructive",
+            });
+            
+            return;
           }
-        } catch (error) {
-          console.error("Error verifying session:", error);
-        } finally {
-          setIsRefreshing(false);
+          
+          // Only show toast for non-rate-limit errors
+          if (!error.message.includes("rate limit")) {
+            toast({
+              title: "Session Error",
+              description: "There was a problem with your session. Please try again.",
+              variant: "destructive",
+            });
+          }
         }
+      } catch (error) {
+        console.error("Error verifying session:", error);
+        
+        // If the error is related to invalid tokens, handle it gracefully
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (errorMessage.includes("Invalid Refresh Token") || 
+            errorMessage.includes("Refresh Token Not Found") ||
+            errorMessage.includes("refresh_token_not_found")) {
+          
+          setHasInvalidToken(true);
+          sessionStorage.setItem('redirectAfterLogin', location.pathname);
+          await signOut();
+          
+          toast({
+            title: "Session Expired",
+            description: "Your session has expired. Please sign in again.",
+            variant: "destructive",
+          });
+        }
+      } finally {
+        setIsRefreshing(false);
       }
     };
 
     verifySession();
-  }, [session, location.pathname, toast, isRefreshing, lastRefreshAttempt, signOut]);
+  }, [session, location.pathname, toast, isRefreshing, lastRefreshAttempt, signOut, hasInvalidToken]);
+
+  // Reset invalid token flag when session changes (e.g., new login)
+  useEffect(() => {
+    if (session && hasInvalidToken) {
+      setHasInvalidToken(false);
+    }
+  }, [session, hasInvalidToken]);
 
   // Show loading state if auth is still being determined
   if (isLoading) {

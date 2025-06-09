@@ -89,29 +89,36 @@ export function useAuthActions() {
     }
   };
   
-  // Sign out
+  // Sign out with improved error handling
   const signOut = async () => {
     try {
-      // Check if we have a session before attempting to sign out
-      const { data: sessionData } = await supabase.auth.getSession();
-      
-      if (!sessionData.session) {
-        console.log("No active session found, redirecting to login");
-        navigate('/auth');
-        return true;
-      }
-      
+      // Always attempt to sign out, even if there's no active session
       const { error } = await supabase.auth.signOut();
       
       if (error) {
-        throw error;
+        // Log the error but don't throw it - we still want to redirect
+        console.error("Sign out error:", error);
+        
+        // If it's a refresh token error, it means the session was already invalid
+        if (error.message.includes("Invalid Refresh Token") || 
+            error.message.includes("Refresh Token Not Found") ||
+            error.message.includes("refresh_token_not_found")) {
+          console.log("Session was already invalid, proceeding with sign out");
+        } else {
+          // For other errors, show a warning but still proceed
+          toast({
+            title: "Sign out issue",
+            description: "There was a problem signing you out, but you've been redirected to the login page.",
+          });
+        }
+      } else {
+        toast({
+          title: "Signed out",
+          description: "You have been signed out successfully.",
+        });
       }
-      
-      toast({
-        title: "Signed out",
-        description: "You have been signed out successfully.",
-      });
 
+      // Always navigate to auth page regardless of errors
       navigate('/auth');
       return true;
     } catch (error: any) {
