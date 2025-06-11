@@ -81,6 +81,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
       <SidebarLink to="/dashboard/admin" icon={Gauge}>Overview</SidebarLink>
       <SidebarLink to="/dashboard/admin/vacations" icon={Palmtree}>Vacations</SidebarLink>
       <SidebarLink to="/dashboard/admin/promotions" icon={Gift}>Promotions</SidebarLink>
+      <SidebarLink to="/dashboard/admin/professionals" icon={UserPlus}>Services</SidebarLink>
       <SidebarLink to="/dashboard/admin/leads" icon={BarChart}>Leads & Analytics</SidebarLink>
       <SidebarLink to="/dashboard/admin/care-teams" icon={Users}>Care Teams</SidebarLink>
       <SidebarLink to="/dashboard/admin/facilities" icon={Building}>Care Facilities</SidebarLink>
@@ -100,7 +101,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
             <span className="font-semibold text-lg text-primary-foreground">V</span>
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Vitale</h2>
+            <h2 className="text-lg font-semibold">Vitalé</h2>
             <p className="text-xs text-muted-foreground">Health Concierge</p>
           </div>
         </div>
