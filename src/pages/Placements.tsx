@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Search, MapPin, Filter, CheckCircle, User, Home } from 'lucide-react';
+import { Search, MapPin, Filter, CheckCircle, User, Home as HomeIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import FacilityDetailCard from '@/components/placement/FacilityDetailCard';
@@ -460,7 +460,7 @@ const Placements = () => {
           }}>
             <TabsList className="grid w-full grid-cols-2 max-w-md">
               <TabsTrigger value="facilities" className="flex gap-2 items-center">
-                <Home className="h-4 w-4" />
+                <HomeIcon className="h-4 w-4" />
                 <span>Care Facilities</span>
               </TabsTrigger>
               <TabsTrigger value="professionals" className="flex gap-2 items-center">
