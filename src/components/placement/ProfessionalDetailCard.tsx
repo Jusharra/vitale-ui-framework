@@ -13,7 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, Calendar as CalendarIcon, Clock, Star, CheckCircle, MessageSquare, Video, ChevronLeft } from 'lucide-react';
+import { MapPin, Phone, Mail, Calendar as CalendarIcon, Clock, Star, CheckCircle, MessageSquare, Video, ChevronLeft, User as UserIcon } from 'lucide-react';
 
 interface Professional {
   id: string;
@@ -407,7 +407,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
               <h4 className="font-medium mb-2">Appointment Type</h4>
               <div className="grid grid-cols-2 gap-2">
                 <Button variant="outline" className="justify-start">
-                  <User className="mr-2 h-4 w-4" />
+                  <UserIcon className="mr-2 h-4 w-4" />
                   In-Person Visit
                 </Button>
                 {professional.telehealth_enabled && (
