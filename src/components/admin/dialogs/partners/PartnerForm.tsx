@@ -181,6 +181,23 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="slug"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Profile URL Slug</FormLabel>
+              <FormControl>
+                <Input placeholder="dr-jane-smith" {...field} />
+              </FormControl>
+              <FormDescription>
+                This will be used in the URL for the professional's profile page. It will be auto-generated from the name but can be customized.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
@@ -211,23 +228,6 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
             )}
           />
         </div>
-
-        <FormField
-          control={form.control}
-          name="slug"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Profile URL Slug</FormLabel>
-              <FormControl>
-                <Input placeholder="dr-jane-smith" {...field} />
-              </FormControl>
-              <FormDescription>
-                This will be used in the URL for the professional's profile page. It will be auto-generated from the name but can be customized.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField

@@ -90,7 +90,10 @@ export const useCareTeamsData = () => {
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (partnersError) throw partnersError;
+      if (partnersError) {
+        console.error("Error fetching partners:", partnersError);
+        throw partnersError;
+      }
       
       // Ensure all partners have a status property
       const partnersWithStatus = partnersData?.map(partner => ({
