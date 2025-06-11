@@ -39,6 +39,11 @@ const formSchema = z.object({
   telehealth_enabled: z.boolean().default(false),
   verified: z.boolean().default(false),
   status: z.enum(['active', 'draft']).default('draft'),
+  instagram_url: z.string().url('Valid URL is required').optional().or(z.literal('')),
+  youtube_url: z.string().url('Valid URL is required').optional().or(z.literal('')),
+  tiktok_url: z.string().url('Valid URL is required').optional().or(z.literal('')),
+  linkedin_url: z.string().url('Valid URL is required').optional().or(z.literal('')),
+  facebook_url: z.string().url('Valid URL is required').optional().or(z.literal('')),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -75,6 +80,11 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
       telehealth_enabled: professional ? professional.telehealth_enabled : false,
       verified: professional ? professional.verified : false,
       status: professional?.status || 'draft',
+      instagram_url: professional?.instagram_url || '',
+      youtube_url: professional?.youtube_url || '',
+      tiktok_url: professional?.tiktok_url || '',
+      linkedin_url: professional?.linkedin_url || '',
+      facebook_url: professional?.facebook_url || '',
     },
   });
 
@@ -188,6 +198,11 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
         telehealth_enabled: values.telehealth_enabled,
         verified: values.verified,
         status: values.status,
+        instagram_url: values.instagram_url,
+        youtube_url: values.youtube_url,
+        tiktok_url: values.tiktok_url,
+        linkedin_url: values.linkedin_url,
+        facebook_url: values.facebook_url,
       };
 
       if (isEditing) {
@@ -511,118 +526,73 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FormField
-              control={form.control}
-              name="accepting_new_patients"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Accepting New Patients
-                    </FormLabel>
-                    <FormDescription>
-                      Is this professional accepting new patients?
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="telehealth_enabled"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Telehealth Enabled
-                    </FormLabel>
-                    <FormDescription>
-                      Does this professional offer telehealth?
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="verified"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Verified Provider
-                    </FormLabel>
-                    <FormDescription>
-                      Is this professional verified?
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">
-                    {field.value === 'active' ? 'Published' : 'Draft'}
-                  </FormLabel>
-                  <FormDescription>
-                    {field.value === 'active' 
-                      ? 'This page is live and visible to the public' 
-                      : 'This page is a draft and only visible to admins'}
-                  </FormDescription>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value === 'active'}
-                    onCheckedChange={(checked) => field.onChange(checked ? 'active' : 'draft')}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <div className="flex justify-end gap-2">
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isEditing ? 'Updating...' : 'Creating...'}
-                </>
-              ) : (
-                isEditing ? 'Update Professional' : 'Create Professional'
-              )}
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </div>
-  );
-};
-
-export default ProfessionalEditor;
+          <div className="border p-4 rounded-lg">
+            <h3 className="text-lg font-medium mb-4">Social Media Profiles</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="instagram_url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Instagram URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://instagram.com/username" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="linkedin_url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>LinkedIn URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://linkedin.com/in/username" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="youtube_url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>YouTube URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://youtube.com/@channel" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="tiktok_url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>TikTok URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://tiktok.com/@username" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="facebook_url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Facebook URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://facebook.com/username" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
