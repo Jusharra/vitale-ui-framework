@@ -17,7 +17,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { DialogFooter } from '@/components/ui/dialog';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 
 interface PartnerFormProps {
   defaultValues: Partial<PartnerFormValues>;
@@ -28,6 +29,8 @@ interface PartnerFormProps {
 
 const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: PartnerFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  
   const form = useForm<PartnerFormValues>({
     resolver: zodResolver(partnerFormSchema),
     defaultValues,
@@ -42,23 +45,99 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
     }
   };
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Dr. Jane Smith" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="md:col-span-2 flex flex-col md:flex-row gap-4 items-start">
+            <div className="w-full md:w-auto">
+              <div className="mb-2">
+                <Label>Profile Image</Label>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-32 h-32 border-2 border-dashed rounded-md flex items-center justify-center overflow-hidden">
+                  {imagePreview ? (
+                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="text-center p-4">
+                      <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-xs text-muted-foreground">Upload image</p>
+                    </div>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  id="profile-image"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => document.getElementById('profile-image')?.click()}
+                >
+                  Select Image
+                </Button>
+              </div>
+            </div>
+            
+            <div className="flex-1 space-y-4 w-full">
+              <FormField
+                control={form.control}
+                name="first_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Jane" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Dr. Jane Smith" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="credentials"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Credentials</FormLabel>
+                    <FormControl>
+                      <Input placeholder="RN, CNA, MD, etc." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
           
           <FormField
             control={form.control}
@@ -73,9 +152,7 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
               </FormItem>
             )}
           />
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
+          
           <FormField
             control={form.control}
             name="phone"
@@ -89,7 +166,9 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
               </FormItem>
             )}
           />
-          
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="practice_name"
@@ -99,6 +178,61 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
                 <FormControl>
                   <Input placeholder="City Health Clinic" {...field} />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="service_area"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Service Area</FormLabel>
+                <FormControl>
+                  <Input placeholder="City, County, or Zip radius" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="hourly_rate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Hourly Rate / Package Range</FormLabel>
+                <FormControl>
+                  <Input placeholder="$50/hr or $200-500/package" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="languages"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Languages Spoken</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="English, Spanish, Mandarin, etc." 
+                    value={Array.isArray(field.value) ? field.value.join(', ') : field.value}
+                    onChange={(e) => {
+                      const languagesArray = e.target.value
+                        .split(',')
+                        .map(item => item.trim())
+                        .filter(Boolean);
+                      field.onChange(languagesArray);
+                    }}
+                  />
+                </FormControl>
+                <FormDescription>Enter languages separated by commas</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -132,10 +266,35 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
         
         <FormField
           control={form.control}
+          name="specializations"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Specializations</FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="Dementia, Hospice, Palliative Care, etc." 
+                  value={Array.isArray(field.value) ? field.value.join(', ') : field.value}
+                  onChange={(e) => {
+                    const specializationsArray = e.target.value
+                      .split(',')
+                      .map(item => item.trim())
+                      .filter(Boolean);
+                    field.onChange(specializationsArray);
+                  }}
+                />
+              </FormControl>
+              <FormDescription>Enter specializations separated by commas</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="bio"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Bio</FormLabel>
+              <FormLabel>Professional Bio</FormLabel>
               <FormControl>
                 <Textarea 
                   placeholder="Brief professional biography and background" 
@@ -147,15 +306,17 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
             </FormItem>
           )}
         />
-        
-        <div className="grid grid-cols-2 gap-4">
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormField
             control={form.control}
             name="accepting_new_patients"
             render={({ field }) => (
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
-                  <FormLabel className="text-base">Accepting New Patients</FormLabel>
+                  <FormLabel className="text-base">
+                    Accepting New Patients
+                  </FormLabel>
                   <FormDescription>
                     Partner is currently accepting new patient appointments
                   </FormDescription>
@@ -190,6 +351,34 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
               </FormItem>
             )}
           />
+          
+          <FormField
+            control={form.control}
+            name="verified"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">Verified by Vitale</FormLabel>
+                  <FormDescription>
+                    Provider has been verified by Vitale Concierge
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+        
+        <div className="border rounded-lg p-4">
+          <h3 className="text-sm font-medium mb-2">Availability Calendar</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            The availability calendar will be implemented in a future update. For now, please note any availability restrictions in the bio field.
+          </p>
         </div>
         
         <DialogFooter>

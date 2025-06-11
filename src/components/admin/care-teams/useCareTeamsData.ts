@@ -5,16 +5,23 @@ import { useToast } from '@/hooks/use-toast';
 export interface Partner {
   id: string;
   name: string;
+  first_name?: string;
+  credentials?: string;
   email: string;
   phone?: string;
   practice_name?: string;
   specialties?: string[];
+  languages?: string[];
+  specializations?: string[];
+  service_area?: string;
+  hourly_rate?: string;
   bio?: string;
   accepting_new_patients?: boolean;
   telehealth_enabled?: boolean;
   status: string; // Changed from optional to required to match the expected type
   profile_image?: string;
   rating?: number;
+  verified?: boolean;
 }
 
 export interface Pharmacy {

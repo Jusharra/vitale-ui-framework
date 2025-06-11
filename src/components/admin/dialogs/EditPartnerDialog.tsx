@@ -42,13 +42,20 @@ const EditPartnerDialog = ({ open, onOpenChange, onSuccess, partnerId }: EditPar
         // Transform the data to match the form schema
         const formattedData: PartnerFormValues = {
           name: data.name || '',
+          first_name: data.first_name || '',
+          credentials: data.credentials || '',
           email: data.email || '',
           phone: data.phone || '',
           practice_name: data.practice_name || '',
           specialties: data.specialties || [],
+          languages: data.languages || [],
+          specializations: data.specializations || [],
+          service_area: data.service_area || '',
+          hourly_rate: data.hourly_rate || '',
           bio: data.bio || '',
           accepting_new_patients: data.accepting_new_patients !== false, // Default to true if undefined
           telehealth_enabled: data.telehealth_enabled || false,
+          verified: data.verified || false,
         };
         
         setPartnerData(formattedData);
@@ -77,13 +84,20 @@ const EditPartnerDialog = ({ open, onOpenChange, onSuccess, partnerId }: EditPar
         .from('partners')
         .update({
           name: values.name,
+          first_name: values.first_name,
+          credentials: values.credentials,
           email: values.email,
           phone: values.phone,
           practice_name: values.practice_name,
           specialties: values.specialties,
+          languages: values.languages,
+          specializations: values.specializations,
+          service_area: values.service_area,
+          hourly_rate: values.hourly_rate,
           bio: values.bio,
           accepting_new_patients: values.accepting_new_patients,
           telehealth_enabled: values.telehealth_enabled,
+          verified: values.verified,
         })
         .eq('id', partnerId);
       
@@ -110,7 +124,7 @@ const EditPartnerDialog = ({ open, onOpenChange, onSuccess, partnerId }: EditPar
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Healthcare Professional</DialogTitle>
           <DialogDescription>
@@ -118,7 +132,7 @@ const EditPartnerDialog = ({ open, onOpenChange, onSuccess, partnerId }: EditPar
           </DialogDescription>
         </DialogHeader>
         
-        {isLoading ? (
+        {isLoading && !partnerData ? (
           <div className="flex justify-center items-center py-8">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <span className="ml-2">Loading partner data...</span>

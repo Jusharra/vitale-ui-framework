@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Dialog,
@@ -22,7 +21,7 @@ const AddPartnerDialog = ({ open, onOpenChange, onSuccess }: AddPartnerDialogPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Healthcare Professional</DialogTitle>
           <DialogDescription>Create a new healthcare partner profile</DialogDescription>
