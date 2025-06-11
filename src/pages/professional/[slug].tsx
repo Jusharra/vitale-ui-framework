@@ -67,7 +67,13 @@ const ProfessionalProfilePage = () => {
 
         if (error) {
           console.error('Error fetching professional by slug:', error);
-          // If there's an error with the exact slug query, try a more flexible approach
+          throw new Error(`Database error: ${error.message}`);
+        }
+
+        if (data) {
+          setProfessional(data);
+        } else {
+          // If no exact match, try a case-insensitive search
           const { data: alternativeData, error: alternativeError } = await supabase
             .from('partners')
             .select('*')
@@ -77,24 +83,21 @@ const ProfessionalProfilePage = () => {
             .maybeSingle();
             
           if (alternativeError) {
-            throw alternativeError;
+            console.error('Error in alternative search:', alternativeError);
+            throw new Error(`Professional with slug "${slug}" not found`);
           }
           
           if (alternativeData) {
             setProfessional(alternativeData);
           } else {
-            throw new Error('Professional not found');
+            throw new Error(`Professional with slug "${slug}" not found`);
           }
-        } else if (data) {
-          setProfessional(data);
-        } else {
-          throw new Error('Professional not found');
         }
       } catch (error: any) {
         console.error('Error fetching professional:', error);
         toast({
-          title: 'Error',
-          description: 'Failed to load professional information',
+          title: 'Professional Not Found',
+          description: error.message || 'Failed to load professional information',
           variant: 'destructive',
         });
       } finally {
@@ -165,7 +168,10 @@ const ProfessionalProfilePage = () => {
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900">Professional Not Found</h1>
             <p className="mt-4 text-lg text-gray-600">
-              The healthcare professional you're looking for doesn't exist or is no longer available.
+              The healthcare professional with slug "{slug}" doesn't exist or is no longer available.
+            </p>
+            <p className="mt-2 text-sm text-gray-500">
+              Please check the URL or browse our available professionals.
             </p>
             <Button 
               className="mt-6" 
