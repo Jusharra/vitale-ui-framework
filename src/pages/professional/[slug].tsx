@@ -305,10 +305,10 @@ const ProfessionalProfilePage = () => {
               <div className="mt-6 flex flex-wrap gap-3">
                 <Button 
                   size="lg"
-                  onClick={() => window.location.href = `tel:${professional.phone}`}
+                  disabled={!professional.accepting_new_patients}
                 >
-                  <Phone className="mr-2 h-5 w-5" />
-                  Call Caregiver
+                  <CalendarIcon className="mr-2 h-5 w-5" />
+                  Book Appointment
                 </Button>
                 
                 <Button 
@@ -472,6 +472,104 @@ const ProfessionalProfilePage = () => {
           <div>
             <Card>
               <CardHeader>
+                <CardTitle>Book an Appointment</CardTitle>
+                <CardDescription>
+                  Select your preferred date and time
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className="w-full justify-start text-left font-normal"
+                      >
+                        {date ? (
+                          format(date, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        disabled={(date) => date < new Date()}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                
+                <div>
+                  <Label>Time</Label>
+                  <div className="grid grid-cols-2 gap-2 mt-2 max-h-[200px] overflow-y-auto">
+                    {timeSlots.map((slot) => (
+                      <Button
+                        key={slot}
+                        variant={timeSlot === slot ? "default" : "outline"}
+                        className="justify-start"
+                        onClick={() => setTimeSlot(slot)}
+                      >
+                        <Clock className="mr-2 h-4 w-4" />
+                        {slot}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <Label>Appointment Type</Label>
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    <Button
+                      variant={appointmentType === 'in-person' ? "default" : "outline"}
+                      className="justify-start"
+                      onClick={() => setAppointmentType('in-person')}
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      In-Person
+                    </Button>
+                    
+                    {professional.telehealth_enabled && (
+                      <Button
+                        variant={appointmentType === 'telehealth' ? "default" : "outline"}
+                        className="justify-start"
+                        onClick={() => setAppointmentType('telehealth')}
+                      >
+                        <Video className="mr-2 h-4 w-4" />
+                        Telehealth
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="reason">Reason for Visit</Label>
+                  <Textarea 
+                    id="reason" 
+                    placeholder="Briefly describe the reason for your appointment"
+                    className="mt-2"
+                  />
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  className="w-full"
+                  onClick={handleBookAppointment}
+                  disabled={!date || !timeSlot || !professional.accepting_new_patients}
+                >
+                  {professional.accepting_new_patients ? 'Book Appointment' : 'Not Accepting Patients'}
+                </Button>
+              </CardFooter>
+            </Card>
+            
+            <Card className="mt-6">
+              <CardHeader>
                 <CardTitle>Contact Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -506,13 +604,9 @@ const ProfessionalProfilePage = () => {
                 )}
               </CardContent>
               <CardFooter>
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => window.location.href = `tel:${professional.phone}`}
-                >
-                  <Phone className="mr-2 h-4 w-4" />
-                  Call Caregiver
+                <Button variant="outline" className="w-full">
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Send Message
                 </Button>
               </CardFooter>
             </Card>

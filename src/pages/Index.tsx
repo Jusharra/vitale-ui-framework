@@ -51,13 +51,8 @@ const Index = () => {
                 Premium IV therapy, private nursing, hospice care, and assisted living placements—trusted, vetted, delivered to your door.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Button 
-                  size="lg" 
-                  className="bg-indigo-600 hover:bg-indigo-700"
-                  onClick={() => window.location.href = 'tel:6614898106'}
-                >
-                  <Phone className="mr-2 h-5 w-5" />
-                  Call Caregiver Now
+                <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700">
+                  Book In-Home Care Now
                 </Button>
                 <Button size="lg" variant="outline" className="border-indigo-600 text-indigo-600 hover:bg-indigo-50">
                   Explore Concierge Services
@@ -194,13 +189,8 @@ const Index = () => {
             </div>
             
             <div className="mt-8 text-center">
-              <Button 
-                size="lg" 
-                className="bg-green-500 hover:bg-green-600 text-white px-8"
-                onClick={() => window.location.href = 'tel:6614898106'}
-              >
-                <Phone className="mr-2 h-5 w-5" />
-                Call Our Caregivers
+              <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white px-8">
+                Claim My Concierge Offer
               </Button>
             </div>
           </div>
@@ -244,13 +234,8 @@ const Index = () => {
           </div>
           
           <div className="text-center mt-12">
-            <Button 
-              size="lg" 
-              className="bg-indigo-600 hover:bg-indigo-700"
-              onClick={() => window.location.href = 'tel:6614898106'}
-            >
-              <Phone className="mr-2 h-5 w-5" />
-              Call Our Caregivers
+            <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700">
+              Get Started Today
             </Button>
           </div>
         </div>
@@ -346,22 +331,11 @@ const Index = () => {
                 Schedule a free consultation with our concierge team to discuss your needs and discover how we can help.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  size="lg" 
-                  className="bg-white text-indigo-700 hover:bg-indigo-50"
-                  onClick={() => window.location.href = 'tel:6614898106'}
-                >
-                  <Phone className="mr-2 h-5 w-5" />
-                  Call Our Caregivers
+                <Button size="lg" className="bg-white text-indigo-700 hover:bg-indigo-50">
+                  Schedule My Concierge Call
                 </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="border-white text-white hover:bg-white/10"
-                  onClick={() => window.location.href = 'mailto:vitalehealthconcierge@gmail.com'}
-                >
-                  <MessageSquare className="mr-2 h-5 w-5" />
-                  Email Us
+                <Button size="lg" variant="outline" className="border-white text-indigo-700 hover:bg-indigo-50">
+                  Book Urgent Care Now
                 </Button>
               </div>
             </div>
