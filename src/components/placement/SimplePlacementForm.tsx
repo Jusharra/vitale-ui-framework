@@ -230,7 +230,7 @@ const SimplePlacementForm: React.FC<SimplePlacementFormProps> = ({
                   <div className="grid gap-1.5">
                     <Label htmlFor="expedited" className="font-medium flex items-center">
                       Expedited Concierge Matching (24–48 hours)
-                      <span className="ml-2 text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full">$497 Deposit</span>
+                      <span className="ml-2 text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full">No Fee</span>
                     </Label>
                     <p className="text-sm text-muted-foreground">
                       Fast-track your case with priority matching, 24/7 concierge support, and exclusive perks.
