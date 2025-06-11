@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PartnerFormValues, partnerFormSchema } from './schema';
 import { generateSlug } from '@/utils/stringUtils';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 import {
   Form,
@@ -18,7 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { DialogFooter } from '@/components/ui/dialog';
-import { Loader2, Upload } from 'lucide-react';
+import { Loader2, Upload, X } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 
 interface PartnerFormProps {
@@ -30,7 +32,9 @@ interface PartnerFormProps {
 
 const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: PartnerFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(defaultValues.profile_image || null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const { toast } = useToast();
   
   const form = useForm<PartnerFormValues>({
     resolver: zodResolver(partnerFormSchema),
@@ -53,7 +57,59 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
   const handleFormSubmit = async (values: PartnerFormValues) => {
     setIsSubmitting(true);
     try {
-      await onSubmit(values);
+      // If there's a new image file, upload it first
+      let imageUrl = values.profile_image;
+      
+      if (imageFile) {
+        try {
+          // Create a unique file name
+          const fileExt = imageFile.name.split('.').pop();
+          const fileName = `${Date.now()}.${fileExt}`;
+          const filePath = `partner_images/${fileName}`;
+          
+          // Check if the bucket exists, create it if it doesn't
+          const { data: buckets } = await supabase.storage.listBuckets();
+          const bucketExists = buckets?.some(bucket => bucket.name === 'partner_images');
+          
+          if (!bucketExists) {
+            await supabase.storage.createBucket('partner_images', {
+              public: true
+            });
+          }
+          
+          // Upload the file
+          const { error: uploadError } = await supabase.storage
+            .from('partner_images')
+            .upload(filePath, imageFile);
+            
+          if (uploadError) {
+            throw uploadError;
+          }
+          
+          // Get the public URL
+          const { data } = supabase.storage
+            .from('partner_images')
+            .getPublicUrl(filePath);
+            
+          imageUrl = data.publicUrl;
+        } catch (error) {
+          console.error('Error uploading image:', error);
+          toast({
+            title: 'Image upload failed',
+            description: 'The profile image could not be uploaded, but other data will be saved.',
+            variant: 'destructive',
+          });
+        }
+      }
+      
+      // Add the image URL to the values
+      const updatedValues = {
+        ...values,
+        profile_image: imageUrl
+      };
+      
+      // Submit the form with the updated values
+      await onSubmit(updatedValues);
     } finally {
       setIsSubmitting(false);
     }
@@ -62,6 +118,7 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target?.result as string);
@@ -82,7 +139,20 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
               <div className="flex flex-col items-center gap-2">
                 <div className="w-32 h-32 border-2 border-dashed rounded-md flex items-center justify-center overflow-hidden">
                   {imagePreview ? (
-                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                    <div className="relative w-full h-full">
+                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                      <button 
+                        type="button" 
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
+                        onClick={() => {
+                          setImagePreview(null);
+                          setImageFile(null);
+                          form.setValue('profile_image', '');
+                        }}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
                   ) : (
                     <div className="text-center p-4">
                       <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-2" />

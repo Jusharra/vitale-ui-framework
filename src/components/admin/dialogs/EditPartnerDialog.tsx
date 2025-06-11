@@ -57,6 +57,8 @@ const EditPartnerDialog = ({ open, onOpenChange, onSuccess, partnerId }: EditPar
           telehealth_enabled: data.telehealth_enabled || false,
           verified: data.verified || false,
           slug: data.slug || '',
+          profile_image: data.profile_image || '',
+          status: data.status || 'active',
         };
         
         setPartnerData(formattedData);
@@ -100,6 +102,8 @@ const EditPartnerDialog = ({ open, onOpenChange, onSuccess, partnerId }: EditPar
           telehealth_enabled: values.telehealth_enabled,
           verified: values.verified,
           slug: values.slug,
+          profile_image: values.profile_image,
+          status: values.status,
         })
         .eq('id', partnerId);
       

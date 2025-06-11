@@ -26,7 +26,7 @@ const formSchema = z.object({
   name: z.string().min(2, 'Professional name is required'),
   slug: z.string().min(2, 'Slug is required'),
   bio: z.string().min(10, 'Bio is required'),
-  profile_image: z.string().url('Valid image URL is required'),
+  profile_image: z.string().url('Valid image URL is required').or(z.string().length(0)),
   specialties: z.string().optional(),
   languages: z.string().optional(),
   service_area: z.string().optional(),
@@ -53,6 +53,7 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [storageError, setStorageError] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const isEditing = !!professional;
 
   // Initialize form with default values or existing professional data
@@ -93,46 +94,38 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
 
     setIsUploading(true);
     setStorageError(null);
+    setImageFile(file);
     
     try {
-      // First, check if the bucket exists by trying to list objects
-      const { error: listError } = await supabase.storage
-        .from('professional_media')
-        .list('', { limit: 1 });
-
-      if (listError) {
-        // If bucket doesn't exist, show helpful error message
-        if (listError.message.includes('Bucket not found')) {
-          setStorageError('Storage bucket not configured. Please contact your administrator to set up the "professional_media" storage bucket in Supabase.');
-          toast({
-            title: 'Storage not configured',
-            description: 'The image storage bucket needs to be created in Supabase. Please use a direct image URL for now.',
-            variant: 'destructive',
-          });
-          return;
-        }
-        throw listError;
+      // Check if the bucket exists, create it if it doesn't
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const bucketExists = buckets?.some(bucket => bucket.name === 'partner_images');
+      
+      if (!bucketExists) {
+        await supabase.storage.createBucket('partner_images', {
+          public: true
+        });
       }
-
+      
       // Create a unique file name
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `professional_images/${fileName}`;
+      const filePath = `partner_images/${fileName}`;
 
       // Upload the file to Supabase Storage
       const { error: uploadError } = await supabase.storage
-        .from('professional_media')
+        .from('partner_images')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
       // Get the public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('professional_media')
+      const { data } = supabase.storage
+        .from('partner_images')
         .getPublicUrl(filePath);
 
       // Set the URL in the form
-      form.setValue('profile_image', publicUrl);
+      form.setValue('profile_image', data.publicUrl);
       
       toast({
         title: 'Image uploaded',
@@ -144,7 +137,7 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
       let errorMessage = 'Failed to upload image';
       if (error.message?.includes('Bucket not found')) {
         errorMessage = 'Storage bucket not found. Please contact your administrator.';
-        setStorageError('The "professional_media" storage bucket needs to be created in your Supabase project.');
+        setStorageError('The "partner_images" storage bucket needs to be created in your Supabase project.');
       } else if (error.message?.includes('not allowed')) {
         errorMessage = 'File type not allowed. Please use JPG, PNG, or WebP images.';
       } else if (error.message?.includes('too large')) {
@@ -364,8 +357,8 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
                       <input
                         type="file"
                         id="image-upload"
-                        accept="image/*"
                         className="hidden"
+                        accept="image/*"
                         onChange={handleFileUpload}
                         disabled={isUploading}
                       />
@@ -527,7 +520,7 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
                       Accepting New Patients
                     </FormLabel>
                     <FormDescription>
-                      Is this professional accepting new patients?
+                      Is this professional accepting new patient appointments?
                     </FormDescription>
                   </div>
                   <FormControl>
@@ -539,7 +532,7 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
                 </FormItem>
               )}
             />
-
+            
             <FormField
               control={form.control}
               name="telehealth_enabled"
@@ -562,7 +555,7 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
                 </FormItem>
               )}
             />
-
+            
             <FormField
               control={form.control}
               name="verified"

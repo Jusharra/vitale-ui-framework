@@ -9,6 +9,7 @@ export const partnerFormSchema = z.object({
   phone: z.string().optional(),
   practice_name: z.string().optional(),
   slug: z.string().optional(),
+  profile_image: z.string().optional(),
   // Fix the specialties field to properly handle the transformation
   specialties: z.union([
     // Accept string input from form
@@ -30,6 +31,7 @@ export const partnerFormSchema = z.object({
   accepting_new_patients: z.boolean().default(true),
   telehealth_enabled: z.boolean().default(false),
   verified: z.boolean().default(false),
+  status: z.string().default('active'),
 });
 
 // Export the type for the form values - this ensures the form values match what the schema expects
@@ -44,6 +46,7 @@ export const defaultPartnerFormValues: Partial<PartnerFormValues> = {
   phone: '',
   practice_name: '',
   slug: '',
+  profile_image: '',
   specialties: [], // Fix: Initialize as an empty array instead of an empty string
   languages: [],
   specializations: [],
@@ -53,6 +56,7 @@ export const defaultPartnerFormValues: Partial<PartnerFormValues> = {
   accepting_new_patients: true,
   telehealth_enabled: false,
   verified: false,
+  status: 'active',
 };
 
 // Define a specific type for the specialties form field to make it clear it's a string in the form
