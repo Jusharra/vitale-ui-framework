@@ -48,6 +48,7 @@ import StripeProvider from '@/components/payments/StripeProvider';
 import SubscriptionSuccess from '@/pages/member/SubscriptionSuccess';
 import FacilityPage from '@/pages/care/[slug]';
 import ProfessionalProfilePage from '@/pages/professional/[slug]';
+import Resources from '@/pages/Resources';
 
 // Blog pages
 import BlogIndex from '@/pages/blog/index';
@@ -124,6 +125,7 @@ const App: React.FC = () => {
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/placements" element={<Placements />} />
                   <Route path="/membership" element={<Membership />} />
+                  <Route path="/resources" element={<Resources />} />
                   
                   {/* Facility routes - order matters, more specific routes first */}
                   <Route path="/care/care-homes/:city/:slug" element={<FacilityPage />} />
