@@ -85,7 +85,7 @@ const mockResources: Resource[] = [
   {
     id: '3',
     title: 'Texas Health and Human Services Commission (HHSC)',
-    description: 'HHSC provides health coverage through programs such as Medicaid and the Children's Health Insurance Program (CHIP).',
+    description: 'HHSC provides health coverage through programs such as Medicaid and the Children\'s Health Insurance Program (CHIP).',
     organization: 'Texas Health and Human Services',
     category: 'healthcare',
     state: 'Texas',
