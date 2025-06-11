@@ -127,6 +127,18 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
     setMessageText('');
   };
 
+  const handleCallCaregiver = () => {
+    if (professional.phone) {
+      window.location.href = `tel:${professional.phone}`;
+    } else {
+      toast({
+        title: "No phone number available",
+        description: "This caregiver hasn't provided a phone number.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -177,10 +189,10 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                 <p className="text-gray-700">{professional.bio || 'No bio available'}</p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {professional.specialties && professional.specialties.length > 0 && (
                   <div>
-                    <h4 className="text-base font-medium mb-2">Specialties</h4>
+                    <h3 className="text-lg font-medium mb-2">Specialties</h3>
                     <div className="flex flex-wrap gap-2">
                       {professional.specialties.map((specialty, index) => (
                         <Badge key={index} variant="outline">{specialty}</Badge>
@@ -191,7 +203,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                 
                 {professional.languages && professional.languages.length > 0 && (
                   <div>
-                    <h4 className="text-base font-medium mb-2">Languages</h4>
+                    <h3 className="text-lg font-medium mb-2">Languages</h3>
                     <div className="flex flex-wrap gap-2">
                       {professional.languages.map((language, index) => (
                         <Badge key={index} variant="secondary">{language}</Badge>
@@ -201,20 +213,6 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                 )}
               </div>
               
-              {professional.service_area && (
-                <div>
-                  <h4 className="text-base font-medium mb-2">Service Area</h4>
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 text-gray-500 mr-2" />
-                    <span>{professional.service_area}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="services" className="pt-4">
-            <div className="space-y-4">
               {professional.specializations && professional.specializations.length > 0 && (
                 <div>
                   <h3 className="text-lg font-medium mb-2">Specializations</h3>
@@ -225,17 +223,36 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                   </div>
                 </div>
               )}
-              
-              <div>
-                <h3 className="text-lg font-medium mb-2">Services Offered</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="services" className="pt-4">
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex items-center mb-3">
+                    <UserIcon className="h-5 w-5 text-indigo-600 mr-2" />
+                    <h3 className="font-medium">In-Person Consultations</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Face-to-face appointments at the provider's office or your location.
+                  </p>
+                  {professional.hourly_rate && (
+                    <div className="flex justify-between items-center">
+                      <span>Rate:</span>
+                      <span className="font-medium">{professional.hourly_rate}</span>
+                    </div>
+                  )}
+                </div>
+                
+                {professional.telehealth_enabled && (
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="flex items-center mb-3">
-                      <UserIcon className="h-5 w-5 text-indigo-600 mr-2" />
-                      <h3 className="font-medium">In-Person Consultations</h3>
+                      <Video className="h-5 w-5 text-indigo-600 mr-2" />
+                      <h3 className="font-medium">Telehealth Sessions</h3>
                     </div>
                     <p className="text-sm text-gray-600 mb-3">
-                      Face-to-face appointments at the provider's office or your location.
+                      Virtual appointments via secure video conferencing.
                     </p>
                     {professional.hourly_rate && (
                       <div className="flex justify-between items-center">
@@ -244,25 +261,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                       </div>
                     )}
                   </div>
-                  
-                  {professional.telehealth_enabled && (
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center mb-3">
-                        <Video className="h-5 w-5 text-indigo-600 mr-2" />
-                        <h3 className="font-medium">Telehealth Sessions</h3>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-3">
-                        Virtual appointments via secure video conferencing.
-                      </p>
-                      {professional.hourly_rate && (
-                        <div className="flex justify-between items-center">
-                          <span>Rate:</span>
-                          <span className="font-medium">{professional.hourly_rate}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
             </div>
           </TabsContent>
@@ -316,6 +315,15 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   Book Appointment
+                </Button>
+
+                <Button 
+                  variant="outline" 
+                  className="w-full md:col-span-2"
+                  onClick={handleCallCaregiver}
+                >
+                  <Phone className="mr-2 h-4 w-4" />
+                  Call Caregiver
                 </Button>
               </div>
               
