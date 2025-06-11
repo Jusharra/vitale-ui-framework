@@ -143,8 +143,8 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
     <Card>
       <CardHeader>
         <div className="flex justify-between items-start">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 mt-1">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-16 w-16">
               <AvatarImage src={professional.profile_image || '/placeholder.svg'} alt={professional.name || 'Professional'} />
               <AvatarFallback className="text-xl">{getInitials(professional.name || '')}</AvatarFallback>
             </Avatar>
@@ -153,19 +153,28 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
               {professional.credentials && (
                 <CardDescription className="text-base">{professional.credentials}</CardDescription>
               )}
+              {professional.practice_name && (
+                <p className="text-base font-medium mt-1">{professional.practice_name}</p>
+              )}
             </div>
           </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => document.getElementById('placements-top')?.scrollIntoView({ behavior: 'smooth' })}
-          >
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            Back to List
-          </Button>
+          <div className="flex flex-col items-end gap-2">
+            {professional.rating && (
+              <div className="flex items-center">
+                <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                <span className="ml-1 font-medium">{professional.rating}</span>
+              </div>
+            )}
+            {professional.verified && (
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                <CheckCircle className="h-3 w-3 mr-1" />
+                Verified Provider
+              </Badge>
+            )}
+          </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         <Tabs defaultValue="about">
           <TabsList>
             <TabsTrigger value="about">About</TabsTrigger>
@@ -174,7 +183,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
           </TabsList>
           
           <TabsContent value="about" className="pt-4">
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-medium mb-2">Professional Bio</h3>
                 <p className="text-gray-700">{professional.bio || 'No bio available'}</p>
@@ -289,7 +298,25 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                 </div>
               )}
               
-              <div className="mt-6">
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => setIsMessageDialogOpen(true)}
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Send Message
+                </Button>
+                
+                <Button 
+                  className="w-full"
+                  onClick={() => setIsBookingDialogOpen(true)}
+                  disabled={!professional.accepting_new_patients}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  Book Appointment
+                </Button>
+
                 <Button 
                   variant="outline" 
                   className="w-full md:col-span-2"
@@ -299,6 +326,12 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                   Call Caregiver
                 </Button>
               </div>
+              
+              {!professional.accepting_new_patients && (
+                <p className="text-sm text-amber-600 text-center">
+                  This provider is not currently accepting new patients.
+                </p>
+              )}
             </div>
           </TabsContent>
         </Tabs>
@@ -306,7 +339,9 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
       <CardFooter className="flex justify-between">
         <Button 
           variant="outline" 
-          onClick={() => document.getElementById('placements-top')?.scrollIntoView({ behavior: 'smooth' })}
+          onClick={() => {
+            document.getElementById('placements-top')?.scrollIntoView({ behavior: 'smooth' });
+          }}
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
           Back to List
