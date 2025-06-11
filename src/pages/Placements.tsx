@@ -195,7 +195,7 @@ const Placements = () => {
   const filteredFacilities = facilities.filter(facility => {
     const matchesSearch = 
       facility.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      facility.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (facility.description?.toLowerCase().includes(searchQuery.toLowerCase()) || false) ||
       facility.location.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesCareType = careType === 'all' || facility.care_type === careType;
@@ -221,30 +221,43 @@ const Placements = () => {
 
   // Filter professionals based on search query, specialties, and location
   const filteredProfessionals = professionals.filter(professional => {
-    const matchesSearch = 
-      professional.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      professional.bio?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      professional.service_area?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      professional.specialties?.some(specialty => 
+    // Safely check if properties exist before using toLowerCase
+    const nameMatch = professional.name ? 
+      professional.name.toLowerCase().includes(searchQuery.toLowerCase()) : false;
+    
+    const bioMatch = professional.bio ? 
+      professional.bio.toLowerCase().includes(searchQuery.toLowerCase()) : false;
+    
+    const serviceAreaMatch = professional.service_area ? 
+      professional.service_area.toLowerCase().includes(searchQuery.toLowerCase()) : false;
+    
+    const specialtiesMatch = professional.specialties ? 
+      professional.specialties.some(specialty => 
         specialty.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      ) : false;
+    
+    const matchesSearch = nameMatch || bioMatch || serviceAreaMatch || specialtiesMatch;
     
     // Match by specialty (using careType as specialty filter)
     const matchesSpecialty = careType === 'all' || 
-      professional.specialties?.some(specialty => 
-        specialty.toLowerCase().includes(careType.toLowerCase())
-      );
+      (professional.specialties ? 
+        professional.specialties.some(specialty => 
+          specialty.toLowerCase().includes(careType.toLowerCase())
+        ) : false);
     
     // Match by state and county
     let matchesLocation = true;
     if (selectedState !== 'all') {
-      matchesLocation = professional.service_area?.includes(selectedState) || false;
+      matchesLocation = professional.service_area ? 
+        professional.service_area.includes(selectedState) : false;
       
       if (selectedCounty !== 'all') {
-        matchesLocation = professional.service_area?.includes(selectedCounty) || false;
+        matchesLocation = professional.service_area ? 
+          professional.service_area.includes(selectedCounty) : false;
       }
     } else if (location !== 'all') {
-      matchesLocation = professional.service_area?.includes(location) || false;
+      matchesLocation = professional.service_area ? 
+        professional.service_area.includes(location) : false;
     }
     
     // For demo purposes, we'll assume all professionals match the selected services
