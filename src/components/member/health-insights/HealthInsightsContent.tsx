@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DownloadReportButton from '@/components/member/DownloadReportButton';
@@ -26,7 +25,7 @@ const HealthInsightsContent: React.FC = () => {
   const [currentTabValue, setCurrentTabValue] = useState("insights");
   
   // Function to download all health data as PDF
-  const handleDownloadFullReport = () => {
+  const handleDownloadFullReport = async () => {
     const healthData = {
       vitalSigns,
       weightData,
@@ -36,11 +35,11 @@ const HealthInsightsContent: React.FC = () => {
     };
     
     const fileName = `health-insights-report-${format(new Date(), 'yyyy-MM-dd')}`;
-    downloadHealthInsightsPDF(healthData, fileName);
+    await downloadHealthInsightsPDF(healthData, fileName);
   };
   
   // Function to download section-specific report
-  const handleDownloadSectionReport = (section: string) => {
+  const handleDownloadSectionReport = async (section: string) => {
     let sectionData = {
       vitalSigns: [],
       weightData: [],
@@ -71,7 +70,7 @@ const HealthInsightsContent: React.FC = () => {
     
     const sectionName = section.charAt(0).toUpperCase() + section.slice(1);
     const fileName = `health-${sectionName}-report-${format(new Date(), 'yyyy-MM-dd')}`;
-    downloadHealthInsightsPDF(sectionData, fileName);
+    await downloadHealthInsightsPDF(sectionData, fileName);
   };
 
   return (

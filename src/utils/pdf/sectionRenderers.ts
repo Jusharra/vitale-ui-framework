@@ -1,15 +1,11 @@
-
-import { jsPDF } from 'jspdf';
-import { VitalSign, WeightRecord, Allergy, MentalHealthRecord, TreatmentPlan } from './types';
-
 export const renderVitalSigns = (
-  doc: jsPDF, 
-  vitalSigns: VitalSign[], 
+  doc: any, 
+  vitalSigns: any[], 
   yPosition: number, 
   headerColor: string,
   textColor: string
 ): number => {
-  if (vitalSigns.length === 0) return yPosition;
+  if (!vitalSigns || vitalSigns.length === 0) return yPosition;
   
   doc.setFontSize(14);
   doc.setTextColor(headerColor);
@@ -19,7 +15,7 @@ export const renderVitalSigns = (
   doc.autoTable({
     startY: yPosition,
     head: [['Measurement', 'Value', 'Status', 'Date']],
-    body: vitalSigns.map(vital => [
+    body: vitalSigns.map((vital: any) => [
       vital.name,
       vital.value,
       vital.status.charAt(0).toUpperCase() + vital.status.slice(1),
@@ -35,13 +31,13 @@ export const renderVitalSigns = (
 };
 
 export const renderWeightData = (
-  doc: jsPDF, 
-  weightData: WeightRecord[], 
+  doc: any, 
+  weightData: any[], 
   yPosition: number, 
   headerColor: string,
   textColor: string
 ): number => {
-  if (weightData.length === 0) return yPosition;
+  if (!weightData || weightData.length === 0) return yPosition;
   
   doc.setFontSize(14);
   doc.setTextColor(headerColor);
@@ -51,7 +47,7 @@ export const renderWeightData = (
   doc.autoTable({
     startY: yPosition,
     head: [['Date', 'Weight']],
-    body: weightData.map(record => [
+    body: weightData.map((record: any) => [
       record.date,
       record.weight
     ]),
@@ -65,13 +61,13 @@ export const renderWeightData = (
 };
 
 export const renderAllergies = (
-  doc: jsPDF, 
-  allergyData: Allergy[], 
+  doc: any, 
+  allergyData: any[], 
   yPosition: number, 
   headerColor: string,
   textColor: string
 ): number => {
-  if (allergyData.length === 0) return yPosition;
+  if (!allergyData || allergyData.length === 0) return yPosition;
   
   // Check if we need to add a new page
   if (yPosition > 230) {
@@ -87,7 +83,7 @@ export const renderAllergies = (
   doc.autoTable({
     startY: yPosition,
     head: [['Allergy', 'Severity', 'Symptoms']],
-    body: allergyData.map(allergy => [
+    body: allergyData.map((allergy: any) => [
       allergy.name,
       allergy.severity,
       allergy.symptoms
@@ -102,13 +98,13 @@ export const renderAllergies = (
 };
 
 export const renderMentalHealth = (
-  doc: jsPDF, 
-  mentalHealthData: MentalHealthRecord[], 
+  doc: any, 
+  mentalHealthData: any[], 
   yPosition: number, 
   headerColor: string,
   textColor: string
 ): number => {
-  if (mentalHealthData.length === 0) return yPosition;
+  if (!mentalHealthData || mentalHealthData.length === 0) return yPosition;
   
   // Check if we need to add a new page
   if (yPosition > 230) {
@@ -124,7 +120,7 @@ export const renderMentalHealth = (
   doc.autoTable({
     startY: yPosition,
     head: [['Date', 'Assessment', 'Score', 'Interpretation']],
-    body: mentalHealthData.map(record => [
+    body: mentalHealthData.map((record: any) => [
       record.date,
       record.assessment,
       record.score,
@@ -140,14 +136,14 @@ export const renderMentalHealth = (
 };
 
 export const renderTreatmentPlans = (
-  doc: jsPDF, 
-  treatmentPlans: TreatmentPlan[], 
+  doc: any, 
+  treatmentPlans: any[], 
   yPosition: number, 
   headerColor: string,
   textColor: string,
   pageWidth: number
 ): number => {
-  if (treatmentPlans.length === 0) return yPosition;
+  if (!treatmentPlans || treatmentPlans.length === 0) return yPosition;
   
   // Check if we need to add a new page
   if (yPosition > 180) {
@@ -160,7 +156,7 @@ export const renderTreatmentPlans = (
   doc.text('Treatment Plans', 14, yPosition);
   yPosition += 8;
   
-  treatmentPlans.forEach((plan, index) => {
+  treatmentPlans.forEach((plan: any, index: number) => {
     doc.setFontSize(11);
     doc.setTextColor(textColor);
     doc.text(`${plan.condition}`, 14, yPosition);
@@ -176,7 +172,7 @@ export const renderTreatmentPlans = (
     doc.text('Recommendations:', 14, yPosition);
     yPosition += 5;
     
-    plan.recommendations.forEach(rec => {
+    plan.recommendations.forEach((rec: string) => {
       doc.text(`• ${rec}`, 18, yPosition);
       yPosition += 5;
     });

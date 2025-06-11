@@ -1,8 +1,5 @@
-
-import { jsPDF } from 'jspdf';
-
 export const addPageHeader = (
-  doc: jsPDF, 
+  doc: any, 
   title: string, 
   date: string, 
   headerColor: string,
@@ -24,7 +21,7 @@ export const addPageHeader = (
   doc.line(14, 32, pageWidth - 14, 32);
 };
 
-export const addPageFooters = (doc: jsPDF): void => {
+export const addPageFooters = (doc: any): void => {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageCount = doc.internal.pages.length - 1;
   
