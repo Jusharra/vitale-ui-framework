@@ -303,7 +303,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
           </TabsContent>
         </Tabs>
       </CardContent>
-      <CardFooter className="flex justify-between">
+      <CardFooter>
         <Button 
           variant="outline" 
           onClick={() => document.getElementById('placements-top')?.scrollIntoView({ behavior: 'smooth' })}
@@ -313,7 +313,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
         </Button>
         
         {professional.slug && (
-          <Button asChild>
+          <Button asChild className="ml-auto">
             <Link to={`/professional/${professional.slug}`}>
               View Full Profile
             </Link>
@@ -321,7 +321,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
         )}
       </CardFooter>
       
-      {/* Booking Dialog */}
+      {/* Booking Dialog - Hidden but functionality preserved */}
       <Dialog open={isBookingDialogOpen} onOpenChange={setIsBookingDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
@@ -407,7 +407,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
         </DialogContent>
       </Dialog>
       
-      {/* Message Dialog */}
+      {/* Message Dialog - Hidden but functionality preserved */}
       <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
