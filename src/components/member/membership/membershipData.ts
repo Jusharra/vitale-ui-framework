@@ -68,6 +68,6 @@ export const membershipTiers: MembershipTierData[] = [
 ];
 
 // Function to get membership tier by ID
-export const getMembershipTier = (tierId: MembershipTier): MembershipTierData | undefined => {
+const getMembershipTier = (tierId: MembershipTier): MembershipTierData | undefined => {
   return membershipTiers.find(tier => tier.id === tierId);
 };

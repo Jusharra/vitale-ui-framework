@@ -19,7 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { DialogFooter } from '@/components/ui/dialog';
 import { Loader2, Upload } from 'lucide-react';
-import { Label } from '@/components/ui/label';
+import { Label } from "@/components/ui/label";
 
 interface PartnerFormProps {
   defaultValues: Partial<PartnerFormValues>;

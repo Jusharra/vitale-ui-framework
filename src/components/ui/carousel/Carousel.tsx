@@ -146,4 +146,4 @@ const Carousel = React.forwardRef<
 )
 Carousel.displayName = "Carousel"
 
-export { useCarousel, CarouselContext, Carousel }
+export { useCarousel,  Carousel }

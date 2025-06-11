@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { MembershipTier } from '@/types/auth';
 
 // Define the Subscription type here since it's missing from auth types
-export interface Subscription {
+interface Subscription {
   id: string;
   status: string;
   tier: MembershipTier;
