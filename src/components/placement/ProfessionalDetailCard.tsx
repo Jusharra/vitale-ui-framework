@@ -39,7 +39,7 @@ interface Professional {
 }
 
 interface ProfessionalDetailCardProps {
-  professional: Professional;
+  professional: Professional | null;
 }
 
 const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ professional }) => {
@@ -230,59 +230,40 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                 <h3 className="text-lg font-medium mb-2">Services Offered</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-medium mb-2">Consultations</h4>
-                    <ul className="space-y-2">
-                      <li className="flex items-center">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                        <span>Initial Consultations</span>
-                      </li>
-                      <li className="flex items-center">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                        <span>Follow-up Appointments</span>
-                      </li>
-                      {professional.telehealth_enabled && (
-                        <li className="flex items-center">
-                          <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                          <span>Telehealth Sessions</span>
-                        </li>
-                      )}
-                    </ul>
+                    <div className="flex items-center mb-3">
+                      <UserIcon className="h-5 w-5 text-indigo-600 mr-2" />
+                      <h3 className="font-medium">In-Person Consultations</h3>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Face-to-face appointments at the provider's office or your location.
+                    </p>
+                    {professional.hourly_rate && (
+                      <div className="flex justify-between items-center">
+                        <span>Rate:</span>
+                        <span className="font-medium">{professional.hourly_rate}</span>
+                      </div>
+                    )}
                   </div>
                   
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-medium mb-2">Additional Services</h4>
-                    <ul className="space-y-2">
-                      <li className="flex items-center">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                        <span>Care Coordination</span>
-                      </li>
-                      <li className="flex items-center">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                        <span>Medication Management</span>
-                      </li>
-                      <li className="flex items-center">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                        <span>Health Education</span>
-                      </li>
-                    </ul>
-                  </div>
+                  {professional.telehealth_enabled && (
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <div className="flex items-center mb-3">
+                        <Video className="h-5 w-5 text-indigo-600 mr-2" />
+                        <h3 className="font-medium">Telehealth Sessions</h3>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-3">
+                        Virtual appointments via secure video conferencing.
+                      </p>
+                      {professional.hourly_rate && (
+                        <div className="flex justify-between items-center">
+                          <span>Rate:</span>
+                          <span className="font-medium">{professional.hourly_rate}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
-              
-              {professional.hourly_rate && (
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Pricing</h3>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="flex justify-between items-center">
-                      <span>Hourly Rate:</span>
-                      <span className="font-medium">{professional.hourly_rate}</span>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2">
-                      * Prices may vary based on specific services and insurance coverage.
-                    </p>
-                  </div>
-                </div>
-              )}
             </div>
           </TabsContent>
           

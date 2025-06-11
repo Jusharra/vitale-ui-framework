@@ -66,19 +66,24 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ professional, onVie
             <AvatarImage src={professional.profile_image || '/placeholder.svg'} alt={professional.name || 'Professional'} />
             <AvatarFallback className="text-2xl">{getInitials(professional.name || '')}</AvatarFallback>
           </Avatar>
-          {professional.rating && (
-            <div className="flex items-center mt-2">
-              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-              <span className="ml-1 font-medium">{professional.rating}</span>
-            </div>
-          )}
-          {professional.verified && (
-            <Badge variant="outline" className="mt-2 bg-green-50 text-green-700 border-green-200">
-              <CheckCircle className="h-3 w-3 mr-1" />
-              Verified
-            </Badge>
-          )}
+          
+          <div className="mt-4 flex flex-col items-center">
+            {professional.rating && (
+              <div className="flex items-center">
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <span className="ml-1 font-medium">{professional.rating}</span>
+              </div>
+            )}
+            
+            {professional.verified && (
+              <Badge variant="outline" className="mt-2 bg-green-50 text-green-700 border-green-200">
+                <CheckCircle className="h-3 w-3 mr-1" />
+                Verified
+              </Badge>
+            )}
+          </div>
         </div>
+        
         <div className="md:w-3/4 p-6">
           <div className="flex justify-between items-start">
             <div>

@@ -703,7 +703,7 @@ const Placements = () => {
                       {filteredProfessionals.map((professional) => (
                         <div key={professional.id}>
                           {selectedProfessional?.id === professional.id ? (
-                            <ProfessionalDetailCard partner={professional} />
+                            <ProfessionalDetailCard professional={professional} />
                           ) : (
                             <ProfessionalCard 
                               professional={professional} 
@@ -745,7 +745,7 @@ const Placements = () => {
                         .map((professional) => (
                           <div key={professional.id}>
                             {selectedProfessional?.id === professional.id ? (
-                              <ProfessionalDetailCard partner={professional} />
+                              <ProfessionalDetailCard professional={professional} />
                             ) : (
                               <ProfessionalCard 
                                 professional={professional} 
