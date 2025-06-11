@@ -18,11 +18,13 @@ import { MapPin, Phone, Mail, Calendar as CalendarIcon, Clock, Star, CheckCircle
 interface Professional {
   id: string;
   name: string;
+  slug: string;
   first_name?: string;
   credentials?: string;
   email?: string;
   phone?: string;
   practice_name?: string;
+  practice_address?: any;
   specialties?: string[];
   languages?: string[];
   specializations?: string[];
@@ -35,23 +37,20 @@ interface Professional {
   profile_image?: string;
   rating?: number;
   verified?: boolean;
-  slug?: string;
 }
 
 interface ProfessionalDetailCardProps {
-  professional: Professional | null;
+  partner: Professional | null;
 }
 
-const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ professional }) => {
+const ProfessionalDetailCard = ({ partner }: ProfessionalDetailCardProps) => {
   const { toast } = useToast();
-  const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
+  const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null);
   const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
-  const [date, setDate] = useState<Date | undefined>(undefined);
-  const [timeSlot, setTimeSlot] = useState<string | null>(null);
   const [messageText, setMessageText] = useState('');
   
   // Early return if professional is not provided
-  if (!professional) {
+  if (!partner) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -64,72 +63,41 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
   }
   
   const getInitials = (name: string) => {
-    if (!name) return 'NA';
+    if (!name) return 'U';
     return name
       .split(' ')
-      .map((word) => word[0])
+      .map(part => part[0])
       .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-  
-  // Generate time slots (9 AM to 5 PM) with 30-minute intervals
-  const generateTimeSlots = () => {
-    const slots = [];
-    for (let hour = 9; hour <= 16; hour++) {
-      const hourFormatted = hour > 12 ? hour - 12 : hour;
-      const period = hour >= 12 ? "PM" : "AM";
-      
-      slots.push(`${hourFormatted}:00 ${period}`);
-      slots.push(`${hourFormatted}:30 ${period}`);
-    }
-    return slots;
+      .toUpperCase();
   };
 
-  const timeSlots = generateTimeSlots();
-  
-  const handleBookAppointment = () => {
-    if (!date || !timeSlot) {
+  const handleCallPartner = () => {
+    if (partner.phone) {
+      window.location.href = `tel:${partner.phone}`;
+    } else {
       toast({
-        title: "Incomplete booking",
-        description: "Please select a date and time for your appointment",
+        title: "No phone number available",
+        description: "This provider hasn't provided a phone number.",
         variant: "destructive",
       });
-      return;
     }
-    
-    toast({
-      title: "Appointment Booked",
-      description: `Your appointment with ${professional.name} has been scheduled for ${format(date, 'MMMM d, yyyy')} at ${timeSlot}.`,
-    });
-    
-    setIsBookingDialogOpen(false);
-    setDate(undefined);
-    setTimeSlot(null);
   };
-  
-  const handleSendMessage = () => {
-    if (!messageText.trim()) {
+
+  const handleEmailPartner = () => {
+    if (partner.email) {
+      window.location.href = `mailto:${partner.email}`;
+    } else {
       toast({
-        title: "Empty message",
-        description: "Please enter a message before sending",
+        title: "No email available",
+        description: "This provider hasn't provided an email address.",
         variant: "destructive",
       });
-      return;
     }
-    
-    toast({
-      title: "Message Sent",
-      description: `Your message has been sent to ${professional.name}.`,
-    });
-    
-    setIsMessageDialogOpen(false);
-    setMessageText('');
   };
 
   const handleCallCaregiver = () => {
-    if (professional.phone) {
-      window.location.href = `tel:${professional.phone}`;
+    if (partner.phone) {
+      window.location.href = `tel:${partner.phone}`;
     } else {
       toast({
         title: "No phone number available",
@@ -145,31 +113,25 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
-              <AvatarImage src={professional.profile_image || '/placeholder.svg'} alt={professional.name || 'Professional'} />
-              <AvatarFallback className="text-xl">{getInitials(professional.name || '')}</AvatarFallback>
+              <AvatarImage src={partner.profile_image || '/placeholder.svg'} alt={partner.name || 'Professional'} />
+              <AvatarFallback className="text-xl">{getInitials(partner.name || '')}</AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-2xl">{professional.name || 'Unknown Professional'}</CardTitle>
-              {professional.credentials && (
-                <CardDescription className="text-base">{professional.credentials}</CardDescription>
+              <CardTitle>{partner.name || 'Unknown Professional'}</CardTitle>
+              {partner.credentials && (
+                <CardDescription className="text-base font-medium">{partner.credentials}</CardDescription>
               )}
-              {professional.practice_name && (
-                <p className="text-base font-medium mt-1">{professional.practice_name}</p>
+              {partner.practice_name && (
+                <p className="text-sm text-muted-foreground">{partner.practice_name}</p>
               )}
             </div>
           </div>
-          <div className="flex flex-col items-end gap-2">
-            {professional.rating && (
-              <div className="flex items-center">
-                <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-                <span className="ml-1 font-medium">{professional.rating}</span>
-              </div>
+          <div className="flex gap-2">
+            {partner.verified && (
+              <Badge className="bg-green-600">Verified</Badge>
             )}
-            {professional.verified && (
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                <CheckCircle className="h-3 w-3 mr-1" />
-                Verified Provider
-              </Badge>
+            {partner.telehealth_enabled && (
+              <Badge variant="outline">Telehealth Available</Badge>
             )}
           </div>
         </div>
@@ -183,29 +145,29 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
           </TabsList>
           
           <TabsContent value="about" className="pt-4">
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-medium mb-2">Professional Bio</h3>
-                <p className="text-gray-700">{professional.bio || 'No bio available'}</p>
+                <h3 className="text-lg font-medium mb-2">About {partner.first_name || partner.name.split(' ')[0]}</h3>
+                <p className="text-gray-700">{partner.bio || 'No bio available'}</p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {professional.specialties && professional.specialties.length > 0 && (
+                {partner.specialties && partner.specialties.length > 0 && (
                   <div>
                     <h3 className="text-lg font-medium mb-2">Specialties</h3>
                     <div className="flex flex-wrap gap-2">
-                      {professional.specialties.map((specialty, index) => (
+                      {partner.specialties.map((specialty, index) => (
                         <Badge key={index} variant="outline">{specialty}</Badge>
                       ))}
                     </div>
                   </div>
                 )}
                 
-                {professional.languages && professional.languages.length > 0 && (
+                {partner.languages && partner.languages.length > 0 && (
                   <div>
                     <h3 className="text-lg font-medium mb-2">Languages</h3>
                     <div className="flex flex-wrap gap-2">
-                      {professional.languages.map((language, index) => (
+                      {partner.languages.map((language, index) => (
                         <Badge key={index} variant="secondary">{language}</Badge>
                       ))}
                     </div>
@@ -213,13 +175,23 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                 )}
               </div>
               
-              {professional.specializations && professional.specializations.length > 0 && (
+              {partner.specializations && partner.specializations.length > 0 && (
                 <div>
                   <h3 className="text-lg font-medium mb-2">Specializations</h3>
                   <div className="flex flex-wrap gap-2">
-                    {professional.specializations.map((specialization, index) => (
+                    {partner.specializations.map((specialization, index) => (
                       <Badge key={index} variant="outline">{specialization}</Badge>
                     ))}
+                  </div>
+                </div>
+              )}
+              
+              {partner.service_area && (
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Service Area</h3>
+                  <div className="flex items-center">
+                    <MapPin className="h-5 w-5 text-indigo-600 mr-2" />
+                    <span>{partner.service_area}</span>
                   </div>
                 </div>
               )}
@@ -237,15 +209,15 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                   <p className="text-sm text-gray-600 mb-3">
                     Face-to-face appointments at the provider's office or your location.
                   </p>
-                  {professional.hourly_rate && (
+                  {partner.hourly_rate && (
                     <div className="flex justify-between items-center">
                       <span>Rate:</span>
-                      <span className="font-medium">{professional.hourly_rate}</span>
+                      <span className="font-medium">{partner.hourly_rate}</span>
                     </div>
                   )}
                 </div>
                 
-                {professional.telehealth_enabled && (
+                {partner.telehealth_enabled && (
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="flex items-center mb-3">
                       <Video className="h-5 w-5 text-indigo-600 mr-2" />
@@ -254,10 +226,10 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                     <p className="text-sm text-gray-600 mb-3">
                       Virtual appointments via secure video conferencing.
                     </p>
-                    {professional.hourly_rate && (
+                    {partner.hourly_rate && (
                       <div className="flex justify-between items-center">
                         <span>Rate:</span>
-                        <span className="font-medium">{professional.hourly_rate}</span>
+                        <span className="font-medium">{partner.hourly_rate}</span>
                       </div>
                     )}
                   </div>
@@ -268,32 +240,32 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
           
           <TabsContent value="contact" className="pt-4">
             <div className="space-y-4">
-              {professional.phone && (
+              {partner.phone && (
                 <div className="flex items-center">
                   <Phone className="h-5 w-5 text-gray-500 mr-3" />
                   <div>
                     <h4 className="font-medium">Phone</h4>
-                    <p>{professional.phone}</p>
+                    <p>{partner.phone}</p>
                   </div>
                 </div>
               )}
               
-              {professional.email && (
+              {partner.email && (
                 <div className="flex items-center">
                   <Mail className="h-5 w-5 text-gray-500 mr-3" />
                   <div>
                     <h4 className="font-medium">Email</h4>
-                    <p>{professional.email}</p>
+                    <p>{partner.email}</p>
                   </div>
                 </div>
               )}
               
-              {professional.service_area && (
+              {partner.service_area && (
                 <div className="flex items-center">
                   <MapPin className="h-5 w-5 text-gray-500 mr-3" />
                   <div>
                     <h4 className="font-medium">Service Area</h4>
-                    <p>{professional.service_area}</p>
+                    <p>{partner.service_area}</p>
                   </div>
                 </div>
               )}
@@ -310,8 +282,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                 
                 <Button 
                   className="w-full"
-                  onClick={() => setIsBookingDialogOpen(true)}
-                  disabled={!professional.accepting_new_patients}
+                  disabled={!partner.accepting_new_patients}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   Book Appointment
@@ -327,7 +298,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                 </Button>
               </div>
               
-              {!professional.accepting_new_patients && (
+              {!partner.accepting_new_patients && (
                 <p className="text-sm text-amber-600 text-center">
                   This provider is not currently accepting new patients.
                 </p>
@@ -347,106 +318,20 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
           Back to List
         </Button>
         
-        {professional.slug && (
+        {partner.slug && (
           <Button asChild>
-            <Link to={`/professional/${professional.slug}`}>
+            <Link to={`/professional/${partner.slug}`}>
               View Full Profile
             </Link>
           </Button>
         )}
       </CardFooter>
       
-      {/* Booking Dialog */}
-      <Dialog open={isBookingDialogOpen} onOpenChange={setIsBookingDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Book Appointment with {professional.name}</DialogTitle>
-            <DialogDescription>
-              Select your preferred date and time for your appointment.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
-            <div>
-              <Label className="mb-2 block">Select Date</Label>
-              <div className="border rounded-md p-2">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  disabled={(date) => date < new Date()}
-                  className="rounded-md"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <Label className="mb-2 block">Select Time</Label>
-              {date ? (
-                <div className="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto">
-                  {timeSlots.map((slot) => (
-                    <Button
-                      key={slot}
-                      variant={timeSlot === slot ? "default" : "outline"}
-                      className="justify-start"
-                      onClick={() => setTimeSlot(slot)}
-                    >
-                      <Clock className="mr-2 h-4 w-4" />
-                      {slot}
-                    </Button>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex items-center justify-center h-[300px] border rounded-md bg-gray-50">
-                  <p className="text-gray-500">Please select a date first</p>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded-md">
-              <h4 className="font-medium mb-2">Appointment Type</h4>
-              <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" className="justify-start">
-                  <UserIcon className="mr-2 h-4 w-4" />
-                  In-Person Visit
-                </Button>
-                {professional.telehealth_enabled && (
-                  <Button variant="outline" className="justify-start">
-                    <Video className="mr-2 h-4 w-4" />
-                    Telehealth
-                  </Button>
-                )}
-              </div>
-            </div>
-            
-            <div>
-              <Label htmlFor="reason">Reason for Visit</Label>
-              <Textarea 
-                id="reason" 
-                placeholder="Briefly describe the reason for your appointment"
-                className="mt-1"
-              />
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsBookingDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleBookAppointment}>
-              Book Appointment
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
       {/* Message Dialog */}
       <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Send Message to {professional.name}</DialogTitle>
+            <DialogTitle>Send Message to {partner.name}</DialogTitle>
             <DialogDescription>
               Your message will be sent directly to the provider.
             </DialogDescription>
@@ -474,7 +359,14 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
             <Button variant="outline" onClick={() => setIsMessageDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSendMessage}>
+            <Button onClick={() => {
+              toast({
+                title: "Message Sent",
+                description: `Your message has been sent to ${partner.name}`,
+              });
+              setMessageText('');
+              setIsMessageDialogOpen(false);
+            }}>
               Send Message
             </Button>
           </DialogFooter>
