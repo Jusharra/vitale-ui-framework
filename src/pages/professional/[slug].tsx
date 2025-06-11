@@ -383,23 +383,6 @@ const ProfessionalProfilePage = () => {
                   </div>
                 )}
               </div>
-              
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Button 
-                  size="lg"
-                  disabled={!professional.accepting_new_patients}
-                >
-                  <CalendarIcon className="mr-2 h-5 w-5" />
-                  Book Consultation
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                >
-                  <MessageSquare className="mr-2 h-5 w-5" />
-                  Send Message
-                </Button>
                 
                 {professional.telehealth_enabled && (
                   <Button 
