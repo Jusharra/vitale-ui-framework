@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
 import MainLayout from '@/components/layout/MainLayout';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
@@ -14,18 +13,18 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
-import { MapPin, Phone, Mail, Calendar as CalendarIcon, Clock, Star, CheckCircle, MessageSquare, Video, User, Award, Stethoscope, ChevronLeft } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { MapPin, Phone, Mail, Calendar as CalendarIcon, Clock, Star, CheckCircle, MessageSquare, Video, User, Award, Stethoscope } from 'lucide-react';
+import { Helmet } from 'react-helmet';
 
 interface Professional {
   id: string;
   name: string;
-  slug: string;
   first_name?: string;
   credentials?: string;
   email?: string;
   phone?: string;
   practice_name?: string;
-  practice_address?: any;
   specialties?: string[];
   languages?: string[];
   specializations?: string[];
@@ -38,6 +37,7 @@ interface Professional {
   profile_image?: string;
   rating?: number;
   verified?: boolean;
+  slug?: string;
 }
 
 const ProfessionalProfilePage = () => {
@@ -153,12 +153,13 @@ const ProfessionalProfilePage = () => {
   };
   
   const getInitials = (name: string) => {
-    if (!name) return 'U';
+    if (!name) return 'NA';
     return name
       .split(' ')
-      .map(part => part[0])
+      .map((word) => word[0])
       .join('')
-      .toUpperCase();
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   const handleCallCaregiver = () => {
@@ -373,8 +374,8 @@ const ProfessionalProfilePage = () => {
                     </div>
                   </div>
                 )}
-              </div>
-            </CardContent>
+              </CardContent>
+            </Card>
             
             <Card className="mt-6">
               <CardHeader>
