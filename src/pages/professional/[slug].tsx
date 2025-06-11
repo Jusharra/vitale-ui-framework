@@ -46,6 +46,7 @@ const ProfessionalProfilePage = () => {
   const { toast } = useToast();
   const [professional, setProfessional] = useState<Professional | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [timeSlot, setTimeSlot] = useState<string | null>(null);
   const [appointmentType, setAppointmentType] = useState<'in-person' | 'telehealth'>('in-person');
@@ -53,9 +54,12 @@ const ProfessionalProfilePage = () => {
   useEffect(() => {
     const fetchProfessional = async () => {
       setIsLoading(true);
+      setNotFound(false);
+      
       try {
         if (!slug) {
-          throw new Error('No slug provided');
+          setNotFound(true);
+          return;
         }
 
         console.log("Fetching partner with slug:", slug);
@@ -70,7 +74,9 @@ const ProfessionalProfilePage = () => {
 
         if (error) {
           console.error('Error fetching partner by slug:', error);
-          throw new Error(`Database error: ${error.message}`);
+          // Don't throw error, just log it and continue to show not found
+          setNotFound(true);
+          return;
         }
 
         if (data) {
@@ -89,7 +95,8 @@ const ProfessionalProfilePage = () => {
             
           if (alternativeError) {
             console.error('Error in alternative search:', alternativeError);
-            throw new Error(`Partner with slug "${slug}" not found`);
+            setNotFound(true);
+            return;
           }
           
           if (alternativeData) {
@@ -97,23 +104,19 @@ const ProfessionalProfilePage = () => {
             setProfessional(alternativeData);
           } else {
             console.log("No partner found with slug:", slug);
-            throw new Error(`Partner with slug "${slug}" not found`);
+            setNotFound(true);
           }
         }
       } catch (error: any) {
-        console.error('Error fetching partner:', error);
-        toast({
-          title: 'Partner Not Found',
-          description: error.message || 'Failed to load partner information',
-          variant: 'destructive',
-        });
+        console.error('Unexpected error fetching partner:', error);
+        setNotFound(true);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchProfessional();
-  }, [slug, toast]);
+  }, [slug]);
 
   // Generate time slots (9 AM to 5 PM) with 30-minute intervals
   const generateTimeSlots = () => {
@@ -171,9 +174,13 @@ const ProfessionalProfilePage = () => {
     );
   }
 
-  if (!professional) {
+  if (notFound || !professional) {
     return (
       <MainLayout>
+        <Helmet>
+          <title>Professional Not Found | Healthcare Professional</title>
+          <meta name="description" content="The requested healthcare professional profile could not be found." />
+        </Helmet>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900">Professional Not Found</h1>
