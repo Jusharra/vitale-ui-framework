@@ -15,6 +15,7 @@ import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { MapPin, Phone, Mail, Calendar as CalendarIcon, Clock, Star, CheckCircle, MessageSquare, Video, User, Award, Stethoscope } from 'lucide-react';
+import { Helmet } from 'react-helmet';
 
 interface Professional {
   id: string;
@@ -194,8 +195,22 @@ const ProfessionalProfilePage = () => {
     );
   }
 
+  // Prepare meta description
+  const metaDescription = professional.bio?.substring(0, 150) + (professional.bio && professional.bio.length > 150 ? '...' : '') || 
+    `Book an appointment with ${professional.name}, ${professional.credentials || 'healthcare professional'} in ${professional.service_area || 'your area'}.`;
+
   return (
     <MainLayout>
+      <Helmet>
+        <title>{professional.name} | Healthcare Professional</title>
+        <meta name="description" content={metaDescription} />
+        <meta property="og:title" content={`${professional.name} | Healthcare Professional`} />
+        <meta property="og:description" content={metaDescription} />
+        {professional.profile_image && <meta property="og:image" content={professional.profile_image} />}
+        <meta property="og:type" content="profile" />
+        <link rel="canonical" href={`${window.location.origin}/professional/${professional.slug}`} />
+      </Helmet>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
           <Button 
