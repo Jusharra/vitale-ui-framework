@@ -35,6 +35,19 @@ interface ProfessionalCardProps {
 }
 
 const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ professional, onViewDetails }) => {
+  // Early return if professional is not provided
+  if (!professional) {
+    return (
+      <Card className="overflow-hidden">
+        <CardContent className="p-6">
+          <div className="text-center text-gray-500">
+            Professional information not available.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const getInitials = (name: string) => {
     if (!name) return 'NA';
     return name
@@ -50,8 +63,8 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ professional, onVie
       <div className="md:flex">
         <div className="md:w-1/4 p-6 flex flex-col items-center justify-center">
           <Avatar className="h-32 w-32">
-            <AvatarImage src={professional.profile_image} alt={professional.name} />
-            <AvatarFallback className="text-2xl">{getInitials(professional.name)}</AvatarFallback>
+            <AvatarImage src={professional.profile_image || ''} alt={professional.name || 'Professional'} />
+            <AvatarFallback className="text-2xl">{getInitials(professional.name || '')}</AvatarFallback>
           </Avatar>
           {professional.rating && (
             <div className="flex items-center mt-2">
@@ -69,7 +82,7 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ professional, onVie
         <div className="md:w-3/4 p-6">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="text-xl font-semibold">{professional.name}</h3>
+              <h3 className="text-xl font-semibold">{professional.name || 'Professional'}</h3>
               {professional.credentials && (
                 <p className="text-sm text-gray-600">{professional.credentials}</p>
               )}
@@ -101,7 +114,7 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ professional, onVie
             </div>
           </div>
           
-          <p className="mt-4 text-gray-600 line-clamp-3">{professional.bio}</p>
+          <p className="mt-4 text-gray-600 line-clamp-3">{professional.bio || 'No bio available.'}</p>
           
           <div className="mt-4">
             {professional.languages && professional.languages.length > 0 && (
