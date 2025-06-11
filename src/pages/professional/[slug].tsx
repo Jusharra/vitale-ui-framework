@@ -1,18 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
 import MainLayout from '@/components/layout/MainLayout';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Phone, Mail, Calendar, CheckCircle, MessageSquare, Star, User, FileText, Video } from 'lucide-react';
-import PlacementRequestButton from '@/components/placement/PlacementRequestButton';
-import { useToast } from '@/hooks/use-toast';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { MapPin, Phone, Mail, Calendar as CalendarIcon, Clock, Star, CheckCircle, MessageSquare, Video, User, Award, Stethoscope } from 'lucide-react';
 
 interface Professional {
   id: string;
@@ -37,15 +39,16 @@ interface Professional {
   slug?: string;
 }
 
-const ProfessionalPage = () => {
+const ProfessionalProfilePage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [professional, setProfessional] = useState<Professional | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [messageText, setMessageText] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
-
+  const [professional, setProfessional] = useState<Professional | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [timeSlot, setTimeSlot] = useState<string | null>(null);
+  const [appointmentType, setAppointmentType] = useState<'in-person' | 'telehealth'>('in-person');
+  
   useEffect(() => {
     const fetchProfessional = async () => {
       setIsLoading(true);
@@ -89,7 +92,6 @@ const ProfessionalPage = () => {
         }
       } catch (error: any) {
         console.error('Error fetching professional:', error);
-        setError(error.message);
         toast({
           title: 'Error',
           description: 'Failed to load professional information',
@@ -103,60 +105,45 @@ const ProfessionalPage = () => {
     fetchProfessional();
   }, [slug, toast]);
 
+  // Generate time slots (9 AM to 5 PM) with 30-minute intervals
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 9; hour <= 16; hour++) {
+      const hourFormatted = hour > 12 ? hour - 12 : hour;
+      const period = hour >= 12 ? "PM" : "AM";
+      
+      slots.push(`${hourFormatted}:00 ${period}`);
+      slots.push(`${hourFormatted}:30 ${period}`);
+    }
+    return slots;
+  };
+
+  const timeSlots = generateTimeSlots();
+  
+  const handleBookAppointment = () => {
+    if (!date || !timeSlot) {
+      toast({
+        title: "Incomplete booking",
+        description: "Please select a date and time for your appointment",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    toast({
+      title: "Appointment Booked",
+      description: `Your ${appointmentType} appointment with ${professional?.name} has been scheduled for ${format(date, 'MMMM d, yyyy')} at ${timeSlot}.`,
+    });
+  };
+  
   const getInitials = (name: string) => {
-    if (!name) return 'U';
+    if (!name) return 'NA';
     return name
       .split(' ')
-      .map(part => part[0])
+      .map((word) => word[0])
       .join('')
-      .toUpperCase();
-  };
-
-  const handleCallProfessional = () => {
-    if (professional?.phone) {
-      window.location.href = `tel:${professional.phone}`;
-    } else {
-      toast({
-        title: "No phone number available",
-        description: "This professional hasn't provided a phone number.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleEmailProfessional = () => {
-    if (professional?.email) {
-      window.location.href = `mailto:${professional.email}`;
-    } else {
-      toast({
-        title: "No email available",
-        description: "This professional hasn't provided an email address.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleSendMessage = () => {
-    if (messageText.trim()) {
-      toast({
-        title: "Message sent",
-        description: "Your message has been sent to the professional.",
-      });
-      setMessageText('');
-    } else {
-      toast({
-        title: "Empty message",
-        description: "Please enter a message before sending.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleBookAppointment = () => {
-    toast({
-      title: "Booking initiated",
-      description: "You'll be redirected to the appointment booking page.",
-    });
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   if (isLoading) {
@@ -171,7 +158,7 @@ const ProfessionalPage = () => {
     );
   }
 
-  if (error || !professional) {
+  if (!professional) {
     return (
       <MainLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -192,387 +179,400 @@ const ProfessionalPage = () => {
     );
   }
 
-  // Prepare SEO metadata
-  const metaDescription = professional.bio?.substring(0, 150) + (professional.bio && professional.bio.length > 150 ? '...' : '') || 
-    `${professional.name} is a healthcare professional specializing in ${professional.specialties?.join(', ') || 'healthcare services'}.`;
-  
   return (
     <MainLayout>
-      <Helmet>
-        <title>{professional.name} | Healthcare Professional</title>
-        <meta name="description" content={metaDescription} />
-        <meta property="og:title" content={`${professional.name} | Healthcare Professional`} />
-        <meta property="og:description" content={metaDescription} />
-        {professional.profile_image && <meta property="og:image" content={professional.profile_image} />}
-        <meta property="og:type" content="profile" />
-        <link rel="canonical" href={`${window.location.origin}/professional/${professional.slug}`} />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Person",
-            "name": professional.name,
-            "description": metaDescription,
-            "jobTitle": professional.credentials,
-            "telephone": professional.phone,
-            "email": professional.email,
-            "workLocation": {
-              "@type": "Place",
-              "address": {
-                "@type": "PostalAddress",
-                "addressRegion": professional.service_area
-              }
-            },
-            "image": professional.profile_image
-          })}
-        </script>
-      </Helmet>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-            <div className="flex items-start gap-6">
-              <Avatar className="h-24 w-24">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/placements')}
+            className="mb-4"
+          >
+            &larr; Back to Placements
+          </Button>
+          
+          <div className="flex flex-col md:flex-row gap-6 items-start">
+            <div className="md:w-1/4 flex flex-col items-center">
+              <Avatar className="h-48 w-48">
                 <AvatarImage src={professional.profile_image} alt={professional.name} />
-                <AvatarFallback className="text-2xl">{getInitials(professional.name)}</AvatarFallback>
+                <AvatarFallback className="text-4xl">{getInitials(professional.name)}</AvatarFallback>
               </Avatar>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-3xl font-bold text-gray-900">{professional.name}</h1>
-                  {professional.verified && (
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
-                      <CheckCircle className="h-3 w-3" />
-                      Verified
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-xl text-gray-600">{professional.credentials}</p>
-                {professional.practice_name && (
-                  <p className="text-gray-600">{professional.practice_name}</p>
-                )}
-                {professional.service_area && (
-                  <div className="flex items-center text-gray-500 mt-1">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    <span>{professional.service_area}</span>
+              
+              <div className="mt-4 flex flex-col items-center">
+                {professional.rating && (
+                  <div className="flex items-center">
+                    <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                    <span className="ml-1 font-medium">{professional.rating}</span>
                   </div>
+                )}
+                
+                {professional.verified && (
+                  <Badge variant="outline" className="mt-2 bg-green-50 text-green-700 border-green-200">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Verified Provider
+                  </Badge>
+                )}
+                
+                {professional.accepting_new_patients !== undefined && (
+                  <Badge 
+                    variant={professional.accepting_new_patients ? "default" : "secondary"}
+                    className="mt-2"
+                  >
+                    {professional.accepting_new_patients ? "Accepting New Patients" : "Not Accepting Patients"}
+                  </Badge>
                 )}
               </div>
             </div>
-            <div className="flex flex-col items-end gap-2">
-              {professional.rating && (
-                <div className="flex items-center bg-yellow-50 px-3 py-1 rounded-md">
-                  <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mr-1" />
-                  <span className="font-medium">{professional.rating}</span>
+            
+            <div className="md:w-3/4">
+              <h1 className="text-3xl font-bold text-gray-900">{professional.name}</h1>
+              {professional.credentials && (
+                <p className="text-xl text-gray-600">{professional.credentials}</p>
+              )}
+              
+              {professional.practice_name && (
+                <p className="text-xl font-medium mt-2">{professional.practice_name}</p>
+              )}
+              
+              {professional.specialties && professional.specialties.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {professional.specialties.map((specialty, index) => (
+                    <Badge key={index} variant="outline">{specialty}</Badge>
+                  ))}
                 </div>
               )}
-              {professional.accepting_new_patients !== undefined && (
-                <Badge variant={professional.accepting_new_patients ? "outline" : "secondary"} className={professional.accepting_new_patients ? "border-green-500 text-green-700" : ""}>
-                  {professional.accepting_new_patients ? 'Accepting New Patients' : 'Not Accepting New Patients'}
-                </Badge>
-              )}
+              
+              <div className="mt-4 space-y-2">
+                {professional.service_area && (
+                  <div className="flex items-center">
+                    <MapPin className="h-5 w-5 text-gray-500 mr-2" />
+                    <span>{professional.service_area}</span>
+                  </div>
+                )}
+                
+                {professional.phone && (
+                  <div className="flex items-center">
+                    <Phone className="h-5 w-5 text-gray-500 mr-2" />
+                    <span>{professional.phone}</span>
+                  </div>
+                )}
+                
+                {professional.email && (
+                  <div className="flex items-center">
+                    <Mail className="h-5 w-5 text-gray-500 mr-2" />
+                    <span>{professional.email}</span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Button 
+                  size="lg"
+                  disabled={!professional.accepting_new_patients}
+                >
+                  <CalendarIcon className="mr-2 h-5 w-5" />
+                  Book Appointment
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                >
+                  <MessageSquare className="mr-2 h-5 w-5" />
+                  Send Message
+                </Button>
+                
+                {professional.telehealth_enabled && (
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                  >
+                    <Video className="mr-2 h-5 w-5" />
+                    Telehealth Session
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>
-
+        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Main Content */}
           <div className="md:col-span-2">
             <Card>
               <CardHeader>
                 <CardTitle>About {professional.first_name || professional.name.split(' ')[0]}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <Tabs defaultValue="bio">
-                  <TabsList>
-                    <TabsTrigger value="bio">Biography</TabsTrigger>
-                    <TabsTrigger value="specialties">Specialties</TabsTrigger>
-                    <TabsTrigger value="services">Services</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="bio" className="pt-4">
-                    <div className="prose max-w-none">
-                      <p>{professional.bio}</p>
-                    </div>
-                    
-                    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {professional.languages && professional.languages.length > 0 && (
-                        <div>
-                          <h3 className="text-sm font-medium mb-2">Languages</h3>
-                          <div className="flex flex-wrap gap-2">
-                            {professional.languages.map((language, idx) => (
-                              <Badge key={idx} variant="outline">{language}</Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      
-                      {professional.hourly_rate && (
-                        <div>
-                          <h3 className="text-sm font-medium mb-2">Rate</h3>
-                          <p>{professional.hourly_rate}</p>
-                        </div>
-                      )}
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="specialties" className="pt-4">
-                    <div className="space-y-6">
-                      {professional.specialties && professional.specialties.length > 0 && (
-                        <div>
-                          <h3 className="text-lg font-medium mb-2">Specialties</h3>
-                          <div className="flex flex-wrap gap-2">
-                            {professional.specialties.map((specialty, idx) => (
-                              <Badge key={idx} variant="secondary">{specialty}</Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      
-                      {professional.specializations && professional.specializations.length > 0 && (
-                        <div>
-                          <h3 className="text-lg font-medium mb-2">Specializations</h3>
-                          <div className="flex flex-wrap gap-2">
-                            {professional.specializations.map((specialization, idx) => (
-                              <Badge key={idx} variant="outline">{specialization}</Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="services" className="pt-4">
-                    <div className="space-y-4">
-                      <div>
-                        <h3 className="text-lg font-medium mb-2">Available Services</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                            <span>In-person consultations</span>
-                          </div>
-                          {professional.telehealth_enabled && (
-                            <div className="flex items-center gap-2">
-                              <CheckCircle className="h-4 w-4 text-green-500" />
-                              <span>Telehealth appointments</span>
-                            </div>
-                          )}
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                            <span>Medical evaluations</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                            <span>Follow-up appointments</span>
-                          </div>
-                          {professional.specializations?.includes('Chronic Disease Management') && (
-                            <div className="flex items-center gap-2">
-                              <CheckCircle className="h-4 w-4 text-green-500" />
-                              <span>Chronic disease management</span>
-                            </div>
-                          )}
-                          {professional.specializations?.includes('Preventive Care') && (
-                            <div className="flex items-center gap-2">
-                              <CheckCircle className="h-4 w-4 text-green-500" />
-                              <span>Preventive care</span>
-                            </div>
-                          )}
-                        </div>
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Professional Bio</h3>
+                  <p className="text-gray-700">{professional.bio}</p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {professional.specialties && professional.specialties.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-medium mb-2">Specialties</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {professional.specialties.map((specialty, index) => (
+                          <Badge key={index} variant="outline">{specialty}</Badge>
+                        ))}
                       </div>
                     </div>
-                  </TabsContent>
-                </Tabs>
+                  )}
+                  
+                  {professional.languages && professional.languages.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-medium mb-2">Languages</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {professional.languages.map((language, index) => (
+                          <Badge key={index} variant="secondary">{language}</Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {professional.specializations && professional.specializations.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-medium mb-2">Specializations</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {professional.specializations.map((specialization, index) => (
+                        <Badge key={index} variant="outline">{specialization}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
             
-            <div className="mt-8">
-              <h2 className="text-2xl font-bold mb-4">Patient Reviews</h2>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center">
-                      <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className={`h-5 w-5 ${i < Math.floor(professional.rating || 5) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} />
-                        ))}
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Services & Pricing</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <div className="flex items-center mb-3">
+                        <User className="h-5 w-5 text-indigo-600 mr-2" />
+                        <h3 className="font-medium">In-Person Consultations</h3>
                       </div>
-                      <span className="ml-2 text-lg font-medium">{professional.rating || 5.0}</span>
-                      <span className="ml-2 text-gray-500">(24 reviews)</span>
-                    </div>
-                    <Button variant="outline">Write a Review</Button>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <div className="border-b pb-6">
-                      <div className="flex justify-between mb-2">
-                        <div className="flex items-center">
-                          <Avatar className="h-10 w-10 mr-3">
-                            <AvatarFallback>JD</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">Jane Doe</p>
-                            <p className="text-sm text-gray-500">May 15, 2025</p>
-                          </div>
-                        </div>
-                        <div className="flex">
-                          {[...Array(5)].map((_, i) => (
-                            <Star key={i} className={`h-4 w-4 ${i < 5 ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} />
-                          ))}
-                        </div>
-                      </div>
-                      <p className="text-gray-700">
-                        Dr. {professional.first_name || professional.name.split(' ')[0]} is an excellent healthcare provider. Very knowledgeable and takes the time to listen to concerns. Highly recommend!
+                      <p className="text-sm text-gray-600 mb-3">
+                        Face-to-face appointments at the provider's office or your location.
                       </p>
+                      {professional.hourly_rate && (
+                        <div className="flex justify-between items-center">
+                          <span>Rate:</span>
+                          <span className="font-medium">{professional.hourly_rate}</span>
+                        </div>
+                      )}
                     </div>
                     
-                    <div className="border-b pb-6">
-                      <div className="flex justify-between mb-2">
-                        <div className="flex items-center">
-                          <Avatar className="h-10 w-10 mr-3">
-                            <AvatarFallback>RS</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">Robert Smith</p>
-                            <p className="text-sm text-gray-500">April 28, 2025</p>
+                    {professional.telehealth_enabled && (
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="flex items-center mb-3">
+                          <Video className="h-5 w-5 text-indigo-600 mr-2" />
+                          <h3 className="font-medium">Telehealth Sessions</h3>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-3">
+                          Virtual appointments via secure video conferencing.
+                        </p>
+                        {professional.hourly_rate && (
+                          <div className="flex justify-between items-center">
+                            <span>Rate:</span>
+                            <span className="font-medium">{professional.hourly_rate}</span>
                           </div>
-                        </div>
-                        <div className="flex">
-                          {[...Array(5)].map((_, i) => (
-                            <Star key={i} className={`h-4 w-4 ${i < 4 ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} />
-                          ))}
-                        </div>
+                        )}
                       </div>
-                      <p className="text-gray-700">
-                        I've been seeing {professional.first_name || professional.name.split(' ')[0]} for several months now and have been very pleased with the care I've received. The office staff is also very friendly and efficient.
-                      </p>
-                    </div>
+                    )}
                   </div>
                   
-                  <div className="mt-4 text-center">
-                    <Button variant="outline">View All Reviews</Button>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex items-center mb-3">
+                      <Award className="h-5 w-5 text-indigo-600 mr-2" />
+                      <h3 className="font-medium">Specialized Services</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <ul className="space-y-2">
+                          <li className="flex items-center">
+                            <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                            <span>Comprehensive Assessments</span>
+                          </li>
+                          <li className="flex items-center">
+                            <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                            <span>Treatment Planning</span>
+                          </li>
+                          <li className="flex items-center">
+                            <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                            <span>Medication Management</span>
+                          </li>
+                        </ul>
+                      </div>
+                      <div>
+                        <ul className="space-y-2">
+                          <li className="flex items-center">
+                            <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                            <span>Care Coordination</span>
+                          </li>
+                          <li className="flex items-center">
+                            <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                            <span>Family Consultations</span>
+                          </li>
+                          <li className="flex items-center">
+                            <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                            <span>Health Education</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-
-          {/* Sidebar */}
+          
           <div>
             <Card>
+              <CardHeader>
+                <CardTitle>Book an Appointment</CardTitle>
+                <CardDescription>
+                  Select your preferred date and time
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className="w-full justify-start text-left font-normal"
+                      >
+                        {date ? (
+                          format(date, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        disabled={(date) => date < new Date()}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                
+                <div>
+                  <Label>Time</Label>
+                  <div className="grid grid-cols-2 gap-2 mt-2 max-h-[200px] overflow-y-auto">
+                    {timeSlots.map((slot) => (
+                      <Button
+                        key={slot}
+                        variant={timeSlot === slot ? "default" : "outline"}
+                        className="justify-start"
+                        onClick={() => setTimeSlot(slot)}
+                      >
+                        <Clock className="mr-2 h-4 w-4" />
+                        {slot}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <Label>Appointment Type</Label>
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    <Button
+                      variant={appointmentType === 'in-person' ? "default" : "outline"}
+                      className="justify-start"
+                      onClick={() => setAppointmentType('in-person')}
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      In-Person
+                    </Button>
+                    
+                    {professional.telehealth_enabled && (
+                      <Button
+                        variant={appointmentType === 'telehealth' ? "default" : "outline"}
+                        className="justify-start"
+                        onClick={() => setAppointmentType('telehealth')}
+                      >
+                        <Video className="mr-2 h-4 w-4" />
+                        Telehealth
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="reason">Reason for Visit</Label>
+                  <Textarea 
+                    id="reason" 
+                    placeholder="Briefly describe the reason for your appointment"
+                    className="mt-2"
+                  />
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  className="w-full"
+                  onClick={handleBookAppointment}
+                  disabled={!date || !timeSlot || !professional.accepting_new_patients}
+                >
+                  {professional.accepting_new_patients ? 'Book Appointment' : 'Not Accepting Patients'}
+                </Button>
+              </CardFooter>
+            </Card>
+            
+            <Card className="mt-6">
               <CardHeader>
                 <CardTitle>Contact Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {professional.phone && (
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-5 w-5 text-indigo-600" />
-                    <span>{professional.phone}</span>
+                  <div className="flex items-center">
+                    <Phone className="h-5 w-5 text-gray-500 mr-3" />
+                    <div>
+                      <h4 className="font-medium">Phone</h4>
+                      <p>{professional.phone}</p>
+                    </div>
                   </div>
                 )}
+                
                 {professional.email && (
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-5 w-5 text-indigo-600" />
-                    <span>{professional.email}</span>
+                  <div className="flex items-center">
+                    <Mail className="h-5 w-5 text-gray-500 mr-3" />
+                    <div>
+                      <h4 className="font-medium">Email</h4>
+                      <p>{professional.email}</p>
+                    </div>
                   </div>
                 )}
-                {professional.practice_name && (
-                  <div className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-indigo-600" />
-                    <span>{professional.practice_name}</span>
-                  </div>
-                )}
+                
                 {professional.service_area && (
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-indigo-600" />
-                    <span>{professional.service_area}</span>
-                  </div>
-                )}
-                {professional.telehealth_enabled && (
-                  <div className="flex items-center gap-2">
-                    <Video className="h-5 w-5 text-indigo-600" />
-                    <span>Telehealth Available</span>
+                  <div className="flex items-center">
+                    <MapPin className="h-5 w-5 text-gray-500 mr-3" />
+                    <div>
+                      <h4 className="font-medium">Service Area</h4>
+                      <p>{professional.service_area}</p>
+                    </div>
                   </div>
                 )}
               </CardContent>
-              <CardFooter className="flex flex-col gap-3">
-                <Button className="w-full" onClick={handleBookAppointment}>
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Book Appointment
+              <CardFooter>
+                <Button variant="outline" className="w-full">
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Send Message
                 </Button>
-                
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full">
-                      <MessageSquare className="h-4 w-4 mr-2" />
-                      Send Message
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Message {professional.name}</DialogTitle>
-                      <DialogDescription>
-                        Send a message to inquire about services or schedule a consultation.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="py-4">
-                      <Textarea 
-                        placeholder="Type your message here..."
-                        className="min-h-[150px]"
-                        value={messageText}
-                        onChange={(e) => setMessageText(e.target.value)}
-                      />
-                    </div>
-                    <DialogFooter>
-                      <Button onClick={handleSendMessage}>Send Message</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-                
-                <Button variant="outline" className="w-full" onClick={handleCallProfessional}>
-                  <Phone className="h-4 w-4 mr-2" />
-                  Call
-                </Button>
-                
-                <Button variant="outline" className="w-full" onClick={handleEmailProfessional}>
-                  <Mail className="h-4 w-4 mr-2" />
-                  Email
-                </Button>
-                
-                <PlacementRequestButton 
-                  professionalId={professional.id}
-                  professionalName={professional.name}
-                  className="w-full"
-                />
               </CardFooter>
             </Card>
-            
-            {professional.specialties && professional.specialties.length > 0 && (
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle>Specialties</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {professional.specialties.map((specialty, idx) => (
-                      <Badge key={idx} variant="secondary">{specialty}</Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-            
-            {professional.languages && professional.languages.length > 0 && (
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle>Languages</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {professional.languages.map((language, idx) => (
-                      <Badge key={idx} variant="outline">{language}</Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </div>
         </div>
       </div>
@@ -580,4 +580,4 @@ const ProfessionalPage = () => {
   );
 };
 
-export default ProfessionalPage;
+export default ProfessionalProfilePage;

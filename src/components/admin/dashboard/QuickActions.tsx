@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Home, Award, Users, Briefcase, Settings, FileText } from 'lucide-react';
+import { Home, Award, Users, Briefcase, Settings, FileText, User } from 'lucide-react';
 
 const QuickActions: React.FC = () => {
   return (
@@ -27,6 +27,14 @@ const QuickActions: React.FC = () => {
           <Button className="justify-start" variant="outline" onClick={() => window.location.href = "/dashboard/admin/care-teams"}>
             <Briefcase className="mr-2 h-4 w-4" />
             <span>Manage Care Teams</span>
+          </Button>
+          <Button className="justify-start" variant="outline" onClick={() => window.location.href = "/dashboard/admin/facilities"}>
+            <Home className="mr-2 h-4 w-4" />
+            <span>Manage Facilities</span>
+          </Button>
+          <Button className="justify-start" variant="outline" onClick={() => window.location.href = "/dashboard/admin/professionals"}>
+            <User className="mr-2 h-4 w-4" />
+            <span>Manage Professionals</span>
           </Button>
           <Button className="justify-start" variant="outline" onClick={() => window.location.href = "/dashboard/admin/blog"}>
             <FileText className="mr-2 h-4 w-4" />

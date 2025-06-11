@@ -7,13 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Search, MapPin, Filter, CheckCircle } from 'lucide-react';
+import { Search, MapPin, Filter, CheckCircle, User, Award, Stethoscope } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import FacilityDetailCard from '@/components/placement/FacilityDetailCard';
+import ProfessionalDetailCard from '@/components/placement/ProfessionalDetailCard';
 import PlacementRequestButton from '@/components/placement/PlacementRequestButton';
 import ProfessionalCard from '@/components/placement/ProfessionalCard';
-import ProfessionalDetailCard from '@/components/placement/ProfessionalDetailCard';
 
 // Define the Facility interface
 interface Facility {
@@ -118,9 +118,29 @@ const counties = {
   ]
 };
 
+// Specialties for filtering professionals
+const specialties = [
+  'Cardiology',
+  'Dermatology',
+  'Family Medicine',
+  'Geriatrics',
+  'Internal Medicine',
+  'Neurology',
+  'Obstetrics & Gynecology',
+  'Oncology',
+  'Orthopedics',
+  'Pediatrics',
+  'Psychiatry',
+  'Pulmonology',
+  'Radiology',
+  'Surgery',
+  'Urology'
+];
+
 const Placements = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [careType, setCareType] = useState<string>('all');
+  const [specialty, setSpecialty] = useState<string>('all');
   const [location, setLocation] = useState<string>('all');
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
@@ -132,7 +152,7 @@ const Placements = () => {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedState, setSelectedState] = useState<string>('all');
   const [selectedCounty, setSelectedCounty] = useState<string>('all');
-  const [activeTab, setActiveTab] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState('all');
   const { toast } = useToast();
 
   // Fetch facilities and professionals from database
@@ -155,7 +175,7 @@ const Placements = () => {
           .select('*')
           .eq('status', 'active')
           .order('created_at', { ascending: false });
-          
+        
         if (professionalsError) throw professionalsError;
         
         if (facilitiesData && facilitiesData.length > 0) {
@@ -287,16 +307,15 @@ const Placements = () => {
               id: 'p1',
               name: 'Dr. Sarah Johnson',
               first_name: 'Sarah',
-              credentials: 'MD, Cardiology',
+              credentials: 'MD, FACP',
               email: 'sarah.johnson@example.com',
               phone: '(555) 123-4567',
-              practice_name: 'Heart Health Specialists',
-              specialties: ['Cardiology', 'Internal Medicine'],
+              practice_name: 'Johnson Family Medicine',
+              specialties: ['Family Medicine', 'Geriatrics'],
               languages: ['English', 'Spanish'],
-              specializations: ['Heart Failure', 'Preventive Cardiology'],
               service_area: 'San Mateo County, CA',
-              hourly_rate: '$250-350/hour',
-              bio: 'Dr. Sarah Johnson is a board-certified cardiologist with over 15 years of experience in treating heart diseases. She specializes in preventive cardiology and heart failure management, with a focus on helping patients improve their heart health through lifestyle modifications and appropriate medical interventions.',
+              hourly_rate: '$200-250',
+              bio: 'Board-certified family physician with over 15 years of experience in geriatric care. Specializes in managing chronic conditions and preventive care for seniors.',
               accepting_new_patients: true,
               telehealth_enabled: true,
               status: 'active',
@@ -309,20 +328,19 @@ const Placements = () => {
               id: 'p2',
               name: 'Dr. Michael Chen',
               first_name: 'Michael',
-              credentials: 'MD, Family Medicine',
+              credentials: 'MD',
               email: 'michael.chen@example.com',
               phone: '(555) 234-5678',
-              practice_name: 'Family Care Medical Group',
-              specialties: ['Family Medicine', 'Primary Care'],
-              languages: ['English', 'Mandarin', 'Cantonese'],
-              specializations: ['Preventive Care', 'Chronic Disease Management'],
+              practice_name: 'Chen Internal Medicine',
+              specialties: ['Internal Medicine', 'Cardiology'],
+              languages: ['English', 'Mandarin'],
               service_area: 'Santa Clara County, CA',
-              hourly_rate: '$180-250/hour',
-              bio: 'Dr. Michael Chen is a compassionate family physician dedicated to providing comprehensive care for patients of all ages. With a focus on preventive medicine and chronic disease management, he believes in building long-term relationships with his patients to promote overall wellness and health maintenance.',
+              hourly_rate: '$220-270',
+              bio: 'Internal medicine physician with a focus on cardiovascular health and preventive medicine. Provides comprehensive care for adults with complex medical needs.',
               accepting_new_patients: true,
               telehealth_enabled: true,
               status: 'active',
-              profile_image: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg',
+              profile_image: 'https://images.pexels.com/photos/6749773/pexels-photo-6749773.jpeg',
               rating: 4.8,
               verified: true,
               slug: 'dr-michael-chen-p2'
@@ -331,21 +349,20 @@ const Placements = () => {
               id: 'p3',
               name: 'Dr. Emily Rodriguez',
               first_name: 'Emily',
-              credentials: 'MD, Pediatrics',
+              credentials: 'MD, MPH',
               email: 'emily.rodriguez@example.com',
               phone: '(555) 345-6789',
-              practice_name: 'Sunshine Pediatrics',
-              specialties: ['Pediatrics'],
+              practice_name: 'Wellness Medical Group',
+              specialties: ['Family Medicine', 'Preventive Medicine'],
               languages: ['English', 'Spanish'],
-              specializations: ['Newborn Care', 'Adolescent Medicine'],
               service_area: 'Los Angeles County, CA',
-              hourly_rate: '$200-300/hour',
-              bio: 'Dr. Emily Rodriguez is a board-certified pediatrician who has been caring for children for over 10 years. She is passionate about child development and preventive care, and strives to create a warm, welcoming environment where both children and parents feel comfortable and supported.',
+              hourly_rate: '$190-240',
+              bio: 'Family physician with a Master\'s in Public Health, focusing on preventive care and health education. Passionate about empowering patients to take control of their health.',
               accepting_new_patients: true,
               telehealth_enabled: true,
               status: 'active',
-              profile_image: 'https://images.pexels.com/photos/5214959/pexels-photo-5214959.jpeg',
-              rating: 4.9,
+              profile_image: 'https://images.pexels.com/photos/5214958/pexels-photo-5214958.jpeg',
+              rating: 4.7,
               verified: true,
               slug: 'dr-emily-rodriguez-p3'
             },
@@ -353,21 +370,20 @@ const Placements = () => {
               id: 'p4',
               name: 'Dr. James Wilson',
               first_name: 'James',
-              credentials: 'MD, Neurology',
+              credentials: 'MD, FACC',
               email: 'james.wilson@example.com',
               phone: '(555) 456-7890',
-              practice_name: 'Advanced Neurology Associates',
-              specialties: ['Neurology'],
+              practice_name: 'Wilson Cardiology Associates',
+              specialties: ['Cardiology', 'Internal Medicine'],
               languages: ['English'],
-              specializations: ['Movement Disorders', 'Headache Medicine'],
               service_area: 'Travis County, TX',
-              hourly_rate: '$275-375/hour',
-              bio: 'Dr. James Wilson is a neurologist specializing in movement disorders and headache medicine. With advanced training in the latest neurological treatments, he is committed to helping patients manage complex neurological conditions and improve their quality of life.',
+              hourly_rate: '$250-300',
+              bio: 'Board-certified cardiologist specializing in preventive cardiology and management of complex cardiovascular conditions. Fellow of the American College of Cardiology.',
               accepting_new_patients: false,
               telehealth_enabled: true,
               status: 'active',
-              profile_image: 'https://images.pexels.com/photos/5407206/pexels-photo-5407206.jpeg',
-              rating: 4.7,
+              profile_image: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg',
+              rating: 4.9,
               verified: true,
               slug: 'dr-james-wilson-p4'
             },
@@ -375,20 +391,19 @@ const Placements = () => {
               id: 'p5',
               name: 'Dr. Lisa Thompson',
               first_name: 'Lisa',
-              credentials: 'MD, Psychiatry',
+              credentials: 'MD, FAPA',
               email: 'lisa.thompson@example.com',
               phone: '(555) 567-8901',
-              practice_name: 'Mind Wellness Center',
-              specialties: ['Psychiatry', 'Mental Health'],
+              practice_name: 'Thompson Psychiatry',
+              specialties: ['Psychiatry', 'Geriatric Psychiatry'],
               languages: ['English', 'French'],
-              specializations: ['Anxiety Disorders', 'Depression', 'PTSD'],
               service_area: 'Marin County, CA',
-              hourly_rate: '$225-325/hour',
-              bio: 'Dr. Lisa Thompson is a board-certified psychiatrist with expertise in treating anxiety disorders, depression, and PTSD. She takes a holistic approach to mental health, combining medication management with therapy recommendations and lifestyle modifications to help patients achieve optimal mental wellness.',
+              hourly_rate: '$230-280',
+              bio: 'Psychiatrist specializing in geriatric mental health, including depression, anxiety, and cognitive disorders in older adults. Provides compassionate, evidence-based care.',
               accepting_new_patients: true,
               telehealth_enabled: true,
               status: 'active',
-              profile_image: 'https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg',
+              profile_image: 'https://images.pexels.com/photos/5407206/pexels-photo-5407206.jpeg',
               rating: 4.8,
               verified: true,
               slug: 'dr-lisa-thompson-p5'
@@ -399,7 +414,7 @@ const Placements = () => {
         console.error('Error fetching data:', error);
         toast({
           title: 'Error',
-          description: 'Failed to load data',
+          description: 'Failed to load facilities and professionals',
           variant: 'destructive',
         });
       } finally {
@@ -438,17 +453,18 @@ const Placements = () => {
     return matchesSearch && matchesCareType && matchesLocation && matchesServices;
   });
 
-  // Filter professionals based on search query, specialties, location, and services
+  // Filter professionals based on search query, specialty, and location
   const filteredProfessionals = professionals.filter(professional => {
     const matchesSearch = 
       professional.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       professional.bio?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       professional.service_area?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      professional.specialties?.some(specialty => specialty.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      professional.specializations?.some(specialization => specialization.toLowerCase().includes(searchQuery.toLowerCase()));
+      professional.practice_name?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Match by specialty (using careType as a proxy for specialty)
-    const matchesSpecialty = careType === 'all' || professional.specialties?.includes(careType);
+    const matchesSpecialty = specialty === 'all' || 
+      (professional.specialties && professional.specialties.some(s => 
+        s.toLowerCase().includes(specialty.toLowerCase())
+      ));
     
     // Match by state and county
     let matchesLocation = true;
@@ -462,11 +478,7 @@ const Placements = () => {
       matchesLocation = professional.service_area?.includes(location) || false;
     }
     
-    // For demo purposes, we'll assume all professionals match the selected services
-    // In a real implementation, you would check if the professional provides the selected services
-    const matchesServices = selectedServices.length === 0 || true;
-    
-    return matchesSearch && matchesSpecialty && matchesLocation && matchesServices;
+    return matchesSearch && matchesSpecialty && matchesLocation;
   });
 
   // Toggle service selection
@@ -484,16 +496,22 @@ const Placements = () => {
     setSelectedCounty('all');
   };
 
+  // Reset selected items when changing tabs
+  useEffect(() => {
+    setSelectedFacility(null);
+    setSelectedProfessional(null);
+  }, [activeTab]);
+
   return (
     <MainLayout>
       <div className="bg-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center mb-12">
             <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              Care Communities & Professionals
+              Assisted Living & Care Communities
             </h1>
             <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-              Find the perfect care community or healthcare professional for your needs with our concierge service.
+              Find the perfect care community or healthcare professional for your loved one with our concierge placement service.
             </p>
           </div>
 
@@ -503,31 +521,40 @@ const Placements = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <Input 
-                  placeholder="Search by name, specialty, or location..." 
+                  placeholder="Search..." 
                   className="pl-10"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
               
-              <Select value={careType} onValueChange={setCareType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Care Type / Specialty" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="Memory Care">Memory Care</SelectItem>
-                  <SelectItem value="Assisted Living">Assisted Living</SelectItem>
-                  <SelectItem value="Independent Living">Independent Living</SelectItem>
-                  <SelectItem value="Long-Term Care">Long-Term Care</SelectItem>
-                  <SelectItem value="Hospice Support">Hospice Support</SelectItem>
-                  <SelectItem value="Cardiology">Cardiology</SelectItem>
-                  <SelectItem value="Family Medicine">Family Medicine</SelectItem>
-                  <SelectItem value="Pediatrics">Pediatrics</SelectItem>
-                  <SelectItem value="Neurology">Neurology</SelectItem>
-                  <SelectItem value="Psychiatry">Psychiatry</SelectItem>
-                </SelectContent>
-              </Select>
+              {activeTab === 'professionals' ? (
+                <Select value={specialty} onValueChange={setSpecialty}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Specialty" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Specialties</SelectItem>
+                    {specialties.map(spec => (
+                      <SelectItem key={spec} value={spec}>{spec}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Select value={careType} onValueChange={setCareType}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Care Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Care Types</SelectItem>
+                    <SelectItem value="Memory Care">Memory Care</SelectItem>
+                    <SelectItem value="Assisted Living">Assisted Living</SelectItem>
+                    <SelectItem value="Independent Living">Independent Living</SelectItem>
+                    <SelectItem value="Long-Term Care">Long-Term Care</SelectItem>
+                    <SelectItem value="Hospice Support">Hospice Support</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
               
               <div className="flex gap-2">
                 <Button 
@@ -539,14 +566,16 @@ const Placements = () => {
                   {showFilters ? 'Hide Filters' : 'More Filters'}
                 </Button>
                 
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowServiceFilters(!showServiceFilters)}
-                  className="flex items-center gap-2"
-                >
-                  <Filter className="h-4 w-4" />
-                  {showServiceFilters ? 'Hide Services' : 'Services Needed'}
-                </Button>
+                {activeTab !== 'professionals' && (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowServiceFilters(!showServiceFilters)}
+                    className="flex items-center gap-2"
+                  >
+                    <Filter className="h-4 w-4" />
+                    {showServiceFilters ? 'Hide Services' : 'Services Needed'}
+                  </Button>
+                )}
               </div>
             </div>
             
@@ -588,7 +617,7 @@ const Placements = () => {
               </div>
             )}
             
-            {showServiceFilters && (
+            {showServiceFilters && activeTab !== 'professionals' && (
               <div className="mt-4 p-4 border rounded-md bg-white">
                 <h3 className="font-medium mb-3">Services Needed for Patient</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -637,7 +666,7 @@ const Placements = () => {
               <div>
                 <h2 className="text-2xl font-bold text-indigo-900 mb-2">Need Help Finding the Perfect Care Solution?</h2>
                 <p className="text-indigo-700">
-                  Our concierge service matches your loved one with the ideal care community or healthcare professional based on their unique needs.
+                  Our concierge placement service matches your loved one with the ideal care community or healthcare professional based on their unique needs.
                 </p>
                 <div className="mt-4 space-y-2">
                   <div className="flex items-center">
@@ -662,7 +691,7 @@ const Placements = () => {
             </div>
           </div>
 
-          {/* Main Tabs for Communities vs Professionals */}
+          {/* Tabs for Communities and Professionals */}
           <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-8">
             <TabsList className="grid w-full grid-cols-3 max-w-md">
               <TabsTrigger value="all">All Communities</TabsTrigger>
@@ -889,9 +918,8 @@ const Placements = () => {
                     <p className="text-gray-600">No healthcare professionals found matching your criteria.</p>
                     <Button className="mt-4" onClick={() => {
                       setSearchQuery('');
-                      setCareType('all');
+                      setSpecialty('all');
                       setLocation('all');
-                      setSelectedServices([]);
                       setSelectedState('all');
                       setSelectedCounty('all');
                     }}>
@@ -929,7 +957,7 @@ const Placements = () => {
                 </div>
                 <h3 className="text-lg font-semibold mb-3 mt-2">We Match & Advocate</h3>
                 <p className="text-gray-600">
-                  Our team matches your needs with trusted providers and advocates for the best possible care and pricing.
+                  Our team matches your needs with trusted communities and professionals, advocating for the best possible care and pricing.
                 </p>
               </div>
               
@@ -939,7 +967,7 @@ const Placements = () => {
                 </div>
                 <h3 className="text-lg font-semibold mb-3 mt-2">Seamless Transition</h3>
                 <p className="text-gray-600">
-                  We coordinate appointments, handle paperwork, and ensure a smooth transition to the selected provider.
+                  We coordinate appointments, handle paperwork, and ensure a smooth transition to the selected care solution.
                 </p>
               </div>
             </div>
@@ -961,14 +989,14 @@ const Placements = () => {
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <h3 className="text-lg font-semibold mb-2">How does your placement fee work?</h3>
                 <p className="text-gray-600">
-                  Our standard placement service has no upfront fee for families. We're paid by the provider after a successful placement. For expedited service, a $497 concierge deposit unlocks priority matching and additional benefits.
+                  Our standard placement service has no upfront fee for families. We're paid by the community or professional after a successful placement. For expedited service, a $497 concierge deposit unlocks priority matching and additional benefits.
                 </p>
               </div>
               
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <h3 className="text-lg font-semibold mb-2">How long does the placement process take?</h3>
                 <p className="text-gray-600">
-                  Standard placements typically take 72-96 hours from initial request to provider recommendations. Our expedited concierge service provides matches within 24-48 hours for urgent situations.
+                  Standard placements typically take 72-96 hours from initial request to recommendations. Our expedited concierge service provides matches within 24-48 hours for urgent situations.
                 </p>
               </div>
               
@@ -980,9 +1008,9 @@ const Placements = () => {
               </div>
               
               <div className="bg-white p-6 rounded-lg shadow-sm">
-                <h3 className="text-lg font-semibold mb-2">What types of providers do you work with?</h3>
+                <h3 className="text-lg font-semibold mb-2">What types of care providers do you work with?</h3>
                 <p className="text-gray-600">
-                  We partner with a wide range of healthcare providers, including memory care facilities, assisted living communities, independent living communities, skilled nursing facilities, hospice care providers, and individual healthcare professionals.
+                  We partner with a wide range of senior living options, including memory care, assisted living, independent living, skilled nursing communities, hospice care providers, and healthcare professionals across various specialties.
                 </p>
               </div>
             </div>

@@ -3,13 +3,17 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, Calendar, CheckCircle, MessageSquare, Star, Clock, User, FileText, Video } from 'lucide-react';
-import PlacementRequestButton from './PlacementRequestButton';
+import { MapPin, Phone, Mail, Calendar as CalendarIcon, Clock, Star, CheckCircle, MessageSquare, Video, ChevronLeft } from 'lucide-react';
 
 interface Professional {
   id: string;
@@ -40,104 +44,106 @@ interface ProfessionalDetailCardProps {
 
 const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ professional }) => {
   const { toast } = useToast();
+  const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
+  const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
+  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [timeSlot, setTimeSlot] = useState<string | null>(null);
   const [messageText, setMessageText] = useState('');
   
   const getInitials = (name: string) => {
+    if (!name) return 'NA';
     return name
       .split(' ')
-      .map(part => part[0])
+      .map((word) => word[0])
       .join('')
-      .toUpperCase();
+      .toUpperCase()
+      .slice(0, 2);
+  };
+  
+  // Generate time slots (9 AM to 5 PM) with 30-minute intervals
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 9; hour <= 16; hour++) {
+      const hourFormatted = hour > 12 ? hour - 12 : hour;
+      const period = hour >= 12 ? "PM" : "AM";
+      
+      slots.push(`${hourFormatted}:00 ${period}`);
+      slots.push(`${hourFormatted}:30 ${period}`);
+    }
+    return slots;
   };
 
-  const handleCallProfessional = () => {
-    if (professional.phone) {
-      window.location.href = `tel:${professional.phone}`;
-    } else {
+  const timeSlots = generateTimeSlots();
+  
+  const handleBookAppointment = () => {
+    if (!date || !timeSlot) {
       toast({
-        title: "No phone number available",
-        description: "This professional hasn't provided a phone number.",
+        title: "Incomplete booking",
+        description: "Please select a date and time for your appointment",
         variant: "destructive",
       });
+      return;
     }
+    
+    toast({
+      title: "Appointment Booked",
+      description: `Your appointment with ${professional.name} has been scheduled for ${format(date, 'MMMM d, yyyy')} at ${timeSlot}.`,
+    });
+    
+    setIsBookingDialogOpen(false);
+    setDate(undefined);
+    setTimeSlot(null);
   };
-
-  const handleEmailProfessional = () => {
-    if (professional.email) {
-      window.location.href = `mailto:${professional.email}`;
-    } else {
-      toast({
-        title: "No email available",
-        description: "This professional hasn't provided an email address.",
-        variant: "destructive",
-      });
-    }
-  };
-
+  
   const handleSendMessage = () => {
-    if (messageText.trim()) {
-      toast({
-        title: "Message sent",
-        description: "Your message has been sent to the professional.",
-      });
-      setMessageText('');
-    } else {
+    if (!messageText.trim()) {
       toast({
         title: "Empty message",
-        description: "Please enter a message before sending.",
+        description: "Please enter a message before sending",
         variant: "destructive",
       });
+      return;
     }
-  };
-
-  const handleBookAppointment = () => {
+    
     toast({
-      title: "Booking initiated",
-      description: "You'll be redirected to the appointment booking page.",
+      title: "Message Sent",
+      description: `Your message has been sent to ${professional.name}.`,
     });
+    
+    setIsMessageDialogOpen(false);
+    setMessageText('');
   };
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+        <div className="flex justify-between items-start">
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
               <AvatarImage src={professional.profile_image} alt={professional.name} />
               <AvatarFallback className="text-xl">{getInitials(professional.name)}</AvatarFallback>
             </Avatar>
             <div>
-              <div className="flex items-center gap-2">
-                <CardTitle>{professional.name}</CardTitle>
-                {professional.verified && (
-                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
-                    <CheckCircle className="h-3 w-3" />
-                    Verified
-                  </Badge>
-                )}
-              </div>
-              <CardDescription>
-                {professional.credentials && <span>{professional.credentials}</span>}
-                {professional.practice_name && <span> • {professional.practice_name}</span>}
-              </CardDescription>
-              {professional.service_area && (
-                <div className="flex items-center mt-1 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  {professional.service_area}
-                </div>
+              <CardTitle className="text-2xl">{professional.name}</CardTitle>
+              {professional.credentials && (
+                <CardDescription className="text-base">{professional.credentials}</CardDescription>
+              )}
+              {professional.practice_name && (
+                <p className="text-base font-medium mt-1">{professional.practice_name}</p>
               )}
             </div>
           </div>
           <div className="flex flex-col items-end gap-2">
             {professional.rating && (
-              <div className="flex items-center bg-yellow-50 px-3 py-1 rounded-md">
-                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mr-1" />
-                <span className="font-medium">{professional.rating}</span>
+              <div className="flex items-center">
+                <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                <span className="ml-1 font-medium">{professional.rating}</span>
               </div>
             )}
-            {professional.accepting_new_patients !== undefined && (
-              <Badge variant={professional.accepting_new_patients ? "outline" : "secondary"} className={professional.accepting_new_patients ? "border-green-500 text-green-700" : ""}>
-                {professional.accepting_new_patients ? 'Accepting New Patients' : 'Not Accepting New Patients'}
+            {professional.verified && (
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                <CheckCircle className="h-3 w-3 mr-1" />
+                Verified Provider
               </Badge>
             )}
           </div>
@@ -147,8 +153,8 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
         <Tabs defaultValue="about">
           <TabsList>
             <TabsTrigger value="about">About</TabsTrigger>
-            <TabsTrigger value="specialties">Specialties</TabsTrigger>
             <TabsTrigger value="services">Services</TabsTrigger>
+            <TabsTrigger value="contact">Contact</TabsTrigger>
           </TabsList>
           
           <TabsContent value="about" className="pt-4">
@@ -159,47 +165,35 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {professional.languages && professional.languages.length > 0 && (
+                {professional.specialties && professional.specialties.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-medium mb-1">Languages</h4>
+                    <h4 className="text-base font-medium mb-2">Specialties</h4>
                     <div className="flex flex-wrap gap-2">
-                      {professional.languages.map((language, idx) => (
-                        <Badge key={idx} variant="outline">{language}</Badge>
+                      {professional.specialties.map((specialty, index) => (
+                        <Badge key={index} variant="outline">{specialty}</Badge>
                       ))}
                     </div>
                   </div>
                 )}
                 
-                {professional.hourly_rate && (
+                {professional.languages && professional.languages.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-medium mb-1">Rate</h4>
-                    <p className="text-gray-700">{professional.hourly_rate}</p>
+                    <h4 className="text-base font-medium mb-2">Languages</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {professional.languages.map((language, index) => (
+                        <Badge key={index} variant="secondary">{language}</Badge>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="specialties" className="pt-4">
-            <div className="space-y-4">
-              {professional.specialties && professional.specialties.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Specialties</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {professional.specialties.map((specialty, idx) => (
-                      <Badge key={idx} variant="secondary">{specialty}</Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
               
-              {professional.specializations && professional.specializations.length > 0 && (
+              {professional.service_area && (
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Specializations</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {professional.specializations.map((specialization, idx) => (
-                      <Badge key={idx} variant="outline">{specialization}</Badge>
-                    ))}
+                  <h4 className="text-base font-medium mb-2">Service Area</h4>
+                  <div className="flex items-center">
+                    <MapPin className="h-4 w-4 text-gray-500 mr-2" />
+                    <span>{professional.service_area}</span>
                   </div>
                 </div>
               )}
@@ -208,131 +202,282 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
           
           <TabsContent value="services" className="pt-4">
             <div className="space-y-4">
+              {professional.specializations && professional.specializations.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Specializations</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {professional.specializations.map((specialization, index) => (
+                      <Badge key={index} variant="outline">{specialization}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
               <div>
-                <h3 className="text-lg font-medium mb-2">Available Services</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>In-person consultations</span>
+                <h3 className="text-lg font-medium mb-2">Services Offered</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-medium mb-2">Consultations</h4>
+                    <ul className="space-y-2">
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                        <span>Initial Consultations</span>
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                        <span>Follow-up Appointments</span>
+                      </li>
+                      {professional.telehealth_enabled && (
+                        <li className="flex items-center">
+                          <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                          <span>Telehealth Sessions</span>
+                        </li>
+                      )}
+                    </ul>
                   </div>
-                  {professional.telehealth_enabled && (
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span>Telehealth appointments</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Medical evaluations</span>
+                  
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-medium mb-2">Additional Services</h4>
+                    <ul className="space-y-2">
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                        <span>Care Coordination</span>
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                        <span>Medication Management</span>
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                        <span>Health Education</span>
+                      </li>
+                    </ul>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span>Follow-up appointments</span>
-                  </div>
-                  {professional.specializations?.includes('Chronic Disease Management') && (
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span>Chronic disease management</span>
-                    </div>
-                  )}
-                  {professional.specializations?.includes('Preventive Care') && (
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span>Preventive care</span>
-                    </div>
-                  )}
                 </div>
               </div>
+              
+              {professional.hourly_rate && (
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Pricing</h3>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span>Hourly Rate:</span>
+                      <span className="font-medium">{professional.hourly_rate}</span>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-2">
+                      * Prices may vary based on specific services and insurance coverage.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="contact" className="pt-4">
+            <div className="space-y-4">
+              {professional.phone && (
+                <div className="flex items-center">
+                  <Phone className="h-5 w-5 text-gray-500 mr-3" />
+                  <div>
+                    <h4 className="font-medium">Phone</h4>
+                    <p>{professional.phone}</p>
+                  </div>
+                </div>
+              )}
+              
+              {professional.email && (
+                <div className="flex items-center">
+                  <Mail className="h-5 w-5 text-gray-500 mr-3" />
+                  <div>
+                    <h4 className="font-medium">Email</h4>
+                    <p>{professional.email}</p>
+                  </div>
+                </div>
+              )}
+              
+              {professional.service_area && (
+                <div className="flex items-center">
+                  <MapPin className="h-5 w-5 text-gray-500 mr-3" />
+                  <div>
+                    <h4 className="font-medium">Service Area</h4>
+                    <p>{professional.service_area}</p>
+                  </div>
+                </div>
+              )}
+              
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => setIsMessageDialogOpen(true)}
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Send Message
+                </Button>
+                
+                <Button 
+                  className="w-full"
+                  onClick={() => setIsBookingDialogOpen(true)}
+                  disabled={!professional.accepting_new_patients}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  Book Appointment
+                </Button>
+              </div>
+              
+              {!professional.accepting_new_patients && (
+                <p className="text-sm text-amber-600 text-center">
+                  This provider is not currently accepting new patients.
+                </p>
+              )}
             </div>
           </TabsContent>
         </Tabs>
-        
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-lg font-medium mb-2">Contact Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {professional.phone && (
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-indigo-600" />
-                <span>{professional.phone}</span>
-              </div>
-            )}
-            {professional.email && (
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-indigo-600" />
-                <span>{professional.email}</span>
-              </div>
-            )}
-            {professional.practice_name && (
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-indigo-600" />
-                <span>{professional.practice_name}</span>
-              </div>
-            )}
-            {professional.telehealth_enabled && (
-              <div className="flex items-center gap-2">
-                <Video className="h-4 w-4 text-indigo-600" />
-                <span>Telehealth Available</span>
-              </div>
-            )}
-          </div>
-        </div>
       </CardContent>
-      <CardFooter className="flex flex-wrap gap-2">
-        <Button variant="outline" onClick={handleCallProfessional}>
-          <Phone className="h-4 w-4 mr-2" />
-          Call
+      <CardFooter className="flex justify-between">
+        <Button 
+          variant="outline" 
+          onClick={() => {
+            document.getElementById('placements-top')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+        >
+          <ChevronLeft className="mr-2 h-4 w-4" />
+          Back to List
         </Button>
         
-        <Button variant="outline" onClick={handleEmailProfessional}>
-          <Mail className="h-4 w-4 mr-2" />
-          Email
-        </Button>
-        
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline">
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Message
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Message {professional.name}</DialogTitle>
-              <DialogDescription>
-                Send a message to inquire about services or schedule a consultation.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="py-4">
+        {professional.slug && (
+          <Button asChild>
+            <Link to={`/professional/${professional.slug}`}>
+              View Full Profile
+            </Link>
+          </Button>
+        )}
+      </CardFooter>
+      
+      {/* Booking Dialog */}
+      <Dialog open={isBookingDialogOpen} onOpenChange={setIsBookingDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Book Appointment with {professional.name}</DialogTitle>
+            <DialogDescription>
+              Select your preferred date and time for your appointment.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+            <div>
+              <Label className="mb-2 block">Select Date</Label>
+              <div className="border rounded-md p-2">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  disabled={(date) => date < new Date()}
+                  className="rounded-md"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label className="mb-2 block">Select Time</Label>
+              {date ? (
+                <div className="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto">
+                  {timeSlots.map((slot) => (
+                    <Button
+                      key={slot}
+                      variant={timeSlot === slot ? "default" : "outline"}
+                      className="justify-start"
+                      onClick={() => setTimeSlot(slot)}
+                    >
+                      <Clock className="mr-2 h-4 w-4" />
+                      {slot}
+                    </Button>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-[300px] border rounded-md bg-gray-50">
+                  <p className="text-gray-500">Please select a date first</p>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="bg-gray-50 p-4 rounded-md">
+              <h4 className="font-medium mb-2">Appointment Type</h4>
+              <div className="grid grid-cols-2 gap-2">
+                <Button variant="outline" className="justify-start">
+                  <User className="mr-2 h-4 w-4" />
+                  In-Person Visit
+                </Button>
+                {professional.telehealth_enabled && (
+                  <Button variant="outline" className="justify-start">
+                    <Video className="mr-2 h-4 w-4" />
+                    Telehealth
+                  </Button>
+                )}
+              </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="reason">Reason for Visit</Label>
               <Textarea 
+                id="reason" 
+                placeholder="Briefly describe the reason for your appointment"
+                className="mt-1"
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsBookingDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleBookAppointment}>
+              Book Appointment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Message Dialog */}
+      <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Send Message to {professional.name}</DialogTitle>
+            <DialogDescription>
+              Your message will be sent directly to the provider.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="subject">Subject</Label>
+              <Input id="subject" placeholder="Enter subject" className="mt-1" />
+            </div>
+            
+            <div>
+              <Label htmlFor="message">Message</Label>
+              <Textarea 
+                id="message" 
                 placeholder="Type your message here..."
-                className="min-h-[150px]"
+                className="mt-1 min-h-[150px]"
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
               />
             </div>
-            <DialogFooter>
-              <Button onClick={handleSendMessage}>Send Message</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-        
-        <Button onClick={handleBookAppointment}>
-          <Calendar className="h-4 w-4 mr-2" />
-          Book Appointment
-        </Button>
-        
-        {professional.slug && (
-          <Button variant="outline" asChild>
-            <Link to={`/professional/${professional.slug}`}>View Full Profile</Link>
-          </Button>
-        )}
-        
-        <PlacementRequestButton 
-          professionalId={professional.id}
-          professionalName={professional.name}
-          className="ml-auto"
-        />
-      </CardFooter>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsMessageDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSendMessage}>
+              Send Message
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

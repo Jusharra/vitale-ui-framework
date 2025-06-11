@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin, Star, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import PlacementRequestButton from './PlacementRequestButton';
 
 interface Professional {
   id: string;
@@ -37,35 +36,46 @@ interface ProfessionalCardProps {
 
 const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ professional, onViewDetails }) => {
   const getInitials = (name: string) => {
+    if (!name) return 'NA';
     return name
       .split(' ')
-      .map(part => part[0])
+      .map((word) => word[0])
       .join('')
-      .toUpperCase();
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
     <Card className="overflow-hidden">
       <div className="md:flex">
-        <div className="md:w-1/4 p-6 flex justify-center items-start">
+        <div className="md:w-1/4 p-6 flex flex-col items-center justify-center">
           <Avatar className="h-32 w-32">
             <AvatarImage src={professional.profile_image} alt={professional.name} />
             <AvatarFallback className="text-2xl">{getInitials(professional.name)}</AvatarFallback>
           </Avatar>
+          {professional.rating && (
+            <div className="flex items-center mt-2">
+              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+              <span className="ml-1 font-medium">{professional.rating}</span>
+            </div>
+          )}
+          {professional.verified && (
+            <Badge variant="outline" className="mt-2 bg-green-50 text-green-700 border-green-200">
+              <CheckCircle className="h-3 w-3 mr-1" />
+              Verified
+            </Badge>
+          )}
         </div>
         <div className="md:w-3/4 p-6">
           <div className="flex justify-between items-start">
             <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-xl font-semibold">{professional.name}</h3>
-                {professional.verified && (
-                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
-                    <CheckCircle className="h-3 w-3" />
-                    Verified
-                  </Badge>
-                )}
-              </div>
-              <p className="text-gray-600">{professional.credentials}</p>
+              <h3 className="text-xl font-semibold">{professional.name}</h3>
+              {professional.credentials && (
+                <p className="text-sm text-gray-600">{professional.credentials}</p>
+              )}
+              {professional.practice_name && (
+                <p className="text-base font-medium mt-1">{professional.practice_name}</p>
+              )}
               {professional.service_area && (
                 <div className="flex items-center text-gray-500 mt-1">
                   <MapPin className="h-4 w-4 mr-1" />
@@ -73,55 +83,45 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ professional, onVie
                 </div>
               )}
             </div>
-            <div className="flex items-center">
-              {professional.rating && (
-                <div className="flex items-center bg-yellow-50 px-2 py-1 rounded-md">
-                  <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mr-1" />
-                  <span className="font-medium">{professional.rating}</span>
+            <div className="flex flex-col items-end gap-2">
+              {professional.specialties && professional.specialties.length > 0 && (
+                <div className="flex flex-wrap gap-1 justify-end">
+                  {professional.specialties.map((specialty, index) => (
+                    <Badge key={index} variant="outline" className="text-xs">
+                      {specialty}
+                    </Badge>
+                  ))}
                 </div>
+              )}
+              {professional.accepting_new_patients !== undefined && (
+                <Badge variant={professional.accepting_new_patients ? "default" : "secondary"}>
+                  {professional.accepting_new_patients ? "Accepting New Patients" : "Not Accepting Patients"}
+                </Badge>
               )}
             </div>
           </div>
           
-          <div className="mt-4 flex flex-wrap gap-2">
-            {professional.specialties?.map((specialty, index) => (
-              <Badge key={index} variant="secondary" className="text-xs">
-                {specialty}
-              </Badge>
-            ))}
-          </div>
+          <p className="mt-4 text-gray-600 line-clamp-3">{professional.bio}</p>
           
-          <p className="mt-4 text-gray-600 line-clamp-2">{professional.bio}</p>
-          
-          <div className="mt-4 flex flex-wrap gap-4">
+          <div className="mt-4">
             {professional.languages && professional.languages.length > 0 && (
-              <div>
-                <span className="text-sm font-medium">Languages:</span>
-                <span className="text-sm text-gray-600 ml-1">{professional.languages.join(', ')}</span>
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <span className="font-medium">Languages:</span>
+                <span>{professional.languages.join(', ')}</span>
               </div>
             )}
-            
             {professional.hourly_rate && (
-              <div>
-                <span className="text-sm font-medium">Rate:</span>
-                <span className="text-sm text-gray-600 ml-1">{professional.hourly_rate}</span>
-              </div>
-            )}
-            
-            {professional.telehealth_enabled !== undefined && (
-              <div>
-                <span className="text-sm font-medium">Telehealth:</span>
-                <span className="text-sm text-gray-600 ml-1">{professional.telehealth_enabled ? 'Available' : 'Not available'}</span>
+              <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+                <span className="font-medium">Rate:</span>
+                <span>{professional.hourly_rate}</span>
               </div>
             )}
           </div>
           
           <div className="mt-6 flex justify-between items-center">
-            <div>
-              {professional.accepting_new_patients !== undefined && (
-                <Badge variant={professional.accepting_new_patients ? "outline" : "secondary"} className={professional.accepting_new_patients ? "border-green-500 text-green-700" : ""}>
-                  {professional.accepting_new_patients ? 'Accepting New Patients' : 'Not Accepting New Patients'}
-                </Badge>
+            <div className="flex gap-2">
+              {professional.telehealth_enabled && (
+                <Badge variant="secondary">Telehealth Available</Badge>
               )}
             </div>
             <div className="flex gap-2">
@@ -132,17 +132,12 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ professional, onVie
                 View Details
               </Button>
               {professional.slug && (
-                <Button 
-                  variant="outline" 
-                  asChild
-                >
-                  <Link to={`/professional/${professional.slug}`}>View Profile</Link>
+                <Button asChild>
+                  <Link to={`/professional/${professional.slug}`}>
+                    Book Appointment
+                  </Link>
                 </Button>
               )}
-              <PlacementRequestButton 
-                professionalId={professional.id}
-                professionalName={professional.name}
-              />
             </div>
           </div>
         </div>
