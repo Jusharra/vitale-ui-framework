@@ -57,6 +57,8 @@ const ProfessionalProfilePage = () => {
           throw new Error('No slug provided');
         }
 
+        console.log("Fetching partner with slug:", slug);
+
         // First try to fetch by exact slug
         const { data, error } = await supabase
           .from('partners')
@@ -71,8 +73,10 @@ const ProfessionalProfilePage = () => {
         }
 
         if (data) {
+          console.log("Found partner with exact slug match:", data);
           setProfessional(data);
         } else {
+          console.log("No exact match found, trying partial match");
           // If no exact match found, try a case-insensitive search
           const { data: alternativeData, error: alternativeError } = await supabase
             .from('partners')
@@ -88,16 +92,18 @@ const ProfessionalProfilePage = () => {
           }
           
           if (alternativeData) {
+            console.log("Found partner with partial match:", alternativeData);
             setProfessional(alternativeData);
           } else {
+            console.log("No partner found with slug:", slug);
             throw new Error(`Partner with slug "${slug}" not found`);
           }
         }
       } catch (error: any) {
         console.error('Error fetching partner:', error);
         toast({
-          title: 'Professional Not Found',
-          description: error.message || 'Failed to load professional information',
+          title: 'Partner Not Found',
+          description: error.message || 'Failed to load partner information',
           variant: 'destructive',
         });
       } finally {
@@ -137,6 +143,9 @@ const ProfessionalProfilePage = () => {
       title: "Appointment Booked",
       description: `Your ${appointmentType} appointment with ${professional?.name} has been scheduled for ${format(date, 'MMMM d, yyyy')} at ${timeSlot}.`,
     });
+    
+    setDate(undefined);
+    setTimeSlot(null);
   };
   
   const getInitials = (name: string) => {
