@@ -370,18 +370,16 @@ const ProfessionalDetailCard = ({ partner }: ProfessionalDetailCardProps) => {
               <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Button 
                   variant="outline" 
-                  className="h-4 w-4 mr-2
                   onClick={() => setIsMessageDialogOpen(true)}
                 >
                   <MessageSquare className="mr-2 h-4 w-4" />
                   Send Message
                 </Button>
                 <Button variant="outline" onClick={handleCallPartner}>
-                 <Phone className="h-4 w-4 mr-2" />
+                  <Phone className="h-4 w-4 mr-2" />
                   Call Caregiver
                 </Button>
                 <Button 
-                  className="h-4 w-4 mr-2
                   onClick={() => setIsBookingDialogOpen(true)}
                   disabled={!partner.accepting_new_patients}
                 >
