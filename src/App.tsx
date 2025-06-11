@@ -46,6 +46,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import StripeProvider from '@/components/payments/StripeProvider';
 import SubscriptionSuccess from '@/pages/member/SubscriptionSuccess';
 import FacilityPage from '@/pages/care/[slug]';
+import ProfessionalProfilePage from '@/pages/professional/[slug]';
 
 // Blog pages
 import BlogIndex from '@/pages/blog/index';
@@ -126,6 +127,9 @@ const App: React.FC = () => {
                   {/* Facility routes - order matters, more specific routes first */}
                   <Route path="/care/care-homes/:city/:slug" element={<FacilityPage />} />
                   <Route path="/care/:slug" element={<FacilityPage />} />
+                  
+                  {/* Professional routes */}
+                  <Route path="/professional/:slug" element={<ProfessionalProfilePage />} />
                   
                   {/* Blog post routes */}
                   <Route path="/blog/iv-therapy-hospice-san-mateo-county" element={<SanMateoCountyBlog />} />

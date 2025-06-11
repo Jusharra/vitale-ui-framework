@@ -6,6 +6,8 @@ import SimplePlacementForm from './SimplePlacementForm';
 interface PlacementRequestButtonProps extends ButtonProps {
   facilityId?: string;
   facilityName?: string;
+  professionalId?: string;
+  professionalName?: string;
   variant?: 'default' | 'outline' | 'secondary';
   size?: 'default' | 'sm' | 'lg';
 }
@@ -13,6 +15,8 @@ interface PlacementRequestButtonProps extends ButtonProps {
 const PlacementRequestButton: React.FC<PlacementRequestButtonProps> = ({
   facilityId,
   facilityName,
+  professionalId,
+  professionalName,
   variant = 'default',
   size = 'default',
   className,
@@ -41,6 +45,8 @@ const PlacementRequestButton: React.FC<PlacementRequestButtonProps> = ({
         <SimplePlacementForm 
           facilityId={facilityId}
           facilityName={facilityName}
+          professionalId={professionalId}
+          professionalName={professionalName}
           onSuccess={() => {
             // Close the dialog after a short delay to allow the success message to be seen
             setTimeout(() => {

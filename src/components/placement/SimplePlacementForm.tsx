@@ -14,12 +14,16 @@ import { useToast } from '@/hooks/use-toast';
 interface SimplePlacementFormProps {
   facilityId?: string;
   facilityName?: string;
+  professionalId?: string;
+  professionalName?: string;
   onSuccess?: () => void;
 }
 
 const SimplePlacementForm: React.FC<SimplePlacementFormProps> = ({
   facilityId,
   facilityName,
+  professionalId,
+  professionalName,
   onSuccess
 }) => {
   const { user } = useAuth();
@@ -91,6 +95,18 @@ const SimplePlacementForm: React.FC<SimplePlacementFormProps> = ({
       // Only add facility_id if it's provided and valid
       if (facilityId && typeof facilityId === 'string' && facilityId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
         requestData.facility_id = facilityId;
+      }
+      
+      // Only add professional_id if it's provided and valid
+      if (professionalId && typeof professionalId === 'string' && professionalId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+        requestData.professional_id = professionalId;
+      }
+      
+      // Add facility or professional name to notes if provided
+      if (facilityName) {
+        requestData.notes = `Interested in: ${facilityName}\n${formData.notes}`;
+      } else if (professionalName) {
+        requestData.notes = `Interested in: ${professionalName}\n${formData.notes}`;
       }
       
       // Submit to Supabase
@@ -181,7 +197,9 @@ const SimplePlacementForm: React.FC<SimplePlacementFormProps> = ({
         <CardDescription>
           {facilityName 
             ? `Request placement at ${facilityName}` 
-            : "Tell us about your placement needs and we'll match you with the perfect care community"}
+            : professionalName
+            ? `Request services from ${professionalName}`
+            : "Tell us about your placement needs and we'll match you with the perfect care provider"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -202,7 +220,7 @@ const SimplePlacementForm: React.FC<SimplePlacementFormProps> = ({
                       <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">No Fee</span>
                     </Label>
                     <p className="text-sm text-muted-foreground">
-                      Our team will review your needs and match you with appropriate facilities within 3-4 days.
+                      Our team will review your needs and match you with appropriate {facilityId ? 'facilities' : professionalId ? 'professionals' : 'care providers'} within 3-4 days.
                     </p>
                   </div>
                 </div>
@@ -291,6 +309,9 @@ const SimplePlacementForm: React.FC<SimplePlacementFormProps> = ({
                   <SelectItem value="skilled_nursing">Skilled Nursing</SelectItem>
                   <SelectItem value="respite_care">Respite Care</SelectItem>
                   <SelectItem value="hospice">Hospice</SelectItem>
+                  <SelectItem value="home_health">Home Health</SelectItem>
+                  <SelectItem value="primary_care">Primary Care</SelectItem>
+                  <SelectItem value="specialist">Specialist Care</SelectItem>
                 </SelectContent>
               </Select>
             </div>
