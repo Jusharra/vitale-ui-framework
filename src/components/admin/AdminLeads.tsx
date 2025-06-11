@@ -76,7 +76,7 @@ const AdminLeads: React.FC = () => {
   const { data: leadAssignments, isLoading: isLeadsLoading } = useQuery({
     queryKey: ['leadAssignments'],
     queryFn: async () => {
-      // Fixed query: Using auth.users instead of partners table
+      // Fixed query: Using proper foreign key relationship syntax
       const { data, error } = await supabase
         .from('lead_assignments')
         .select(`
@@ -86,8 +86,7 @@ const AdminLeads: React.FC = () => {
           assigned_at,
           status,
           profile_id,
-          partner:auth.users(id, email),
-          lead:leads(id, first_name, last_name, email, status)
+          leads!lead_id(id, first_name, last_name, email, status)
         `)
         .limit(50);
       
@@ -182,17 +181,17 @@ const AdminLeads: React.FC = () => {
                             leadAssignments.map((assignment: any) => (
                               <TableRow key={assignment.id}>
                                 <TableCell>
-                                  {assignment.partner?.email || 'Unknown Partner'}
+                                  {assignment.partner_id || 'Unknown Partner'}
                                 </TableCell>
                                 <TableCell>
-                                  {assignment.lead ? 
-                                    `${assignment.lead.first_name} ${assignment.lead.last_name}` : 
+                                  {assignment.leads ? 
+                                    `${assignment.leads.first_name} ${assignment.leads.last_name}` : 
                                     'Unknown Lead'}
                                 </TableCell>
                                 <TableCell>
-                                  <Badge variant={assignment.lead?.status === 'converted' ? 'outline' : 'secondary'}
-                                      className={assignment.lead?.status === 'converted' ? 'border-green-500 text-green-500' : ''}>
-                                    {assignment.lead?.status || 'Unknown'}
+                                  <Badge variant={assignment.leads?.status === 'converted' ? 'outline' : 'secondary'}
+                                      className={assignment.leads?.status === 'converted' ? 'border-green-500 text-green-500' : ''}>
+                                    {assignment.leads?.status || 'Unknown'}
                                   </Badge>
                                 </TableCell>
                                 <TableCell className="flex items-center gap-1 text-sm text-muted-foreground">
