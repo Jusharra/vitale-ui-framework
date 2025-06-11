@@ -66,7 +66,7 @@ const ProfessionalProfilePage = () => {
           .maybeSingle();
 
         if (error) {
-          console.error('Error fetching professional by slug:', error);
+          console.error('Error fetching partner by slug:', error);
           throw new Error(`Database error: ${error.message}`);
         }
 
@@ -84,17 +84,17 @@ const ProfessionalProfilePage = () => {
             
           if (alternativeError) {
             console.error('Error in alternative search:', alternativeError);
-            throw new Error(`Professional with slug "${slug}" not found`);
+            throw new Error(`Partner with slug "${slug}" not found`);
           }
           
           if (alternativeData) {
             setProfessional(alternativeData);
           } else {
-            throw new Error(`Professional with slug "${slug}" not found`);
+            throw new Error(`Partner with slug "${slug}" not found`);
           }
         }
       } catch (error: any) {
-        console.error('Error fetching professional:', error);
+        console.error('Error fetching partner:', error);
         toast({
           title: 'Professional Not Found',
           description: error.message || 'Failed to load professional information',
