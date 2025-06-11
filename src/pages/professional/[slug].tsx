@@ -390,7 +390,7 @@ const ProfessionalProfilePage = () => {
                   disabled={!professional.accepting_new_patients}
                 >
                   <CalendarIcon className="mr-2 h-5 w-5" />
-                  Book Appointment
+                  Book Consultation
                 </Button>
                 
                 <Button 
