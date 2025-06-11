@@ -32,6 +32,12 @@ export const partnerFormSchema = z.object({
   telehealth_enabled: z.boolean().default(false),
   verified: z.boolean().default(false),
   status: z.string().default('active'),
+  // Add social media URL fields
+  instagram_url: z.string().url('Invalid URL format').optional().or(z.literal('')),
+  youtube_url: z.string().url('Invalid URL format').optional().or(z.literal('')),
+  tiktok_url: z.string().url('Invalid URL format').optional().or(z.literal('')),
+  linkedin_url: z.string().url('Invalid URL format').optional().or(z.literal('')),
+  facebook_url: z.string().url('Invalid URL format').optional().or(z.literal(''))
 });
 
 // Export the type for the form values - this ensures the form values match what the schema expects
@@ -57,6 +63,11 @@ export const defaultPartnerFormValues: Partial<PartnerFormValues> = {
   telehealth_enabled: false,
   verified: false,
   status: 'active',
+  instagram_url: '',
+  youtube_url: '',
+  tiktok_url: '',
+  linkedin_url: '',
+  facebook_url: ''
 };
 
 // Define a specific type for the specialties form field to make it clear it's a string in the form
