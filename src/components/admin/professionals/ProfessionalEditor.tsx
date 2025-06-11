@@ -17,8 +17,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Upload, X } from 'lucide-react';
+import { Loader2, Upload, X, AlertCircle } from 'lucide-react';
 import { generateSlug } from '@/utils/stringUtils';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Form schema
 const formSchema = z.object({
@@ -51,6 +52,7 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [storageError, setStorageError] = useState<string | null>(null);
   const isEditing = !!professional;
 
   // Initialize form with default values or existing professional data
@@ -90,7 +92,28 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
     if (!file) return;
 
     setIsUploading(true);
+    setStorageError(null);
+    
     try {
+      // First, check if the bucket exists by trying to list objects
+      const { error: listError } = await supabase.storage
+        .from('professional_media')
+        .list('', { limit: 1 });
+
+      if (listError) {
+        // If bucket doesn't exist, show helpful error message
+        if (listError.message.includes('Bucket not found')) {
+          setStorageError('Storage bucket not configured. Please contact your administrator to set up the "professional_media" storage bucket in Supabase.');
+          toast({
+            title: 'Storage not configured',
+            description: 'The image storage bucket needs to be created in Supabase. Please use a direct image URL for now.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        throw listError;
+      }
+
       // Create a unique file name
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
@@ -115,15 +138,28 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
         title: 'Image uploaded',
         description: 'The image has been uploaded successfully',
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading image:', error);
+      
+      let errorMessage = 'Failed to upload image';
+      if (error.message?.includes('Bucket not found')) {
+        errorMessage = 'Storage bucket not found. Please contact your administrator.';
+        setStorageError('The "professional_media" storage bucket needs to be created in your Supabase project.');
+      } else if (error.message?.includes('not allowed')) {
+        errorMessage = 'File type not allowed. Please use JPG, PNG, or WebP images.';
+      } else if (error.message?.includes('too large')) {
+        errorMessage = 'File too large. Please use an image smaller than 5MB.';
+      }
+      
       toast({
         title: 'Upload failed',
-        description: 'Failed to upload image',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
       setIsUploading(false);
+      // Reset the file input
+      event.target.value = '';
     }
   };
 
@@ -209,6 +245,15 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
             : 'Fill in the details to create a new professional page'}
         </p>
       </div>
+
+      {storageError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {storageError}
+          </AlertDescription>
+        </Alert>
+      )}
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -311,7 +356,7 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
                 <FormLabel>Profile Image</FormLabel>
                 <div className="space-y-4">
                   <FormControl>
-                    <Input placeholder="Image URL" {...field} />
+                    <Input placeholder="Image URL (e.g., https://example.com/image.jpg)" {...field} />
                   </FormControl>
                   
                   <div className="flex items-center gap-4">
@@ -350,6 +395,9 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
                           src={field.value} 
                           alt="Preview" 
                           className="h-full w-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder.svg';
+                          }}
                         />
                         <Button
                           type="button"
@@ -363,6 +411,12 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
                       </div>
                     )}
                   </div>
+                  
+                  {storageError && (
+                    <FormDescription className="text-orange-600">
+                      Note: File upload is currently unavailable. Please use a direct image URL instead.
+                    </FormDescription>
+                  )}
                 </div>
                 <FormMessage />
               </FormItem>
