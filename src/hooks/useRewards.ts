@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 
-interface Reward {
+export interface Reward {
   id: string;
   name: string;
   title: string; // Added to match RewardsList interface
@@ -22,7 +22,7 @@ interface Reward {
   renewal_date: string;
 }
 
-interface Activity {
+export interface Activity {
   id: string | number;
   date: string;
   action: string;

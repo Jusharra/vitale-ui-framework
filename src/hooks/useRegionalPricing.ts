@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 
-interface RegionalPricingHook {
+export interface RegionalPricingHook {
   currency: string;
   setCurrency: (currency: string) => void;
   formatCurrency: (amount: number) => string;

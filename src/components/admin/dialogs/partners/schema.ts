@@ -30,7 +30,6 @@ export const partnerFormSchema = z.object({
   accepting_new_patients: z.boolean().default(true),
   telehealth_enabled: z.boolean().default(false),
   verified: z.boolean().default(false),
-  status: z.enum(['active', 'draft']).default('active'),
 });
 
 // Export the type for the form values - this ensures the form values match what the schema expects
@@ -54,8 +53,7 @@ export const defaultPartnerFormValues: Partial<PartnerFormValues> = {
   accepting_new_patients: true,
   telehealth_enabled: false,
   verified: false,
-  status: 'active',
 };
 
 // Define a specific type for the specialties form field to make it clear it's a string in the form
-type PartnerFormSpecialtiesField = string;
+export type PartnerFormSpecialtiesField = string;

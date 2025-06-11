@@ -16,7 +16,7 @@ import { useAccessCheck } from '@/hooks/useToolAccess';
 import { useAuth } from '@/context/AuthContext';
 
 // Form schema for medical transport booking
-const transportFormSchema = z.object({
+export const transportFormSchema = z.object({
   pickupLocation: z.string().min(5, { message: "Pickup location must be at least 5 characters." }),
   dropoffLocation: z.string().min(5, { message: "Dropoff location must be at least 5 characters." }),
   date: z.date({ required_error: "Please select a date." }),

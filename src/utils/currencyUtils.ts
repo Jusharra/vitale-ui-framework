@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 export type Currency = 'USD' | 'EUR' | 'GBP' | 'KES' | 'NGN' | 'ZAR' | 'JPY';
 export type Region = 'North America' | 'Europe' | 'Africa' | 'Asia' | 'Latin America' | 'Middle East';
 
-interface RegionalPricing {
+export interface RegionalPricing {
   region: Region;
   currency: Currency;
   baseMultiplier: number; // Multiplier applied to base USD price
@@ -40,7 +40,7 @@ const mockExchangeRates: Record<Currency, number> = {
   JPY: 150.2,
 };
 
-const convertPrice = (
+export const convertPrice = (
   priceInUSD: number,
   targetCurrency: Currency = 'USD',
   regionMultiplier = 1.0
@@ -54,7 +54,7 @@ const convertPrice = (
     : Math.round(adjustedPrice * 100) / 100;
 };
 
-const formatPrice = (
+export const formatPrice = (
   price: number,
   currency: Currency = 'USD',
   includeSymbol = true
@@ -71,7 +71,7 @@ const formatPrice = (
 };
 
 // Function to get regional settings for a user
-const getUserRegionalSettings = async (userId: string | null): Promise<{
+export const getUserRegionalSettings = async (userId: string | null): Promise<{
   region: Region;
   currency: Currency;
   multiplier: number;

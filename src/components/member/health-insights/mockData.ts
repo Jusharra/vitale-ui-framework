@@ -51,7 +51,7 @@ export const treatmentPlans: TreatmentPlan[] = [
   },
 ];
 
-interface Assessment {
+export interface Assessment {
   id: number;
   name: string;
   duration: string;

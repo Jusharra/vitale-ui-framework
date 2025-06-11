@@ -25,7 +25,7 @@ export interface Partner {
   slug?: string;
 }
 
-interface Pharmacy {
+export interface Pharmacy {
   id: string;
   name: string;
   address?: string;

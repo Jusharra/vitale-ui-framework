@@ -12,7 +12,7 @@ import {
 } from './sectionRenderers';
 import { addPageHeader, addPageFooters } from './pdfUtils';
 
-const generateHealthInsightsPDF = (healthData: HealthData): jsPDF => {
+export const generateHealthInsightsPDF = (healthData: HealthData): jsPDF => {
   // Initialize PDF document
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
