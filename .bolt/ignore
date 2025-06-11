@@ -1,4 +1,4 @@
 supabase/migrations/*
+supabase/migrations
 hooks/use-toast.ts
 src/components/ui/*
-home/project/supabase/migrations/*
