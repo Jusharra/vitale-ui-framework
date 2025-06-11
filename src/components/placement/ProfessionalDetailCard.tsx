@@ -50,19 +50,6 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
   const [timeSlot, setTimeSlot] = useState<string | null>(null);
   const [messageText, setMessageText] = useState('');
   
-  // Early return if professional is not provided
-  if (!professional) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center text-gray-500">
-            Professional information not available.
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-  
   const getInitials = (name: string) => {
     if (!name) return 'NA';
     return name
@@ -100,7 +87,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
     
     toast({
       title: "Appointment Booked",
-      description: `Your appointment with ${professional.name || 'the professional'} has been scheduled for ${format(date, 'MMMM d, yyyy')} at ${timeSlot}.`,
+      description: `Your appointment with ${professional.name} has been scheduled for ${format(date, 'MMMM d, yyyy')} at ${timeSlot}.`,
     });
     
     setIsBookingDialogOpen(false);
@@ -120,7 +107,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
     
     toast({
       title: "Message Sent",
-      description: `Your message has been sent to ${professional.name || 'the professional'}.`,
+      description: `Your message has been sent to ${professional.name}.`,
     });
     
     setIsMessageDialogOpen(false);
@@ -133,11 +120,11 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
-              <AvatarImage src={professional.profile_image || ''} alt={professional.name || 'Professional'} />
-              <AvatarFallback className="text-xl">{getInitials(professional.name || '')}</AvatarFallback>
+              <AvatarImage src={professional.profile_image} alt={professional.name} />
+              <AvatarFallback className="text-xl">{getInitials(professional.name)}</AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-2xl">{professional.name || 'Professional'}</CardTitle>
+              <CardTitle className="text-2xl">{professional.name}</CardTitle>
               {professional.credentials && (
                 <CardDescription className="text-base">{professional.credentials}</CardDescription>
               )}
@@ -174,7 +161,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-medium mb-2">Professional Bio</h3>
-                <p className="text-gray-700">{professional.bio || 'No bio available.'}</p>
+                <p className="text-gray-700">{professional.bio}</p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -371,7 +358,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
       <Dialog open={isBookingDialogOpen} onOpenChange={setIsBookingDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Book Appointment with {professional.name || 'Professional'}</DialogTitle>
+            <DialogTitle>Book Appointment with {professional.name}</DialogTitle>
             <DialogDescription>
               Select your preferred date and time for your appointment.
             </DialogDescription>
@@ -457,7 +444,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
       <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Send Message to {professional.name || 'Professional'}</DialogTitle>
+            <DialogTitle>Send Message to {professional.name}</DialogTitle>
             <DialogDescription>
               Your message will be sent directly to the provider.
             </DialogDescription>
