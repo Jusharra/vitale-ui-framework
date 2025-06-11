@@ -13,7 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, Calendar as CalendarIcon, Clock, Star, CheckCircle, MessageSquare, Video, ChevronLeft, User as UserIcon } from 'lucide-react';
+import { MapPin, Phone, Mail, Calendar as CalendarIcon, Clock, Star, CheckCircle, MessageSquare, Video, User as UserIcon, Award, Stethoscope } from 'lucide-react';
 
 interface Professional {
   id: string;
@@ -42,7 +42,7 @@ interface ProfessionalDetailCardProps {
   professional: Professional | null;
 }
 
-const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ professional }) => {
+const ProfessionalDetailCard = ({ professional }: ProfessionalDetailCardProps) => {
   const { toast } = useToast();
   const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
   const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
@@ -72,42 +72,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
       .toUpperCase()
       .slice(0, 2);
   };
-  
-  // Generate time slots (9 AM to 5 PM) with 30-minute intervals
-  const generateTimeSlots = () => {
-    const slots = [];
-    for (let hour = 9; hour <= 16; hour++) {
-      const hourFormatted = hour > 12 ? hour - 12 : hour;
-      const period = hour >= 12 ? "PM" : "AM";
-      
-      slots.push(`${hourFormatted}:00 ${period}`);
-      slots.push(`${hourFormatted}:30 ${period}`);
-    }
-    return slots;
-  };
 
-  const timeSlots = generateTimeSlots();
-  
-  const handleBookAppointment = () => {
-    if (!date || !timeSlot) {
-      toast({
-        title: "Incomplete booking",
-        description: "Please select a date and time for your appointment",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    toast({
-      title: "Appointment Booked",
-      description: `Your appointment with ${professional.name} has been scheduled for ${format(date, 'MMMM d, yyyy')} at ${timeSlot}.`,
-    });
-    
-    setIsBookingDialogOpen(false);
-    setDate(undefined);
-    setTimeSlot(null);
-  };
-  
   const handleSendMessage = () => {
     if (!messageText.trim()) {
       toast({
@@ -153,6 +118,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                 <span className="ml-1 font-medium">{professional.rating}</span>
               </div>
             )}
+            
             {professional.verified && (
               <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
                 <CheckCircle className="h-3 w-3 mr-1" />
@@ -177,10 +143,10 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                 <p className="text-gray-700">{professional.bio || 'No bio available'}</p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {professional.specialties && professional.specialties.length > 0 && (
                   <div>
-                    <h4 className="text-base font-medium mb-2">Specialties</h4>
+                    <h3 className="text-lg font-medium mb-2">Specialties</h3>
                     <div className="flex flex-wrap gap-2">
                       {professional.specialties.map((specialty, index) => (
                         <Badge key={index} variant="outline">{specialty}</Badge>
@@ -191,7 +157,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                 
                 {professional.languages && professional.languages.length > 0 && (
                   <div>
-                    <h4 className="text-base font-medium mb-2">Languages</h4>
+                    <h3 className="text-lg font-medium mb-2">Languages</h3>
                     <div className="flex flex-wrap gap-2">
                       {professional.languages.map((language, index) => (
                         <Badge key={index} variant="secondary">{language}</Badge>
@@ -201,20 +167,6 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                 )}
               </div>
               
-              {professional.service_area && (
-                <div>
-                  <h4 className="text-base font-medium mb-2">Service Area</h4>
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 text-gray-500 mr-2" />
-                    <span>{professional.service_area}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="services" className="pt-4">
-            <div className="space-y-4">
               {professional.specializations && professional.specializations.length > 0 && (
                 <div>
                   <h3 className="text-lg font-medium mb-2">Specializations</h3>
@@ -225,17 +177,36 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                   </div>
                 </div>
               )}
-              
-              <div>
-                <h3 className="text-lg font-medium mb-2">Services Offered</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="services" className="pt-4">
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex items-center mb-3">
+                    <UserIcon className="h-5 w-5 text-indigo-600 mr-2" />
+                    <h3 className="font-medium">In-Person Consultations</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Face-to-face appointments at the provider's office or your location.
+                  </p>
+                  {professional.hourly_rate && (
+                    <div className="flex justify-between items-center">
+                      <span>Rate:</span>
+                      <span className="font-medium">{professional.hourly_rate}</span>
+                    </div>
+                  )}
+                </div>
+                
+                {professional.telehealth_enabled && (
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="flex items-center mb-3">
-                      <UserIcon className="h-5 w-5 text-indigo-600 mr-2" />
-                      <h3 className="font-medium">In-Person Consultations</h3>
+                      <Video className="h-5 w-5 text-indigo-600 mr-2" />
+                      <h3 className="font-medium">Telehealth Sessions</h3>
                     </div>
                     <p className="text-sm text-gray-600 mb-3">
-                      Face-to-face appointments at the provider's office or your location.
+                      Virtual appointments via secure video conferencing.
                     </p>
                     {professional.hourly_rate && (
                       <div className="flex justify-between items-center">
@@ -244,25 +215,7 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                       </div>
                     )}
                   </div>
-                  
-                  {professional.telehealth_enabled && (
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex items-center mb-3">
-                        <Video className="h-5 w-5 text-indigo-600 mr-2" />
-                        <h3 className="font-medium">Telehealth Sessions</h3>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-3">
-                        Virtual appointments via secure video conferencing.
-                      </p>
-                      {professional.hourly_rate && (
-                        <div className="flex justify-between items-center">
-                          <span>Rate:</span>
-                          <span className="font-medium">{professional.hourly_rate}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
             </div>
           </TabsContent>
@@ -311,11 +264,10 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
                 
                 <Button 
                   className="w-full"
-                  onClick={() => setIsBookingDialogOpen(true)}
-                  disabled={!professional.accepting_new_patients}
+                  onClick={() => window.location.href = `tel:${professional.phone}`}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  Book Appointment
+                  <Phone className="mr-2 h-4 w-4" />
+                  Call Caregiver
                 </Button>
               </div>
               
@@ -347,92 +299,6 @@ const ProfessionalDetailCard: React.FC<ProfessionalDetailCardProps> = ({ profess
           </Button>
         )}
       </CardFooter>
-      
-      {/* Booking Dialog */}
-      <Dialog open={isBookingDialogOpen} onOpenChange={setIsBookingDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Book Appointment with {professional.name}</DialogTitle>
-            <DialogDescription>
-              Select your preferred date and time for your appointment.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
-            <div>
-              <Label className="mb-2 block">Select Date</Label>
-              <div className="border rounded-md p-2">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  disabled={(date) => date < new Date()}
-                  className="rounded-md"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <Label className="mb-2 block">Select Time</Label>
-              {date ? (
-                <div className="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto">
-                  {timeSlots.map((slot) => (
-                    <Button
-                      key={slot}
-                      variant={timeSlot === slot ? "default" : "outline"}
-                      className="justify-start"
-                      onClick={() => setTimeSlot(slot)}
-                    >
-                      <Clock className="mr-2 h-4 w-4" />
-                      {slot}
-                    </Button>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex items-center justify-center h-[300px] border rounded-md bg-gray-50">
-                  <p className="text-gray-500">Please select a date first</p>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded-md">
-              <h4 className="font-medium mb-2">Appointment Type</h4>
-              <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" className="justify-start">
-                  <UserIcon className="mr-2 h-4 w-4" />
-                  In-Person Visit
-                </Button>
-                {professional.telehealth_enabled && (
-                  <Button variant="outline" className="justify-start">
-                    <Video className="mr-2 h-4 w-4" />
-                    Telehealth
-                  </Button>
-                )}
-              </div>
-            </div>
-            
-            <div>
-              <Label htmlFor="reason">Reason for Visit</Label>
-              <Textarea 
-                id="reason" 
-                placeholder="Briefly describe the reason for your appointment"
-                className="mt-1"
-              />
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsBookingDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleBookAppointment}>
-              Book Appointment
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
       
       {/* Message Dialog */}
       <Dialog open={isMessageDialogOpen} onOpenChange={setIsMessageDialogOpen}>
