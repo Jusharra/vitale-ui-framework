@@ -4,6 +4,27 @@ import { Button } from '@/components/ui/button';
 import { Helmet } from 'react-helmet';
 
 const SanMateoCountyBlog = () => {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Premium IV Hydration & In-Home Hospice in San Mateo County",
+    "image": "https://images.pexels.com/photos/7089401/pexels-photo-7089401.jpeg",
+    "author": {
+      "@type": "Organization",
+      "name": "Vitale Health Concierge"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Vitale Health Concierge",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://vitalehealth.com/logo.png"
+      }
+    },
+    "datePublished": "2025-05-20",
+    "dateModified": "2025-05-20"
+  };
+
   return (
     <MainLayout>
       <Helmet>
@@ -13,28 +34,7 @@ const SanMateoCountyBlog = () => {
         <meta property="og:description" content="Book luxury in-home IV therapy & end-of-life care in San Mateo County. Mobile nurses. Membership plans. Trusted by families in Atherton, Menlo Park, and Hillsborough." />
         <meta property="og:type" content="article" />
         <script type="application/ld+json">
-          {`
-            {
-              "@context": "https://schema.org",
-              "@type": "BlogPosting",
-              "headline": "Premium IV Hydration & In-Home Hospice in San Mateo County",
-              "image": "https://images.pexels.com/photos/7089401/pexels-photo-7089401.jpeg",
-              "author": {
-                "@type": "Organization",
-                "name": "Vitale Health Concierge"
-              },
-              "publisher": {
-                "@type": "Organization",
-                "name": "Vitale Health Concierge",
-                "logo": {
-                  "@type": "ImageObject",
-                  "url": "https://vitalehealth.com/logo.png"
-                }
-              },
-              "datePublished": "2025-05-20",
-              "dateModified": "2025-05-20"
-            }
-          `}
+          {JSON.stringify(structuredData)}
         </script>
       </Helmet>
 
