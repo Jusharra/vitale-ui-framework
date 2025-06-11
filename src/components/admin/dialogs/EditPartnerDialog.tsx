@@ -47,7 +47,6 @@ const EditPartnerDialog = ({ open, onOpenChange, onSuccess, partnerId }: EditPar
           email: data.email || '',
           phone: data.phone || '',
           practice_name: data.practice_name || '',
-          slug: data.slug || '',
           specialties: data.specialties || [],
           languages: data.languages || [],
           specializations: data.specializations || [],
@@ -57,6 +56,7 @@ const EditPartnerDialog = ({ open, onOpenChange, onSuccess, partnerId }: EditPar
           accepting_new_patients: data.accepting_new_patients !== false, // Default to true if undefined
           telehealth_enabled: data.telehealth_enabled || false,
           verified: data.verified || false,
+          slug: data.slug || '',
         };
         
         setPartnerData(formattedData);
@@ -90,7 +90,6 @@ const EditPartnerDialog = ({ open, onOpenChange, onSuccess, partnerId }: EditPar
           email: values.email,
           phone: values.phone,
           practice_name: values.practice_name,
-          slug: values.slug,
           specialties: values.specialties,
           languages: values.languages,
           specializations: values.specializations,
@@ -100,6 +99,7 @@ const EditPartnerDialog = ({ open, onOpenChange, onSuccess, partnerId }: EditPar
           accepting_new_patients: values.accepting_new_patients,
           telehealth_enabled: values.telehealth_enabled,
           verified: values.verified,
+          slug: values.slug,
         })
         .eq('id', partnerId);
       

@@ -181,7 +181,7 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
             )}
           />
         </div>
-
+        
         <FormField
           control={form.control}
           name="slug"
@@ -192,7 +192,7 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
                 <Input placeholder="dr-jane-smith" {...field} />
               </FormControl>
               <FormDescription>
-                This will be used in the URL for the professional's profile page. It will be auto-generated from the name but can be customized.
+                This will be used in the URL: /professional/{field.value || 'dr-jane-smith'}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -404,6 +404,31 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
             )}
           />
         </div>
+        
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">
+                  {field.value === 'active' ? 'Published' : 'Draft'}
+                </FormLabel>
+                <FormDescription>
+                  {field.value === 'active' 
+                    ? 'This profile is live and visible to the public' 
+                    : 'This profile is a draft and only visible to admins'}
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value === 'active'}
+                  onCheckedChange={(checked) => field.onChange(checked ? 'active' : 'draft')}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
         
         <div className="border rounded-lg p-4">
           <h3 className="text-sm font-medium mb-2">Availability Calendar</h3>

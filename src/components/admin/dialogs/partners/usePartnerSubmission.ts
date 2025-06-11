@@ -20,7 +20,6 @@ export const usePartnerSubmission = (onSuccess: () => void, onClose: () => void)
           email: values.email,
           phone: values.phone,
           practice_name: values.practice_name,
-          slug: values.slug,
           specialties: values.specialties, // This will now be an array after the transform
           languages: values.languages,
           specializations: values.specializations,
@@ -31,6 +30,7 @@ export const usePartnerSubmission = (onSuccess: () => void, onClose: () => void)
           telehealth_enabled: values.telehealth_enabled,
           verified: values.verified,
           status: 'active',
+          slug: values.slug,
         });
 
       if (error) throw error;

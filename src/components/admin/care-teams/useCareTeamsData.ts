@@ -64,13 +64,17 @@ export interface Facility {
   spots_available: number;
   amenities?: string[];
   image_url?: string;
-  images?: string[];
-  videos?: string[];
+  images?: string[]; // Array of image URLs
+  videos?: string[]; // Array of video URLs
   status: string;
   featured?: boolean;
   phone?: string;
   email?: string;
+  website?: string;
   hours?: string;
+  virtual_tour_url?: string;
+  services?: string[];
+  slug?: string;
 }
 
 export const useCareTeamsData = () => {
