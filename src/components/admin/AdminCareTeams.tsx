@@ -98,6 +98,7 @@ const AdminCareTeams = () => {
               partners={partners}
               isLoading={isLoading}
               searchTerm={searchTerm}
+              refetchData={refetchData}
             />
           </TabsContent>
 
@@ -106,6 +107,7 @@ const AdminCareTeams = () => {
               pharmacies={pharmacies}
               isLoading={isLoading}
               searchTerm={searchTerm}
+              refetchData={refetchData}
             />
           </TabsContent>
 
@@ -114,6 +116,7 @@ const AdminCareTeams = () => {
               transports={transports}
               isLoading={isLoading}
               searchTerm={searchTerm}
+              refetchData={refetchData}
             />
           </TabsContent>
 
@@ -122,6 +125,7 @@ const AdminCareTeams = () => {
               facilities={facilities}
               isLoading={isLoading}
               searchTerm={searchTerm}
+              refetchData={refetchData}
             />
           </TabsContent>
         </Tabs>

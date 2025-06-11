@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,22 +17,34 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { DialogFooter } from '@/components/ui/dialog';
+import { Loader2 } from 'lucide-react';
 
 interface PartnerFormProps {
   defaultValues: Partial<PartnerFormValues>;
   onSubmit: (values: PartnerFormValues) => Promise<void>;
   onCancel: () => void;
+  isEditing?: boolean;
 }
 
-const PartnerForm = ({ defaultValues, onSubmit, onCancel }: PartnerFormProps) => {
+const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: PartnerFormProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const form = useForm<PartnerFormValues>({
     resolver: zodResolver(partnerFormSchema),
     defaultValues,
   });
 
+  const handleFormSubmit = async (values: PartnerFormValues) => {
+    setIsSubmitting(true);
+    try {
+      await onSubmit(values);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -101,7 +112,17 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel }: PartnerFormProps) =>
             <FormItem>
               <FormLabel>Specialties</FormLabel>
               <FormControl>
-                <Input placeholder="General Practice, Cardiology, Pediatrics" {...field} />
+                <Input 
+                  placeholder="General Practice, Cardiology, Pediatrics" 
+                  value={Array.isArray(field.value) ? field.value.join(', ') : field.value}
+                  onChange={(e) => {
+                    const specialtiesArray = e.target.value
+                      .split(',')
+                      .map(item => item.trim())
+                      .filter(Boolean);
+                    field.onChange(specialtiesArray);
+                  }}
+                />
               </FormControl>
               <FormDescription>Enter specialties separated by commas</FormDescription>
               <FormMessage />
@@ -172,10 +193,19 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel }: PartnerFormProps) =>
         </div>
         
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit">Create Partner</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {isEditing ? 'Updating...' : 'Creating...'}
+              </>
+            ) : (
+              isEditing ? 'Update Partner' : 'Create Partner'
+            )}
+          </Button>
         </DialogFooter>
       </form>
     </Form>
