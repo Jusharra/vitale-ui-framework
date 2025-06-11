@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { MapPin, Phone, Mail, Clock, CheckCircle, Globe, Calendar, User, Video, Instagram, Linkedin, Facebook, Youtube, TikTok } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, CheckCircle, Globe, Calendar, User, Video, Instagram, Linkedin, Facebook, Youtube, BookText as TikTok } from 'lucide-react';
 import PlacementRequestButton from '@/components/placement/PlacementRequestButton';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
