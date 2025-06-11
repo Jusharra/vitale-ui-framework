@@ -20,6 +20,7 @@ export const usePartnerSubmission = (onSuccess: () => void, onClose: () => void)
           email: values.email,
           phone: values.phone,
           practice_name: values.practice_name,
+          slug: values.slug,
           specialties: values.specialties, // This will now be an array after the transform
           languages: values.languages,
           specializations: values.specializations,

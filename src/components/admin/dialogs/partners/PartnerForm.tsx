@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PartnerFormValues, partnerFormSchema } from './schema';
+import { generateSlug } from '@/utils/stringUtils';
 
 import {
   Form,
@@ -35,6 +36,19 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
     resolver: zodResolver(partnerFormSchema),
     defaultValues,
   });
+
+  // Auto-generate slug from name for new partners
+  useEffect(() => {
+    if (!isEditing) {
+      const subscription = form.watch((value, { name }) => {
+        if (name === 'name' && value.name) {
+          const slug = generateSlug(value.name);
+          form.setValue('slug', slug);
+        }
+      });
+      return () => subscription.unsubscribe();
+    }
+  }, [form, isEditing]);
 
   const handleFormSubmit = async (values: PartnerFormValues) => {
     setIsSubmitting(true);
@@ -197,6 +211,23 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="slug"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Profile URL Slug</FormLabel>
+              <FormControl>
+                <Input placeholder="dr-jane-smith" {...field} />
+              </FormControl>
+              <FormDescription>
+                This will be used in the URL for the professional's profile page. It will be auto-generated from the name but can be customized.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField

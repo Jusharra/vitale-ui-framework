@@ -22,6 +22,7 @@ export interface Partner {
   profile_image?: string;
   rating?: number;
   verified?: boolean;
+  slug?: string;
 }
 
 export interface Pharmacy {

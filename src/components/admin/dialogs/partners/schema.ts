@@ -8,6 +8,7 @@ export const partnerFormSchema = z.object({
   email: z.string().email('Valid email is required'),
   phone: z.string().optional(),
   practice_name: z.string().optional(),
+  slug: z.string().optional(),
   // Fix the specialties field to properly handle the transformation
   specialties: z.union([
     // Accept string input from form
@@ -42,6 +43,7 @@ export const defaultPartnerFormValues: Partial<PartnerFormValues> = {
   email: '',
   phone: '',
   practice_name: '',
+  slug: '',
   specialties: [], // Fix: Initialize as an empty array instead of an empty string
   languages: [],
   specializations: [],
