@@ -25,7 +25,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import EditPartnerDialog from '../dialogs/EditPartnerDialog';
-import { Link } from 'react-router-dom';
 
 interface PartnersListProps {
   partners: Partner[];
