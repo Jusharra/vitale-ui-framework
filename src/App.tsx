@@ -24,6 +24,7 @@ import AdminSettingsPage from '@/pages/admin/AdminSettingsPage';
 import AdminBlogPostsPage from '@/pages/admin/AdminBlogPostsPage';
 import AdminFacilitiesPage from '@/pages/admin/AdminFacilitiesPage';
 import AdminReportsPage from '@/pages/admin/AdminReportsPage';
+import AdminProfessionalsPage from '@/pages/admin/AdminProfessionalsPage';
 import ProfessionalPage from '@/pages/ProfessionalDashboard';
 import MemberConciergePage from '@/pages/member/Concierge';
 import MemberPharmacyPage from '@/pages/member/Pharmacy';
@@ -341,6 +342,14 @@ const App: React.FC = () => {
                     element={
                       <ProtectedRoute requiredRole="admin">
                         <AdminFacilitiesPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/admin/professionals"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminProfessionalsPage />
                       </ProtectedRoute>
                     }
                   />
