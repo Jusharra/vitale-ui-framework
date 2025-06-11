@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Search, MapPin, Filter, CheckCircle, User } from 'lucide-react';
+import { Search, MapPin, Filter, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import FacilityDetailCard from '@/components/placement/FacilityDetailCard';
@@ -118,29 +118,9 @@ const counties = {
   ]
 };
 
-// Professional specialties for filtering
-const specialties = [
-  'Cardiology',
-  'Dermatology',
-  'Family Medicine',
-  'Geriatrics',
-  'Internal Medicine',
-  'Neurology',
-  'Nursing',
-  'Orthopedics',
-  'Pediatrics',
-  'Primary Care',
-  'Psychiatry',
-  'Psychology',
-  'Pulmonology',
-  'Radiology',
-  'Rheumatology'
-];
-
 const Placements = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [careType, setCareType] = useState<string>('all');
-  const [specialty, setSpecialty] = useState<string>('all');
   const [location, setLocation] = useState<string>('all');
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
@@ -152,26 +132,34 @@ const Placements = () => {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedState, setSelectedState] = useState<string>('all');
   const [selectedCounty, setSelectedCounty] = useState<string>('all');
-  const [activeTab, setActiveTab] = useState('all');
-  const [listingType, setListingType] = useState('facilities');
+  const [activeTab, setActiveTab] = useState<string>('all');
   const { toast } = useToast();
 
-  // Fetch facilities from database
+  // Fetch facilities and professionals from database
   useEffect(() => {
-    const fetchFacilities = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
       try {
         // Fetch active facilities from the database
-        const { data, error } = await supabase
+        const { data: facilitiesData, error: facilitiesError } = await supabase
           .from('care_facilities')
           .select('*')
           .eq('status', 'active')
           .order('created_at', { ascending: false });
         
-        if (error) throw error;
+        if (facilitiesError) throw facilitiesError;
         
-        if (data && data.length > 0) {
-          setFacilities(data);
+        // Fetch active professionals from the database
+        const { data: professionalsData, error: professionalsError } = await supabase
+          .from('partners')
+          .select('*')
+          .eq('status', 'active')
+          .order('created_at', { ascending: false });
+          
+        if (professionalsError) throw professionalsError;
+        
+        if (facilitiesData && facilitiesData.length > 0) {
+          setFacilities(facilitiesData);
         } else {
           // If no facilities found in the database, use mock data
           console.log("No facilities found in database, using mock data");
@@ -288,42 +276,9 @@ const Placements = () => {
             }
           ]);
         }
-      } catch (error) {
-        console.error('Error fetching facilities:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load facilities',
-          variant: 'destructive',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchFacilities();
-  }, [toast]);
-
-  // Fetch professionals from database
-  useEffect(() => {
-    const fetchProfessionals = async () => {
-      setIsLoading(true);
-      try {
-        // Fetch active professionals from the database
-        const { data, error } = await supabase
-          .from('partners')
-          .select('*')
-          .eq('status', 'active')
-          .order('created_at', { ascending: false });
         
-        if (error) throw error;
-        
-        if (data && data.length > 0) {
-          // Generate slugs for professionals if they don't have one
-          const professionalsWithSlugs = data.map(prof => ({
-            ...prof,
-            slug: prof.slug || `${prof.name.toLowerCase().replace(/\s+/g, '-')}-${prof.id.substring(0, 8)}`
-          }));
-          setProfessionals(professionalsWithSlugs);
+        if (professionalsData && professionalsData.length > 0) {
+          setProfessionals(professionalsData);
         } else {
           // If no professionals found in the database, use mock data
           console.log("No professionals found in database, using mock data");
@@ -332,16 +287,16 @@ const Placements = () => {
               id: 'p1',
               name: 'Dr. Sarah Johnson',
               first_name: 'Sarah',
-              credentials: 'MD',
+              credentials: 'MD, Cardiology',
               email: 'sarah.johnson@example.com',
               phone: '(555) 123-4567',
-              practice_name: 'Johnson Family Medicine',
-              specialties: ['Family Medicine', 'Geriatrics'],
+              practice_name: 'Heart Health Specialists',
+              specialties: ['Cardiology', 'Internal Medicine'],
               languages: ['English', 'Spanish'],
-              specializations: ['Dementia Care', 'Chronic Disease Management'],
+              specializations: ['Heart Failure', 'Preventive Cardiology'],
               service_area: 'San Mateo County, CA',
-              hourly_rate: '$200-300/hour',
-              bio: 'Board-certified family physician with over 15 years of experience in geriatric care.',
+              hourly_rate: '$250-350/hour',
+              bio: 'Dr. Sarah Johnson is a board-certified cardiologist with over 15 years of experience in treating heart diseases. She specializes in preventive cardiology and heart failure management, with a focus on helping patients improve their heart health through lifestyle modifications and appropriate medical interventions.',
               accepting_new_patients: true,
               telehealth_enabled: true,
               status: 'active',
@@ -354,16 +309,16 @@ const Placements = () => {
               id: 'p2',
               name: 'Dr. Michael Chen',
               first_name: 'Michael',
-              credentials: 'MD',
+              credentials: 'MD, Family Medicine',
               email: 'michael.chen@example.com',
               phone: '(555) 234-5678',
-              practice_name: 'Chen Internal Medicine',
-              specialties: ['Internal Medicine', 'Cardiology'],
+              practice_name: 'Family Care Medical Group',
+              specialties: ['Family Medicine', 'Primary Care'],
               languages: ['English', 'Mandarin', 'Cantonese'],
-              specializations: ['Heart Health', 'Preventive Care'],
+              specializations: ['Preventive Care', 'Chronic Disease Management'],
               service_area: 'Santa Clara County, CA',
-              hourly_rate: '$250-350/hour',
-              bio: 'Internal medicine specialist with a focus on cardiac health and preventive medicine.',
+              hourly_rate: '$180-250/hour',
+              bio: 'Dr. Michael Chen is a compassionate family physician dedicated to providing comprehensive care for patients of all ages. With a focus on preventive medicine and chronic disease management, he believes in building long-term relationships with his patients to promote overall wellness and health maintenance.',
               accepting_new_patients: true,
               telehealth_enabled: true,
               status: 'active',
@@ -374,77 +329,77 @@ const Placements = () => {
             },
             {
               id: 'p3',
-              name: 'Emily Rodriguez, NP',
+              name: 'Dr. Emily Rodriguez',
               first_name: 'Emily',
-              credentials: 'NP',
+              credentials: 'MD, Pediatrics',
               email: 'emily.rodriguez@example.com',
               phone: '(555) 345-6789',
-              practice_name: 'Wellness Primary Care',
-              specialties: ['Family Medicine', 'Women\'s Health'],
+              practice_name: 'Sunshine Pediatrics',
+              specialties: ['Pediatrics'],
               languages: ['English', 'Spanish'],
-              specializations: ['Preventive Care', 'Chronic Disease Management'],
+              specializations: ['Newborn Care', 'Adolescent Medicine'],
               service_area: 'Los Angeles County, CA',
-              hourly_rate: '$150-200/hour',
-              bio: 'Nurse practitioner specializing in women\'s health and preventive care with a holistic approach.',
+              hourly_rate: '$200-300/hour',
+              bio: 'Dr. Emily Rodriguez is a board-certified pediatrician who has been caring for children for over 10 years. She is passionate about child development and preventive care, and strives to create a warm, welcoming environment where both children and parents feel comfortable and supported.',
               accepting_new_patients: true,
               telehealth_enabled: true,
               status: 'active',
-              profile_image: 'https://images.pexels.com/photos/5407206/pexels-photo-5407206.jpeg',
+              profile_image: 'https://images.pexels.com/photos/5214959/pexels-photo-5214959.jpeg',
               rating: 4.9,
               verified: true,
-              slug: 'emily-rodriguez-np-p3'
+              slug: 'dr-emily-rodriguez-p3'
             },
             {
               id: 'p4',
               name: 'Dr. James Wilson',
               first_name: 'James',
-              credentials: 'MD',
+              credentials: 'MD, Neurology',
               email: 'james.wilson@example.com',
               phone: '(555) 456-7890',
-              practice_name: 'Wilson Neurology',
+              practice_name: 'Advanced Neurology Associates',
               specialties: ['Neurology'],
               languages: ['English'],
-              specializations: ['Memory Care', 'Stroke Recovery'],
+              specializations: ['Movement Disorders', 'Headache Medicine'],
               service_area: 'Travis County, TX',
               hourly_rate: '$275-375/hour',
-              bio: 'Neurologist with expertise in memory disorders and stroke recovery.',
+              bio: 'Dr. James Wilson is a neurologist specializing in movement disorders and headache medicine. With advanced training in the latest neurological treatments, he is committed to helping patients manage complex neurological conditions and improve their quality of life.',
               accepting_new_patients: false,
               telehealth_enabled: true,
               status: 'active',
-              profile_image: 'https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg',
+              profile_image: 'https://images.pexels.com/photos/5407206/pexels-photo-5407206.jpeg',
               rating: 4.7,
               verified: true,
               slug: 'dr-james-wilson-p4'
             },
             {
               id: 'p5',
-              name: 'Lisa Thompson, RN',
+              name: 'Dr. Lisa Thompson',
               first_name: 'Lisa',
-              credentials: 'RN',
+              credentials: 'MD, Psychiatry',
               email: 'lisa.thompson@example.com',
               phone: '(555) 567-8901',
-              practice_name: 'Thompson Home Health',
-              specialties: ['Home Health', 'Hospice Care'],
-              languages: ['English'],
-              specializations: ['End-of-Life Care', 'Pain Management'],
-              service_area: 'Collin County, TX',
-              hourly_rate: '$75-125/hour',
-              bio: 'Registered nurse with extensive experience in hospice and palliative care.',
+              practice_name: 'Mind Wellness Center',
+              specialties: ['Psychiatry', 'Mental Health'],
+              languages: ['English', 'French'],
+              specializations: ['Anxiety Disorders', 'Depression', 'PTSD'],
+              service_area: 'Marin County, CA',
+              hourly_rate: '$225-325/hour',
+              bio: 'Dr. Lisa Thompson is a board-certified psychiatrist with expertise in treating anxiety disorders, depression, and PTSD. She takes a holistic approach to mental health, combining medication management with therapy recommendations and lifestyle modifications to help patients achieve optimal mental wellness.',
               accepting_new_patients: true,
-              telehealth_enabled: false,
+              telehealth_enabled: true,
               status: 'active',
-              profile_image: 'https://images.pexels.com/photos/5214949/pexels-photo-5214949.jpeg',
-              rating: 4.9,
+              profile_image: 'https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg',
+              rating: 4.8,
               verified: true,
-              slug: 'lisa-thompson-rn-p5'
+              slug: 'dr-lisa-thompson-p5'
             }
           ]);
         }
       } catch (error) {
-        console.error('Error fetching professionals:', error);
+        console.error('Error fetching data:', error);
         toast({
           title: 'Error',
-          description: 'Failed to load healthcare professionals',
+          description: 'Failed to load data',
           variant: 'destructive',
         });
       } finally {
@@ -452,7 +407,7 @@ const Placements = () => {
       }
     };
 
-    fetchProfessionals();
+    fetchData();
   }, [toast]);
 
   // Filter facilities based on search query, care type, location, and services
@@ -483,18 +438,17 @@ const Placements = () => {
     return matchesSearch && matchesCareType && matchesLocation && matchesServices;
   });
 
-  // Filter professionals based on search query, specialty, location
+  // Filter professionals based on search query, specialties, location, and services
   const filteredProfessionals = professionals.filter(professional => {
     const matchesSearch = 
       professional.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       professional.bio?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       professional.service_area?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      professional.specialties?.some(s => s.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      professional.specializations?.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()));
+      professional.specialties?.some(specialty => specialty.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      professional.specializations?.some(specialization => specialization.toLowerCase().includes(searchQuery.toLowerCase()));
     
-    const matchesSpecialty = specialty === 'all' || 
-      professional.specialties?.some(s => s === specialty) ||
-      professional.specializations?.some(s => s === specialty);
+    // Match by specialty (using careType as a proxy for specialty)
+    const matchesSpecialty = careType === 'all' || professional.specialties?.includes(careType);
     
     // Match by state and county
     let matchesLocation = true;
@@ -508,7 +462,11 @@ const Placements = () => {
       matchesLocation = professional.service_area?.includes(location) || false;
     }
     
-    return matchesSearch && matchesSpecialty && matchesLocation;
+    // For demo purposes, we'll assume all professionals match the selected services
+    // In a real implementation, you would check if the professional provides the selected services
+    const matchesServices = selectedServices.length === 0 || true;
+    
+    return matchesSearch && matchesSpecialty && matchesLocation && matchesServices;
   });
 
   // Toggle service selection
@@ -532,41 +490,11 @@ const Placements = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center mb-12">
             <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              Find Care Providers
+              Care Communities & Professionals
             </h1>
             <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-              Discover the perfect care community or healthcare professional for your loved one with our concierge placement service.
+              Find the perfect care community or healthcare professional for your needs with our concierge service.
             </p>
-          </div>
-
-          {/* Listing Type Selector */}
-          <div className="mb-8">
-            <div className="flex justify-center">
-              <div className="inline-flex rounded-md shadow-sm" role="group">
-                <button
-                  type="button"
-                  className={`px-4 py-2 text-sm font-medium rounded-l-lg ${
-                    listingType === 'facilities' 
-                      ? 'bg-indigo-600 text-white' 
-                      : 'bg-white text-gray-700 hover:bg-gray-50'
-                  } border border-gray-200`}
-                  onClick={() => setListingType('facilities')}
-                >
-                  Care Communities
-                </button>
-                <button
-                  type="button"
-                  className={`px-4 py-2 text-sm font-medium rounded-r-lg ${
-                    listingType === 'professionals' 
-                      ? 'bg-indigo-600 text-white' 
-                      : 'bg-white text-gray-700 hover:bg-gray-50'
-                  } border border-gray-200`}
-                  onClick={() => setListingType('professionals')}
-                >
-                  Healthcare Professionals
-                </button>
-              </div>
-            </div>
           </div>
 
           {/* Search and Filter Section */}
@@ -575,40 +503,31 @@ const Placements = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <Input 
-                  placeholder={`Search ${listingType === 'facilities' ? 'facilities' : 'professionals'}...`} 
+                  placeholder="Search by name, specialty, or location..." 
                   className="pl-10"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
               
-              {listingType === 'facilities' ? (
-                <Select value={careType} onValueChange={setCareType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Care Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Care Types</SelectItem>
-                    <SelectItem value="Memory Care">Memory Care</SelectItem>
-                    <SelectItem value="Assisted Living">Assisted Living</SelectItem>
-                    <SelectItem value="Independent Living">Independent Living</SelectItem>
-                    <SelectItem value="Long-Term Care">Long-Term Care</SelectItem>
-                    <SelectItem value="Hospice Support">Hospice Support</SelectItem>
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Select value={specialty} onValueChange={setSpecialty}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Specialty" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Specialties</SelectItem>
-                    {specialties.map(spec => (
-                      <SelectItem key={spec} value={spec}>{spec}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
+              <Select value={careType} onValueChange={setCareType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Care Type / Specialty" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="Memory Care">Memory Care</SelectItem>
+                  <SelectItem value="Assisted Living">Assisted Living</SelectItem>
+                  <SelectItem value="Independent Living">Independent Living</SelectItem>
+                  <SelectItem value="Long-Term Care">Long-Term Care</SelectItem>
+                  <SelectItem value="Hospice Support">Hospice Support</SelectItem>
+                  <SelectItem value="Cardiology">Cardiology</SelectItem>
+                  <SelectItem value="Family Medicine">Family Medicine</SelectItem>
+                  <SelectItem value="Pediatrics">Pediatrics</SelectItem>
+                  <SelectItem value="Neurology">Neurology</SelectItem>
+                  <SelectItem value="Psychiatry">Psychiatry</SelectItem>
+                </SelectContent>
+              </Select>
               
               <div className="flex gap-2">
                 <Button 
@@ -620,16 +539,14 @@ const Placements = () => {
                   {showFilters ? 'Hide Filters' : 'More Filters'}
                 </Button>
                 
-                {listingType === 'facilities' && (
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowServiceFilters(!showServiceFilters)}
-                    className="flex items-center gap-2"
-                  >
-                    <Filter className="h-4 w-4" />
-                    {showServiceFilters ? 'Hide Services' : 'Services Needed'}
-                  </Button>
-                )}
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowServiceFilters(!showServiceFilters)}
+                  className="flex items-center gap-2"
+                >
+                  <Filter className="h-4 w-4" />
+                  {showServiceFilters ? 'Hide Services' : 'Services Needed'}
+                </Button>
               </div>
             </div>
             
@@ -671,7 +588,7 @@ const Placements = () => {
               </div>
             )}
             
-            {showServiceFilters && listingType === 'facilities' && (
+            {showServiceFilters && (
               <div className="mt-4 p-4 border rounded-md bg-white">
                 <h3 className="font-medium mb-3">Services Needed for Patient</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -718,9 +635,9 @@ const Placements = () => {
           <div className="mb-8 bg-indigo-50 border border-indigo-100 p-6 rounded-lg">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div>
-                <h2 className="text-2xl font-bold text-indigo-900 mb-2">Need Help Finding the Perfect {listingType === 'facilities' ? 'Community' : 'Caregiver'}?</h2>
+                <h2 className="text-2xl font-bold text-indigo-900 mb-2">Need Help Finding the Perfect Care Solution?</h2>
                 <p className="text-indigo-700">
-                  Our concierge placement service matches your loved one with the ideal {listingType === 'facilities' ? 'care community' : 'healthcare professional'} based on their unique needs.
+                  Our concierge service matches your loved one with the ideal care community or healthcare professional based on their unique needs.
                 </p>
                 <div className="mt-4 space-y-2">
                   <div className="flex items-center">
@@ -733,7 +650,7 @@ const Placements = () => {
                   </div>
                   <div className="flex items-center">
                     <CheckCircle className="h-5 w-5 text-indigo-600 mr-2" />
-                    <span className="text-indigo-800">Personalized matching with trusted {listingType === 'facilities' ? 'communities' : 'professionals'}</span>
+                    <span className="text-indigo-800">Personalized matching with trusted providers</span>
                   </div>
                 </div>
               </div>
@@ -745,23 +662,119 @@ const Placements = () => {
             </div>
           </div>
 
-          {/* Tabs for Facilities */}
-          {listingType === 'facilities' && (
-            <Tabs defaultValue="all" className="mb-8" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-2 max-w-md">
-                <TabsTrigger value="all">All Communities</TabsTrigger>
-                <TabsTrigger value="featured">Featured Communities</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="all" className="mt-6">
-                {isLoading ? (
-                  <div className="text-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading communities...</p>
-                  </div>
-                ) : filteredFacilities.length > 0 ? (
-                  <div className="space-y-8">
-                    {filteredFacilities.map((facility) => (
+          {/* Main Tabs for Communities vs Professionals */}
+          <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-8">
+            <TabsList className="grid w-full grid-cols-3 max-w-md">
+              <TabsTrigger value="all">All Communities</TabsTrigger>
+              <TabsTrigger value="featured">Featured Communities</TabsTrigger>
+              <TabsTrigger value="professionals">Professional Caregivers</TabsTrigger>
+            </TabsList>
+            
+            {/* All Communities Tab */}
+            <TabsContent value="all" className="mt-6">
+              {isLoading ? (
+                <div className="text-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+                  <p className="mt-4 text-gray-600">Loading communities...</p>
+                </div>
+              ) : filteredFacilities.length > 0 ? (
+                <div className="space-y-8">
+                  {filteredFacilities.map((facility) => (
+                    <div key={facility.id}>
+                      {selectedFacility?.id === facility.id ? (
+                        <FacilityDetailCard facility={facility} />
+                      ) : (
+                        <Card className="overflow-hidden">
+                          <div className="md:flex">
+                            <div className="md:w-1/3 h-48 md:h-auto">
+                              <img 
+                                src={facility.image_url} 
+                                alt={facility.name} 
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                            <div className="md:w-2/3 p-6">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <h3 className="text-xl font-semibold">{facility.name}</h3>
+                                  <div className="flex items-center text-gray-500 mt-1">
+                                    <MapPin className="h-4 w-4 mr-1" />
+                                    <span>{facility.location}</span>
+                                  </div>
+                                </div>
+                                <Badge variant="outline">{facility.care_type}</Badge>
+                              </div>
+                              
+                              <p className="mt-4 text-gray-600 line-clamp-2">{facility.description}</p>
+                              
+                              <div className="mt-4 flex flex-wrap gap-2">
+                                {facility.amenities?.slice(0, 3).map((amenity, index) => (
+                                  <Badge key={index} variant="secondary" className="text-xs">
+                                    {amenity}
+                                  </Badge>
+                                ))}
+                              </div>
+                              
+                              <div className="mt-6 flex justify-between items-center">
+                                <div>
+                                  <span className="font-semibold">{facility.price_range}</span>
+                                  <span className="text-sm text-gray-500 ml-2">
+                                    {facility.spots_available > 0 
+                                      ? `${facility.spots_available} spots available` 
+                                      : "Currently full"}
+                                  </span>
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button 
+                                    variant="outline" 
+                                    onClick={() => setSelectedFacility(facility)}
+                                  >
+                                    View Details
+                                  </Button>
+                                  <PlacementRequestButton 
+                                    facilityId={facility.id}
+                                    facilityName={facility.name}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <Card>
+                  <CardContent className="text-center py-12">
+                    <p className="text-gray-600">No communities found matching your criteria.</p>
+                    <Button className="mt-4" onClick={() => {
+                      setSearchQuery('');
+                      setCareType('all');
+                      setLocation('all');
+                      setSelectedServices([]);
+                      setSelectedState('all');
+                      setSelectedCounty('all');
+                    }}>
+                      Clear Filters
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+            
+            {/* Featured Communities Tab */}
+            <TabsContent value="featured" className="mt-6">
+              {isLoading ? (
+                <div className="text-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+                  <p className="mt-4 text-gray-600">Loading featured communities...</p>
+                </div>
+              ) : filteredFacilities.filter(f => f.featured).length > 0 ? (
+                <div className="space-y-8">
+                  {filteredFacilities
+                    .filter(facility => facility.featured)
+                    .map((facility) => (
                       <div key={facility.id}>
                         {selectedFacility?.id === facility.id ? (
                           <FacilityDetailCard facility={facility} />
@@ -784,7 +797,10 @@ const Placements = () => {
                                       <span>{facility.location}</span>
                                     </div>
                                   </div>
-                                  <Badge variant="outline">{facility.care_type}</Badge>
+                                  <div className="flex gap-2">
+                                    <Badge variant="outline">{facility.care_type}</Badge>
+                                    <Badge className="bg-indigo-600">Featured</Badge>
+                                  </div>
                                 </div>
                                 
                                 <p className="mt-4 text-gray-600 line-clamp-2">{facility.description}</p>
@@ -825,221 +841,74 @@ const Placements = () => {
                         )}
                       </div>
                     ))}
-                  </div>
-                ) : (
-                  <Card>
-                    <CardContent className="text-center py-12">
-                      <p className="text-gray-600">No communities found matching your criteria.</p>
-                      <Button className="mt-4" onClick={() => {
-                        setSearchQuery('');
-                        setCareType('all');
-                        setLocation('all');
-                        setSelectedServices([]);
-                        setSelectedState('all');
-                        setSelectedCounty('all');
-                      }}>
-                        Clear Filters
-                      </Button>
-                    </CardContent>
-                  </Card>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="featured" className="mt-6">
-                {isLoading ? (
-                  <div className="text-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading featured communities...</p>
-                  </div>
-                ) : filteredFacilities.filter(f => f.featured).length > 0 ? (
-                  <div className="space-y-8">
-                    {filteredFacilities
-                      .filter(facility => facility.featured)
-                      .map((facility) => (
-                        <div key={facility.id}>
-                          {selectedFacility?.id === facility.id ? (
-                            <FacilityDetailCard facility={facility} />
-                          ) : (
-                            <Card className="overflow-hidden">
-                              <div className="md:flex">
-                                <div className="md:w-1/3 h-48 md:h-auto">
-                                  <img 
-                                    src={facility.image_url} 
-                                    alt={facility.name} 
-                                    className="h-full w-full object-cover"
-                                  />
-                                </div>
-                                <div className="md:w-2/3 p-6">
-                                  <div className="flex justify-between items-start">
-                                    <div>
-                                      <h3 className="text-xl font-semibold">{facility.name}</h3>
-                                      <div className="flex items-center text-gray-500 mt-1">
-                                        <MapPin className="h-4 w-4 mr-1" />
-                                        <span>{facility.location}</span>
-                                      </div>
-                                    </div>
-                                    <div className="flex gap-2">
-                                      <Badge variant="outline">{facility.care_type}</Badge>
-                                      <Badge className="bg-indigo-600">Featured</Badge>
-                                    </div>
-                                  </div>
-                                  
-                                  <p className="mt-4 text-gray-600 line-clamp-2">{facility.description}</p>
-                                  
-                                  <div className="mt-4 flex flex-wrap gap-2">
-                                    {facility.amenities?.slice(0, 3).map((amenity, index) => (
-                                      <Badge key={index} variant="secondary" className="text-xs">
-                                        {amenity}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                  
-                                  <div className="mt-6 flex justify-between items-center">
-                                    <div>
-                                      <span className="font-semibold">{facility.price_range}</span>
-                                      <span className="text-sm text-gray-500 ml-2">
-                                        {facility.spots_available > 0 
-                                          ? `${facility.spots_available} spots available` 
-                                          : "Currently full"}
-                                      </span>
-                                    </div>
-                                    <div className="flex gap-2">
-                                      <Button 
-                                        variant="outline" 
-                                        onClick={() => setSelectedFacility(facility)}
-                                      >
-                                        View Details
-                                      </Button>
-                                      <PlacementRequestButton 
-                                        facilityId={facility.id}
-                                        facilityName={facility.name}
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </Card>
-                          )}
-                        </div>
-                      ))}
-                  </div>
-                ) : (
-                  <Card>
-                    <CardContent className="text-center py-12">
-                      <p className="text-gray-600">No featured communities found matching your criteria.</p>
-                      <Button className="mt-4" onClick={() => {
-                        setSearchQuery('');
-                        setCareType('all');
-                        setLocation('all');
-                        setSelectedServices([]);
-                        setSelectedState('all');
-                        setSelectedCounty('all');
-                      }}>
-                        Clear Filters
-                      </Button>
-                    </CardContent>
-                  </Card>
-                )}
-              </TabsContent>
-            </Tabs>
-          )}
-
-          {/* Tabs for Professionals */}
-          {listingType === 'professionals' && (
-            <Tabs defaultValue="all" className="mb-8" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-2 max-w-md">
-                <TabsTrigger value="all">All Professionals</TabsTrigger>
-                <TabsTrigger value="featured">Featured Professionals</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="all" className="mt-6">
-                {isLoading ? (
-                  <div className="text-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading healthcare professionals...</p>
-                  </div>
-                ) : filteredProfessionals.length > 0 ? (
-                  <div className="space-y-8">
-                    {filteredProfessionals.map((professional) => (
-                      <div key={professional.id}>
-                        {selectedProfessional?.id === professional.id ? (
-                          <ProfessionalDetailCard professional={professional} />
-                        ) : (
-                          <ProfessionalCard 
-                            professional={professional} 
-                            onViewDetails={() => setSelectedProfessional(professional)}
-                          />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <Card>
-                    <CardContent className="text-center py-12">
-                      <p className="text-gray-600">No healthcare professionals found matching your criteria.</p>
-                      <Button className="mt-4" onClick={() => {
-                        setSearchQuery('');
-                        setSpecialty('all');
-                        setLocation('all');
-                        setSelectedState('all');
-                        setSelectedCounty('all');
-                      }}>
-                        Clear Filters
-                      </Button>
-                    </CardContent>
-                  </Card>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="featured" className="mt-6">
-                {isLoading ? (
-                  <div className="text-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading featured professionals...</p>
-                  </div>
-                ) : filteredProfessionals.filter(p => p.verified).length > 0 ? (
-                  <div className="space-y-8">
-                    {filteredProfessionals
-                      .filter(professional => professional.verified)
-                      .map((professional) => (
-                        <div key={professional.id}>
-                          {selectedProfessional?.id === professional.id ? (
-                            <ProfessionalDetailCard professional={professional} />
-                          ) : (
-                            <ProfessionalCard 
-                              professional={professional} 
-                              onViewDetails={() => setSelectedProfessional(professional)}
-                            />
-                          )}
-                        </div>
-                      ))}
-                  </div>
-                ) : (
-                  <Card>
-                    <CardContent className="text-center py-12">
-                      <p className="text-gray-600">No featured professionals found matching your criteria.</p>
-                      <Button className="mt-4" onClick={() => {
-                        setSearchQuery('');
-                        setSpecialty('all');
-                        setLocation('all');
-                        setSelectedState('all');
-                        setSelectedCounty('all');
-                      }}>
-                        Clear Filters
-                      </Button>
-                    </CardContent>
-                  </Card>
-                )}
-              </TabsContent>
-            </Tabs>
-          )}
+                </div>
+              ) : (
+                <Card>
+                  <CardContent className="text-center py-12">
+                    <p className="text-gray-600">No featured communities found matching your criteria.</p>
+                    <Button className="mt-4" onClick={() => {
+                      setSearchQuery('');
+                      setCareType('all');
+                      setLocation('all');
+                      setSelectedServices([]);
+                      setSelectedState('all');
+                      setSelectedCounty('all');
+                    }}>
+                      Clear Filters
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+            
+            {/* Professional Caregivers Tab */}
+            <TabsContent value="professionals" className="mt-6">
+              {isLoading ? (
+                <div className="text-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+                  <p className="mt-4 text-gray-600">Loading healthcare professionals...</p>
+                </div>
+              ) : filteredProfessionals.length > 0 ? (
+                <div className="space-y-8">
+                  {filteredProfessionals.map((professional) => (
+                    <div key={professional.id}>
+                      {selectedProfessional?.id === professional.id ? (
+                        <ProfessionalDetailCard professional={professional} />
+                      ) : (
+                        <ProfessionalCard 
+                          professional={professional}
+                          onViewDetails={() => setSelectedProfessional(professional)}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <Card>
+                  <CardContent className="text-center py-12">
+                    <p className="text-gray-600">No healthcare professionals found matching your criteria.</p>
+                    <Button className="mt-4" onClick={() => {
+                      setSearchQuery('');
+                      setCareType('all');
+                      setLocation('all');
+                      setSelectedServices([]);
+                      setSelectedState('all');
+                      setSelectedCounty('all');
+                    }}>
+                      Clear Filters
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+          </Tabs>
 
           {/* How Our Placement Works */}
           <div className="mt-16 bg-gray-50 rounded-lg p-8">
             <div className="text-center mb-10">
               <h2 className="text-2xl font-bold text-gray-900">How Our Placement Service Works</h2>
               <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-                Unlike traditional agencies, Vitalé offers families concierge placement options with the power of perks, speed, and advocacy. We only work with trusted {listingType === 'facilities' ? 'homes' : 'professionals'} and ensure you get the best care—and we get paid only when we've earned it.
+                Unlike traditional agencies, Vitalé offers families concierge placement options with the power of perks, speed, and advocacy. We only work with trusted providers and ensure you get the best care—and we get paid only when we've earned it.
               </p>
             </div>
             
@@ -1060,7 +929,7 @@ const Placements = () => {
                 </div>
                 <h3 className="text-lg font-semibold mb-3 mt-2">We Match & Advocate</h3>
                 <p className="text-gray-600">
-                  Our team matches your needs with trusted {listingType === 'facilities' ? 'communities' : 'professionals'} and advocates for the best possible care and pricing.
+                  Our team matches your needs with trusted providers and advocates for the best possible care and pricing.
                 </p>
               </div>
               
@@ -1070,7 +939,7 @@ const Placements = () => {
                 </div>
                 <h3 className="text-lg font-semibold mb-3 mt-2">Seamless Transition</h3>
                 <p className="text-gray-600">
-                  We coordinate {listingType === 'facilities' ? 'tours' : 'interviews'}, handle paperwork, and ensure a smooth transition to the selected {listingType === 'facilities' ? 'community' : 'caregiver'}.
+                  We coordinate appointments, handle paperwork, and ensure a smooth transition to the selected provider.
                 </p>
               </div>
             </div>
@@ -1092,14 +961,14 @@ const Placements = () => {
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <h3 className="text-lg font-semibold mb-2">How does your placement fee work?</h3>
                 <p className="text-gray-600">
-                  Our standard placement service has no upfront fee for families. We're paid by the {listingType === 'facilities' ? 'community' : 'professional'} after a successful placement. For expedited service, a $497 concierge deposit unlocks priority matching and additional benefits.
+                  Our standard placement service has no upfront fee for families. We're paid by the provider after a successful placement. For expedited service, a $497 concierge deposit unlocks priority matching and additional benefits.
                 </p>
               </div>
               
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <h3 className="text-lg font-semibold mb-2">How long does the placement process take?</h3>
                 <p className="text-gray-600">
-                  Standard placements typically take 72-96 hours from initial request to {listingType === 'facilities' ? 'community' : 'professional'} recommendations. Our expedited concierge service provides matches within 24-48 hours for urgent situations.
+                  Standard placements typically take 72-96 hours from initial request to provider recommendations. Our expedited concierge service provides matches within 24-48 hours for urgent situations.
                 </p>
               </div>
               
@@ -1111,11 +980,9 @@ const Placements = () => {
               </div>
               
               <div className="bg-white p-6 rounded-lg shadow-sm">
-                <h3 className="text-lg font-semibold mb-2">What types of {listingType === 'facilities' ? 'facilities' : 'professionals'} do you work with?</h3>
+                <h3 className="text-lg font-semibold mb-2">What types of providers do you work with?</h3>
                 <p className="text-gray-600">
-                  {listingType === 'facilities' 
-                    ? 'We partner with a wide range of senior living options, including memory care, assisted living, independent living, skilled nursing communities, and hospice care providers.'
-                    : 'We work with licensed healthcare professionals including doctors, nurses, nurse practitioners, physician assistants, and specialized caregivers across various medical fields.'}
+                  We partner with a wide range of healthcare providers, including memory care facilities, assisted living communities, independent living communities, skilled nursing facilities, hospice care providers, and individual healthcare professionals.
                 </p>
               </div>
             </div>
