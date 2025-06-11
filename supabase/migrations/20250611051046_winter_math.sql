@@ -1,31 +1,22 @@
 /*
-  # Add slug column to partners table
+  # Add slug column to partners table and create slug generation function
 
-  1. New Columns
-    - Add `slug` column to partners table if it doesn't exist
-  2. Data Updates
-    - Generate slugs for existing partners
-    - Handle potential duplicate slugs
-  3. Constraints
+  1. Changes
+    - Add slug column to partners table if it doesn't exist
+    - Create function to generate slugs from partner names
+    - Create trigger to automatically generate slugs for new partners
+    - Update existing partners with slugs based on their names
     - Create unique index on slug column
-  4. Functions & Triggers
-    - Create function to generate slugs from names
-    - Create trigger to auto-generate slugs on insert
 */
 
 -- Check if the slug column exists and add it if it doesn't
 DO $$ 
-DECLARE
-  column_exists BOOLEAN;
 BEGIN
-  -- Check if the slug column exists
-  SELECT EXISTS (
+  -- Add the slug column if it doesn't exist
+  IF NOT EXISTS (
     SELECT 1 FROM information_schema.columns 
     WHERE table_name = 'partners' AND column_name = 'slug'
-  ) INTO column_exists;
-  
-  IF NOT column_exists THEN
-    -- Add the slug column
+  ) THEN
     ALTER TABLE partners ADD COLUMN slug text;
     
     -- Generate slugs for existing partners
@@ -49,7 +40,7 @@ BEGIN
   END IF;
 END $$;
 
--- Create a function to generate a slug from the name
+-- Create or replace the function to generate a slug from the name
 CREATE OR REPLACE FUNCTION generate_partner_slug()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -79,25 +70,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Check if the trigger exists and create it if it doesn't
-DO $$ 
-DECLARE
-  trigger_exists BOOLEAN;
+-- Drop the trigger if it exists and recreate it
+DO $$
 BEGIN
-  -- Check if the trigger already exists
-  SELECT EXISTS (
-    SELECT 1 FROM pg_trigger
-    JOIN pg_class ON pg_trigger.tgrelid = pg_class.oid
-    WHERE pg_class.relname = 'partners' 
-    AND pg_trigger.tgname = 'generate_partner_slug_trigger'
-  ) INTO trigger_exists;
+  -- Drop the trigger if it exists
+  DROP TRIGGER IF EXISTS generate_partner_slug_trigger ON partners;
   
-  -- Only create the trigger if it doesn't exist
-  IF NOT trigger_exists THEN
-    EXECUTE 'CREATE TRIGGER generate_partner_slug_trigger
-    BEFORE INSERT ON partners
-    FOR EACH ROW
-    WHEN (NEW.slug IS NULL OR NEW.slug = '''')
-    EXECUTE FUNCTION generate_partner_slug()';
-  END IF;
+  -- Create the trigger
+  CREATE TRIGGER generate_partner_slug_trigger
+  BEFORE INSERT ON partners
+  FOR EACH ROW
+  WHEN (NEW.slug IS NULL OR NEW.slug = '')
+  EXECUTE FUNCTION generate_partner_slug();
 END $$;

@@ -10,7 +10,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Check, ChevronRight, Edit, Trash2, X } from 'lucide-react';
+import { Check, ChevronRight, Edit, Trash2, X, Eye } from 'lucide-react';
 import { Partner } from './useCareTeamsData'; // Import the Partner type from useCareTeamsData
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,6 +25,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import EditPartnerDialog from '../dialogs/EditPartnerDialog';
+import { Link } from 'react-router-dom';
 
 interface PartnersListProps {
   partners: Partner[];
@@ -102,12 +103,16 @@ const PartnersList = ({ partners, isLoading, searchTerm, refetchData }: Partners
     }
   };
 
-  const handleViewDetails = (partnerId: string) => {
-    // In a real app, this would navigate to a detailed view
-    toast({
-      title: 'View Details',
-      description: `Viewing details for partner ID: ${partnerId}`,
-    });
+  const handleViewDetails = (partner: Partner) => {
+    if (partner.slug) {
+      window.open(`/professional/${partner.slug}`, '_blank');
+    } else {
+      toast({
+        title: 'No profile page available',
+        description: 'This professional does not have a public profile page yet.',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (isLoading) {
@@ -192,8 +197,12 @@ const PartnersList = ({ partners, isLoading, searchTerm, refetchData }: Partners
                       <Button size="sm" variant="outline" className="text-destructive hover:text-destructive" onClick={() => handleDelete(partner.id)}>
                         <Trash2 className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => handleViewDetails(partner.id)}>
-                        <ChevronRight className="w-4 h-4" />
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleViewDetails(partner)}
+                      >
+                        <Eye className="w-4 h-4" />
                       </Button>
                     </div>
                   </TableCell>
