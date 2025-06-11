@@ -10,8 +10,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
 import ScheduleTourModal from './ScheduleTourModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 interface FacilityDetailCardProps {
   facility: {
@@ -46,7 +44,6 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
   const [messageText, setMessageText] = useState('');
   const [isTourModalOpen, setIsTourModalOpen] = useState(false);
   const [activeMediaType, setActiveMediaType] = useState<'images' | 'videos'>('images');
-  const [learnMoreUrl, setLearnMoreUrl] = useState(facility.slug || '');
   
   // If no images or videos are available, use a placeholder
   if (imageUrls.length === 0 && videoUrls.length === 0) {
@@ -117,12 +114,12 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
   };
 
   const handleLearnMore = () => {
-    if (learnMoreUrl) {
-      window.open(`/care/${learnMoreUrl}`, '_blank');
+    if (facility.slug) {
+      window.open(`/care/${facility.slug}`, '_blank');
     } else {
       toast({
         title: "URL not available",
-        description: "Please enter a valid URL slug for this facility.",
+        description: "This facility doesn't have a landing page URL.",
         variant: "destructive",
       });
     }
@@ -163,8 +160,8 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
           <div>
             <CardTitle>{facility.name}</CardTitle>
             <CardDescription>
-              <div className="flex items-center mt-1">
-                <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-indigo-600" />
                 {facility.location}
               </div>
             </CardDescription>
@@ -367,25 +364,14 @@ const FacilityDetailCard = ({ facility }: FacilityDetailCardProps) => {
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="learnMoreUrl">Learn More URL</Label>
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <Input
-                id="learnMoreUrl"
-                placeholder="facility-name-slug"
-                value={learnMoreUrl}
-                onChange={(e) => setLearnMoreUrl(e.target.value)}
-              />
-            </div>
+        {facility.slug && (
+          <div className="flex justify-end">
             <Button onClick={handleLearnMore}>
+              <Globe className="mr-2 h-4 w-4" />
               Learn More
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Enter the URL slug for this facility's landing page
-          </p>
-        </div>
+        )}
       </CardContent>
       <CardFooter className="flex flex-wrap gap-2 justify-between">
         <div className="flex flex-wrap gap-2">
