@@ -674,7 +674,7 @@ const ProfessionalProfilePage = () => {
           <div>
             <Card>
               <CardHeader>
-                <CardTitle>Book an Appointment</CardTitle>
+                <CardTitle>Book a Consultation</CardTitle>
                 <CardDescription>
                   Select your preferred date and time
                 </CardDescription>
