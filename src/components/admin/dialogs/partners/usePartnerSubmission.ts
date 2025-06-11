@@ -28,16 +28,24 @@ export const usePartnerSubmission = (onSuccess: () => void, onClose: () => void)
         accepting_new_patients: values.accepting_new_patients,
         telehealth_enabled: values.telehealth_enabled,
         verified: values.verified,
-        status: 'active',
+        status: values.status || 'active',
         slug: values.slug,
         profile_image: values.profile_image, // This will be set by the form component
       };
 
-      const { error } = await supabase
-        .from('partners')
-        .insert(partnerData);
+      console.log("Submitting partner data:", partnerData);
 
-      if (error) throw error;
+      const { error, data } = await supabase
+        .from('partners')
+        .insert(partnerData)
+        .select();
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      console.log("Partner created successfully:", data);
 
       toast({
         title: 'Partner created',

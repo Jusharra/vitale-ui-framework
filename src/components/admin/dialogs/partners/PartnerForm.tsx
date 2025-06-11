@@ -67,20 +67,23 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
           const fileName = `${Date.now()}.${fileExt}`;
           const filePath = `partner_images/${fileName}`;
           
-          // Check if the bucket exists, create it if it doesn't
+          // Check if the bucket exists
           const { data: buckets } = await supabase.storage.listBuckets();
-          const bucketExists = buckets?.some(bucket => bucket.name === 'partner_images');
           
-          if (!bucketExists) {
+          // Create the bucket if it doesn't exist
+          if (!buckets?.some(bucket => bucket.name === 'partner_images')) {
             await supabase.storage.createBucket('partner_images', {
               public: true
             });
           }
           
           // Upload the file
-          const { error: uploadError } = await supabase.storage
+          const { error: uploadError, data: uploadData } = await supabase.storage
             .from('partner_images')
-            .upload(filePath, imageFile);
+            .upload(filePath, imageFile, {
+              cacheControl: '3600',
+              upsert: false
+            });
             
           if (uploadError) {
             throw uploadError;
@@ -92,12 +95,14 @@ const PartnerForm = ({ defaultValues, onSubmit, onCancel, isEditing = false }: P
             .getPublicUrl(filePath);
             
           imageUrl = data.publicUrl;
+          
+          console.log("Image uploaded successfully:", imageUrl);
         } catch (error) {
           console.error('Error uploading image:', error);
           toast({
-            title: 'Image upload failed',
-            description: 'The profile image could not be uploaded, but other data will be saved.',
-            variant: 'destructive',
+            title: "Image upload failed",
+            description: "The profile image could not be uploaded, but other data will be saved.",
+            variant: "destructive",
           });
         }
       }
