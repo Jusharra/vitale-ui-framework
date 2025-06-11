@@ -73,7 +73,7 @@ const ProfessionalProfilePage = () => {
         if (data) {
           setProfessional(data);
         } else {
-          // If no exact match, try a case-insensitive search
+          // If no exact match found, try a case-insensitive search
           const { data: alternativeData, error: alternativeError } = await supabase
             .from('partners')
             .select('*')
