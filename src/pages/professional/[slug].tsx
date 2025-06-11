@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { MapPin, Phone, Mail, Calendar as CalendarIcon, Clock, Star, CheckCircle, MessageSquare, Video, User, Award, Stethoscope, Instagram, Linkedin, Facebook, Globe, Heart, ArrowRight, Youtube, TikTok } from 'lucide-react';
+import { MapPin, Phone, Mail, Calendar as CalendarIcon, Clock, Star, CheckCircle, MessageSquare, Video, User, Award, Stethoscope, Instagram, Linkedin, Facebook, Globe, Heart, ArrowRight, Youtube, BookText } from 'lucide-react';
 import { Helmet } from 'react-helmet';
 
 interface Professional {
@@ -366,7 +366,7 @@ const ProfessionalProfilePage = () => {
                     {professional.tiktok_url && (
                       <a href={professional.tiktok_url} target="_blank" rel="noopener noreferrer" aria-label="TikTok Profile">
                         <Button variant="outline" size="icon">
-                          <TikTok className="h-4 w-4" />
+                          <BookText className="h-4 w-4" />
                         </Button>
                       </a>
                     )}

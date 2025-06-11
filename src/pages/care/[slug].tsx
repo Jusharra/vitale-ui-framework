@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { MapPin, Phone, Mail, Clock, CheckCircle, Globe, Calendar, User, Video, Instagram, Linkedin, Facebook, Youtube, BookText as TikTok } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, CheckCircle, Globe, Calendar, User, Video, Instagram, Linkedin, Facebook, Youtube, BookText } from 'lucide-react';
 import PlacementRequestButton from '@/components/placement/PlacementRequestButton';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -688,7 +688,7 @@ const FacilityPage = () => {
                         {partner.tiktok_url && (
                           <a href={partner.tiktok_url} target="_blank" rel="noopener noreferrer" aria-label="TikTok Profile">
                             <Button variant="outline" size="icon">
-                              <TikTok className="h-4 w-4" />
+                              <BookText className="h-4 w-4" />
                             </Button>
                           </a>
                         )}
