@@ -7,7 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Search, MapPin, Filter, CheckCircle, User, Home } from 'lucide-react';
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { Search, MapPin, Filter, CheckCircle, User, Home, DollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import FacilityDetailCard from '@/components/placement/FacilityDetailCard';
@@ -118,6 +120,34 @@ const counties = {
   ]
 };
 
+// Budget ranges for facilities
+const facilityBudgetRanges = [
+  { id: 'budget-1', label: 'Under $3,000/month', min: 0, max: 3000 },
+  { id: 'budget-2', label: '$3,000 - $5,000/month', min: 3000, max: 5000 },
+  { id: 'budget-3', label: '$5,000 - $7,000/month', min: 5000, max: 7000 },
+  { id: 'budget-4', label: '$7,000 - $10,000/month', min: 7000, max: 10000 },
+  { id: 'budget-5', label: 'Over $10,000/month', min: 10000, max: 100000 }
+];
+
+// Budget ranges for professionals
+const professionalBudgetRanges = [
+  { id: 'rate-1', label: 'Under $50/hour', min: 0, max: 50 },
+  { id: 'rate-2', label: '$50 - $100/hour', min: 50, max: 100 },
+  { id: 'rate-3', label: '$100 - $150/hour', min: 100, max: 150 },
+  { id: 'rate-4', label: '$150 - $200/hour', min: 150, max: 200 },
+  { id: 'rate-5', label: 'Over $200/hour', min: 200, max: 1000 }
+];
+
+// Helper function to extract numeric price from string
+const extractNumericPrice = (priceString: string): number => {
+  if (!priceString) return 0;
+  const matches = priceString.match(/\$?([\d,]+)/);
+  if (matches && matches[1]) {
+    return parseInt(matches[1].replace(/,/g, ''), 10);
+  }
+  return 0;
+};
+
 const Placements = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [careType, setCareType] = useState<string>('all');
@@ -133,6 +163,9 @@ const Placements = () => {
   const [selectedState, setSelectedState] = useState<string>('all');
   const [selectedCounty, setSelectedCounty] = useState<string>('all');
   const [contentType, setContentType] = useState<'facilities' | 'professionals'>('facilities');
+  const [selectedBudgetRange, setSelectedBudgetRange] = useState<string>('all');
+  const [customBudgetRange, setCustomBudgetRange] = useState<[number, number]>([0, 10000]);
+  const [useCustomBudget, setUseCustomBudget] = useState(false);
   const { toast } = useToast();
 
   // Fetch facilities and professionals from database
@@ -212,11 +245,26 @@ const Placements = () => {
       matchesLocation = facility.location.includes(location);
     }
     
+    // Budget filtering
+    let matchesBudget = true;
+    if (useCustomBudget) {
+      // Use custom budget range slider values
+      const facilityPrice = extractNumericPrice(facility.price_range);
+      matchesBudget = facilityPrice >= customBudgetRange[0] && facilityPrice <= customBudgetRange[1];
+    } else if (selectedBudgetRange !== 'all') {
+      // Use predefined budget ranges
+      const selectedRange = facilityBudgetRanges.find(range => range.id === selectedBudgetRange);
+      if (selectedRange) {
+        const facilityPrice = extractNumericPrice(facility.price_range);
+        matchesBudget = facilityPrice >= selectedRange.min && facilityPrice <= selectedRange.max;
+      }
+    }
+    
     // For demo purposes, we'll assume all facilities match the selected services
     // In a real implementation, you would check if the facility provides the selected services
     const matchesServices = selectedServices.length === 0 || true;
     
-    return matchesSearch && matchesCareType && matchesLocation && matchesServices;
+    return matchesSearch && matchesCareType && matchesLocation && matchesServices && matchesBudget;
   });
 
   // Filter professionals based on search query, specialties, and location
@@ -262,10 +310,25 @@ const Placements = () => {
         professional.service_area.includes(location) : false;
     }
     
+    // Budget filtering for professionals
+    let matchesBudget = true;
+    if (useCustomBudget) {
+      // Use custom budget range slider values
+      const hourlyRate = extractNumericPrice(professional.hourly_rate || '');
+      matchesBudget = hourlyRate >= customBudgetRange[0] && hourlyRate <= customBudgetRange[1];
+    } else if (selectedBudgetRange !== 'all') {
+      // Use predefined budget ranges
+      const selectedRange = professionalBudgetRanges.find(range => range.id === selectedBudgetRange);
+      if (selectedRange) {
+        const hourlyRate = extractNumericPrice(professional.hourly_rate || '');
+        matchesBudget = hourlyRate >= selectedRange.min && hourlyRate <= selectedRange.max;
+      }
+    }
+    
     // For demo purposes, we'll assume all professionals match the selected services
     const matchesServices = selectedServices.length === 0 || true;
     
-    return matchesSearch && matchesSpecialty && matchesLocation && matchesServices;
+    return matchesSearch && matchesSpecialty && matchesLocation && matchesServices && matchesBudget;
   });
 
   // Toggle service selection
@@ -281,6 +344,28 @@ const Placements = () => {
   const handleStateChange = (state: string) => {
     setSelectedState(state);
     setSelectedCounty('all');
+  };
+
+  // Handle budget range change
+  const handleBudgetRangeChange = (value: string) => {
+    setSelectedBudgetRange(value);
+    setUseCustomBudget(false);
+  };
+
+  // Handle custom budget slider change
+  const handleCustomBudgetChange = (values: number[]) => {
+    setCustomBudgetRange([values[0], values[1]]);
+    setUseCustomBudget(true);
+    setSelectedBudgetRange('all');
+  };
+
+  // Format currency for display
+  const formatCurrency = (amount: number): string => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0
+    }).format(amount);
   };
 
   return (
@@ -357,40 +442,93 @@ const Placements = () => {
             </div>
             
             {showFilters && (
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Select value={selectedState} onValueChange={handleStateChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select State" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All States</SelectItem>
-                    <SelectItem value="California">California</SelectItem>
-                    <SelectItem value="Texas">Texas</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="mt-4 space-y-4 border-t pt-4">
+                <h3 className="font-medium text-lg mb-2">Advanced Filters</h3>
                 
-                <Select 
-                  value={selectedCounty} 
-                  onValueChange={setSelectedCounty}
-                  disabled={selectedState === 'all'}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={selectedState === 'all' ? "Select State First" : "Select County"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Counties</SelectItem>
-                    {selectedState === 'California' && 
-                      counties.California.map(county => (
-                        <SelectItem key={county} value={county}>{county}</SelectItem>
-                      ))
-                    }
-                    {selectedState === 'Texas' && 
-                      counties.Texas.map(county => (
-                        <SelectItem key={county} value={county}>{county}</SelectItem>
-                      ))
-                    }
-                  </SelectContent>
-                </Select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="mb-2 block">Location</Label>
+                    <div className="grid grid-cols-1 gap-4">
+                      <Select value={selectedState} onValueChange={handleStateChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select State" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All States</SelectItem>
+                          <SelectItem value="California">California</SelectItem>
+                          <SelectItem value="Texas">Texas</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      <Select 
+                        value={selectedCounty} 
+                        onValueChange={setSelectedCounty}
+                        disabled={selectedState === 'all'}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={selectedState === 'all' ? "Select State First" : "Select County"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Counties</SelectItem>
+                          {selectedState === 'California' && 
+                            counties.California.map(county => (
+                              <SelectItem key={county} value={county}>{county}</SelectItem>
+                            ))
+                          }
+                          {selectedState === 'Texas' && 
+                            counties.Texas.map(county => (
+                              <SelectItem key={county} value={county}>{county}</SelectItem>
+                            ))
+                          }
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label className="mb-2 block">Budget</Label>
+                    <div className="space-y-4">
+                      <Select 
+                        value={selectedBudgetRange} 
+                        onValueChange={handleBudgetRangeChange}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select Budget Range" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Price Ranges</SelectItem>
+                          {contentType === 'facilities' ? (
+                            facilityBudgetRanges.map(range => (
+                              <SelectItem key={range.id} value={range.id}>{range.label}</SelectItem>
+                            ))
+                          ) : (
+                            professionalBudgetRanges.map(range => (
+                              <SelectItem key={range.id} value={range.id}>{range.label}</SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <Label>Custom Budget Range</Label>
+                          <div className="text-sm text-muted-foreground">
+                            {formatCurrency(customBudgetRange[0])} - {formatCurrency(customBudgetRange[1])}
+                            {contentType === 'facilities' ? '/month' : '/hour'}
+                          </div>
+                        </div>
+                        <Slider
+                          defaultValue={[0, 10000]}
+                          max={contentType === 'facilities' ? 15000 : 500}
+                          step={contentType === 'facilities' ? 500 : 25}
+                          value={customBudgetRange}
+                          onValueChange={handleCustomBudgetChange}
+                          className="my-4"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
             
@@ -435,6 +573,103 @@ const Placements = () => {
                 </div>
               </div>
             )}
+            
+            {/* Active Filters Display */}
+            {(selectedState !== 'all' || selectedCounty !== 'all' || selectedBudgetRange !== 'all' || useCustomBudget || selectedServices.length > 0) && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {selectedState !== 'all' && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    {selectedState}
+                    <button 
+                      className="ml-1 hover:bg-muted rounded-full"
+                      onClick={() => {
+                        setSelectedState('all');
+                        setSelectedCounty('all');
+                      }}
+                    >
+                      ×
+                    </button>
+                  </Badge>
+                )}
+                
+                {selectedCounty !== 'all' && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    {selectedCounty}
+                    <button 
+                      className="ml-1 hover:bg-muted rounded-full"
+                      onClick={() => setSelectedCounty('all')}
+                    >
+                      ×
+                    </button>
+                  </Badge>
+                )}
+                
+                {selectedBudgetRange !== 'all' && !useCustomBudget && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <DollarSign className="h-3 w-3" />
+                    {contentType === 'facilities' 
+                      ? facilityBudgetRanges.find(r => r.id === selectedBudgetRange)?.label 
+                      : professionalBudgetRanges.find(r => r.id === selectedBudgetRange)?.label}
+                    <button 
+                      className="ml-1 hover:bg-muted rounded-full"
+                      onClick={() => setSelectedBudgetRange('all')}
+                    >
+                      ×
+                    </button>
+                  </Badge>
+                )}
+                
+                {useCustomBudget && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <DollarSign className="h-3 w-3" />
+                    {formatCurrency(customBudgetRange[0])} - {formatCurrency(customBudgetRange[1])}
+                    {contentType === 'facilities' ? '/month' : '/hour'}
+                    <button 
+                      className="ml-1 hover:bg-muted rounded-full"
+                      onClick={() => {
+                        setUseCustomBudget(false);
+                        setCustomBudgetRange([0, contentType === 'facilities' ? 10000 : 500]);
+                      }}
+                    >
+                      ×
+                    </button>
+                  </Badge>
+                )}
+                
+                {selectedServices.length > 0 && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <CheckCircle className="h-3 w-3" />
+                    {selectedServices.length} services
+                    <button 
+                      className="ml-1 hover:bg-muted rounded-full"
+                      onClick={() => setSelectedServices([])}
+                    >
+                      ×
+                    </button>
+                  </Badge>
+                )}
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    setSearchQuery('');
+                    setCareType('all');
+                    setLocation('all');
+                    setSelectedServices([]);
+                    setSelectedState('all');
+                    setSelectedCounty('all');
+                    setSelectedBudgetRange('all');
+                    setUseCustomBudget(false);
+                    setCustomBudgetRange([0, contentType === 'facilities' ? 10000 : 500]);
+                  }}
+                >
+                  Clear All Filters
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Concierge Placement Banner */}
@@ -473,6 +708,10 @@ const Placements = () => {
             setContentType(value as 'facilities' | 'professionals');
             setSelectedFacility(null);
             setSelectedProfessional(null);
+            // Reset budget range when switching content type
+            setSelectedBudgetRange('all');
+            setUseCustomBudget(false);
+            setCustomBudgetRange([0, value === 'facilities' ? 10000 : 500]);
           }}>
             <TabsList className="grid w-full grid-cols-2 max-w-md">
               <TabsTrigger value="facilities" className="flex gap-2 items-center">
@@ -577,6 +816,9 @@ const Placements = () => {
                           setSelectedServices([]);
                           setSelectedState('all');
                           setSelectedCounty('all');
+                          setSelectedBudgetRange('all');
+                          setUseCustomBudget(false);
+                          setCustomBudgetRange([0, 10000]);
                         }}>
                           Clear Filters
                         </Button>
@@ -674,6 +916,9 @@ const Placements = () => {
                           setSelectedServices([]);
                           setSelectedState('all');
                           setSelectedCounty('all');
+                          setSelectedBudgetRange('all');
+                          setUseCustomBudget(false);
+                          setCustomBudgetRange([0, 10000]);
                         }}>
                           Clear Filters
                         </Button>
@@ -724,6 +969,9 @@ const Placements = () => {
                           setSelectedServices([]);
                           setSelectedState('all');
                           setSelectedCounty('all');
+                          setSelectedBudgetRange('all');
+                          setUseCustomBudget(false);
+                          setCustomBudgetRange([0, 500]);
                         }}>
                           Clear Filters
                         </Button>
@@ -766,6 +1014,9 @@ const Placements = () => {
                           setSelectedServices([]);
                           setSelectedState('all');
                           setSelectedCounty('all');
+                          setSelectedBudgetRange('all');
+                          setUseCustomBudget(false);
+                          setCustomBudgetRange([0, 500]);
                         }}>
                           Clear Filters
                         </Button>
