@@ -57,7 +57,7 @@ const ProfessionalDetailCard = ({ partner }: ProfessionalDetailCardProps) => {
       <Card>
         <CardContent className="p-6">
           <div className="text-center text-gray-500">
-            Professional information not available
+            Caregiver information not available
           </div>
         </CardContent>
       </Card>
@@ -376,14 +376,17 @@ const ProfessionalDetailCard = ({ partner }: ProfessionalDetailCardProps) => {
                   <MessageSquare className="mr-2 h-4 w-4" />
                   Send Message
                 </Button>
-                
+                <Button variant="outline" onClick={handleCallPartner}>
+                 <Phone className="h-4 w-4 mr-2" />
+                  Call Caregiver
+                </Button>
                 <Button 
                   className="w-full"
                   onClick={() => setIsBookingDialogOpen(true)}
                   disabled={!partner.accepting_new_patients}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  Book Appointment
+                  Book Consultation
                 </Button>
               </div>
               
@@ -410,7 +413,7 @@ const ProfessionalDetailCard = ({ partner }: ProfessionalDetailCardProps) => {
         {partner.slug && (
           <Button asChild>
             <Link to={`/professional/${partner.slug}`}>
-              View Full Profile
+              View Profile
             </Link>
           </Button>
         )}
@@ -420,7 +423,7 @@ const ProfessionalDetailCard = ({ partner }: ProfessionalDetailCardProps) => {
       <Dialog open={isBookingDialogOpen} onOpenChange={setIsBookingDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Book Appointment with {partner.name}</DialogTitle>
+            <DialogTitle>Book Consultation with {partner.name}</DialogTitle>
             <DialogDescription>
               Select your preferred date and time for your appointment.
             </DialogDescription>
@@ -480,7 +483,7 @@ const ProfessionalDetailCard = ({ partner }: ProfessionalDetailCardProps) => {
               Cancel
             </Button>
             <Button onClick={handleBookAppointment}>
-              Book Appointment
+              Book Consultation
             </Button>
           </DialogFooter>
         </DialogContent>

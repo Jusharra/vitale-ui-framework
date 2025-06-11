@@ -41,7 +41,7 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ professional, onVie
       <Card className="overflow-hidden">
         <CardContent className="p-6">
           <div className="text-center text-gray-500">
-            Professional information not available
+            Caregiver information not available
           </div>
         </CardContent>
       </Card>
@@ -147,12 +147,12 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ professional, onVie
                 variant="outline" 
                 onClick={onViewDetails}
               >
-                View Details
+                Info
               </Button>
               {professional.slug && (
                 <Button asChild>
                   <Link to={`/professional/${professional.slug}`}>
-                    Book Appointment
+                    View Profile
                   </Link>
                 </Button>
               )}

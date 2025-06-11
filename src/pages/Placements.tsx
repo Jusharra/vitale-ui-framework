@@ -310,6 +310,8 @@ const Placements = () => {
                   ) : (
                     <>
                       <SelectItem value="Cardiology">Cardiology</SelectItem>
+                      <SelectItem value="Cardiology">Caregiver</SelectItem>
+                      <SelectItem value="Cardiology">Skilled Nurse</SelectItem>
                       <SelectItem value="Family Medicine">Family Medicine</SelectItem>
                       <SelectItem value="Internal Medicine">Internal Medicine</SelectItem>
                       <SelectItem value="Geriatric Care">Geriatric Care</SelectItem>
@@ -350,6 +352,9 @@ const Placements = () => {
                     <SelectItem value="all">All States</SelectItem>
                     <SelectItem value="California">California</SelectItem>
                     <SelectItem value="Texas">Texas</SelectItem>
+                    <SelectItem value="Texas">Arizona</SelectItem>
+                    <SelectItem value="Texas">Nevada</SelectItem>
+                    <SelectItem value="Texas">Florida</SelectItem>
                   </SelectContent>
                 </Select>
                 
@@ -370,6 +375,21 @@ const Placements = () => {
                     }
                     {selectedState === 'Texas' && 
                       counties.Texas.map(county => (
+                        <SelectItem key={county} value={county}>{county}</SelectItem>
+                      ))
+                    }
+                    {selectedState === 'Arizona' && 
+                      counties.Arizona.map(county => (
+                        <SelectItem key={county} value={county}>{county}</SelectItem>
+                      ))
+                    }
+                    {selectedState === 'Nevada' && 
+                      counties.Nevada.map(county => (
+                        <SelectItem key={county} value={county}>{county}</SelectItem>
+                      ))
+                    }
+                    {selectedState === 'Florida' && 
+                      counties.Florida.map(county => (
                         <SelectItem key={county} value={county}>{county}</SelectItem>
                       ))
                     }
@@ -672,8 +692,8 @@ const Placements = () => {
             <TabsContent value="professionals" className="mt-6">
               <Tabs defaultValue="all" className="mb-8">
                 <TabsList className="grid w-full grid-cols-2 max-w-md">
-                  <TabsTrigger value="all">All Professionals</TabsTrigger>
-                  <TabsTrigger value="verified">Verified Professionals</TabsTrigger>
+                  <TabsTrigger value="all">All Caregivers</TabsTrigger>
+                  <TabsTrigger value="verified">Verified Caregivers</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="all" className="mt-6">
@@ -700,7 +720,7 @@ const Placements = () => {
                   ) : (
                     <Card>
                       <CardContent className="text-center py-12">
-                        <p className="text-gray-600">No healthcare professionals found matching your criteria.</p>
+                        <p className="text-gray-600">No caregivers found matching your criteria.</p>
                         <Button className="mt-4" onClick={() => {
                           setSearchQuery('');
                           setCareType('all');
@@ -720,7 +740,7 @@ const Placements = () => {
                   {isLoading ? (
                     <div className="text-center py-12">
                       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-                      <p className="mt-4 text-gray-600">Loading verified professionals...</p>
+                      <p className="mt-4 text-gray-600">Loading verified caregivers...</p>
                     </div>
                   ) : filteredProfessionals.filter(p => p.verified).length > 0 ? (
                     <div className="space-y-8">
@@ -742,7 +762,7 @@ const Placements = () => {
                   ) : (
                     <Card>
                       <CardContent className="text-center py-12">
-                        <p className="text-gray-600">No verified professionals found matching your criteria.</p>
+                        <p className="text-gray-600">No verified caregivers found matching your criteria.</p>
                         <Button className="mt-4" onClick={() => {
                           setSearchQuery('');
                           setCareType('all');
