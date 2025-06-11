@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { MapPin, Phone, Mail, Clock, CheckCircle, Globe, Calendar, User } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, CheckCircle, Globe, Calendar, User, Video, Instagram, Linkedin, Facebook, Youtube, TikTok } from 'lucide-react';
 import PlacementRequestButton from '@/components/placement/PlacementRequestButton';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -58,6 +58,11 @@ interface Partner {
   profile_image?: string;
   rating?: number;
   verified?: boolean;
+  instagram_url?: string;
+  youtube_url?: string;
+  tiktok_url?: string;
+  linkedin_url?: string;
+  facebook_url?: string;
 }
 
 const FacilityPage = () => {
@@ -485,6 +490,11 @@ const FacilityPage = () => {
     const metaDescription = partner.bio?.substring(0, 150) + (partner.bio && partner.bio.length > 150 ? '...' : '') || 
       `${partner.name} is a healthcare professional specializing in ${partner.specialties?.join(', ') || 'various areas'}.`;
     
+    // Check if partner has any social media links
+    const hasSocialMedia = partner.instagram_url || partner.facebook_url || 
+                           partner.linkedin_url || partner.youtube_url || 
+                           partner.tiktok_url;
+
     return (
       <MainLayout>
         <Helmet>
@@ -638,6 +648,50 @@ const FacilityPage = () => {
                       <div className="flex items-center">
                         <p className="text-lg font-semibold">{partner.rating}</p>
                         <span className="text-yellow-500 ml-1">★</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Social Media Links */}
+                  {hasSocialMedia && (
+                    <div>
+                      <p className="text-sm font-medium text-gray-500 mb-2">Social Media</p>
+                      <div className="flex flex-wrap gap-2">
+                        {partner.instagram_url && (
+                          <a href={partner.instagram_url} target="_blank" rel="noopener noreferrer" aria-label="Instagram Profile">
+                            <Button variant="outline" size="icon">
+                              <Instagram className="h-4 w-4" />
+                            </Button>
+                          </a>
+                        )}
+                        {partner.linkedin_url && (
+                          <a href={partner.linkedin_url} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
+                            <Button variant="outline" size="icon">
+                              <Linkedin className="h-4 w-4" />
+                            </Button>
+                          </a>
+                        )}
+                        {partner.facebook_url && (
+                          <a href={partner.facebook_url} target="_blank" rel="noopener noreferrer" aria-label="Facebook Profile">
+                            <Button variant="outline" size="icon">
+                              <Facebook className="h-4 w-4" />
+                            </Button>
+                          </a>
+                        )}
+                        {partner.youtube_url && (
+                          <a href={partner.youtube_url} target="_blank" rel="noopener noreferrer" aria-label="YouTube Channel">
+                            <Button variant="outline" size="icon">
+                              <Youtube className="h-4 w-4" />
+                            </Button>
+                          </a>
+                        )}
+                        {partner.tiktok_url && (
+                          <a href={partner.tiktok_url} target="_blank" rel="noopener noreferrer" aria-label="TikTok Profile">
+                            <Button variant="outline" size="icon">
+                              <TikTok className="h-4 w-4" />
+                            </Button>
+                          </a>
+                        )}
                       </div>
                     </div>
                   )}

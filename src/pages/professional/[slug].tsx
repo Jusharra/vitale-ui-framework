@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { MapPin, Phone, Mail, Calendar as CalendarIcon, Clock, Star, CheckCircle, MessageSquare, Video, User, Award, Stethoscope, Instagram, Linkedin, Facebook, Globe, Heart, ArrowRight } from 'lucide-react';
+import { MapPin, Phone, Mail, Calendar as CalendarIcon, Clock, Star, CheckCircle, MessageSquare, Video, User, Award, Stethoscope, Instagram, Linkedin, Facebook, Globe, Heart, ArrowRight, Youtube, TikTok } from 'lucide-react';
 import { Helmet } from 'react-helmet';
 
 interface Professional {
@@ -38,6 +38,11 @@ interface Professional {
   rating?: number;
   verified?: boolean;
   slug?: string;
+  instagram_url?: string;
+  youtube_url?: string;
+  tiktok_url?: string;
+  linkedin_url?: string;
+  facebook_url?: string;
 }
 
 const ProfessionalProfilePage = () => {
@@ -263,6 +268,11 @@ const ProfessionalProfilePage = () => {
     ]
   };
 
+  // Check if professional has any social media links
+  const hasSocialMedia = professional.instagram_url || professional.facebook_url || 
+                         professional.linkedin_url || professional.youtube_url || 
+                         professional.tiktok_url;
+
   return (
     <MainLayout>
       <Helmet>
@@ -323,23 +333,45 @@ const ProfessionalProfilePage = () => {
                 )}
 
                 {/* Social Media Links */}
-                <div className="mt-4 flex gap-2">
-                  <a href="https://www.instagram.com/healthcare_provider" target="_blank" rel="noopener noreferrer" aria-label="Instagram Profile">
-                    <Button variant="outline" size="icon">
-                      <Instagram className="h-4 w-4" />
-                    </Button>
-                  </a>
-                  <a href="https://www.linkedin.com/in/healthcare-professional" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
-                    <Button variant="outline" size="icon">
-                      <Linkedin className="h-4 w-4" />
-                    </Button>
-                  </a>
-                  <a href="https://www.facebook.com/healthcare_provider" target="_blank" rel="noopener noreferrer" aria-label="Facebook Profile">
-                    <Button variant="outline" size="icon">
-                      <Facebook className="h-4 w-4" />
-                    </Button>
-                  </a>
-                </div>
+                {hasSocialMedia && (
+                  <div className="mt-4 flex gap-2">
+                    {professional.instagram_url && (
+                      <a href={professional.instagram_url} target="_blank" rel="noopener noreferrer" aria-label="Instagram Profile">
+                        <Button variant="outline" size="icon">
+                          <Instagram className="h-4 w-4" />
+                        </Button>
+                      </a>
+                    )}
+                    {professional.linkedin_url && (
+                      <a href={professional.linkedin_url} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
+                        <Button variant="outline" size="icon">
+                          <Linkedin className="h-4 w-4" />
+                        </Button>
+                      </a>
+                    )}
+                    {professional.facebook_url && (
+                      <a href={professional.facebook_url} target="_blank" rel="noopener noreferrer" aria-label="Facebook Profile">
+                        <Button variant="outline" size="icon">
+                          <Facebook className="h-4 w-4" />
+                        </Button>
+                      </a>
+                    )}
+                    {professional.youtube_url && (
+                      <a href={professional.youtube_url} target="_blank" rel="noopener noreferrer" aria-label="YouTube Channel">
+                        <Button variant="outline" size="icon">
+                          <Youtube className="h-4 w-4" />
+                        </Button>
+                      </a>
+                    )}
+                    {professional.tiktok_url && (
+                      <a href={professional.tiktok_url} target="_blank" rel="noopener noreferrer" aria-label="TikTok Profile">
+                        <Button variant="outline" size="icon">
+                          <TikTok className="h-4 w-4" />
+                        </Button>
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             
