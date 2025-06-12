@@ -25,6 +25,7 @@ import AdminBlogPostsPage from '@/pages/admin/AdminBlogPostsPage';
 import AdminFacilitiesPage from '@/pages/admin/AdminFacilitiesPage';
 import AdminProfessionalsPage from '@/pages/admin/AdminProfessionalsPage';
 import AdminReportsPage from '@/pages/admin/AdminReportsPage';
+import AdminServicesPage from '@/pages/admin/AdminServicesPage';
 import ProfessionalPage from '@/pages/ProfessionalDashboard';
 import MemberConciergePage from '@/pages/member/Concierge';
 import MemberPharmacyPage from '@/pages/member/Pharmacy';
@@ -49,6 +50,7 @@ import SubscriptionSuccess from '@/pages/member/SubscriptionSuccess';
 import FacilityPage from '@/pages/care/[slug]';
 import ProfessionalProfilePage from '@/pages/professional/[slug]';
 import Resources from '@/pages/Resources';
+import Services from '@/pages/Services';
 
 // Blog pages
 import BlogIndex from '@/pages/blog/index';
@@ -95,9 +97,9 @@ const DashboardRouter = () => {
   
   // Route based on user role
   if (userRole === 'admin') {
-    return <Navigate to="/dashboard/admin\" replace />;
+    return <Navigate to="/dashboard/admin" replace />;
   } else if (userRole === 'professional' || userRole === 'partner') {
-    return <Navigate to="/dashboard/professional\" replace />;
+    return <Navigate to="/dashboard/professional" replace />;
   } else {
     // Default to member dashboard
     return <Dashboard />;
@@ -126,6 +128,7 @@ const App: React.FC = () => {
                   <Route path="/placements" element={<Placements />} />
                   <Route path="/membership" element={<Membership />} />
                   <Route path="/resources" element={<Resources />} />
+                  <Route path="/services" element={<Services />} />
                   
                   {/* Facility routes - order matters, more specific routes first */}
                   <Route path="/care/care-homes/:city/:slug" element={<FacilityPage />} />
@@ -360,6 +363,14 @@ const App: React.FC = () => {
                     element={
                       <ProtectedRoute requiredRole="admin">
                         <AdminReportsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/admin/services"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminServicesPage />
                       </ProtectedRoute>
                     }
                   />
