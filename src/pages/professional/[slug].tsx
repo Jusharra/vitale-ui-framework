@@ -167,6 +167,26 @@ const ProfessionalProfilePage = () => {
       .slice(0, 2);
   };
 
+  // Function to extract YouTube video ID from various YouTube URL formats
+  const getYoutubeVideoId = (url: string): string | null => {
+    if (!url) return null;
+    
+    // Regular expressions to match different YouTube URL formats
+    const regexps = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/|youtube\.com\/user\/[^#]*#[^\/]*\/[^#]*#)([^"&?\/\s]{11})/i,
+      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i
+    ];
+    
+    for (const regex of regexps) {
+      const match = url.match(regex);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    
+    return null;
+  };
+
   if (isLoading) {
     return (
       <MainLayout>
@@ -272,6 +292,9 @@ const ProfessionalProfilePage = () => {
   const hasSocialMedia = professional.instagram_url || professional.facebook_url || 
                          professional.linkedin_url || professional.youtube_url || 
                          professional.tiktok_url;
+
+  // Extract YouTube video ID if available
+  const youtubeVideoId = professional.youtube_url ? getYoutubeVideoId(professional.youtube_url) : null;
 
   return (
     <MainLayout>
@@ -675,12 +698,26 @@ const ProfessionalProfilePage = () => {
                 <CardTitle>Meet Your Care Provider</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="aspect-video rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
-                  <div className="text-center p-4">
-                    <Video className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-                    <p className="text-gray-500">Video introduction available soon</p>
+                {youtubeVideoId ? (
+                  <div className="aspect-video rounded-lg overflow-hidden">
+                    <iframe 
+                      width="100%" 
+                      height="100%" 
+                      src={`https://www.youtube.com/embed/${youtubeVideoId}`}
+                      title={`${professional.name} Introduction Video`}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
                   </div>
-                </div>
+                ) : (
+                  <div className="aspect-video rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                    <div className="text-center p-4">
+                      <Video className="h-12 w-12 mx-auto text-gray-400 mb-2" />
+                      <p className="text-gray-500">Video introduction available soon</p>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

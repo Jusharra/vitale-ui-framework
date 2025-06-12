@@ -564,8 +564,11 @@ const ProfessionalEditor: React.FC<ProfessionalEditorProps> = ({ professional, o
                   <FormItem>
                     <FormLabel>YouTube URL</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://youtube.com/@channel" {...field} />
+                      <Input placeholder="https://youtube.com/watch?v=VIDEO_ID" {...field} />
                     </FormControl>
+                    <FormDescription>
+                      Enter a YouTube video URL for your profile introduction video
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
