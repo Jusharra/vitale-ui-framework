@@ -111,7 +111,7 @@ const SimplePlacementForm: React.FC<SimplePlacementFormProps> = ({
       
       // Submit to Supabase
       const { data, error } = await supabase
-        .from('placement_requests')
+        .from('placement_requests' as any)
         .insert(requestData)
         .select()
         .single();
@@ -121,7 +121,7 @@ const SimplePlacementForm: React.FC<SimplePlacementFormProps> = ({
       // Send email notifications
       try {
         await supabase.functions.invoke('send-placement-email', {
-          body: { requestId: data.id }
+          body: { requestId: data?.id }
         });
       } catch (emailError) {
         console.error("Error sending notification emails:", emailError);

@@ -31,7 +31,7 @@ const AssessmentsTab: React.FC<AssessmentsTabProps> = ({ assessments, handleDown
             <CardDescription>Complete these assessments to get personalized health recommendations</CardDescription>
           </div>
           <DownloadReportButton
-            onDownload={() => handleDownloadSectionReport("assessments")}
+            onDownload={async () => handleDownloadSectionReport("assessments")}
             variant="outline"
             label="Export Results"
             size="sm"

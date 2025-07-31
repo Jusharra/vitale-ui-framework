@@ -20,7 +20,7 @@ interface SidebarProps {
 
 interface SidebarLinkProps {
   to: string;
-  icon: LucideIcon;
+  icon: React.ComponentType<any>;
   children: React.ReactNode;
   className?: string;
 }

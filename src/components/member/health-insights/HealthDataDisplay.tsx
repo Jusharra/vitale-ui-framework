@@ -31,7 +31,7 @@ const HealthDataDisplay: React.FC<HealthDataDisplayProps> = ({
             <CardDescription>Your recent health measurements</CardDescription>
           </div>
           <DownloadReportButton
-            onDownload={() => handleDownloadSectionReport("vitals")}
+            onDownload={async () => handleDownloadSectionReport("vitals")}
             variant="outline"
             label="Export"
             size="sm"
@@ -74,7 +74,7 @@ const HealthDataDisplay: React.FC<HealthDataDisplayProps> = ({
             <CardDescription>Track your weight trends over time</CardDescription>
           </div>
           <DownloadReportButton
-            onDownload={() => handleDownloadSectionReport("weight")}
+            onDownload={async () => handleDownloadSectionReport("weight")}
             variant="outline"
             label="Export"
             size="sm"
@@ -112,7 +112,7 @@ const HealthDataDisplay: React.FC<HealthDataDisplayProps> = ({
             <CardDescription>Important allergy information to share with providers</CardDescription>
           </div>
           <DownloadReportButton
-            onDownload={() => handleDownloadSectionReport("allergies")}
+            onDownload={async () => handleDownloadSectionReport("allergies")}
             variant="outline"
             label="Export"
             size="sm"
@@ -154,7 +154,7 @@ const HealthDataDisplay: React.FC<HealthDataDisplayProps> = ({
             <CardDescription>Results from your mental health assessments</CardDescription>
           </div>
           <DownloadReportButton
-            onDownload={() => handleDownloadSectionReport("mental")}
+            onDownload={async () => handleDownloadSectionReport("mental")}
             variant="outline"
             label="Export"
             size="sm"

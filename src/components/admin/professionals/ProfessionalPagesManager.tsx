@@ -56,7 +56,7 @@ const ProfessionalPagesManager = () => {
 
       if (error) throw error;
       
-      setProfessionals(data || []);
+      setProfessionals((data || []) as any);
     } catch (error: any) {
       console.error('Error fetching professionals:', error);
       toast({

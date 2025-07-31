@@ -141,7 +141,7 @@ const FacilityEditor: React.FC<FacilityEditorProps> = ({ facility, onSuccess }) 
       } else {
         // Create new facility
         const { error } = await supabase
-          .from('care_facilities')
+          .from('care_facilities' as any)
           .insert(facilityData);
 
         if (error) throw error;

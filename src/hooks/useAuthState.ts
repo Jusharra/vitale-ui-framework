@@ -126,7 +126,7 @@ export function useAuthState() {
           email: user?.email || '', 
           full_name: data.full_name,
           // Get role directly from profiles table
-          role: data.role || 'member' as UserRole 
+          role: (data as any)?.role || 'member' as UserRole
         };
         
         setProfile(userProfile);

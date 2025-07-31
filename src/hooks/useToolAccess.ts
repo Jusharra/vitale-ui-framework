@@ -21,7 +21,7 @@ export function useToolAccess() {
       if (error) throw error;
       
       // Premium members have access to all tools
-      return data?.membership_tier === 'premium';
+      return (data as any)?.membership_tier === 'premium';
     } catch (error) {
       console.error('Error checking tool access:', error);
       return false;

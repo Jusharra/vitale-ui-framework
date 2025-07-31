@@ -27,12 +27,12 @@ const Financing = () => {
   
   // Calculate total payment
   const calculateTotalPayment = () => {
-    return (calculateMonthlyPayment() * loanTerm).toFixed(2);
+    return (Number(calculateMonthlyPayment()) * loanTerm).toFixed(2);
   };
   
   // Calculate total interest
   const calculateTotalInterest = () => {
-    return (calculateTotalPayment() - loanAmount).toFixed(2);
+    return (Number(calculateTotalPayment()) - loanAmount).toFixed(2);
   };
 
   return (

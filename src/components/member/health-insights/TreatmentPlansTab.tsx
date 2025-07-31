@@ -24,7 +24,7 @@ const TreatmentPlansTab: React.FC<TreatmentPlansTabProps> = ({ treatmentPlans, h
             <CardDescription>Current treatment plans from your healthcare team</CardDescription>
           </div>
           <DownloadReportButton
-            onDownload={() => handleDownloadSectionReport("treatments")}
+            onDownload={async () => handleDownloadSectionReport("treatments")}
             variant="outline"
             label="Export Plans"
             size="sm"
