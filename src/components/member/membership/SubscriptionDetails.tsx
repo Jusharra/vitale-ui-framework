@@ -44,7 +44,7 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
             <CardTitle className="text-2xl">Your Membership</CardTitle>
             <CardDescription>Current plan and membership benefits</CardDescription>
           </div>
-          <MembershipBadge type={profile?.membership_tier as "smart" | "core" | "vip" || "smart"} size="lg" />
+          <MembershipBadge type="premium" size="lg" />
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

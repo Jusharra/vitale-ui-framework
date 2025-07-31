@@ -127,7 +127,7 @@ export const useCareTeamsData = () => {
 
       // Fetch care facilities
       const { data: facilitiesData, error: facilitiesError } = await supabase
-        .from('care_facilities')
+        .from('care_facilities' as any)
         .select('*')
         .order('created_at', { ascending: false });
         
@@ -202,7 +202,7 @@ export const useCareTeamsData = () => {
           }
         ]);
       } else {
-        setFacilities(facilitiesData || []);
+        setFacilities((facilitiesData as unknown as Facility[]) || []);
       }
 
     } catch (error) {

@@ -142,7 +142,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
       setIsLoading(true);
       try {
         const { data, error } = await supabase
-          .from('care_facilities')
+          .from('care_facilities' as any)
           .select('*')
           .eq('id', facilityId)
           .single();
@@ -150,16 +150,17 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
         if (error) throw error;
         
         if (data) {
-          const amenitiesString = data.amenities ? data.amenities.join(', ') : '';
+          const facilityData = data as any;
+          const amenitiesString = facilityData.amenities ? facilityData.amenities.join(', ') : '';
           
           const existingMedia = [
-            ...(data.images || []).map(url => ({
+            ...(facilityData.images || []).map((url: string) => ({
               url,
               type: 'image' as const,
               isUploaded: true,
               isExisting: true,
             })),
-            ...(data.videos || []).map(url => ({
+            ...(facilityData.videos || []).map((url: string) => ({
               url,
               type: 'video' as const,
               isUploaded: true,
@@ -168,23 +169,23 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
           ];
           
           form.reset({
-            name: data.name,
-            description: data.description || '',
-            location: data.location,
-            care_type: data.care_type,
-            price_range: data.price_range,
-            spots_available: data.spots_available || 0,
+            name: facilityData.name,
+            description: facilityData.description || '',
+            location: facilityData.location,
+            care_type: facilityData.care_type,
+            price_range: facilityData.price_range,
+            spots_available: facilityData.spots_available || 0,
             amenities: amenitiesString,
-            phone: data.phone || '',
-            email: data.email || '',
-            website: data.website || '',
-            hours: data.hours || '',
-            virtual_tour_url: data.virtual_tour_url || '',
-            services: data.services || [],
+            phone: facilityData.phone || '',
+            email: facilityData.email || '',
+            website: facilityData.website || '',
+            hours: facilityData.hours || '',
+            virtual_tour_url: facilityData.virtual_tour_url || '',
+            services: facilityData.services || [],
             media: existingMedia,
-            featured: data.featured || false,
-            status: data.status as 'active' | 'draft' || 'draft',
-            slug: data.slug || '',
+            featured: facilityData.featured || false,
+            status: facilityData.status as 'active' | 'draft' || 'draft',
+            slug: facilityData.slug || '',
           });
         }
       } catch (error) {
@@ -311,7 +312,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
       const allVideoUrls = [...existingVideoUrls, ...newVideoUrls];
       
       const { error } = await supabase
-        .from('care_facilities')
+        .from('care_facilities' as any)
         .update({
           name: values.name,
           description: values.description,
@@ -364,7 +365,7 @@ const EditFacilityDialog = ({ open, onOpenChange, onSuccess, facilityId }: EditF
       setIsSubmitting(true);
       
       const { error } = await supabase
-        .from('care_facilities')
+        .from('care_facilities' as any)
         .delete()
         .eq('id', facilityId);
 

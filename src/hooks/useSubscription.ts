@@ -48,10 +48,8 @@ export function useSubscription(userId: string | null) {
         // Generate deterministic dummy data based on user ID
         const userIdSum = userId.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
         
-        // Assign tier based on user ID (deterministic but appears random)
-        const tiers: MembershipTier[] = ['smart', 'core', 'vip'];
-        const tierIndex = userIdSum % 3;
-        const dummyTier = tiers[tierIndex];
+        // Single tier system - all subscribed users get premium
+        const dummyTier: MembershipTier = 'premium';
         
         // Set trial status for some users
         const isInTrial = userIdSum % 5 === 0;
@@ -86,7 +84,7 @@ export function useSubscription(userId: string | null) {
         setSubscription({
           id: 'default',
           status: 'active',
-          tier: 'smart' as MembershipTier,
+          tier: 'premium' as MembershipTier,
           current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
           cancel_at_period_end: false
         });
@@ -98,7 +96,7 @@ export function useSubscription(userId: string | null) {
       setSubscription({
         id: 'default',
         status: 'active',
-        tier: 'smart' as MembershipTier,
+        tier: 'premium' as MembershipTier,
         current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         cancel_at_period_end: false
       });

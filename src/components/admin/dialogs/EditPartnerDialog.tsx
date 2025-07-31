@@ -40,25 +40,26 @@ const EditPartnerDialog = ({ open, onOpenChange, onSuccess, partnerId }: EditPar
         if (error) throw error;
         
         // Transform the data to match the form schema
+        const partnerData = data as any;
         const formattedData: PartnerFormValues = {
-          name: data.name || '',
-          first_name: data.first_name || '',
-          credentials: data.credentials || '',
-          email: data.email || '',
-          phone: data.phone || '',
-          practice_name: data.practice_name || '',
-          specialties: data.specialties || [],
-          languages: data.languages || [],
-          specializations: data.specializations || [],
-          service_area: data.service_area || '',
-          hourly_rate: data.hourly_rate || '',
-          bio: data.bio || '',
-          accepting_new_patients: data.accepting_new_patients !== false, // Default to true if undefined
-          telehealth_enabled: data.telehealth_enabled || false,
-          verified: data.verified || false,
-          slug: data.slug || '',
-          profile_image: data.profile_image || '',
-          status: data.status || 'active',
+          name: partnerData.name || '',
+          first_name: partnerData.first_name || '',
+          credentials: partnerData.credentials || '',
+          email: partnerData.email || '',
+          phone: partnerData.phone || '',
+          practice_name: partnerData.practice_name || '',
+          specialties: partnerData.specialties || [],
+          languages: partnerData.languages || [],
+          specializations: partnerData.specializations || [],
+          service_area: partnerData.service_area || '',
+          hourly_rate: partnerData.hourly_rate || '',
+          bio: partnerData.bio || '',
+          accepting_new_patients: partnerData.accepting_new_patients !== false, // Default to true if undefined
+          telehealth_enabled: partnerData.telehealth_enabled || false,
+          verified: partnerData.verified || false,
+          slug: partnerData.slug || '',
+          profile_image: partnerData.profile_image || '',
+          status: partnerData.status || 'active',
         };
         
         setPartnerData(formattedData);

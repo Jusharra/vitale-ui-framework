@@ -4,21 +4,24 @@ import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Base hook that provides the core tool access checking functionality
+ * Now simplified for single membership tier - users either have premium access or they don't
  */
 export function useToolAccess() {
   const hasToolAccess = useCallback(async (userId: string | null, toolName: string): Promise<boolean> => {
     if (!userId) return false;
     
     try {
-      // Call the check_tool_access database function
-      const { data, error } = await supabase.rpc('check_tool_access', {
-        user_id: userId,
-        tool_name: toolName
-      });
+      // Simple check - if user has premium membership, they have access to all tools
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('membership_tier')
+        .eq('id', userId)
+        .single();
       
       if (error) throw error;
       
-      return !!data;
+      // Premium members have access to all tools
+      return data?.membership_tier === 'premium';
     } catch (error) {
       console.error('Error checking tool access:', error);
       return false;

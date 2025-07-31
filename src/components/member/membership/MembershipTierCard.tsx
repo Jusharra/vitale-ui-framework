@@ -85,14 +85,14 @@ const MembershipTierCard: React.FC<MembershipTierCardProps> = ({
       </CardContent>
       <CardFooter>
         {isCurrent ? (
-          <Button variant="outline\" className="w-full\" disabled>
+          <Button variant="outline" className="w-full" disabled>
             <span>Current Plan</span>
           </Button>
         ) : (
           <StripeSubscriptionButton 
             tier={tier.id}
             buttonText={hasSubscription ? "Switch to" : "Upgrade to"}
-            variant={tier.id === "core" || tier.id === "vip" ? "default" : "outline"}
+            variant="default"
             className="w-full"
           />
         )}

@@ -128,7 +128,7 @@ const FacilityEditor: React.FC<FacilityEditorProps> = ({ facility, onSuccess }) 
       if (isEditing) {
         // Update existing facility
         const { error } = await supabase
-          .from('care_facilities')
+          .from('care_facilities' as any)
           .update(facilityData)
           .eq('id', facility.id);
 

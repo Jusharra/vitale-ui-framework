@@ -64,7 +64,7 @@ const FacilitiesList = ({ facilities, isLoading, searchTerm, refetchData }: Faci
     
     try {
       const { error } = await supabase
-        .from('care_facilities')
+        .from('care_facilities' as any)
         .delete()
         .eq('id', selectedFacilityId);
         

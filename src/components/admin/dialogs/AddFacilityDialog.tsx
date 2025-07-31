@@ -211,7 +211,7 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
 
       // Check if the care_facilities table exists
       const { error: tableCheckError } = await supabase
-        .from('care_facilities')
+        .from('care_facilities' as any)
         .select('id')
         .limit(1);
 
@@ -220,11 +220,11 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
         console.log("Creating care_facilities table");
         
         // Create the table
-        const { error: createTableError } = await supabase.rpc('create_care_facilities_table');
+        const { error: createTableError } = await supabase.rpc('create_care_facilities_table' as any);
         
         if (createTableError) {
           // If the RPC function doesn't exist, we'll try to create the table directly
-          const { error: directCreateError } = await supabase.rpc('execute_sql', {
+          const { error: directCreateError } = await supabase.rpc('execute_sql' as any, {
             sql_query: `
               CREATE TABLE IF NOT EXISTS care_facilities (
                 id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -277,7 +277,7 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
 
       // Insert the new facility to get its ID
       const { data: facilityData, error: insertError } = await supabase
-        .from('care_facilities')
+        .from('care_facilities' as any)
         .insert({
           name: values.name,
           description: values.description,
@@ -303,7 +303,7 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
 
       if (insertError) throw insertError;
       
-      const facilityId = facilityData.id;
+      const facilityId = (facilityData as any).id;
       
       // Upload all media files
       const imageUrls: string[] = [];
@@ -333,7 +333,7 @@ const AddFacilityDialog = ({ open, onOpenChange, onSuccess }: AddFacilityDialogP
       // Update the facility with the media URLs
       if (imageUrls.length > 0 || videoUrls.length > 0) {
         const { error: updateError } = await supabase
-          .from('care_facilities')
+          .from('care_facilities' as any)
           .update({
             images: imageUrls,
             videos: videoUrls,

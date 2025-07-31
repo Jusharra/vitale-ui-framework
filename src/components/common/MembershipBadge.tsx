@@ -15,9 +15,7 @@ const MembershipBadge: React.FC<MembershipBadgeProps> = ({
   className 
 }) => {
   const labels: Record<MembershipTier, string> = {
-    smart: 'Smart Access',
-    core: 'Core Concierge',
-    vip: 'VIP Executive'
+    premium: 'Premium Member'
   };
 
   const sizeClasses = {
@@ -29,9 +27,7 @@ const MembershipBadge: React.FC<MembershipBadgeProps> = ({
   return (
     <span className={cn(
       'inline-flex items-center justify-center font-medium rounded-full',
-      type === 'smart' && 'bg-membership-smart-bg text-membership-smart-text',
-      type === 'core' && 'bg-membership-core-bg text-membership-core-text',
-      type === 'vip' && 'bg-membership-vip-bg text-membership-vip-text',
+      type === 'premium' && 'bg-primary text-primary-foreground',
       sizeClasses[size],
       className
     )}>

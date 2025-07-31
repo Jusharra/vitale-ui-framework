@@ -50,14 +50,14 @@ const FacilityPagesManager = () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
-        .from('care_facilities')
+        .from('care_facilities' as any)
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       
       // Map the data to match our Facility interface
-      const mappedData = data.map(facility => ({
+      const mappedData = (data as any[]).map((facility: any) => ({
         ...facility,
         is_published: facility.status === 'active',
         featured_image: facility.image_url || '',

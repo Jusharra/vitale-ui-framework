@@ -60,7 +60,7 @@ const AdminReports = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setReports(data || []);
+      setReports((data as CallReport[]) || []);
     } catch (error: any) {
       console.error('Error fetching call reports:', error);
       toast({

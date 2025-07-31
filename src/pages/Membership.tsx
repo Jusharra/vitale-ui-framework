@@ -84,7 +84,7 @@ const Membership = () => {
                   </ul>
                   <div className="mt-8">
                     <StripeSubscriptionButton 
-                      tier="vip"
+                tier="premium"
                       buttonText="Get Started"
                       className="w-full"
                     />
@@ -145,7 +145,7 @@ const Membership = () => {
             </p>
             <div className="mt-8">
               <StripeSubscriptionButton 
-                tier="vip"
+                tier="premium"
                 buttonText="Sign Up Today"
                 size="lg"
               />
