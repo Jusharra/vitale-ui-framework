@@ -73,16 +73,8 @@ const Services = () => {
 
   // Get discount percentage based on membership tier
   const getDiscountPercentage = () => {
-    switch (membershipTier) {
-      case 'vip':
-        return 20;
-      case 'core':
-        return 15;
-      case 'smart':
-        return 10;
-      default:
-        return 0;
-    }
+    // Since we only have premium tier now, return standard discount
+    return membershipTier === 'premium' ? 15 : 0;
   };
 
   // Calculate discounted price
@@ -228,13 +220,13 @@ const Services = () => {
             </div>
           )}
 
-          {/* Membership Upgrade Banner */}
-          {membershipTier !== 'vip' && (
+          {/* Membership Banner */}
+          {membershipTier === 'premium' && (
             <div className="mt-16 bg-indigo-50 rounded-lg p-8">
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900">Upgrade for More Benefits</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Premium Membership Benefits</h2>
                 <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-                  Upgrade to VIP membership to get 20% off all services and exclusive access to premium offerings.
+                  You're enjoying 15% off all services and exclusive access to premium offerings with your Premium membership.
                 </p>
                 <Button 
                   size="lg" 

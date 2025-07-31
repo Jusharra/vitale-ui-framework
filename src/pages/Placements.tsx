@@ -141,7 +141,7 @@ const Placements = () => {
       setIsLoading(true);
       try {
         // Fetch active facilities from the database
-        const { data: facilitiesData, error: facilitiesError } = await supabase
+        const { data: facilitiesData, error: facilitiesError } = await (supabase as any)
           .from('care_facilities')
           .select('*')
           .eq('status', 'active')
@@ -155,7 +155,7 @@ const Placements = () => {
             variant: 'destructive',
           });
         } else {
-          setFacilities(facilitiesData || []);
+          setFacilities((facilitiesData as any) || []);
         }
         
         // Fetch active professionals from the database
@@ -378,21 +378,7 @@ const Placements = () => {
                         <SelectItem key={county} value={county}>{county}</SelectItem>
                       ))
                     }
-                    {selectedState === 'Arizona' && 
-                      counties.Arizona.map(county => (
-                        <SelectItem key={county} value={county}>{county}</SelectItem>
-                      ))
-                    }
-                    {selectedState === 'Nevada' && 
-                      counties.Nevada.map(county => (
-                        <SelectItem key={county} value={county}>{county}</SelectItem>
-                      ))
-                    }
-                    {selectedState === 'Florida' && 
-                      counties.Florida.map(county => (
-                        <SelectItem key={county} value={county}>{county}</SelectItem>
-                      ))
-                    }
+                    {/* Arizona, Nevada, Florida counties not implemented yet */}
                   </SelectContent>
                 </Select>
               </div>

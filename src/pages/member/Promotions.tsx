@@ -148,14 +148,7 @@ const Promotions = () => {
 
   // Get discount based on membership tier
   const getMembershipDiscount = () => {
-    switch (membershipTier) {
-      case 'vip':
-        return 20;
-      case 'core':
-        return 10;
-      default:
-        return 5;
-    }
+    return membershipTier === 'premium' ? 15 : 5;
   };
 
   return (

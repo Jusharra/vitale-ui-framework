@@ -83,7 +83,7 @@ const FacilityPage = () => {
         }
 
         // First try to fetch facility by exact slug
-        const { data: facilityData, error: facilityError } = await supabase
+        const { data: facilityData, error: facilityError } = await (supabase as any)
           .from('care_facilities')
           .select('*')
           .eq('slug', slug)
@@ -92,13 +92,13 @@ const FacilityPage = () => {
 
         // If facility is found, use it
         if (facilityData) {
-          setFacility(facilityData);
+          setFacility(facilityData as any);
           setIsLoading(false);
           return;
         }
 
         // If no facility found, try to fetch partner by slug
-        const { data: partnerData, error: partnerError } = await supabase
+        const { data: partnerData, error: partnerError } = await (supabase as any)
           .from('partners')
           .select('*')
           .eq('slug', slug)
@@ -106,7 +106,7 @@ const FacilityPage = () => {
           .maybeSingle();
 
         if (partnerData) {
-          setPartner(partnerData);
+          setPartner(partnerData as any);
           setIsLoading(false);
           return;
         }
@@ -114,7 +114,7 @@ const FacilityPage = () => {
         // If neither found, try more flexible approaches
         if (!facilityData && !partnerData) {
           // Try a more flexible facility search
-          const { data: altFacilityData, error: altFacilityError } = await supabase
+          const { data: altFacilityData, error: altFacilityError } = await (supabase as any)
             .from('care_facilities')
             .select('*')
             .eq('status', 'active')
@@ -123,13 +123,13 @@ const FacilityPage = () => {
             .maybeSingle();
             
           if (altFacilityData) {
-            setFacility(altFacilityData);
+            setFacility(altFacilityData as any);
             setIsLoading(false);
             return;
           }
           
           // Try a more flexible partner search
-          const { data: altPartnerData, error: altPartnerError } = await supabase
+          const { data: altPartnerData, error: altPartnerError } = await (supabase as any)
             .from('partners')
             .select('*')
             .eq('status', 'active')
@@ -138,7 +138,7 @@ const FacilityPage = () => {
             .maybeSingle();
             
           if (altPartnerData) {
-            setPartner(altPartnerData);
+            setPartner(altPartnerData as any);
             setIsLoading(false);
             return;
           }
