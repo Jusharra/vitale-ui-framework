@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -61,13 +62,14 @@ const AdminBlogPosts = () => {
   const fetchBlogPosts = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // Type cast the query since blog_posts might not be in the current type definitions
+      const { data, error } = await (supabase as any)
         .from('blog_posts')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setPosts(data || []);
+      setPosts((data || []) as BlogPost[]);
     } catch (error: any) {
       console.error('Error fetching blog posts:', error);
       toast({
@@ -129,7 +131,7 @@ const AdminBlogPosts = () => {
 
   const handleAddPost = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('blog_posts')
         .insert({
           title: formData.title,
@@ -186,7 +188,7 @@ const AdminBlogPosts = () => {
     if (!selectedPost) return;
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('blog_posts')
         .update({
           title: formData.title,
@@ -232,7 +234,7 @@ const AdminBlogPosts = () => {
     }
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('blog_posts')
         .delete()
         .eq('id', postId);
