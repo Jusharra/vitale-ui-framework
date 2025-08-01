@@ -68,33 +68,27 @@ serve(async (req) => {
     }
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    // Verify user has partner role
-    try {
-      const { data: profile, error: profileError } = await supabaseClient
-        .from('profiles')
-        .select('role, full_name')
-        .eq('id', user.id)
-        .single();
+    // Verify user has partner role and get profile data
+    const { data: profile, error: profileError } = await supabaseClient
+      .from('profiles')
+      .select('role, full_name')
+      .eq('id', user.id)
+      .single();
 
-      if (profileError) {
-        logStep("ERROR: Failed to fetch user profile", { error: profileError.message });
-        throw new Error(`Failed to fetch user profile: ${profileError.message}`);
-      }
-
-      if (profile?.role !== 'partner') {
-        logStep("ERROR: User does not have partner role", { 
-          userId: user.id, 
-          currentRole: profile?.role 
-        });
-        throw new Error("User does not have partner role");
-      }
-
-      logStep("User confirmed as partner", { userId: user.id, fullName: profile.full_name });
-
-    } catch (profileError) {
-      logStep("ERROR: Profile verification failed", { error: profileError.message });
-      throw new Error(`Profile verification failed: ${profileError.message}`);
+    if (profileError) {
+      logStep("ERROR: Failed to fetch user profile", { error: profileError.message });
+      throw new Error(`Failed to fetch user profile: ${profileError.message}`);
     }
+
+    if (profile?.role !== 'partner') {
+      logStep("ERROR: User does not have partner role", { 
+        userId: user.id, 
+        currentRole: profile?.role 
+      });
+      throw new Error("User does not have partner role");
+    }
+
+    logStep("User confirmed as partner", { userId: user.id, fullName: profile.full_name });
 
     // Simplified partner record lookup - use only user_id method
     let partner = null;
