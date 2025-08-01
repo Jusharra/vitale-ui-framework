@@ -69,20 +69,24 @@ serve(async (req) => {
     let assignedPartnerId = profile?.assigned_partner_id;
     let partnerStripeAccount = null;
 
-    // If user has an assigned partner, get their Stripe Connect account
+    // If user has an assigned partner, get their Stripe Connect account and platform subscription status
+    let assignedPartner = null;
     if (assignedPartnerId) {
       const { data: partner, error: partnerError } = await supabaseClient
         .from('partners')
-        .select('stripe_connect_account_id, revenue_split_percentage, revenue_split_active')
+        .select('stripe_connect_account_id, revenue_split_percentage, revenue_split_active, platform_subscription_active, full_revenue_eligible')
         .eq('id', assignedPartnerId)
         .single();
 
       if (!partnerError && partner?.stripe_connect_account_id && partner.revenue_split_active) {
+        assignedPartner = partner;
         partnerStripeAccount = partner.stripe_connect_account_id;
         logStep("Partner Stripe account found", { 
           partnerId: assignedPartnerId, 
           accountId: partnerStripeAccount,
-          revenueSplit: partner.revenue_split_percentage 
+          revenueSplit: partner.revenue_split_percentage,
+          platformSubscriptionActive: partner.platform_subscription_active,
+          fullRevenueEligible: partner.full_revenue_eligible
         });
       }
     }
@@ -100,17 +104,36 @@ serve(async (req) => {
 
     logStep("Pricing determined", priceInfo);
 
-    // Calculate revenue split if partner is involved
+    // Calculate revenue split based on partner's platform subscription status
     let applicationFeeAmount = 0;
-    if (partnerStripeAccount) {
-      const partnerRevenuePct = 70; // Default 70% to partner
-      const platformFeePct = 30;   // 30% to platform
-      applicationFeeAmount = Math.round(priceInfo.amount * (platformFeePct / 100));
-      logStep("Revenue split calculated", { 
-        total: priceInfo.amount,
-        partnerShare: priceInfo.amount - applicationFeeAmount,
-        platformShare: applicationFeeAmount
-      });
+    let partnerRevenueAmount = 0;
+    
+    if (assignedPartner && partnerStripeAccount) {
+      // Check if partner has active platform subscription for 100% revenue
+      if (assignedPartner.platform_subscription_active && assignedPartner.full_revenue_eligible) {
+        // Partner gets 100% of revenue
+        applicationFeeAmount = 0;
+        partnerRevenueAmount = priceInfo.amount;
+        
+        logStep("Full revenue share (100%) - Platform subscription active", {
+          total: priceInfo.amount,
+          platformFee: applicationFeeAmount,
+          partnerRevenue: partnerRevenueAmount,
+          partnerAccount: partnerStripeAccount
+        });
+      } else {
+        // Standard revenue split: Platform keeps 30%, partner gets 70%
+        const platformFeePct = 30;
+        applicationFeeAmount = Math.round(priceInfo.amount * (platformFeePct / 100));
+        partnerRevenueAmount = priceInfo.amount - applicationFeeAmount;
+        
+        logStep("Standard revenue split (70/30)", {
+          total: priceInfo.amount,
+          platformFee: applicationFeeAmount,
+          partnerRevenue: partnerRevenueAmount,
+          partnerAccount: partnerStripeAccount
+        });
+      }
     }
 
     // Create checkout session

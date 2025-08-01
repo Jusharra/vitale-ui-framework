@@ -59,7 +59,50 @@ serve(async (req) => {
         const session = event.data.object;
         logStep("Checkout session completed", { sessionId: session.id });
 
-        // Extract metadata
+        // Check if this is a partner platform subscription
+        if (session.metadata?.subscription_type === 'partner_platform_access') {
+          const partnerId = session.metadata?.partner_id;
+          
+          if (!partnerId) {
+            logStep("No partner ID in partner platform session metadata");
+            break;
+          }
+
+          // Get the subscription from Stripe
+          if (session.subscription) {
+            const subscription = await stripe.subscriptions.retrieve(session.subscription);
+            
+            // Update partner platform subscription in database
+            await supabaseClient.from('partner_platform_subscriptions').upsert({
+              partner_id: partnerId,
+              stripe_subscription_id: subscription.id,
+              status: subscription.status,
+              subscription_start_date: new Date().toISOString(),
+              current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+              cancel_at_period_end: subscription.cancel_at_period_end,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: 'partner_id' });
+
+            // Update partner flags
+            await supabaseClient
+              .from('partners')
+              .update({
+                platform_subscription_active: true,
+                full_revenue_eligible: true,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', partnerId);
+
+            logStep("Partner platform subscription activated", { 
+              partnerId, 
+              subscriptionId: subscription.id,
+              status: subscription.status 
+            });
+          }
+          break;
+        }
+
+        // Handle regular member subscriptions
         const userId = session.metadata?.user_id;
         const tier = session.metadata?.tier;
         const assignedPartnerId = session.metadata?.assigned_partner_id;

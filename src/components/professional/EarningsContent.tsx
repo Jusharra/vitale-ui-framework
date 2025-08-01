@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, DollarSign, WalletIcon, PiggyBank } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import PlatformSubscriptionCard from './PlatformSubscriptionCard';
 
 // Mock data
 const recentPayouts = [
@@ -32,6 +33,9 @@ const EarningsContent: React.FC = () => {
           <Button variant="outline">Download Statement</Button>
         </div>
       </div>
+
+      {/* Platform Subscription Card */}
+      <PlatformSubscriptionCard />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>

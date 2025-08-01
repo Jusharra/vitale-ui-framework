@@ -25,6 +25,11 @@ schema = "public"
 
 [[functions]]
 verify_jwt = true
+name = "create-partner-checkout"
+schema = "public"
+
+[[functions]]
+verify_jwt = true
 name = "onboard-partner"
 schema = "public"
 
