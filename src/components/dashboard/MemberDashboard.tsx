@@ -17,8 +17,8 @@ const MemberDashboard: React.FC = () => {
   // Get user name from profile or use default
   const userName = profile?.full_name || "Member";
   
-  // Use membershipTier from auth context or default to "smart"
-  const userMembership = membershipTier || "smart" as MembershipTier;
+  // Use membershipTier from auth context or default to "inactive"
+  const userMembership = membershipTier || "inactive" as MembershipTier;
   
   return (
     <div className="space-y-8">

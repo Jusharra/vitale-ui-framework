@@ -20,12 +20,16 @@ const MembershipCard: React.FC<MembershipCardProps> = ({ membershipTier }) => {
   const navigate = useNavigate();
   
   const getTierInfo = (tier: MembershipTier) => {
-    return { name: 'Premium Member', benefits: 15, used: 12, color: 'bg-gradient-to-r from-purple-600 to-blue-600' };
+    if (tier === 'premium') {
+      return { name: 'Premium Member', benefits: 15, used: 12, color: 'bg-gradient-to-r from-purple-600 to-blue-600' };
+    } else {
+      return { name: 'Inactive Member', benefits: 0, used: 0, color: 'bg-muted' };
+    }
   };
 
   const tierInfo = getTierInfo(membershipTier);
-  const usagePercentage = Math.round((tierInfo.used / tierInfo.benefits) * 100);
-  const canUpgrade = false; // No upgrades needed for premium tier
+  const usagePercentage = tierInfo.benefits > 0 ? Math.round((tierInfo.used / tierInfo.benefits) * 100) : 0;
+  const canUpgrade = membershipTier === 'inactive'; // Only show upgrade for inactive members
   
   return (
     <Card>
@@ -52,14 +56,21 @@ const MembershipCard: React.FC<MembershipCardProps> = ({ membershipTier }) => {
           )}
         </div>
 
-        <div>
-          <p className="text-sm font-medium mb-1">Benefits Used</p>
-          <Progress value={usagePercentage} className="h-2" />
-          <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-            <span>{tierInfo.used} of {tierInfo.benefits} benefits used</span>
-            <span>{usagePercentage}%</span>
+        {membershipTier === 'premium' ? (
+          <div>
+            <p className="text-sm font-medium mb-1">Benefits Used</p>
+            <Progress value={usagePercentage} className="h-2" />
+            <div className="flex justify-between mt-1 text-xs text-muted-foreground">
+              <span>{tierInfo.used} of {tierInfo.benefits} benefits used</span>
+              <span>{usagePercentage}%</span>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div>
+            <p className="text-sm text-muted-foreground">No active subscription</p>
+            <p className="text-xs text-muted-foreground mt-1">Subscribe to access premium benefits</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
