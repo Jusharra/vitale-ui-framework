@@ -5,7 +5,8 @@ import { useAuth } from '@/context/AuthContext';
 
 const ProfileSettingsPage = () => {
   const { userRole } = useAuth();
-  const layoutRole = userRole === 'partner' ? 'partner' : 'professional';
+  // Ensure we use the correct role for layout - both professional and partner should use professional layout
+  const layoutRole = (userRole === 'partner' || userRole === 'professional') ? 'professional' : 'professional';
   
   return (
     <Layout role={layoutRole}>
