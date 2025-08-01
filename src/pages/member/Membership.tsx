@@ -130,7 +130,7 @@ const Membership = () => {
       <div className="space-y-8">
         {/* Subscription Status */}
         <SubscriptionDetails 
-          profile={{...profile, membership_tier: membershipTier}}
+          profile={profile}
           isTrialing={isTrialing}
           membershipTiers={[...membershipTiers]}
           subscriptionData={adaptedSubscriptionData}
@@ -163,7 +163,7 @@ const Membership = () => {
               <MembershipTierCard 
                 key={tier.id}
                 tier={tier}
-                isCurrent={tier.id === membershipTier}
+                isCurrent={subscription && subscription.status === 'active' && tier.id === 'premium'}
                 hasSubscription={!!subscription}
               />
             ))}

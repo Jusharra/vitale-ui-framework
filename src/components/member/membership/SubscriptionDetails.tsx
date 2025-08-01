@@ -44,14 +44,14 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
             <CardTitle className="text-2xl">Your Membership</CardTitle>
             <CardDescription>Current plan and membership benefits</CardDescription>
           </div>
-          <MembershipBadge type={(profile?.membership_tier as any) || "smart"} size="lg" />
+          <MembershipBadge type={subscriptionData?.subscription ? "premium" : "inactive"} size="lg" />
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <p className="text-sm text-muted-foreground">Current Plan</p>
-            <p className="font-medium">{membershipTiers.find(t => t.id === profile?.membership_tier)?.name || 'Smart Access'}</p>
+            <p className="font-medium">{subscriptionData?.subscription ? 'Premium Membership' : 'Inactive'}</p>
           </div>
           {isTrialing && profile?.trial_end_date && (
             <div>
@@ -87,7 +87,7 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
               <CircleCheck className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
               <div>
                 <p className="font-medium text-green-800">Active Subscription</p>
-                <p className="text-sm text-green-700">Your {profile?.membership_tier} membership is currently active and will renew automatically.</p>
+                <p className="text-sm text-green-700">Your premium membership is currently active and will renew automatically.</p>
               </div>
             </div>
           </div>
