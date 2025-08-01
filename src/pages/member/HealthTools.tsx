@@ -1,7 +1,10 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import MemberPageLayout from '@/components/layout/MemberPageLayout';
 import FeatureCard from '@/components/common/FeatureCard';
+import { useAuth } from '@/context/AuthContext';
+import { useAccessCheck } from '@/hooks/useToolAccess';
 import { 
   Calendar, 
   Heart, 
@@ -16,6 +19,39 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const HealthTools = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { hasAccess } = useAccessCheck(user?.id || null, 'premium_health_tools');
+
+  // Navigation handlers for each tool
+  const handleToolClick = (toolName: string) => {
+    switch (toolName) {
+      case 'symptom_checker':
+      case 'virtual_consultation':
+      case 'specialist_referral':
+        navigate('/dashboard/appointments');
+        break;
+      case 'health_assessment':
+      case 'risk_calculator':
+      case 'vital_signs':
+      case 'health_insights':
+        navigate('/dashboard/health-insights');
+        break;
+      case 'concierge':
+        navigate('/dashboard/concierge');
+        break;
+      case 'medication_tracker':
+        navigate('/dashboard/pharmacy');
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleUpgradeClick = () => {
+    navigate('/dashboard/membership');
+  };
+
   return (
     <MemberPageLayout 
       title="Smart Health Tools" 
@@ -36,16 +72,21 @@ const HealthTools = () => {
                 title="Symptom Checker"
                 description="Check your symptoms and get recommendations"
                 icon={Thermometer}
+                onClick={() => handleToolClick('symptom_checker')}
               />
               <FeatureCard
                 title="Health Assessment"
                 description="Complete a comprehensive health assessment"
                 icon={CircleCheck}
+                onClick={() => handleToolClick('health_assessment')}
               />
               <FeatureCard
                 title="Risk Calculator"
                 description="Calculate your risk for common conditions"
                 icon={Heart}
+                locked={!hasAccess}
+                requiresUpgrade="core"
+                onClick={hasAccess ? () => handleToolClick('risk_calculator') : handleUpgradeClick}
               />
             </div>
           </div>
@@ -59,16 +100,23 @@ const HealthTools = () => {
                 title="Virtual Consultation"
                 description="Connect with a healthcare provider via video"
                 icon={MessageSquare}
+                onClick={() => handleToolClick('virtual_consultation')}
               />
               <FeatureCard
                 title="Specialist Referral"
                 description="Get referred to the right specialist quickly"
                 icon={CirclePlus}
+                locked={!hasAccess}
+                requiresUpgrade="core"
+                onClick={hasAccess ? () => handleToolClick('specialist_referral') : handleUpgradeClick}
               />
               <FeatureCard
                 title="24/7 Concierge Access"
                 description="On-demand access to healthcare concierge"
                 icon={Calendar}
+                locked={!hasAccess}
+                requiresUpgrade="core"
+                onClick={hasAccess ? () => handleToolClick('concierge') : handleUpgradeClick}
               />
             </div>
           </div>
@@ -82,16 +130,21 @@ const HealthTools = () => {
                 title="Medication Tracker"
                 description="Track and manage your medications"
                 icon={Pill}
+                onClick={() => handleToolClick('medication_tracker')}
               />
               <FeatureCard
                 title="Vital Signs Log"
                 description="Record and monitor important vital signs"
                 icon={HeartPulse}
+                locked={!hasAccess}
+                requiresUpgrade="core"
+                onClick={hasAccess ? () => handleToolClick('vital_signs') : handleUpgradeClick}
               />
               <FeatureCard
                 title="Health Insights"
                 description="Get AI-powered insights on your health data"
                 icon={Heart}
+                onClick={() => handleToolClick('health_insights')}
               />
             </div>
           </div>
@@ -111,16 +164,25 @@ const HealthTools = () => {
                 title="Risk Calculator"
                 description="Calculate your risk for common conditions"
                 icon={Heart}
+                locked={!hasAccess}
+                requiresUpgrade="core"
+                onClick={hasAccess ? () => handleToolClick('risk_calculator') : handleUpgradeClick}
               />
               <FeatureCard
                 title="Specialist Referral"
                 description="Get referred to the right specialist quickly"
                 icon={CirclePlus}
+                locked={!hasAccess}
+                requiresUpgrade="core"
+                onClick={hasAccess ? () => handleToolClick('specialist_referral') : handleUpgradeClick}
               />
               <FeatureCard
                 title="24/7 Concierge Access"
                 description="On-demand access to healthcare concierge"
                 icon={Calendar}
+                locked={!hasAccess}
+                requiresUpgrade="core"
+                onClick={hasAccess ? () => handleToolClick('concierge') : handleUpgradeClick}
               />
             </div>
           </div>
