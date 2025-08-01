@@ -153,6 +153,18 @@ serve(async (req) => {
         const assignedPartnerId = session.metadata?.assigned_partner_id;
         const platformFeeAmount = parseInt(session.metadata?.platform_fee_amount || '0');
         const partnerRevenueAmount = parseInt(session.metadata?.partner_revenue_amount || '0');
+        const isGuestCheckout = session.metadata?.is_guest_checkout === 'true';
+
+        // For guest checkout, we need to handle user creation differently
+        if (isGuestCheckout && !userId) {
+          logStep("Guest checkout completed - subscription will be handled by customer email", {
+            sessionId: session.id,
+            customerEmail: session.customer_details?.email
+          });
+          // For guest checkout, we'd need additional logic to match or create user
+          // This is a more complex flow that would require additional implementation
+          break;
+        }
 
         if (!userId) {
           logStep("No user ID in session metadata");

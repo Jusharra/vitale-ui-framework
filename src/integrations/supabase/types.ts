@@ -2473,6 +2473,7 @@ export type Database = {
           partner_revenue_amount: number | null
           platform_fee_amount: number | null
           status: string
+          stripe_customer_id: string | null
           stripe_subscription_id: string | null
           tier: string
           updated_at: string | null
@@ -2491,6 +2492,7 @@ export type Database = {
           partner_revenue_amount?: number | null
           platform_fee_amount?: number | null
           status?: string
+          stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           tier?: string
           updated_at?: string | null
@@ -2509,6 +2511,7 @@ export type Database = {
           partner_revenue_amount?: number | null
           platform_fee_amount?: number | null
           status?: string
+          stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           tier?: string
           updated_at?: string | null

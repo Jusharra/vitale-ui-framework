@@ -347,6 +347,7 @@ serve(async (req) => {
         user_id: user.id,
         status: 'pending',
         tier,
+        stripe_customer_id: customerId,
         stripe_session_id: session.id,
         additional_members_count: additionalMembers,
         assigned_partner_id: assignedPartnerId,
