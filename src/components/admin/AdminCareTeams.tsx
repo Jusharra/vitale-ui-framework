@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -8,7 +8,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Tabs, TabsList, TabsContent, TabsTrigger } from '@/components/ui/tabs';
-import { Pill, UserPlus, Ambulance, Building } from 'lucide-react';
+import { Pill, UserPlus, Ambulance, Building, Heart } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 import AddPartnerDialog from './dialogs/AddPartnerDialog';
 import AddPharmacyDialog from './dialogs/AddPharmacyDialog';
@@ -19,6 +20,7 @@ import PartnersList from './care-teams/PartnersList';
 import PharmaciesList from './care-teams/PharmaciesList';
 import TransportsList from './care-teams/TransportsList';
 import FacilitiesList from './care-teams/FacilitiesList';
+import CaregiversList from './CaregiversList';
 import { useCareTeamsData } from './care-teams/useCareTeamsData';
 
 const AdminCareTeams = () => {
@@ -28,8 +30,28 @@ const AdminCareTeams = () => {
   const [isPharmacyDialogOpen, setIsPharmacyDialogOpen] = useState(false);
   const [isTransportDialogOpen, setIsTransportDialogOpen] = useState(false);
   const [isFacilityDialogOpen, setIsFacilityDialogOpen] = useState(false);
+  const [caregivers, setCaregivers] = useState([]);
   
   const { partners, pharmacies, transports, facilities, isLoading, refetchData } = useCareTeamsData();
+
+  const fetchCaregivers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('role', 'caregiver')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setCaregivers(data || []);
+    } catch (error) {
+      console.error('Error fetching caregivers:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCaregivers();
+  }, []);
 
   const handleAddProvider = () => {
     if (activeTab === 'partners') {
@@ -74,7 +96,7 @@ const AdminCareTeams = () => {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="partners" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="partners" className="flex gap-2 items-center">
               <UserPlus className="h-4 w-4" />
               <span>Healthcare Professionals</span>
@@ -90,6 +112,10 @@ const AdminCareTeams = () => {
             <TabsTrigger value="facilities" className="flex gap-2 items-center">
               <Building className="h-4 w-4" />
               <span>Care Facilities</span>
+            </TabsTrigger>
+            <TabsTrigger value="caregivers" className="flex gap-2 items-center">
+              <Heart className="h-4 w-4" />
+              <span>Caregivers</span>
             </TabsTrigger>
           </TabsList>
 
@@ -126,6 +152,13 @@ const AdminCareTeams = () => {
               isLoading={isLoading}
               searchTerm={searchTerm}
               refetchData={refetchData}
+            />
+          </TabsContent>
+
+          <TabsContent value="caregivers" className="mt-6">
+            <CaregiversList 
+              caregivers={caregivers}
+              onRefresh={fetchCaregivers}
             />
           </TabsContent>
         </Tabs>

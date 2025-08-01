@@ -7,7 +7,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 
 interface LayoutProps {
   children: ReactNode;
-  role?: 'member' | 'admin' | 'professional' | 'partner';
+  role?: 'member' | 'admin' | 'professional' | 'partner' | 'caregiver';
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, role = 'member' }) => {

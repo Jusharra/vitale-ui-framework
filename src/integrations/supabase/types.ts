@@ -388,6 +388,47 @@ export type Database = {
           },
         ]
       }
+      caregiver_subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean | null
+          caregiver_id: string
+          created_at: string
+          current_period_end: string | null
+          id: string
+          status: string
+          stripe_subscription_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean | null
+          caregiver_id: string
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean | null
+          caregiver_id?: string
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "caregiver_subscriptions_caregiver_id_fkey"
+            columns: ["caregiver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       counties: {
         Row: {
           created_at: string | null
@@ -1575,10 +1616,14 @@ export type Database = {
       profiles: {
         Row: {
           assigned_partner_id: string | null
+          availability: Json | null
           avatar_url: string | null
+          certifications: string[] | null
           created_at: string | null
+          directory_listing: boolean | null
           first_name: string | null
           full_name: string | null
+          hourly_rate: number | null
           id: string
           last_name: string | null
           membership_tier: string | null
@@ -1587,18 +1632,25 @@ export type Database = {
           referral_reward_earned: boolean | null
           referred_count: number | null
           role: string | null
+          specialties: string[] | null
           status: string | null
           stripe_customer_id: string | null
           trial_end_date: string | null
           trial_status: string | null
           updated_at: string | null
+          vetting_status: string | null
+          years_experience: number | null
         }
         Insert: {
           assigned_partner_id?: string | null
+          availability?: Json | null
           avatar_url?: string | null
+          certifications?: string[] | null
           created_at?: string | null
+          directory_listing?: boolean | null
           first_name?: string | null
           full_name?: string | null
+          hourly_rate?: number | null
           id: string
           last_name?: string | null
           membership_tier?: string | null
@@ -1607,18 +1659,25 @@ export type Database = {
           referral_reward_earned?: boolean | null
           referred_count?: number | null
           role?: string | null
+          specialties?: string[] | null
           status?: string | null
           stripe_customer_id?: string | null
           trial_end_date?: string | null
           trial_status?: string | null
           updated_at?: string | null
+          vetting_status?: string | null
+          years_experience?: number | null
         }
         Update: {
           assigned_partner_id?: string | null
+          availability?: Json | null
           avatar_url?: string | null
+          certifications?: string[] | null
           created_at?: string | null
+          directory_listing?: boolean | null
           first_name?: string | null
           full_name?: string | null
+          hourly_rate?: number | null
           id?: string
           last_name?: string | null
           membership_tier?: string | null
@@ -1627,11 +1686,14 @@ export type Database = {
           referral_reward_earned?: boolean | null
           referred_count?: number | null
           role?: string | null
+          specialties?: string[] | null
           status?: string | null
           stripe_customer_id?: string | null
           trial_end_date?: string | null
           trial_status?: string | null
           updated_at?: string | null
+          vetting_status?: string | null
+          years_experience?: number | null
         }
         Relationships: [
           {

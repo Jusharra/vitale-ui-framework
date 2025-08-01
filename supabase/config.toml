@@ -39,6 +39,11 @@ name = "check-subscription"
 schema = "public"
 
 [[functions]]
+verify_jwt = true
+name = "create-caregiver-checkout"
+schema = "public"
+
+[[functions]]
 verify_jwt = false
 name = "handle-webhook"
 schema = "public"

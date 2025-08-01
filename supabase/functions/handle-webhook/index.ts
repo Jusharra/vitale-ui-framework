@@ -59,8 +59,11 @@ serve(async (req) => {
         const session = event.data.object;
         logStep("Checkout session completed", { sessionId: session.id });
 
-        // Check if this is a partner platform subscription
-        if (session.metadata?.subscription_type === 'partner_platform_access') {
+        // Check subscription type from metadata
+        const subscriptionType = session.metadata?.subscription_type;
+
+        // Handle partner platform subscription
+        if (subscriptionType === 'partner_platform_access') {
           const partnerId = session.metadata?.partner_id;
           
           if (!partnerId) {
@@ -95,6 +98,48 @@ serve(async (req) => {
 
             logStep("Partner platform subscription activated", { 
               partnerId, 
+              subscriptionId: subscription.id,
+              status: subscription.status 
+            });
+          }
+          break;
+        }
+
+        // Handle caregiver directory subscription
+        if (subscriptionType === 'caregiver_directory') {
+          const caregiverId = session.metadata?.user_id;
+          
+          if (!caregiverId) {
+            logStep("No caregiver ID in caregiver subscription metadata");
+            break;
+          }
+
+          // Get the subscription from Stripe
+          if (session.subscription) {
+            const subscription = await stripe.subscriptions.retrieve(session.subscription);
+            
+            // Create caregiver subscription record
+            await supabaseClient.from('caregiver_subscriptions').upsert({
+              caregiver_id: caregiverId,
+              stripe_subscription_id: subscription.id,
+              status: subscription.status,
+              current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+              cancel_at_period_end: subscription.cancel_at_period_end,
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'caregiver_id' });
+
+            // Enable directory listing for caregiver
+            await supabaseClient
+              .from('profiles')
+              .update({ 
+                directory_listing: true,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', caregiverId)
+              .eq('role', 'caregiver');
+
+            logStep("Caregiver directory subscription activated", { 
+              caregiverId, 
               subscriptionId: subscription.id,
               status: subscription.status 
             });
@@ -162,28 +207,64 @@ serve(async (req) => {
         const subscription = event.data.object;
         logStep("Subscription updated", { subscriptionId: subscription.id });
 
-        // Find user by customer ID
-        const { data: existingSub } = await supabaseClient
-          .from('subscriptions')
-          .select('user_id, assigned_partner_id')
-          .eq('stripe_customer_id', subscription.customer)
+        // Check if this is a caregiver subscription
+        const { data: caregiverSub } = await supabaseClient
+          .from('caregiver_subscriptions')
+          .select('caregiver_id')
+          .eq('stripe_subscription_id', subscription.id)
           .single();
 
-        if (existingSub) {
+        if (caregiverSub) {
+          // Update caregiver subscription
           await supabaseClient
-            .from('subscriptions')
+            .from('caregiver_subscriptions')
             .update({
               status: subscription.status,
               current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
               cancel_at_period_end: subscription.cancel_at_period_end,
-              updated_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
             })
-            .eq('user_id', existingSub.user_id);
+            .eq('stripe_subscription_id', subscription.id);
 
-          logStep("Subscription status updated", { 
-            userId: existingSub.user_id,
+          // If subscription is cancelled or past due, disable directory listing
+          if (subscription.status === 'canceled' || subscription.status === 'past_due') {
+            await supabaseClient
+              .from('profiles')
+              .update({ 
+                directory_listing: false,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', caregiverSub.caregiver_id);
+          }
+
+          logStep("Caregiver subscription updated", { 
+            caregiverId: caregiverSub.caregiver_id,
             status: subscription.status 
           });
+        } else {
+          // Handle regular member subscriptions
+          const { data: existingSub } = await supabaseClient
+            .from('subscriptions')
+            .select('user_id, assigned_partner_id')
+            .eq('stripe_customer_id', subscription.customer)
+            .single();
+
+          if (existingSub) {
+            await supabaseClient
+              .from('subscriptions')
+              .update({
+                status: subscription.status,
+                current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+                cancel_at_period_end: subscription.cancel_at_period_end,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('user_id', existingSub.user_id);
+
+            logStep("Subscription status updated", { 
+              userId: existingSub.user_id,
+              status: subscription.status 
+            });
+          }
         }
         break;
       }
@@ -192,23 +273,52 @@ serve(async (req) => {
         const subscription = event.data.object;
         logStep("Subscription cancelled", { subscriptionId: subscription.id });
 
-        // Find user by customer ID
-        const { data: existingSub } = await supabaseClient
-          .from('subscriptions')
-          .select('user_id')
-          .eq('stripe_customer_id', subscription.customer)
+        // Check if this is a caregiver subscription
+        const { data: caregiverSub } = await supabaseClient
+          .from('caregiver_subscriptions')
+          .select('caregiver_id')
+          .eq('stripe_subscription_id', subscription.id)
           .single();
 
-        if (existingSub) {
+        if (caregiverSub) {
+          // Cancel caregiver subscription and disable directory listing
           await supabaseClient
-            .from('subscriptions')
+            .from('caregiver_subscriptions')
             .update({
               status: 'cancelled',
-              updated_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
             })
-            .eq('user_id', existingSub.user_id);
+            .eq('stripe_subscription_id', subscription.id);
 
-          logStep("Subscription marked as cancelled", { userId: existingSub.user_id });
+          // Disable directory listing
+          await supabaseClient
+            .from('profiles')
+            .update({ 
+              directory_listing: false,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', caregiverSub.caregiver_id);
+
+          logStep("Caregiver subscription cancelled", { caregiverId: caregiverSub.caregiver_id });
+        } else {
+          // Handle regular member subscriptions
+          const { data: existingSub } = await supabaseClient
+            .from('subscriptions')
+            .select('user_id')
+            .eq('stripe_customer_id', subscription.customer)
+            .single();
+
+          if (existingSub) {
+            await supabaseClient
+              .from('subscriptions')
+              .update({
+                status: 'cancelled',
+                updated_at: new Date().toISOString(),
+              })
+              .eq('user_id', existingSub.user_id);
+
+            logStep("Subscription marked as cancelled", { userId: existingSub.user_id });
+          }
         }
         break;
       }

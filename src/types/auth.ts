@@ -1,6 +1,6 @@
 import { User, Session } from '@supabase/supabase-js';
 
-export type UserRole = 'member' | 'admin' | 'professional' | 'partner';
+export type UserRole = 'member' | 'admin' | 'professional' | 'partner' | 'caregiver';
 
 export interface UserProfile {
   id: string;
@@ -9,6 +9,18 @@ export interface UserProfile {
   role: UserRole;
   phone?: string;
   avatar_url?: string;
+  // Caregiver-specific fields
+  vetting_status?: 'pending' | 'approved' | 'rejected';
+  directory_listing?: boolean;
+  specialties?: string[];
+  hourly_rate?: number;
+  years_experience?: number;
+  certifications?: string[];
+  availability?: {
+    days: string[];
+    hours: string;
+  };
+  bio?: string;
 }
 
 export type MembershipTier = 'premium';
