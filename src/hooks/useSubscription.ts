@@ -48,7 +48,14 @@ export function useSubscription(userId: string | null) {
           .eq('user_id', userId)
           .maybeSingle();
         
-        if (dbError || !dbData) {
+        if (dbError) {
+          console.error("Database subscription check error:", dbError);
+          setSubscription(null);
+          setIsTrialing(false);
+          return;
+        }
+        
+        if (!dbData) {
           // No subscription found - set to null to show proper subscription prompt
           setSubscription(null);
           setIsTrialing(false);
@@ -59,8 +66,8 @@ export function useSubscription(userId: string | null) {
           id: dbData.id,
           status: dbData.status,
           tier: dbData.tier as MembershipTier,
-          current_period_end: dbData.current_period_end,
-          cancel_at_period_end: dbData.cancel_at_period_end
+          current_period_end: dbData.current_period_end || new Date().toISOString(),
+          cancel_at_period_end: dbData.cancel_at_period_end || false
         };
         
         setSubscription(subscriptionData);

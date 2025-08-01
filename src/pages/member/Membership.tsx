@@ -29,20 +29,59 @@ const Membership = () => {
   // Check subscription status on initial load only
   useEffect(() => {
     const checkSubscription = async () => {
-      if (!isAuthenticated) return;
+      if (!isAuthenticated) {
+        setIsLoading(false);
+        return;
+      }
       
       setIsLoading(true);
       try {
+        // Try database first for faster response
+        const { data: dbData, error: dbError } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', profile?.id)
+          .maybeSingle();
+        
+        if (!dbError && dbData) {
+          setSubscriptionData({
+            subscribed: dbData.status === 'active',
+            subscription_tier: dbData.tier,
+            subscription_end: dbData.current_period_end,
+            assigned_partner: dbData.assigned_partner_id,
+          });
+          setIsLoading(false);
+          return;
+        }
+        
+        // Fallback to edge function
         const { data, error } = await supabase.functions.invoke('check-subscription');
         
-        if (error) throw error;
-        setSubscriptionData(data);
+        if (error) {
+          console.warn('Edge function error, using fallback:', error);
+          // Set fallback data to prevent infinite loading
+          setSubscriptionData({
+            subscribed: false,
+            subscription_tier: null,
+            subscription_end: null,
+            assigned_partner: null,
+          });
+        } else {
+          setSubscriptionData(data);
+        }
         
         // Refresh auth context subscription data as well
         await refreshSubscription();
         
       } catch (error) {
         console.error('Error checking subscription:', error);
+        // Set fallback data to prevent infinite loading
+        setSubscriptionData({
+          subscribed: false,
+          subscription_tier: null,
+          subscription_end: null,
+          assigned_partner: null,
+        });
         toast({
           title: t('common.error'),
           description: t('membership.errorFetchingSubscription'),
@@ -53,8 +92,13 @@ const Membership = () => {
       }
     };
     
-    checkSubscription();
-  }, [isAuthenticated, refreshSubscription, t, toast]);
+    if (profile?.id) {
+      checkSubscription();
+    } else if (isAuthenticated) {
+      // If authenticated but no profile yet, still set loading to false
+      setIsLoading(false);
+    }
+  }, [isAuthenticated, profile?.id, refreshSubscription, t, toast]);
 
   // When the user comes from an upgrade required redirect
   useEffect(() => {
