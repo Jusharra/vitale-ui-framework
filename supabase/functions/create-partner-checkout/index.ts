@@ -43,24 +43,42 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    // Check if user is a partner - query by user_id field first
-    let { data: partner, error: partnerError } = await supabaseClient
+    // Check if user has partner role first
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('role, full_name')
+      .eq('id', user.id)
+      .single();
+
+    if (profile?.role !== 'partner') {
+      throw new Error("User does not have partner role");
+    }
+
+    logStep("User confirmed as partner", { userId: user.id, fullName: profile.full_name });
+
+    // Try to find existing partner record by multiple methods
+    let partner = null;
+    let partnerError = null;
+
+    // Method 1: Query by user_id field (text format)
+    const { data: partnerByUserId } = await supabaseClient
       .from('partners')
       .select('id, name, email, stripe_connect_account_id, user_id')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
-    // If not found by user_id, try by id (fallback for existing data)
-    if (partnerError && partnerError.code === 'PGRST116') {
-      logStep("Partner not found by user_id, trying by id", { userId: user.id });
-      
-      const { data: partnerById, error: partnerByIdError } = await supabaseClient
+    if (partnerByUserId) {
+      partner = partnerByUserId;
+      logStep("Partner found by user_id", { partnerId: partner.id });
+    } else {
+      // Method 2: Query by id (UUID format) - fallback for existing data
+      const { data: partnerById } = await supabaseClient
         .from('partners')
         .select('id, name, email, stripe_connect_account_id, user_id')
         .eq('id', user.id)
-        .single();
-      
-      if (!partnerByIdError && partnerById) {
+        .maybeSingle();
+
+      if (partnerById) {
         // Update the user_id field for this partner record to fix future lookups
         const { error: updateError } = await supabaseClient
           .from('partners')
@@ -70,44 +88,33 @@ serve(async (req) => {
         if (!updateError) {
           logStep("Updated partner record with user_id", { partnerId: partnerById.id });
           partner = partnerById;
-          partnerError = null;
         } else {
           logStep("Failed to update partner user_id", { error: updateError });
         }
       }
     }
 
-    // Final check - if still no partner found, check if user has partner role but no partner record
-    if (partnerError || !partner) {
-      const { data: profile } = await supabaseClient
-        .from('profiles')
-        .select('role, full_name')
-        .eq('id', user.id)
+    // Method 3: If no partner record exists, create one
+    if (!partner) {
+      logStep("Creating new partner record", { userId: user.id });
+      
+      const { data: newPartner, error: createError } = await supabaseClient
+        .from('partners')
+        .insert({
+          user_id: user.id,
+          name: profile.full_name || user.email?.split('@')[0] || 'Partner',
+          email: user.email,
+          status: 'pending'
+        })
+        .select('id, name, email, stripe_connect_account_id, user_id')
         .single();
 
-      if (profile?.role === 'partner') {
-        // User has partner role but no partner record - create one
-        logStep("Creating partner record for user with partner role", { userId: user.id });
-        
-        const { data: newPartner, error: createError } = await supabaseClient
-          .from('partners')
-          .insert({
-            id: user.id,
-            user_id: user.id,
-            name: profile.full_name || user.email?.split('@')[0] || 'Partner',
-            email: user.email,
-            status: 'active'
-          })
-          .select('id, name, email, stripe_connect_account_id, user_id')
-          .single();
-
-        if (!createError && newPartner) {
-          partner = newPartner;
-          partnerError = null;
-          logStep("Created new partner record", { partnerId: newPartner.id });
-        } else {
-          logStep("Failed to create partner record", { error: createError });
-        }
+      if (!createError && newPartner) {
+        partner = newPartner;
+        logStep("Created new partner record", { partnerId: newPartner.id });
+      } else {
+        logStep("Failed to create partner record", { error: createError });
+        partnerError = createError;
       }
     }
 

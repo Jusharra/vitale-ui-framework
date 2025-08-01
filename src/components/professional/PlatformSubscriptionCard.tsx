@@ -77,14 +77,23 @@ const PlatformSubscriptionCard = () => {
       
       if (error) throw error;
       
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+      
       if (data?.url) {
         window.open(data.url, '_blank');
+      } else {
+        throw new Error('No checkout URL received');
       }
     } catch (error) {
       console.error('Error creating checkout session:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create checkout session';
       toast({
-        title: "Error",
-        description: "Failed to create checkout session. Please try again.",
+        title: "Upgrade Error",
+        description: errorMessage.includes('partner role') 
+          ? "Please ensure your profile is set up as a partner"
+          : errorMessage,
         variant: "destructive",
       });
     } finally {
