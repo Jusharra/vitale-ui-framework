@@ -1154,6 +1154,56 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_platform_subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean | null
+          created_at: string
+          current_period_end: string | null
+          id: string
+          partner_id: string
+          status: string
+          stripe_subscription_id: string | null
+          subscription_start_date: string | null
+          trial_end_date: string
+          trial_start_date: string
+          updated_at: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean | null
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          partner_id: string
+          status?: string
+          stripe_subscription_id?: string | null
+          subscription_start_date?: string | null
+          trial_end_date?: string
+          trial_start_date?: string
+          updated_at?: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean | null
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          partner_id?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          subscription_start_date?: string | null
+          trial_end_date?: string
+          trial_start_date?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_platform_subscriptions_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partner_trials: {
         Row: {
           conversion_date: string | null
@@ -1217,6 +1267,7 @@ export type Database = {
           email: string | null
           facebook_url: string | null
           first_name: string | null
+          full_revenue_eligible: boolean | null
           hourly_rate: string | null
           id: string
           in_person_consultation: boolean | null
@@ -1225,6 +1276,8 @@ export type Database = {
           linkedin_url: string | null
           name: string
           phone: string | null
+          platform_subscription_active: boolean | null
+          platform_trial_ends_at: string | null
           practice_address: Json | null
           practice_name: string | null
           profile_image: string | null
@@ -1257,6 +1310,7 @@ export type Database = {
           email?: string | null
           facebook_url?: string | null
           first_name?: string | null
+          full_revenue_eligible?: boolean | null
           hourly_rate?: string | null
           id?: string
           in_person_consultation?: boolean | null
@@ -1265,6 +1319,8 @@ export type Database = {
           linkedin_url?: string | null
           name: string
           phone?: string | null
+          platform_subscription_active?: boolean | null
+          platform_trial_ends_at?: string | null
           practice_address?: Json | null
           practice_name?: string | null
           profile_image?: string | null
@@ -1297,6 +1353,7 @@ export type Database = {
           email?: string | null
           facebook_url?: string | null
           first_name?: string | null
+          full_revenue_eligible?: boolean | null
           hourly_rate?: string | null
           id?: string
           in_person_consultation?: boolean | null
@@ -1305,6 +1362,8 @@ export type Database = {
           linkedin_url?: string | null
           name?: string
           phone?: string | null
+          platform_subscription_active?: boolean | null
+          platform_trial_ends_at?: string | null
           practice_address?: Json | null
           practice_name?: string | null
           profile_image?: string | null
