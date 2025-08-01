@@ -7,33 +7,21 @@ import { CircleCheck, Calendar, Loader2 } from 'lucide-react';
 import MembershipBadge from '@/components/common/MembershipBadge';
 import { supabase } from '@/integrations/supabase/client';
 
-interface UserProfile {
-  id: string;
-  membership_tier?: string;
-  trial_end_date?: string;
-}
-
-interface SubscriptionData {
-  subscription?: {
-    current_period_end: number;
-    status: string;
-    cancel_at_period_end: boolean;
-  };
-}
+import { Subscription, MembershipTier, UserProfile } from '@/types/auth';
 
 interface SubscriptionDetailsProps {
   profile: UserProfile | null;
   isTrialing: boolean;
-  membershipTiers: any[];
-  subscriptionData: SubscriptionData | null;
+  subscription: Subscription | null;
+  membershipTier: MembershipTier | null;
   isLoading: boolean;
 }
 
 const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({ 
   profile, 
   isTrialing, 
-  membershipTiers,
-  subscriptionData,
+  subscription,
+  membershipTier,
   isLoading 
 }) => {
   return (
@@ -44,23 +32,23 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
             <CardTitle className="text-2xl">Your Membership</CardTitle>
             <CardDescription>Current plan and membership benefits</CardDescription>
           </div>
-          <MembershipBadge type={subscriptionData?.subscription ? "premium" : "inactive"} size="lg" />
+          <MembershipBadge type={membershipTier || "inactive"} size="lg" />
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <p className="text-sm text-muted-foreground">Current Plan</p>
-            <p className="font-medium">{subscriptionData?.subscription ? 'Premium Membership' : 'Inactive'}</p>
+            <p className="font-medium">{membershipTier === 'premium' ? 'Premium Membership' : 'Inactive'}</p>
           </div>
-          {isTrialing && profile?.trial_end_date && (
+          {isTrialing && (
             <div>
-              <p className="text-sm text-muted-foreground">Trial Ends On</p>
-              <p className="font-medium">{new Date(profile.trial_end_date).toLocaleDateString()}</p>
+              <p className="text-sm text-muted-foreground">Trial Status</p>
+              <p className="font-medium">Active Trial</p>
               <Badge variant="outline" className="mt-1">Trial Active</Badge>
             </div>
           )}
-          {subscriptionData?.subscription && (
+          {subscription && (
             <>
               <div>
                 <p className="text-sm text-muted-foreground">Billing Cycle</p>
@@ -68,7 +56,12 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Next Billing Date</p>
-                <p className="font-medium">{new Date(subscriptionData.subscription.current_period_end * 1000).toLocaleDateString()}</p>
+                <p className="font-medium">
+                  {new Date(typeof subscription.current_period_end === 'string' 
+                    ? subscription.current_period_end 
+                    : subscription.current_period_end * 1000
+                  ).toLocaleDateString()}
+                </p>
               </div>
             </>
           )}
@@ -81,7 +74,7 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
           </div>
         )}
         
-        {!isLoading && subscriptionData?.subscription && (
+        {!isLoading && subscription && (
           <div className="bg-green-50 border border-green-200 rounded-md p-4 mt-4">
             <div className="flex">
               <CircleCheck className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
@@ -93,7 +86,7 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
           </div>
         )}
         
-        {!isLoading && isTrialing && !subscriptionData?.subscription && (
+        {!isLoading && isTrialing && !subscription && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mt-4">
             <div className="flex">
               <Calendar className="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0" />
@@ -106,7 +99,7 @@ const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
         )}
       </CardContent>
       <CardFooter className="flex flex-col md:flex-row gap-2">
-        {subscriptionData?.subscription ? (
+        {subscription ? (
           <Button variant="outline" onClick={async () => {
             try {
               const { data } = await supabase.functions.invoke('customer-portal');

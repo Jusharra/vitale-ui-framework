@@ -1,7 +1,6 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import MemberPageLayout from '@/components/layout/MemberPageLayout';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -17,87 +16,11 @@ import PaymentHistory from '@/components/member/membership/PaymentHistory';
 import { membershipTiers } from '@/components/member/membership/membershipData';
 
 const Membership = () => {
-  const { profile, isTrialing, isAuthenticated, refreshSubscription, membershipTier, subscription } = useAuth();
-  const [subscriptionData, setSubscriptionData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { profile, isTrialing, membershipTier, subscription, isLoading } = useAuth();
   const location = useLocation();
   const { toast } = useToast();
   const { t } = useTranslation();
   const upgradeRequired = location.state?.upgradeRequired;
-
-  // Check subscription status on initial load only
-  useEffect(() => {
-    const checkSubscription = async () => {
-      if (!isAuthenticated) {
-        setIsLoading(false);
-        return;
-      }
-      
-      setIsLoading(true);
-      try {
-        // Try database first for faster response
-        const { data: dbData, error: dbError } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', profile?.id)
-          .maybeSingle();
-        
-        if (!dbError && dbData) {
-          setSubscriptionData({
-            subscribed: dbData.status === 'active',
-            subscription_tier: dbData.tier,
-            subscription_end: dbData.current_period_end,
-            assigned_partner: dbData.assigned_partner_id,
-          });
-          setIsLoading(false);
-          return;
-        }
-        
-        // Fallback to edge function
-        const { data, error } = await supabase.functions.invoke('check-subscription');
-        
-        if (error) {
-          console.warn('Edge function error, using fallback:', error);
-          // Set fallback data to prevent infinite loading
-          setSubscriptionData({
-            subscribed: false,
-            subscription_tier: null,
-            subscription_end: null,
-            assigned_partner: null,
-          });
-        } else {
-          setSubscriptionData(data);
-        }
-        
-        // Refresh auth context subscription data as well
-        await refreshSubscription();
-        
-      } catch (error) {
-        console.error('Error checking subscription:', error);
-        // Set fallback data to prevent infinite loading
-        setSubscriptionData({
-          subscribed: false,
-          subscription_tier: null,
-          subscription_end: null,
-          assigned_partner: null,
-        });
-        toast({
-          title: t('common.error'),
-          description: t('membership.errorFetchingSubscription'),
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    if (profile?.id) {
-      checkSubscription();
-    } else if (isAuthenticated) {
-      // If authenticated but no profile yet, still set loading to false
-      setIsLoading(false);
-    }
-  }, [isAuthenticated, profile?.id, refreshSubscription, t, toast]);
 
   // When the user comes from an upgrade required redirect
   useEffect(() => {
@@ -110,18 +33,6 @@ const Membership = () => {
     }
   }, [upgradeRequired, t, toast]);
 
-  // Adapt subscription data to match expected format in subcomponents
-  // Convert current_period_end to a number if it's a string
-  const adaptedSubscriptionData = {
-    subscription: subscription ? {
-      current_period_end: typeof subscription.current_period_end === 'string' 
-        ? Math.floor(new Date(subscription.current_period_end).getTime() / 1000) // Convert string date to UNIX timestamp
-        : subscription.current_period_end,
-      status: subscription.status,
-      cancel_at_period_end: subscription.cancel_at_period_end
-    } : null
-  };
-
   return (
     <MemberPageLayout 
       title={t('membership.tier')} 
@@ -132,8 +43,8 @@ const Membership = () => {
         <SubscriptionDetails 
           profile={profile}
           isTrialing={isTrialing}
-          membershipTiers={[...membershipTiers]}
-          subscriptionData={adaptedSubscriptionData}
+          subscription={subscription}
+          membershipTier={membershipTier}
           isLoading={isLoading}
         />
         
@@ -163,7 +74,7 @@ const Membership = () => {
               <MembershipTierCard 
                 key={tier.id}
                 tier={tier}
-                isCurrent={subscription && subscription.status === 'active' && tier.id === 'premium'}
+                isCurrent={membershipTier === 'premium' && tier.id === 'premium'}
                 hasSubscription={!!subscription}
               />
             ))}
@@ -175,7 +86,7 @@ const Membership = () => {
           <div className="space-y-6">
             <BillingInformation 
               isLoading={isLoading} 
-              subscriptionData={adaptedSubscriptionData} 
+              subscription={subscription} 
             />
             
             <PaymentHistory 
