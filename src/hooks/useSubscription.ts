@@ -36,58 +36,59 @@ export function useSubscription(userId: string | null) {
     try {
       setIsLoading(true);
       
-      // Query subscriptions table for the user
-      const { data, error } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle(); // Changed from single() to maybeSingle() to handle zero rows
+      // Use enhanced check-subscription edge function
+      const { data, error } = await supabase.functions.invoke('check-subscription');
       
       if (error) {
-        console.log("No subscription found in database, generating dummy data");
-        // Generate deterministic dummy data based on user ID
-        const userIdSum = userId.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+        console.log("Error checking subscription via edge function:", error);
+        // Fallback to local database check
+        const { data: dbData, error: dbError } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle();
         
-        // Single tier system - all subscribed users get premium
-        const dummyTier: MembershipTier = 'premium';
+        if (dbError || !dbData) {
+          // Default subscription for users without records
+          setSubscription({
+            id: 'default',
+            status: 'active',
+            tier: 'premium' as MembershipTier,
+            current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            cancel_at_period_end: false
+          });
+          setIsTrialing(false);
+          return;
+        }
         
-        // Set trial status for some users
-        const isInTrial = userIdSum % 5 === 0;
-        
-        // Create a subscription object with the dummy data
-        const dummySubscription: Subscription = {
-          id: `dummy-${userId.substring(0, 8)}`,
-          status: isInTrial ? 'trialing' : 'active',
-          tier: dummyTier,
-          current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          cancel_at_period_end: userIdSum % 7 === 0 // some users will have cancellation pending
-        };
-        
-        setSubscription(dummySubscription);
-        setIsTrialing(isInTrial);
-        return;
-      }
-      
-      if (data) {
         const subscriptionData: Subscription = {
-          id: data.id,
-          status: data.status,
-          tier: data.tier as MembershipTier,
-          current_period_end: data.current_period_end,
-          cancel_at_period_end: data.cancel_at_period_end
+          id: dbData.id,
+          status: dbData.status,
+          tier: dbData.tier as MembershipTier,
+          current_period_end: dbData.current_period_end,
+          cancel_at_period_end: dbData.cancel_at_period_end
         };
         
         setSubscription(subscriptionData);
-        setIsTrialing(data.status === 'trialing');
-      } else {
-        // Default subscription for users
-        setSubscription({
-          id: 'default',
+        setIsTrialing(dbData.status === 'trialing');
+        return;
+      }
+      
+      // Handle edge function response
+      if (data.subscribed) {
+        const subscriptionData: Subscription = {
+          id: 'stripe-subscription',
           status: 'active',
-          tier: 'premium' as MembershipTier,
-          current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          cancel_at_period_end: false
-        });
+          tier: data.subscription_tier as MembershipTier,
+          current_period_end: data.subscription_end,
+          cancel_at_period_end: data.cancel_at_period_end || false
+        };
+        
+        setSubscription(subscriptionData);
+        setIsTrialing(data.trial_status?.trial_status === 'active');
+      } else {
+        // No active subscription
+        setSubscription(null);
         setIsTrialing(false);
       }
     } catch (error) {

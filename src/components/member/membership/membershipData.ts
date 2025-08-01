@@ -6,11 +6,11 @@ import { MembershipTierData } from '@/components/member/membership/MembershipTie
 export const membershipTiers: MembershipTierData[] = [
   {
     id: 'premium' as MembershipTier,
-    name: 'Premium Membership',
-    description: 'Complete healthcare access with all premium features included',
-    price: '$29.99',
+    name: 'Vitalé Premium Membership',
+    description: 'Elite healthcare concierge with dedicated physician partnership and comprehensive wellness services',
+    price: '$1,297',
     interval: 'month',
-    yearlyPrice: '$299.99',
+    yearlyPrice: '$15,564',
     features: [
       'Complete health tracking and insights',
       'Unlimited telehealth consultations',

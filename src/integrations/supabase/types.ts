@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.3 (519615d)"
+  }
   public: {
     Tables: {
       ai_feedback: {
@@ -97,6 +102,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      blog_posts: {
+        Row: {
+          author_id: string | null
+          category: string | null
+          content: string
+          created_at: string | null
+          excerpt: string | null
+          featured_image: string | null
+          id: string
+          meta_description: string | null
+          meta_title: string | null
+          published_at: string | null
+          slug: string
+          status: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          category?: string | null
+          content: string
+          created_at?: string | null
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          published_at?: string | null
+          slug: string
+          status?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          category?: string | null
+          content?: string
+          created_at?: string | null
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          published_at?: string | null
+          slug?: string
+          status?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       call_reports: {
         Row: {
@@ -190,6 +246,84 @@ export type Database = {
         }
         Relationships: []
       }
+      care_facilities: {
+        Row: {
+          amenities: string[] | null
+          care_type: string
+          created_at: string | null
+          description: string | null
+          email: string | null
+          featured: boolean | null
+          hours: string | null
+          id: string
+          image_url: string | null
+          images: string[] | null
+          location: string
+          name: string
+          phone: string | null
+          price_range: string
+          seo_keywords: string[] | null
+          services: string[] | null
+          slug: string | null
+          spots_available: number | null
+          status: string | null
+          updated_at: string | null
+          videos: string[] | null
+          virtual_tour_url: string | null
+          website: string | null
+        }
+        Insert: {
+          amenities?: string[] | null
+          care_type: string
+          created_at?: string | null
+          description?: string | null
+          email?: string | null
+          featured?: boolean | null
+          hours?: string | null
+          id?: string
+          image_url?: string | null
+          images?: string[] | null
+          location: string
+          name: string
+          phone?: string | null
+          price_range: string
+          seo_keywords?: string[] | null
+          services?: string[] | null
+          slug?: string | null
+          spots_available?: number | null
+          status?: string | null
+          updated_at?: string | null
+          videos?: string[] | null
+          virtual_tour_url?: string | null
+          website?: string | null
+        }
+        Update: {
+          amenities?: string[] | null
+          care_type?: string
+          created_at?: string | null
+          description?: string | null
+          email?: string | null
+          featured?: boolean | null
+          hours?: string | null
+          id?: string
+          image_url?: string | null
+          images?: string[] | null
+          location?: string
+          name?: string
+          phone?: string | null
+          price_range?: string
+          seo_keywords?: string[] | null
+          services?: string[] | null
+          slug?: string | null
+          spots_available?: number | null
+          status?: string | null
+          updated_at?: string | null
+          videos?: string[] | null
+          virtual_tour_url?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       care_team_members: {
         Row: {
           created_at: string | null
@@ -254,31 +388,79 @@ export type Database = {
           },
         ]
       }
-      clerk_user_mapping: {
+      counties: {
         Row: {
-          Created_Clerk_User: string | null
+          created_at: string | null
+          description: string | null
           id: string
-          profile_id: string | null
+          name: string
+          state: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          state: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          state?: string
+        }
+        Relationships: []
+      }
+      facility_tours: {
+        Row: {
+          created_at: string | null
+          email: string
+          facility_id: string | null
+          full_name: string
+          id: string
+          notes: string | null
+          phone: string
+          status: string
+          tour_date: string
+          tour_type: string
+          updated_at: string | null
           user_id: string | null
         }
         Insert: {
-          Created_Clerk_User?: string | null
-          id: string
-          profile_id?: string | null
+          created_at?: string | null
+          email: string
+          facility_id?: string | null
+          full_name: string
+          id?: string
+          notes?: string | null
+          phone: string
+          status?: string
+          tour_date: string
+          tour_type: string
+          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
-          Created_Clerk_User?: string | null
+          created_at?: string | null
+          email?: string
+          facility_id?: string | null
+          full_name?: string
           id?: string
-          profile_id?: string | null
+          notes?: string | null
+          phone?: string
+          status?: string
+          tour_date?: string
+          tour_type?: string
+          updated_at?: string | null
           user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "clerk_user_mapping_profile_id_fkey"
-            columns: ["profile_id"]
+            foreignKeyName: "facility_tours_facility_id_fkey"
+            columns: ["facility_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "care_facilities"
             referencedColumns: ["id"]
           },
         ]
@@ -970,12 +1152,55 @@ export type Database = {
           stripe_payout_id?: string | null
           updated_at?: string | null
         }
+        Relationships: []
+      }
+      partner_trials: {
+        Row: {
+          conversion_date: string | null
+          created_at: string | null
+          id: string
+          partner_id: string
+          profile_id: string
+          trial_end_date: string
+          trial_start_date: string
+          trial_status: string
+          updated_at: string | null
+        }
+        Insert: {
+          conversion_date?: string | null
+          created_at?: string | null
+          id?: string
+          partner_id: string
+          profile_id: string
+          trial_end_date?: string
+          trial_start_date?: string
+          trial_status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          conversion_date?: string | null
+          created_at?: string | null
+          id?: string
+          partner_id?: string
+          profile_id?: string
+          trial_end_date?: string
+          trial_start_date?: string
+          trial_status?: string
+          updated_at?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "partner_payouts_partner_id_fkey"
+            foreignKeyName: "partner_trials_partner_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_trials_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -984,71 +1209,194 @@ export type Database = {
         Row: {
           accepting_new_patients: boolean | null
           bio: string | null
+          connect_onboarding_complete: boolean | null
           consultation_fee: number | null
           created_at: string | null
+          credentials: string | null
           doxy_room_url: string | null
           email: string | null
+          facebook_url: string | null
+          first_name: string | null
+          hourly_rate: string | null
           id: string
           in_person_consultation: boolean | null
+          instagram_url: string | null
+          languages: string[] | null
+          linkedin_url: string | null
           name: string
           phone: string | null
           practice_address: Json | null
           practice_name: string | null
           profile_image: string | null
           rating: number | null
+          revenue_split_active: boolean | null
+          revenue_split_percentage: number | null
+          service_area: string | null
+          slug: string | null
+          specializations: string[] | null
           specialties: string[] | null
           status: string | null
+          stripe_connect_account_id: string | null
           telehealth_enabled: boolean | null
+          tiktok_url: string | null
           user_id: string | null
           vacation_mode: boolean | null
+          verified: boolean | null
           video_consultation: boolean | null
           virtual_appointment_preferences: Json | null
+          youtube_url: string | null
         }
         Insert: {
           accepting_new_patients?: boolean | null
           bio?: string | null
+          connect_onboarding_complete?: boolean | null
           consultation_fee?: number | null
           created_at?: string | null
+          credentials?: string | null
           doxy_room_url?: string | null
           email?: string | null
+          facebook_url?: string | null
+          first_name?: string | null
+          hourly_rate?: string | null
           id?: string
           in_person_consultation?: boolean | null
+          instagram_url?: string | null
+          languages?: string[] | null
+          linkedin_url?: string | null
           name: string
           phone?: string | null
           practice_address?: Json | null
           practice_name?: string | null
           profile_image?: string | null
           rating?: number | null
+          revenue_split_active?: boolean | null
+          revenue_split_percentage?: number | null
+          service_area?: string | null
+          slug?: string | null
+          specializations?: string[] | null
           specialties?: string[] | null
           status?: string | null
+          stripe_connect_account_id?: string | null
           telehealth_enabled?: boolean | null
+          tiktok_url?: string | null
           user_id?: string | null
           vacation_mode?: boolean | null
+          verified?: boolean | null
           video_consultation?: boolean | null
           virtual_appointment_preferences?: Json | null
+          youtube_url?: string | null
         }
         Update: {
           accepting_new_patients?: boolean | null
           bio?: string | null
+          connect_onboarding_complete?: boolean | null
           consultation_fee?: number | null
           created_at?: string | null
+          credentials?: string | null
           doxy_room_url?: string | null
           email?: string | null
+          facebook_url?: string | null
+          first_name?: string | null
+          hourly_rate?: string | null
           id?: string
           in_person_consultation?: boolean | null
+          instagram_url?: string | null
+          languages?: string[] | null
+          linkedin_url?: string | null
           name?: string
           phone?: string | null
           practice_address?: Json | null
           practice_name?: string | null
           profile_image?: string | null
           rating?: number | null
+          revenue_split_active?: boolean | null
+          revenue_split_percentage?: number | null
+          service_area?: string | null
+          slug?: string | null
+          specializations?: string[] | null
           specialties?: string[] | null
           status?: string | null
+          stripe_connect_account_id?: string | null
           telehealth_enabled?: boolean | null
+          tiktok_url?: string | null
           user_id?: string | null
           vacation_mode?: boolean | null
+          verified?: boolean | null
           video_consultation?: boolean | null
           virtual_appointment_preferences?: Json | null
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
+      payment_history: {
+        Row: {
+          amount: number
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          id: string
+          payment_method: string | null
+          status: string
+          stripe_payment_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          payment_method?: string | null
+          status: string
+          stripe_payment_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          payment_method?: string | null
+          status?: string
+          stripe_payment_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payment_tracking: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          payment_type: string
+          reference_id: string | null
+          status: string
+          stripe_session_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          payment_type: string
+          reference_id?: string | null
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          payment_type?: string
+          reference_id?: string | null
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1108,50 +1456,133 @@ export type Database = {
           },
         ]
       }
+      placement_requests: {
+        Row: {
+          care_needs: string
+          created_at: string | null
+          deposit_amount: number | null
+          deposit_paid: boolean | null
+          email: string
+          email_sent: boolean | null
+          facility_id: string | null
+          full_name: string
+          id: string
+          location: string
+          notes: string | null
+          phone: string
+          status: string
+          updated_at: string | null
+          urgency_level: string
+          user_id: string | null
+        }
+        Insert: {
+          care_needs: string
+          created_at?: string | null
+          deposit_amount?: number | null
+          deposit_paid?: boolean | null
+          email: string
+          email_sent?: boolean | null
+          facility_id?: string | null
+          full_name: string
+          id?: string
+          location: string
+          notes?: string | null
+          phone: string
+          status?: string
+          updated_at?: string | null
+          urgency_level: string
+          user_id?: string | null
+        }
+        Update: {
+          care_needs?: string
+          created_at?: string | null
+          deposit_amount?: number | null
+          deposit_paid?: boolean | null
+          email?: string
+          email_sent?: boolean | null
+          facility_id?: string | null
+          full_name?: string
+          id?: string
+          location?: string
+          notes?: string | null
+          phone?: string
+          status?: string
+          updated_at?: string | null
+          urgency_level?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
+          assigned_partner_id: string | null
           avatar_url: string | null
           created_at: string | null
           first_name: string | null
           full_name: string | null
           id: string
           last_name: string | null
+          membership_tier: string | null
           phone: string | null
           referral_code: string | null
           referral_reward_earned: boolean | null
           referred_count: number | null
+          role: string | null
           status: string | null
+          stripe_customer_id: string | null
+          trial_end_date: string | null
+          trial_status: string | null
           updated_at: string | null
         }
         Insert: {
+          assigned_partner_id?: string | null
           avatar_url?: string | null
           created_at?: string | null
           first_name?: string | null
           full_name?: string | null
           id: string
           last_name?: string | null
+          membership_tier?: string | null
           phone?: string | null
           referral_code?: string | null
           referral_reward_earned?: boolean | null
           referred_count?: number | null
+          role?: string | null
           status?: string | null
+          stripe_customer_id?: string | null
+          trial_end_date?: string | null
+          trial_status?: string | null
           updated_at?: string | null
         }
         Update: {
+          assigned_partner_id?: string | null
           avatar_url?: string | null
           created_at?: string | null
           first_name?: string | null
           full_name?: string | null
           id?: string
           last_name?: string | null
+          membership_tier?: string | null
           phone?: string | null
           referral_code?: string | null
           referral_reward_earned?: boolean | null
           referred_count?: number | null
+          role?: string | null
           status?: string | null
+          stripe_customer_id?: string | null
+          trial_end_date?: string | null
+          trial_status?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_assigned_partner_id_fkey"
+            columns: ["assigned_partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       promotion_claims: {
         Row: {
@@ -1573,6 +2004,57 @@ export type Database = {
         }
         Relationships: []
       }
+      resources: {
+        Row: {
+          category: string
+          county: string | null
+          created_at: string | null
+          description: string
+          documents_needed: string[] | null
+          eligibility: string | null
+          id: string
+          organization: string
+          phone: string | null
+          state: string
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          website: string | null
+        }
+        Insert: {
+          category: string
+          county?: string | null
+          created_at?: string | null
+          description: string
+          documents_needed?: string[] | null
+          eligibility?: string | null
+          id?: string
+          organization: string
+          phone?: string | null
+          state: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          category?: string
+          county?: string | null
+          created_at?: string | null
+          description?: string
+          documents_needed?: string[] | null
+          eligibility?: string | null
+          id?: string
+          organization?: string
+          phone?: string | null
+          state?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       reward_points: {
         Row: {
           created_at: string | null
@@ -1834,11 +2316,14 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          assigned_partner_id: string | null
           cancel_at_period_end: boolean | null
           created_at: string | null
           current_period_end: string | null
           current_period_start: string | null
           id: string
+          partner_revenue_amount: number | null
+          platform_fee_amount: number | null
           status: string
           stripe_subscription_id: string | null
           tier: string
@@ -1846,11 +2331,14 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assigned_partner_id?: string | null
           cancel_at_period_end?: boolean | null
           created_at?: string | null
           current_period_end?: string | null
           current_period_start?: string | null
           id?: string
+          partner_revenue_amount?: number | null
+          platform_fee_amount?: number | null
           status?: string
           stripe_subscription_id?: string | null
           tier?: string
@@ -1858,11 +2346,14 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assigned_partner_id?: string | null
           cancel_at_period_end?: boolean | null
           created_at?: string | null
           current_period_end?: string | null
           current_period_start?: string | null
           id?: string
+          partner_revenue_amount?: number | null
+          platform_fee_amount?: number | null
           status?: string
           stripe_subscription_id?: string | null
           tier?: string
@@ -1871,10 +2362,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "subscriptions_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "subscriptions_assigned_partner_id_fkey"
+            columns: ["assigned_partner_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "partners"
             referencedColumns: ["id"]
           },
         ]
@@ -2239,30 +2730,6 @@ export type Database = {
         }
         Relationships: []
       }
-      users: {
-        Row: {
-          created_at: string | null
-          email: string | null
-          id: string
-          role: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          email?: string | null
-          id: string
-          role?: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          email?: string | null
-          id?: string
-          role?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       vacation_packages: {
         Row: {
           amenities: string[] | null
@@ -2404,6 +2871,10 @@ export type Database = {
         Args: { user_id: string; tool_name: string }
         Returns: boolean
       }
+      create_care_facilities_table: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       is_vip_member: {
         Args: { user_id: string }
         Returns: boolean
@@ -2426,21 +2897,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -2458,14 +2933,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -2481,14 +2958,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -2504,14 +2983,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -2519,14 +3000,16 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never

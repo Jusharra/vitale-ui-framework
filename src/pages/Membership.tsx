@@ -30,7 +30,7 @@ const Membership = () => {
                     </h3>
                   </div>
                   <div className="mt-4 flex items-baseline text-6xl font-extrabold">
-                    $197
+                    $1,297
                     <span className="ml-1 text-2xl font-medium text-gray-500">/mo</span>
                   </div>
                   <p className="mt-5 text-lg text-gray-500">

@@ -25,6 +25,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import EditPartnerDialog from '../dialogs/EditPartnerDialog';
+import { OnboardPartnerDialog } from '../dialogs/OnboardPartnerDialog';
 
 interface PartnersListProps {
   partners: Partner[];
@@ -190,6 +191,10 @@ const PartnersList = ({ partners, isLoading, searchTerm, refetchData }: Partners
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
+                      <OnboardPartnerDialog 
+                        partner={partner}
+                        onSuccess={() => refetchData?.()}
+                      />
                       <Button size="sm" variant="outline" onClick={() => handleEdit(partner.id)}>
                         <Edit className="w-4 h-4" />
                       </Button>

@@ -17,3 +17,23 @@ schema = "public"
 verify_jwt = true
 name = "admin-reset-password"
 schema = "public"
+
+[[functions]]
+verify_jwt = true
+name = "create-checkout"
+schema = "public"
+
+[[functions]]
+verify_jwt = true
+name = "onboard-partner"
+schema = "public"
+
+[[functions]]
+verify_jwt = true
+name = "check-subscription"
+schema = "public"
+
+[[functions]]
+verify_jwt = false
+name = "handle-webhook"
+schema = "public"
