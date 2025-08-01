@@ -84,7 +84,9 @@ const EditPartnerDialog = ({ open, onOpenChange, onSuccess, partnerId }: EditPar
     try {
       setIsLoading(true);
       
-      const { error } = await supabase
+      console.log('Attempting to update partner:', partnerId, 'with values:', values);
+      
+      const { data, error } = await supabase
         .from('partners')
         .update({
           name: values.name,
@@ -106,9 +108,15 @@ const EditPartnerDialog = ({ open, onOpenChange, onSuccess, partnerId }: EditPar
           profile_image: values.profile_image,
           status: values.status,
         })
-        .eq('id', partnerId);
+        .eq('id', partnerId)
+        .select();
       
-      if (error) throw error;
+      console.log('Update result:', { data, error });
+      
+      if (error) {
+        console.error('Supabase update error:', error);
+        throw error;
+      }
       
       toast({
         title: 'Partner updated',
