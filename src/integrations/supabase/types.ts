@@ -1450,7 +1450,15 @@ export type Database = {
           virtual_appointment_preferences?: Json | null
           youtube_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "partners_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_history: {
         Row: {

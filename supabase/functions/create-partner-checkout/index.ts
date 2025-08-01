@@ -117,21 +117,18 @@ serve(async (req) => {
       throw new Error(`Database connectivity issue: ${dbTestError.message}`);
     }
 
-    // Step 2: Partner record lookup with explicit type conversion
+    // Step 2: Partner record lookup with proper UUID handling
     let partner = null;
-    const userIdString = user.id.toString(); // Explicit UUID to string conversion
     logStep("Starting partner lookup", { 
       userId: user.id, 
-      userIdString, 
-      userIdType: typeof user.id,
-      stringType: typeof userIdString 
+      userIdType: typeof user.id
     });
     
     try {
       const { data: existingPartner, error: partnerQueryError } = await supabaseClient
         .from('partners')
         .select('id, name, email, stripe_connect_account_id, user_id')
-        .eq('user_id', userIdString) // Use converted string
+        .eq('user_id', user.id) // Direct UUID comparison
         .maybeSingle();
 
       if (partnerQueryError) {
@@ -143,17 +140,16 @@ serve(async (req) => {
         partner = existingPartner;
         logStep("Existing partner found", { partnerId: partner.id, partnerName: partner.name });
       } else {
-        // Create new partner record with explicit type conversion
+        // Create new partner record with proper UUID
         logStep("Creating new partner record", { 
           userId: user.id,
-          userIdString: userIdString,
           email: user.email 
         });
         
         const { data: newPartner, error: createError } = await supabaseClient
           .from('partners')
           .insert({
-            user_id: userIdString, // Use converted string for consistency
+            user_id: user.id, // Direct UUID assignment
             name: profile.full_name || user.email?.split('@')[0] || 'Partner',
             email: user.email,
             status: 'pending'
