@@ -19,6 +19,19 @@ interface MembershipCardProps {
 const MembershipCard: React.FC<MembershipCardProps> = ({ membershipTier }) => {
   const navigate = useNavigate();
   
+  const getTierInfo = (tier: MembershipTier) => {
+    const tierMap = {
+      smart: { name: 'Smart Access', benefits: 5, used: 3, color: 'bg-blue-500' },
+      core: { name: 'Core Concierge', benefits: 9, used: 6, color: 'bg-primary' },
+      vip: { name: 'VIP Executive', benefits: 12, used: 8, color: 'bg-gradient-to-r from-purple-500 to-pink-500' }
+    };
+    return tierMap[tier] || tierMap.smart;
+  };
+
+  const tierInfo = getTierInfo(membershipTier);
+  const usagePercentage = Math.round((tierInfo.used / tierInfo.benefits) * 100);
+  const canUpgrade = membershipTier !== 'vip';
+  
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -30,24 +43,26 @@ const MembershipCard: React.FC<MembershipCardProps> = ({ membershipTier }) => {
             <p className="text-sm font-medium">Current Tier</p>
             <div className="flex items-center gap-2">
               <MembershipBadge type={membershipTier} />
-              <span className="font-semibold capitalize">{membershipTier}</span>
+              <span className="font-semibold">{tierInfo.name}</span>
             </div>
           </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => navigate('/dashboard/membership')}
-          >
-            <span>Upgrade</span>
-          </Button>
+          {canUpgrade && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate('/dashboard/membership')}
+            >
+              <span>Upgrade</span>
+            </Button>
+          )}
         </div>
 
         <div>
           <p className="text-sm font-medium mb-1">Benefits Used</p>
-          <Progress value={45} className="h-2" />
+          <Progress value={usagePercentage} className="h-2" />
           <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-            <span>3 of 7 benefits used</span>
-            <span>45%</span>
+            <span>{tierInfo.used} of {tierInfo.benefits} benefits used</span>
+            <span>{usagePercentage}%</span>
           </div>
         </div>
       </CardContent>

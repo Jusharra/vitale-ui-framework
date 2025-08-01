@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 
 const FamilyManagement: React.FC = () => {
   const { membershipTier } = useAuth();
-  const premiumTier = membershipTiers[0]; // Get the premium tier
+  const currentTier = membershipTiers.find(tier => tier.id === membershipTier) || membershipTiers[0];
 
   return (
     <MemberPageLayout title="Family Management">
@@ -31,10 +31,10 @@ const FamilyManagement: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="subscription" className="space-y-6">
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-6 lg:grid-cols-1">
               <FamilyMembershipCard
-                tier={premiumTier}
-                isCurrent={membershipTier === 'premium'}
+                tier={currentTier}
+                isCurrent={true}
                 hasSubscription={!!membershipTier}
               />
             </div>

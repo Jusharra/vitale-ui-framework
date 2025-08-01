@@ -43,7 +43,7 @@ const AuthProviderComponent: React.FC<{ children: React.ReactNode }> = ({ childr
   const isAuthenticated = !!session;
 
   // Extract membership tier from subscription or profile
-  const membershipTier: MembershipTier = 'premium';
+  const membershipTier: MembershipTier = 'smart';
   
   // Update profile wrapper - memoize to prevent recreation on every render
   const updateProfile = useCallback(async (data: Partial<UserProfile>) => {

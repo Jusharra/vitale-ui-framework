@@ -150,7 +150,7 @@ const FamilyMemberManager: React.FC = () => {
     try {
       // Check if user exists and get their ID
       const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
-      const existingUser = userData.users.find(u => u.email === inviteEmail.trim());
+      const existingUser = userData.users.find((u: any) => u.email === inviteEmail.trim());
 
       if (!existingUser) {
         toast({

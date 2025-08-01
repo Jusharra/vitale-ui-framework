@@ -23,7 +23,7 @@ export interface UserProfile {
   bio?: string;
 }
 
-export type MembershipTier = 'premium';
+export type MembershipTier = 'smart' | 'core' | 'vip';
 
 export interface Subscription {
   id: string;

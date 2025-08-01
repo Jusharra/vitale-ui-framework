@@ -74,7 +74,7 @@ const Services = () => {
   // Get discount percentage based on membership tier
   const getDiscountPercentage = () => {
     // Since we only have premium tier now, return standard discount
-    return membershipTier === 'premium' ? 15 : 0;
+    return membershipTier === 'vip' ? 15 : membershipTier === 'core' ? 10 : 5;
   };
 
   // Calculate discounted price
@@ -221,7 +221,7 @@ const Services = () => {
           )}
 
           {/* Membership Banner */}
-          {membershipTier === 'premium' && (
+          {membershipTier === 'vip' && (
             <div className="mt-16 bg-indigo-50 rounded-lg p-8">
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-gray-900">Premium Membership Benefits</h2>

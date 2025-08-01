@@ -51,8 +51,10 @@ const VacationCard: React.FC<VacationCardProps> = ({
     }
     
     // Apply membership tier discounts
-    if (membershipTier === 'premium') {
-      return price * 0.8; // 20% discount for Premium members
+    if (membershipTier === 'vip') {
+      return price * 0.8; // 20% discount for VIP members
+    } else if (membershipTier === 'core') {
+      return price * 0.9; // 10% discount for Core members
     }
     
     return price; // No discount for basic tier or non-authenticated users

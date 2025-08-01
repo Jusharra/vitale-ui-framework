@@ -209,7 +209,7 @@ const ServiceBookingContent: React.FC = () => {
             <div>
               <h2 className="text-2xl font-bold">Book Services</h2>
               <p className="text-muted-foreground">
-                As a <MembershipBadge type="premium" /> member, you receive {getDiscountPercentage("premium" as any)}% off all service bookings
+                As a member, you receive exclusive discounts on all service bookings
               </p>
             </div>
           </div>
