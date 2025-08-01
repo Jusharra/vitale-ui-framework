@@ -38,7 +38,7 @@ serve(async (req) => {
     // Get all subscriptions with stripe customer IDs that might need syncing
     const { data: subscriptions, error: subscriptionsError } = await supabaseClient
       .from('subscriptions')
-      .select('id, user_id, email, stripe_customer_id, stripe_subscription_id, status, tier, current_period_end, cancel_at_period_end')
+      .select('id, user_id, stripe_customer_id, stripe_subscription_id, status, tier, current_period_end, cancel_at_period_end')
       .not('stripe_customer_id', 'is', null);
 
     if (subscriptionsError) {
@@ -106,10 +106,13 @@ serve(async (req) => {
           logStep("No active subscription found", { userId: subscription.user_id });
         }
 
+        // Get user email from auth.users
+        const { data: authUser } = await supabaseClient.auth.admin.getUserById(subscription.user_id);
+        const userEmail = authUser?.user?.email;
+
         // Prepare update data with proper null handling
         const updateData: any = {
           user_id: subscription.user_id,
-          email: subscription.email, // Preserve existing email
           stripe_customer_id: subscription.stripe_customer_id,
           stripe_subscription_id: stripeSubscriptionId,
           status: hasActiveSub ? 'active' : 'inactive',
@@ -118,6 +121,11 @@ serve(async (req) => {
           cancel_at_period_end: cancelAtPeriodEnd,
           updated_at: new Date().toISOString(),
         };
+
+        // Only add email if we found it
+        if (userEmail) {
+          updateData.email = userEmail;
+        }
 
         // Update the subscriptions table
         const { error: upsertError } = await supabaseClient

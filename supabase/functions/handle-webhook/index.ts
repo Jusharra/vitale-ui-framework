@@ -223,7 +223,6 @@ serve(async (req) => {
 
           const subscriptionData = {
             user_id: userId,
-            email: customerEmail,
             status: subscription.status,
             tier: tier,
             stripe_customer_id: subscription.customer,
@@ -236,6 +235,11 @@ serve(async (req) => {
             partner_revenue_amount: partnerRevenueAmount,
             updated_at: new Date().toISOString(),
           };
+
+          // Only add email if we have it
+          if (customerEmail) {
+            subscriptionData.email = customerEmail;
+          }
 
           if (existingSubscription) {
             // Update existing record
