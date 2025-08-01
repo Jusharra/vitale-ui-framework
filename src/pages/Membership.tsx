@@ -1,10 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { CheckIcon } from 'lucide-react';
 import StripeSubscriptionButton from '@/components/payments/StripeSubscriptionButton';
 
 const Membership = () => {
+  const [isYearly, setIsYearly] = useState(false);
+  
+  const monthlyPrice = 1297;
+  const yearlyPrice = 15564;
+  const monthlySavings = (monthlyPrice * 12 - yearlyPrice) / (monthlyPrice * 12) * 100;
+  
+  const displayPrice = isYearly ? yearlyPrice : monthlyPrice;
+  const displayInterval = isYearly ? '/year' : '/mo';
+  const interval = isYearly ? 'yearly' : 'monthly';
+
   return (
     <MainLayout>
       <div className="bg-white py-12">
@@ -19,6 +30,28 @@ const Membership = () => {
             </p>
           </div>
 
+          {/* Billing Toggle */}
+          <div className="mt-12 flex justify-center">
+            <div className="flex items-center space-x-3 bg-gray-100 rounded-lg p-1">
+              <span className={`px-3 py-1 text-sm font-medium ${!isYearly ? 'text-indigo-600' : 'text-gray-500'}`}>
+                Monthly
+              </span>
+              <Switch
+                checked={isYearly}
+                onCheckedChange={setIsYearly}
+                className="data-[state=checked]:bg-indigo-600"
+              />
+              <span className={`px-3 py-1 text-sm font-medium ${isYearly ? 'text-indigo-600' : 'text-gray-500'}`}>
+                Yearly
+              </span>
+              {isYearly && (
+                <span className="px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">
+                  Save {Math.round(monthlySavings)}%
+                </span>
+              )}
+            </div>
+          </div>
+
           <div className="mt-16">
             <div className="max-w-lg mx-auto">
               {/* Single Membership Plan */}
@@ -30,9 +63,14 @@ const Membership = () => {
                     </h3>
                   </div>
                   <div className="mt-4 flex items-baseline text-6xl font-extrabold">
-                    $1,297
-                    <span className="ml-1 text-2xl font-medium text-gray-500">/mo</span>
+                    ${displayPrice.toLocaleString()}
+                    <span className="ml-1 text-2xl font-medium text-gray-500">{displayInterval}</span>
                   </div>
+                  {isYearly && (
+                    <p className="mt-2 text-sm text-green-600 font-medium">
+                      Save ${(monthlyPrice * 12 - yearlyPrice).toLocaleString()} per year
+                    </p>
+                  )}
                   <p className="mt-5 text-lg text-gray-500">
                     Complete healthcare coverage with personalized concierge service
                   </p>
@@ -84,7 +122,8 @@ const Membership = () => {
                   </ul>
                   <div className="mt-8">
                     <StripeSubscriptionButton 
-                tier="premium"
+                      tier="premium"
+                      interval={interval}
                       buttonText="Get Started"
                       className="w-full"
                     />
@@ -146,6 +185,7 @@ const Membership = () => {
             <div className="mt-8">
               <StripeSubscriptionButton 
                 tier="premium"
+                interval={interval}
                 buttonText="Sign Up Today"
                 size="lg"
               />
