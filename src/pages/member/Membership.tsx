@@ -26,7 +26,7 @@ const Membership = () => {
   const { t } = useTranslation();
   const upgradeRequired = location.state?.upgradeRequired;
 
-  // Check subscription status
+  // Check subscription status on initial load only
   useEffect(() => {
     const checkSubscription = async () => {
       if (!isAuthenticated) return;
@@ -39,7 +39,7 @@ const Membership = () => {
         setSubscriptionData(data);
         
         // Refresh auth context subscription data as well
-        refreshSubscription();
+        await refreshSubscription();
         
       } catch (error) {
         console.error('Error checking subscription:', error);
@@ -54,11 +54,6 @@ const Membership = () => {
     };
     
     checkSubscription();
-    
-    // Set up periodic refresh (every 30 seconds)
-    const refreshInterval = setInterval(checkSubscription, 30000);
-    
-    return () => clearInterval(refreshInterval);
   }, [isAuthenticated, refreshSubscription, t, toast]);
 
   // When the user comes from an upgrade required redirect

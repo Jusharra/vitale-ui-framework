@@ -49,14 +49,8 @@ export function useSubscription(userId: string | null) {
           .maybeSingle();
         
         if (dbError || !dbData) {
-          // Default subscription for users without records
-          setSubscription({
-            id: 'default',
-            status: 'active',
-            tier: 'premium' as MembershipTier,
-            current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-            cancel_at_period_end: false
-          });
+          // No subscription found - set to null to show proper subscription prompt
+          setSubscription(null);
           setIsTrialing(false);
           return;
         }
@@ -93,14 +87,8 @@ export function useSubscription(userId: string | null) {
       }
     } catch (error) {
       console.error('Error fetching subscription:', error);
-      // Default subscription on error
-      setSubscription({
-        id: 'default',
-        status: 'active',
-        tier: 'premium' as MembershipTier,
-        current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        cancel_at_period_end: false
-      });
+      // On error, set to null to show proper subscription prompt
+      setSubscription(null);
       setIsTrialing(false);
     } finally {
       setIsLoading(false);
