@@ -20,113 +20,143 @@ serve(async (req) => {
   try {
     logStep("Partner platform checkout initiated");
 
+    // Validate environment variables
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
+    if (!stripeKey) {
+      logStep("ERROR: STRIPE_SECRET_KEY not configured");
+      throw new Error("STRIPE_SECRET_KEY is not set");
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!supabaseUrl || !supabaseServiceKey) {
+      logStep("ERROR: Supabase configuration missing");
+      throw new Error("Supabase configuration is incomplete");
+    }
+
+    logStep("Environment variables validated");
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     
     // Initialize Supabase with service role
     const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      supabaseUrl,
+      supabaseServiceKey,
       { auth: { persistSession: false } }
     );
 
+    // Validate authentication
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header provided");
+    if (!authHeader) {
+      logStep("ERROR: No authorization header provided");
+      throw new Error("No authorization header provided");
+    }
 
     const token = authHeader.replace("Bearer ", "");
+    logStep("Authenticating user with token");
+    
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError) throw new Error(`Authentication error: ${userError.message}`);
+    if (userError) {
+      logStep("ERROR: Authentication failed", { error: userError.message });
+      throw new Error(`Authentication error: ${userError.message}`);
+    }
     
     const user = userData.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
+    if (!user?.email) {
+      logStep("ERROR: User not authenticated or email not available");
+      throw new Error("User not authenticated or email not available");
+    }
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    // Check if user has partner role first
-    const { data: profile } = await supabaseClient
-      .from('profiles')
-      .select('role, full_name')
-      .eq('id', user.id)
-      .single();
-
-    if (profile?.role !== 'partner') {
-      throw new Error("User does not have partner role");
-    }
-
-    logStep("User confirmed as partner", { userId: user.id, fullName: profile.full_name });
-
-    // Try to find existing partner record by multiple methods
-    let partner = null;
-    let partnerError = null;
-
-    // Method 1: Query by user_id field (text format)
-    const { data: partnerByUserId } = await supabaseClient
-      .from('partners')
-      .select('id, name, email, stripe_connect_account_id, user_id')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    if (partnerByUserId) {
-      partner = partnerByUserId;
-      logStep("Partner found by user_id", { partnerId: partner.id });
-    } else {
-      // Method 2: Query by id (UUID format) - fallback for existing data
-      const { data: partnerById } = await supabaseClient
-        .from('partners')
-        .select('id, name, email, stripe_connect_account_id, user_id')
+    // Verify user has partner role
+    try {
+      const { data: profile, error: profileError } = await supabaseClient
+        .from('profiles')
+        .select('role, full_name')
         .eq('id', user.id)
-        .maybeSingle();
-
-      if (partnerById) {
-        // Update the user_id field for this partner record to fix future lookups
-        const { error: updateError } = await supabaseClient
-          .from('partners')
-          .update({ user_id: user.id })
-          .eq('id', user.id);
-        
-        if (!updateError) {
-          logStep("Updated partner record with user_id", { partnerId: partnerById.id });
-          partner = partnerById;
-        } else {
-          logStep("Failed to update partner user_id", { error: updateError });
-        }
-      }
-    }
-
-    // Method 3: If no partner record exists, create one
-    if (!partner) {
-      logStep("Creating new partner record", { userId: user.id });
-      
-      const { data: newPartner, error: createError } = await supabaseClient
-        .from('partners')
-        .insert({
-          user_id: user.id,
-          name: profile.full_name || user.email?.split('@')[0] || 'Partner',
-          email: user.email,
-          status: 'pending'
-        })
-        .select('id, name, email, stripe_connect_account_id, user_id')
         .single();
 
-      if (!createError && newPartner) {
-        partner = newPartner;
-        logStep("Created new partner record", { partnerId: newPartner.id });
-      } else {
-        logStep("Failed to create partner record", { error: createError });
-        partnerError = createError;
+      if (profileError) {
+        logStep("ERROR: Failed to fetch user profile", { error: profileError.message });
+        throw new Error(`Failed to fetch user profile: ${profileError.message}`);
       }
-    }
 
-    if (partnerError || !partner) {
-      logStep("Partner verification failed", { 
-        partnerError: partnerError?.message,
-        userId: user.id,
-        hasPartner: !!partner
+      if (profile?.role !== 'partner') {
+        logStep("ERROR: User does not have partner role", { 
+          userId: user.id, 
+          currentRole: profile?.role 
+        });
+        throw new Error("User does not have partner role");
+      }
+
+      logStep("User confirmed as partner", { userId: user.id, fullName: profile.full_name });
+
+      // Simplified partner record lookup - use only user_id method
+      let partner = null;
+      
+      try {
+        const { data: existingPartner, error: partnerQueryError } = await supabaseClient
+          .from('partners')
+          .select('id, name, email, stripe_connect_account_id, user_id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (partnerQueryError) {
+          logStep("ERROR: Failed to query partner record", { error: partnerQueryError.message });
+          throw new Error(`Failed to query partner record: ${partnerQueryError.message}`);
+        }
+
+        if (existingPartner) {
+          partner = existingPartner;
+          logStep("Existing partner found", { partnerId: partner.id, partnerName: partner.name });
+        } else {
+          // Create new partner record
+          logStep("Creating new partner record", { userId: user.id });
+          
+          const { data: newPartner, error: createError } = await supabaseClient
+            .from('partners')
+            .insert({
+              user_id: user.id,
+              name: profile.full_name || user.email?.split('@')[0] || 'Partner',
+              email: user.email,
+              status: 'pending'
+            })
+            .select('id, name, email, stripe_connect_account_id, user_id')
+            .single();
+
+          if (createError) {
+            logStep("ERROR: Failed to create partner record", { error: createError.message });
+            throw new Error(`Failed to create partner record: ${createError.message}`);
+          }
+
+          if (!newPartner) {
+            logStep("ERROR: Partner record creation returned no data");
+            throw new Error("Partner record creation failed - no data returned");
+          }
+
+          partner = newPartner;
+          logStep("New partner record created", { partnerId: newPartner.id });
+        }
+      } catch (partnerError) {
+        logStep("ERROR: Partner record operation failed", { error: partnerError.message });
+        throw new Error(`Partner setup failed: ${partnerError.message}`);
+      }
+
+      if (!partner) {
+        logStep("ERROR: No partner record available after lookup/creation");
+        throw new Error("Partner setup is incomplete");
+      }
+
+      logStep("Partner verified successfully", { 
+        partnerId: partner.id, 
+        partnerName: partner.name,
+        partnerEmail: partner.email 
       });
-      throw new Error("User is not a registered partner or partner setup is incomplete");
+
+    } catch (profileError) {
+      logStep("ERROR: Profile verification failed", { error: profileError.message });
+      throw profileError;
     }
-    logStep("Partner verified", { partnerId: partner.id, partnerName: partner.name });
 
     // Check if partner already has an active platform subscription
     const { data: existingSubscription } = await supabaseClient
