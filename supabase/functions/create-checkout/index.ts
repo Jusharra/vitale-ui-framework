@@ -343,21 +343,49 @@ serve(async (req) => {
 
     // Store subscription intent in database (only for authenticated users)
     if (user?.id) {
-      await supabaseClient.from('subscriptions').upsert({
-        user_id: user.id,
-        status: 'pending',
-        tier,
-        stripe_customer_id: customerId,
-        stripe_session_id: session.id,
-        additional_members_count: additionalMembers,
-        assigned_partner_id: assignedPartnerId,
-        platform_fee_amount: applicationFeeAmount,
-        partner_revenue_amount: priceInfo.amount - applicationFeeAmount,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'user_id' });
-      
-      logStep("Subscription record created");
+      try {
+        const subscriptionData = {
+          user_id: user.id,
+          status: 'pending',
+          tier,
+          stripe_customer_id: customerId,
+          stripe_subscription_id: session.id,  // Use session.id as the stripe_subscription_id
+          additional_members_count: additionalMembers,
+          assigned_partner_id: assignedPartnerId,
+          platform_fee_amount: applicationFeeAmount,
+          partner_revenue_amount: priceInfo.amount - applicationFeeAmount,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+
+        const { error: upsertError } = await supabaseClient
+          .from('subscriptions')
+          .upsert(subscriptionData, { 
+            onConflict: 'stripe_subscription_id'  // Use unique constraint on stripe_subscription_id
+          });
+        
+        if (upsertError) {
+          logStep("ERROR: Failed to create subscription record", {
+            error: upsertError,
+            userId: user.id,
+            sessionId: session.id
+          });
+          throw new Error(`Subscription record creation failed: ${upsertError.message}`);
+        }
+        
+        logStep("Subscription record created successfully", {
+          userId: user.id,
+          sessionId: session.id,
+          tier
+        });
+      } catch (dbError) {
+        logStep("CRITICAL ERROR: Database operation failed in create-checkout", {
+          error: dbError.message,
+          userId: user.id,
+          sessionId: session.id
+        });
+        throw dbError;
+      }
     } else {
       logStep("Guest checkout - subscription record will be created after payment completion");
     }
