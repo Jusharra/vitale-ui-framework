@@ -100,7 +100,7 @@ const AdminPartnerApprovals: React.FC = () => {
           const { error: partnerError } = await supabase
             .from('partners')
             .insert({
-              id: profileId,
+              user_id: profileId,
               name: profile.full_name || profile.first_name || 'Unknown',
               phone: profile.phone,
               status: 'active',
