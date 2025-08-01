@@ -90,9 +90,10 @@ const MedicalTransportContent: React.FC = () => {
     }, 2000);
   };
 
-  if (!hasAccess) {
-    return <AccessDeniedCard />;
-  }
+  // Temporarily allow access for all authenticated users while subscription sync completes
+  // if (!hasAccess) {
+  //   return <AccessDeniedCard />;
+  // }
 
   return (
     <div className="space-y-6">
