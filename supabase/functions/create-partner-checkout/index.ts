@@ -91,72 +91,72 @@ serve(async (req) => {
 
       logStep("User confirmed as partner", { userId: user.id, fullName: profile.full_name });
 
-      // Simplified partner record lookup - use only user_id method
-      let partner = null;
-      
-      try {
-        const { data: existingPartner, error: partnerQueryError } = await supabaseClient
-          .from('partners')
-          .select('id, name, email, stripe_connect_account_id, user_id')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (partnerQueryError) {
-          logStep("ERROR: Failed to query partner record", { error: partnerQueryError.message });
-          throw new Error(`Failed to query partner record: ${partnerQueryError.message}`);
-        }
-
-        if (existingPartner) {
-          partner = existingPartner;
-          logStep("Existing partner found", { partnerId: partner.id, partnerName: partner.name });
-        } else {
-          // Create new partner record
-          logStep("Creating new partner record", { userId: user.id });
-          
-          const { data: newPartner, error: createError } = await supabaseClient
-            .from('partners')
-            .insert({
-              user_id: user.id,
-              name: profile.full_name || user.email?.split('@')[0] || 'Partner',
-              email: user.email,
-              status: 'pending'
-            })
-            .select('id, name, email, stripe_connect_account_id, user_id')
-            .single();
-
-          if (createError) {
-            logStep("ERROR: Failed to create partner record", { error: createError.message });
-            throw new Error(`Failed to create partner record: ${createError.message}`);
-          }
-
-          if (!newPartner) {
-            logStep("ERROR: Partner record creation returned no data");
-            throw new Error("Partner record creation failed - no data returned");
-          }
-
-          partner = newPartner;
-          logStep("New partner record created", { partnerId: newPartner.id });
-        }
-      } catch (partnerError) {
-        logStep("ERROR: Partner record operation failed", { error: partnerError.message });
-        throw new Error(`Partner setup failed: ${partnerError.message}`);
-      }
-
-      if (!partner) {
-        logStep("ERROR: No partner record available after lookup/creation");
-        throw new Error("Partner setup is incomplete");
-      }
-
-      logStep("Partner verified successfully", { 
-        partnerId: partner.id, 
-        partnerName: partner.name,
-        partnerEmail: partner.email 
-      });
-
     } catch (profileError) {
       logStep("ERROR: Profile verification failed", { error: profileError.message });
-      throw profileError;
+      throw new Error(`Profile verification failed: ${profileError.message}`);
     }
+
+    // Simplified partner record lookup - use only user_id method
+    let partner = null;
+    
+    try {
+      const { data: existingPartner, error: partnerQueryError } = await supabaseClient
+        .from('partners')
+        .select('id, name, email, stripe_connect_account_id, user_id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (partnerQueryError) {
+        logStep("ERROR: Failed to query partner record", { error: partnerQueryError.message });
+        throw new Error(`Failed to query partner record: ${partnerQueryError.message}`);
+      }
+
+      if (existingPartner) {
+        partner = existingPartner;
+        logStep("Existing partner found", { partnerId: partner.id, partnerName: partner.name });
+      } else {
+        // Create new partner record
+        logStep("Creating new partner record", { userId: user.id });
+        
+        const { data: newPartner, error: createError } = await supabaseClient
+          .from('partners')
+          .insert({
+            user_id: user.id,
+            name: profile.full_name || user.email?.split('@')[0] || 'Partner',
+            email: user.email,
+            status: 'pending'
+          })
+          .select('id, name, email, stripe_connect_account_id, user_id')
+          .single();
+
+        if (createError) {
+          logStep("ERROR: Failed to create partner record", { error: createError.message });
+          throw new Error(`Failed to create partner record: ${createError.message}`);
+        }
+
+        if (!newPartner) {
+          logStep("ERROR: Partner record creation returned no data");
+          throw new Error("Partner record creation failed - no data returned");
+        }
+
+        partner = newPartner;
+        logStep("New partner record created", { partnerId: newPartner.id });
+      }
+    } catch (partnerError) {
+      logStep("ERROR: Partner record operation failed", { error: partnerError.message });
+      throw new Error(`Partner setup failed: ${partnerError.message}`);
+    }
+
+    if (!partner) {
+      logStep("ERROR: No partner record available after lookup/creation");
+      throw new Error("Partner setup is incomplete");
+    }
+
+    logStep("Partner verified successfully", { 
+      partnerId: partner.id, 
+      partnerName: partner.name,
+      partnerEmail: partner.email 
+    });
 
     // Check if partner already has an active platform subscription
     const { data: existingSubscription } = await supabaseClient
