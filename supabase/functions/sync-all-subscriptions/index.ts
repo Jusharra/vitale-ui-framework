@@ -35,18 +35,17 @@ serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
 
-    // Get all subscriptions with stripe customer IDs that might need syncing
+    // Get all subscriptions that might need syncing (including those without stripe_customer_id)
     const { data: subscriptions, error: subscriptionsError } = await supabaseClient
       .from('subscriptions')
-      .select('id, user_id, stripe_customer_id, stripe_subscription_id, status, tier, current_period_end, cancel_at_period_end')
-      .not('stripe_customer_id', 'is', null);
+      .select('id, user_id, stripe_customer_id, stripe_subscription_id, status, tier, current_period_end, cancel_at_period_end, email');
 
     if (subscriptionsError) {
       throw new Error(`Failed to fetch subscriptions: ${subscriptionsError.message}`);
     }
 
     if (!subscriptions || subscriptions.length === 0) {
-      logStep("No subscriptions with Stripe customer IDs found");
+      logStep("No subscriptions found");
       return new Response(JSON.stringify({ message: "No subscriptions to sync", synced: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -61,49 +60,73 @@ serve(async (req) => {
     // Process each subscription
     for (const subscription of subscriptions) {
       try {
-        logStep("Processing subscription", { userId: subscription.user_id, customerId: subscription.stripe_customer_id });
+        logStep("Processing subscription", { userId: subscription.user_id, customerId: subscription.stripe_customer_id, email: subscription.email });
 
-        // Get current subscriptions from Stripe
-        const stripeSubscriptions = await stripe.subscriptions.list({
-          customer: subscription.stripe_customer_id,
-          status: "active",
-          limit: 1,
-        });
+        let customerId = subscription.stripe_customer_id;
+        
+        // If no stripe_customer_id, try to find customer by email
+        if (!customerId && subscription.email) {
+          logStep("No customer ID found, searching by email", { email: subscription.email });
+          const customers = await stripe.customers.list({ 
+            email: subscription.email, 
+            limit: 1 
+          });
+          
+          if (customers.data.length > 0) {
+            customerId = customers.data[0].id;
+            logStep("Found customer by email", { customerId, email: subscription.email });
+          } else {
+            logStep("No Stripe customer found for email", { email: subscription.email });
+          }
+        }
 
-        const hasActiveSub = stripeSubscriptions.data.length > 0;
+        let hasActiveSub = false;
         let subscriptionTier = null;
         let subscriptionEnd = null;
         let cancelAtPeriodEnd = false;
         let stripeSubscriptionId = null;
 
-        if (hasActiveSub) {
-          const stripeSubscription = stripeSubscriptions.data[0];
-          stripeSubscriptionId = stripeSubscription.id;
-          subscriptionEnd = new Date(stripeSubscription.current_period_end * 1000).toISOString();
-          cancelAtPeriodEnd = stripeSubscription.cancel_at_period_end || false;
-
-          // Determine subscription tier from price
-          const priceId = stripeSubscription.items.data[0].price.id;
-          const price = await stripe.prices.retrieve(priceId);
-          const amount = price.unit_amount || 0;
-          
-          if (amount <= 999) {
-            subscriptionTier = "basic";
-          } else if (amount <= 1999) {
-            subscriptionTier = "premium";
-          } else {
-            subscriptionTier = "vip";
-          }
-
-          logStep("Active subscription found", { 
-            userId: subscription.user_id, 
-            subscriptionId: stripeSubscriptionId,
-            tier: subscriptionTier, 
-            endDate: subscriptionEnd,
-            cancelAtPeriodEnd 
+        // Only query Stripe if we have a customer ID
+        if (customerId) {
+          const stripeSubscriptions = await stripe.subscriptions.list({
+            customer: customerId,
+            status: "active",
+            limit: 1,
           });
+
+          hasActiveSub = stripeSubscriptions.data.length > 0;
+
+          if (hasActiveSub) {
+            const stripeSubscription = stripeSubscriptions.data[0];
+            stripeSubscriptionId = stripeSubscription.id;
+            subscriptionEnd = new Date(stripeSubscription.current_period_end * 1000).toISOString();
+            cancelAtPeriodEnd = stripeSubscription.cancel_at_period_end || false;
+
+            // Determine subscription tier from price
+            const priceId = stripeSubscription.items.data[0].price.id;
+            const price = await stripe.prices.retrieve(priceId);
+            const amount = price.unit_amount || 0;
+            
+            if (amount <= 999) {
+              subscriptionTier = "basic";
+            } else if (amount <= 1999) {
+              subscriptionTier = "premium";
+            } else {
+              subscriptionTier = "vip";
+            }
+
+            logStep("Active subscription found", { 
+              userId: subscription.user_id, 
+              subscriptionId: stripeSubscriptionId,
+              tier: subscriptionTier, 
+              endDate: subscriptionEnd,
+              cancelAtPeriodEnd 
+            });
+          } else {
+            logStep("No active subscription found", { userId: subscription.user_id, customerId });
+          }
         } else {
-          logStep("No active subscription found", { userId: subscription.user_id });
+          logStep("No customer ID available, marking as inactive", { userId: subscription.user_id, email: subscription.email });
         }
 
         // Get user email from auth.users
@@ -113,7 +136,7 @@ serve(async (req) => {
         // Prepare update data with proper null handling
         const updateData: any = {
           user_id: subscription.user_id,
-          stripe_customer_id: subscription.stripe_customer_id,
+          stripe_customer_id: customerId, // Use the found customer ID
           stripe_subscription_id: stripeSubscriptionId,
           status: hasActiveSub ? 'active' : 'inactive',
           tier: subscriptionTier,
