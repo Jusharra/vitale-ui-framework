@@ -274,14 +274,14 @@ serve(async (req) => {
             });
             
             logStep("Created/updated subscription record via upsert", {
-              userId,
+              userId: actualUserId,
               stripeSubscriptionId: subscription.id,
               status: subscription.status
             });
           }
 
           logStep("Subscription processing completed successfully", {
-            userId, 
+            userId: actualUserId, 
             subscriptionId: subscription.id,
             status: subscription.status,
             sessionId: session.id
@@ -296,11 +296,11 @@ serve(async (req) => {
                 conversion_date: new Date().toISOString(),
                 updated_at: new Date().toISOString()
               })
-              .eq('profile_id', userId)
+              .eq('profile_id', actualUserId)
               .eq('partner_id', assignedPartnerId)
               .eq('trial_status', 'active');
 
-            logStep("Trial converted to subscription", { userId, partnerId: assignedPartnerId });
+            logStep("Trial converted to subscription", { userId: actualUserId, partnerId: assignedPartnerId });
           }
         }
         break;
