@@ -1695,6 +1695,7 @@ export type Database = {
           assigned_partner_id: string | null
           avatar_url: string | null
           created_at: string | null
+          email: string | null
           first_name: string | null
           full_name: string | null
           id: string
@@ -1712,6 +1713,7 @@ export type Database = {
           assigned_partner_id?: string | null
           avatar_url?: string | null
           created_at?: string | null
+          email?: string | null
           first_name?: string | null
           full_name?: string | null
           id: string
@@ -1729,6 +1731,7 @@ export type Database = {
           assigned_partner_id?: string | null
           avatar_url?: string | null
           created_at?: string | null
+          email?: string | null
           first_name?: string | null
           full_name?: string | null
           id?: string
@@ -3078,6 +3081,10 @@ export type Database = {
       is_vip_member: {
         Args: { user_id: string }
         Returns: boolean
+      }
+      populate_profile_emails: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       role: {
         Args: Record<PropertyKey, never>
