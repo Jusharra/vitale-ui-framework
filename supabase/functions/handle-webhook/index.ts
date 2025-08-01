@@ -173,30 +173,44 @@ serve(async (req) => {
           break;
         }
 
-        if (!userId) {
-          logStep("No user ID in session metadata - attempting to handle as guest checkout", {
+        let actualUserId = userId;
+        
+        if (!actualUserId) {
+          logStep("No user ID in session metadata - attempting to find user by email", {
             sessionId: session.id,
             customerEmail: customerEmail
           });
           
-          // Try to find existing user by email for guest checkouts
-          const { data: existingUser } = await supabaseClient
-            .from('profiles')
-            .select('id, email')
-            .eq('email', customerEmail)
-            .single();
+          // Try to find existing user by email using auth.users table via RPC
+          const { data: authUsers, error: authError } = await supabaseClient
+            .rpc('get_user_by_email', { user_email: customerEmail });
             
-          if (!existingUser) {
-            logStep("No existing user found for guest checkout email", { customerEmail });
-            break;
+          if (authError) {
+            logStep("Error querying auth users", { error: authError.message });
+            
+            // Fallback: try profiles table
+            const { data: existingUser } = await supabaseClient
+              .from('profiles')
+              .select('id')
+              .eq('email', customerEmail)
+              .single();
+              
+            if (existingUser) {
+              actualUserId = existingUser.id;
+              logStep("Found user in profiles table", { userId: actualUserId, customerEmail });
+            }
+          } else if (authUsers && authUsers.length > 0) {
+            actualUserId = authUsers[0].id;
+            logStep("Found user in auth.users", { userId: actualUserId, customerEmail });
           }
           
-          // Use found user ID
-          const foundUserId = existingUser.id;
-          logStep("Found existing user for guest checkout", { 
-            foundUserId, 
-            customerEmail 
-          });
+          if (!actualUserId) {
+            logStep("No existing user found for email - skipping subscription creation", { 
+              customerEmail,
+              sessionId: session.id 
+            });
+            break;
+          }
         }
 
         // Get the subscription from Stripe
@@ -222,7 +236,7 @@ serve(async (req) => {
           }
 
           const subscriptionData = {
-            user_id: userId,
+            user_id: actualUserId,
             status: subscription.status,
             tier: tier,
             stripe_customer_id: subscription.customer,
