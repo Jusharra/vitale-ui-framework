@@ -297,7 +297,7 @@ serve(async (req) => {
       customer_email: customerId ? undefined : (user?.email || undefined),
       line_items: lineItems,
       mode: "subscription",
-      success_url: `${req.headers.get("origin")}/member/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${req.headers.get("origin")}/dashboard/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/membership`,
       metadata: {
         user_id: user?.id || '',

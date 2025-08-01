@@ -256,6 +256,12 @@ const App: React.FC = () => {
                      }
                    />
                    
+                   {/* Backward compatibility route */}
+                   <Route
+                     path="/member/subscription-success"
+                     element={<Navigate to="/dashboard/subscription-success" replace />}
+                   />
+                   
                    <Route
                      path="/dashboard/family"
                      element={
