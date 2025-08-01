@@ -26,7 +26,7 @@ import { useTranslation } from "@/utils/i18n";
 import { useAuth } from "@/context/AuthContext";
 
 interface NavbarProps {
-  role?: "member" | "professional" | "admin" | "partner";
+  role?: "member" | "professional" | "admin" | "partner" | "caregiver";
   onToggleSidebar?: () => void;
   isMobile?: boolean;
 }
@@ -62,6 +62,8 @@ const Navbar: React.FC<NavbarProps> = ({
       case 'professional':
       case 'partner':
         return '/dashboard/professional';
+      case 'caregiver':
+        return '/caregiver/dashboard';
       default:
         return '/dashboard';
     }
@@ -81,6 +83,7 @@ const Navbar: React.FC<NavbarProps> = ({
             <h1 className="text-xl font-semibold">
               {role === "professional" || role === "partner" ? t('navigation.professionalPortal') : 
                role === "admin" ? t('navigation.adminPortal') : 
+               role === "caregiver" ? "Caregiver Portal" :
                t('navigation.healthConcierge')}
             </h1>
           </div>

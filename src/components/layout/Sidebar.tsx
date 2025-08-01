@@ -15,7 +15,7 @@ import { Button } from '../ui/button';
 import { useAuth } from '@/context/AuthContext';
 
 interface SidebarProps {
-  role?: 'member' | 'professional' | 'admin' | 'partner';
+  role?: 'member' | 'professional' | 'admin' | 'partner' | 'caregiver';
 }
 
 interface SidebarLinkProps {
@@ -93,6 +93,18 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
     </>
   );
 
+  const renderCaregiverLinks = () => (
+    <>
+      <SidebarLink to="/caregiver/dashboard" icon={Home}>Dashboard</SidebarLink>
+      <SidebarLink to="/caregiver/profile" icon={User}>Profile</SidebarLink>
+      <SidebarLink to="/caregiver/calendar" icon={Calendar}>Calendar</SidebarLink>
+      <SidebarLink to="/caregiver/clients" icon={Users}>My Clients</SidebarLink>
+      <SidebarLink to="/caregiver/subscription" icon={CreditCard}>Subscription</SidebarLink>
+      <SidebarLink to="/caregiver/messages" icon={MessageSquare}>Messages</SidebarLink>
+      <SidebarLink to="/caregiver/earnings" icon={BadgeDollarSign}>Earnings</SidebarLink>
+    </>
+  );
+
   return (
     <SidebarContainer>
       <SidebarHeader className="p-4 border-b">
@@ -111,6 +123,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
           {role === 'member' && renderMemberLinks()}
           {(role === 'professional' || role === 'partner') && renderProfessionalLinks()}
           {role === 'admin' && renderAdminLinks()}
+          {role === 'caregiver' && renderCaregiverLinks()}
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="p-4 border-t">
