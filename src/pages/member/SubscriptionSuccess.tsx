@@ -7,17 +7,14 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, Calendar, CreditCard, Users, Star, ArrowRight, Settings } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import GuestAccountCreation from '@/components/payments/GuestAccountCreation';
 
 const SubscriptionSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, refreshSubscription, subscription } = useAuth();
   const { toast } = useToast();
-  const [sessionDetails, setSessionDetails] = useState<any>(null);
-  const [isGuestCheckout, setIsGuestCheckout] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [redirectCountdown, setRedirectCountdown] = useState(3);
   
   // Parse query parameters
   const queryParams = new URLSearchParams(location.search);
@@ -27,40 +24,44 @@ const SubscriptionSuccess = () => {
   const tier = queryParams.get('tier') || subscription?.tier || 'Premium';
   
   useEffect(() => {
-    const fetchSessionDetails = async () => {
+    const initializeSuccess = async () => {
       setIsLoading(true);
-      if (sessionId) {
+      
+      // Refresh subscription data for authenticated users
+      if (refreshSubscription && user && success) {
         try {
-          // Check if this was a guest checkout by looking at session metadata
-          const { data, error } = await supabase.functions.invoke('verify-checkout-session', {
-            body: { sessionId }
-          });
-          
-          if (!error && data) {
-            setSessionDetails(data);
-            setIsGuestCheckout(data.is_guest_checkout === 'true' && !user);
-          }
-        } catch (error) {
-          console.error('Error fetching session details:', error);
-        }
-      }
-      setIsLoading(false);
-    };
-
-    fetchSessionDetails();
-
-    // Refresh subscription data when the component mounts for authenticated users
-    if (refreshSubscription && user) {
-      refreshSubscription().then(() => {
-        if (success) {
+          await refreshSubscription();
           toast({
             title: 'Subscription Activated!',
             description: `Welcome to your ${tier} membership. You now have access to all premium features.`,
           });
+        } catch (error) {
+          console.error('Error refreshing subscription:', error);
         }
-      });
+      }
+      
+      setIsLoading(false);
+    };
+
+    initializeSuccess();
+  }, [refreshSubscription, user, success, tier, toast]);
+
+  // Auto-redirect countdown for authenticated users
+  useEffect(() => {
+    if (!isLoading && user && success && !canceled) {
+      const timer = setInterval(() => {
+        setRedirectCountdown((prev) => {
+          if (prev <= 1) {
+            navigate('/dashboard/membership');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
     }
-  }, [sessionId, success, refreshSubscription, tier, toast, user]);
+  }, [isLoading, user, success, canceled, navigate]);
   
   if (canceled) {
     return (
@@ -81,25 +82,21 @@ const SubscriptionSuccess = () => {
     );
   }
 
-  // Show guest account creation if this was a guest checkout
-  if (isGuestCheckout && sessionDetails) {
+  // Handle guest users (redirect to sign up/login)
+  if (!user && success) {
     return (
       <MainLayout>
         <div className="max-w-2xl mx-auto py-16 px-4">
           <div className="text-center mb-8">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Successful!</h1>
-            <p className="text-lg text-gray-600">
-              Your subscription has been activated. Complete your account setup below.
+            <p className="text-lg text-gray-600 mb-6">
+              Your subscription has been activated. Please sign in to access your premium features.
             </p>
+            <Button onClick={() => navigate('/auth')}>
+              Sign In to Continue
+            </Button>
           </div>
-          <GuestAccountCreation
-            sessionId={sessionId!}
-            customerEmail={sessionDetails.customer_email}
-            onAccountCreated={() => {
-              navigate('/dashboard');
-            }}
-          />
         </div>
       </MainLayout>
     );
@@ -184,6 +181,24 @@ const SubscriptionSuccess = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Auto-redirect Notice */}
+        {user && (
+          <Card className="bg-primary/5 border-primary/20">
+            <CardContent className="pt-6 text-center">
+              <p className="text-sm text-muted-foreground mb-2">
+                Redirecting to your membership dashboard in {redirectCountdown} seconds...
+              </p>
+              <Button 
+                onClick={() => navigate('/dashboard/membership')}
+                variant="outline"
+                size="sm"
+              >
+                Go Now
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* What's Next */}
         <Card>
