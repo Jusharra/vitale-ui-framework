@@ -233,20 +233,7 @@ serve(async (req) => {
             });
           }
 
-          // Immediately update profile membership tier for instant feature access
-          if (subscription.status === 'active') {
-            await supabaseClient
-              .from('profiles')
-              .update({
-                membership_tier: 'premium',
-                updated_at: new Date().toISOString()
-              })
-              .eq('id', userId);
-            
-            logStep("Updated profile membership tier to premium", { userId });
-          }
-
-          logStep("Subscription processing completed successfully", { 
+          logStep("Subscription processing completed successfully", {
             userId, 
             subscriptionId: subscription.id,
             status: subscription.status,

@@ -24,17 +24,8 @@ export function useToolAccess() {
         return true; // Active premium subscription grants access
       }
       
-      // Fallback: Check profile membership tier for backward compatibility
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('membership_tier')
-        .eq('id', userId)
-        .single();
-      
-      if (profileError) throw profileError;
-      
-      // Premium members have access to all tools
-      return profile?.membership_tier === 'premium';
+      // No active subscription found
+      return false;
     } catch (error) {
       console.error('Error checking tool access:', error);
       return false;
