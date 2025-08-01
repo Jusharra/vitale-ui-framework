@@ -4,10 +4,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ThermometerSun } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { usePrescriptionData } from './pharmacy/usePrescriptionData';
+import RefillRequestForm from './pharmacy/RefillRequestForm';
+import { RefillRequestFormValues } from './pharmacy/types';
 
 interface Delivery {
   id: string;
@@ -21,57 +25,38 @@ interface Delivery {
 
 const PharmacyDelivery = () => {
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { profile } = useAuth();
+  const { medications, refillRequests, isLoading, submitRefillRequest } = usePrescriptionData();
 
   useEffect(() => {
-    const fetchDeliveries = async () => {
-      try {
-        setIsLoading(true);
-        if (!profile) return;
-        
-        // This would be replaced with actual data from the prescription_deliveries table
-        // For now, using mock data based on refill_requests table
-        const { data: refillRequests, error } = await supabase
-          .from('refill_requests')
-          .select(`
-            id, status, delivery_type, notes,
-            medication:medication_id (name)
-          `)
-          .eq('patient_id', profile.id)
-          .eq('delivery_type', 'standard')
-          .or('delivery_type.eq.express,delivery_type.eq.drone');
-        
-        if (error) throw error;
-        
-        // Transform data into delivery format (in real implementation, would be from prescription_deliveries table)
-        const mockDeliveries: Delivery[] = (refillRequests || []).map(request => ({
-          id: request.id,
-          trackingId: `VTL-${Math.floor(10000000 + Math.random() * 90000000)}`,
-          medications: [request.medication?.name || 'Unknown Medication'],
-          status: request.status === 'approved' ? 'in transit' : 
-                 request.status === 'completed' ? 'delivered' : 'processing',
-          estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-          progress: request.status === 'approved' ? 60 : 
-                   request.status === 'completed' ? 100 : 20,
-          deliveryMethod: request.delivery_type
-        }));
-        
-        setDeliveries(mockDeliveries);
-      } catch (error) {
-        console.error('Error fetching deliveries:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load your prescription deliveries',
-          variant: 'destructive',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    // Transform refill requests into delivery format for delivery tracking
+    const deliveryRequests = refillRequests.filter(request => 
+      request.delivery_type !== 'pickup' && request.delivery_type !== ''
+    );
     
-    fetchDeliveries();
-  }, [profile]);
+    const mockDeliveries: Delivery[] = deliveryRequests.map(request => ({
+      id: request.id,
+      trackingId: `VTL-${Math.floor(10000000 + Math.random() * 90000000)}`,
+      medications: [medications.find(med => med.id === request.medication_id)?.name || 'Unknown Medication'],
+      status: request.status === 'approved' ? 'in transit' : 
+             request.status === 'completed' ? 'delivered' : 'processing',
+      estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+      progress: request.status === 'approved' ? 60 : 
+               request.status === 'completed' ? 100 : 20,
+      deliveryMethod: request.delivery_type
+    }));
+    
+    setDeliveries(mockDeliveries);
+  }, [refillRequests, medications]);
+
+  const handleRefillRequest = async (values: RefillRequestFormValues): Promise<boolean> => {
+    const success = await submitRefillRequest(values);
+    if (success) {
+      setIsDialogOpen(false);
+    }
+    return success;
+  };
 
   if (isLoading) {
     return <div>Loading deliveries...</div>;
@@ -87,7 +72,16 @@ const PharmacyDelivery = () => {
         <p className="text-muted-foreground mb-4">
           You don't have any prescription deliveries in progress
         </p>
-        <Button>Schedule a Delivery</Button>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>Schedule a Delivery</Button>
+          </DialogTrigger>
+          <RefillRequestForm 
+            medications={medications}
+            onSubmit={handleRefillRequest}
+            onSuccess={() => setIsDialogOpen(false)}
+          />
+        </Dialog>
       </div>
     );
   }
