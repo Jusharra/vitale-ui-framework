@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from 'react-router-dom';
-import { CreditCard, LifeBuoy, DivideIcon as LucideIcon, MessageSquare, PanelLeft, Settings, Users, User, Calendar, Activity, Home, Map, Pill, ShoppingCart, Truck, Palmtree, Gift, Tag, BarChart2 as BarChart, Heart, Clipboard, BadgeDollarSign, Gauge, FileText, Download, Stethoscope, Building, UserPlus } from 'lucide-react';
+import { CreditCard, LifeBuoy, DivideIcon as LucideIcon, MessageSquare, PanelLeft, Settings, Users, User, Calendar, Activity, Home, Map, Pill, ShoppingCart, Truck, Palmtree, Gift, Tag, BarChart2 as BarChart, Heart, Clipboard, BadgeDollarSign, Gauge, FileText, Download, Stethoscope, Building, UserPlus, UserCheck } from 'lucide-react';
 import { 
   Sidebar as SidebarContainer, 
   SidebarContent, 
@@ -83,6 +83,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
       <SidebarLink to="/dashboard/admin/promotions" icon={Gift}>Promotions</SidebarLink>
       <SidebarLink to="/dashboard/admin/professionals" icon={UserPlus}>Services</SidebarLink>
       <SidebarLink to="/dashboard/admin/leads" icon={BarChart}>Leads & Analytics</SidebarLink>
+      <SidebarLink to="/dashboard/admin/partner-approvals" icon={UserCheck}>Partner Approvals</SidebarLink>
       <SidebarLink to="/dashboard/admin/care-teams" icon={Users}>Care Teams</SidebarLink>
       <SidebarLink to="/dashboard/admin/facilities" icon={Building}>Care Facilities</SidebarLink>
       <SidebarLink to="/dashboard/admin/professionals" icon={UserPlus}>Professionals</SidebarLink>
