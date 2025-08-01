@@ -202,11 +202,8 @@ serve(async (req) => {
       }
     };
 
-    // For guest checkout, ensure email collection
-    if (isGuestCheckout) {
-      sessionParams.customer_creation = 'always';
-      sessionParams.customer_email = undefined; // Let Stripe collect the email
-    }
+    // For guest checkout, Stripe will automatically collect email and create customer
+    // No need to specify customer_creation in subscription mode
 
     // Add trial period if applicable
     if (priceInfo.trial_days > 0) {
