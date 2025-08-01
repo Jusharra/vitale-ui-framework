@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from 'react-router-dom';
-import { CreditCard, LifeBuoy, DivideIcon as LucideIcon, MessageSquare, PanelLeft, Settings, Users, User, Calendar, Activity, Home, Map, Pill, ShoppingCart, Truck, Palmtree, Gift, Tag, BarChart2 as BarChart, Heart, Clipboard, BadgeDollarSign, Gauge, FileText, Download, Stethoscope, Building, UserPlus, UserCheck } from 'lucide-react';
+import { CreditCard, LifeBuoy, DivideIcon as LucideIcon, MessageSquare, PanelLeft, Settings, Users, User, Calendar, Activity, Home, Map, Pill, ShoppingCart, Truck, Palmtree, Gift, Tag, BarChart2 as BarChart, Heart, Clipboard, BadgeDollarSign, Gauge, FileText, Download, Stethoscope, Building, UserPlus, UserCheck, UserCog } from 'lucide-react';
 import { 
   Sidebar as SidebarContainer, 
   SidebarContent, 
@@ -74,6 +74,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
       <SidebarLink to="/dashboard/professional/tools" icon={Stethoscope}>Tools of the Trade</SidebarLink>
       <SidebarLink to="/dashboard/professional/earnings" icon={BadgeDollarSign}>Earnings</SidebarLink>
       <SidebarLink to="/profile" icon={User}>Profile</SidebarLink>
+      <SidebarLink to="/dashboard/professional/profile" icon={UserCog}>Professional Settings</SidebarLink>
       <SidebarLink to="/settings" icon={Settings}>Settings</SidebarLink>
       <SidebarLink to="/membership" icon={CreditCard}>Membership</SidebarLink>
       <SidebarLink to="/dashboard/professional/analytics" icon={BarChart}>Analytics</SidebarLink>
