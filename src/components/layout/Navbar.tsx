@@ -136,13 +136,11 @@ const Navbar: React.FC<NavbarProps> = ({
                 <Link to="/profile">{t('user.profile')}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/dashboard/settings">{t('user.settings')}</Link>
+                <Link to="/settings">{t('user.settings')}</Link>
               </DropdownMenuItem>
-              {role === "member" && (
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard/membership">{t('user.membership')}</Link>
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem asChild>
+                <Link to="/membership">{t('user.membership')}</Link>
+              </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to={getDashboardPath()}>Dashboard</Link>
               </DropdownMenuItem>
