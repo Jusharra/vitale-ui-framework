@@ -56,10 +56,8 @@ const VacationDetailsModal: React.FC<VacationDetailsModalProps> = ({
     }
     
     // Apply membership tier discounts
-    if (membershipTier === 'vip') {
-      return vacation.price * 0.8; // 20% discount for VIP members
-    } else if (membershipTier === 'core') {
-      return vacation.price * 0.9; // 10% discount for Core members
+    if (membershipTier === 'premium') {
+      return vacation.price * 0.8; // 20% discount for Premium members
     }
     
     return vacation.price; // No discount for basic tier or non-authenticated users
@@ -79,8 +77,8 @@ const VacationDetailsModal: React.FC<VacationDetailsModalProps> = ({
     });
   };
 
-  // Default to 'smart' tier if no membership tier is available
-  const userTier = membershipTier || 'smart' as MembershipTier;
+  // Default to 'premium' tier if no membership tier is available
+  const userTier = membershipTier || 'premium' as MembershipTier;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>

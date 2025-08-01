@@ -20,17 +20,12 @@ const MembershipCard: React.FC<MembershipCardProps> = ({ membershipTier }) => {
   const navigate = useNavigate();
   
   const getTierInfo = (tier: MembershipTier) => {
-    const tierMap = {
-      smart: { name: 'Smart Access', benefits: 5, used: 3, color: 'bg-blue-500' },
-      core: { name: 'Core Concierge', benefits: 9, used: 6, color: 'bg-primary' },
-      vip: { name: 'VIP Executive', benefits: 12, used: 8, color: 'bg-gradient-to-r from-purple-500 to-pink-500' }
-    };
-    return tierMap[tier] || tierMap.smart;
+    return { name: 'Premium Member', benefits: 15, used: 12, color: 'bg-gradient-to-r from-purple-600 to-blue-600' };
   };
 
   const tierInfo = getTierInfo(membershipTier);
   const usagePercentage = Math.round((tierInfo.used / tierInfo.benefits) * 100);
-  const canUpgrade = membershipTier !== 'vip';
+  const canUpgrade = false; // No upgrades needed for premium tier
   
   return (
     <Card>
