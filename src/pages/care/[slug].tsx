@@ -11,6 +11,7 @@ import PlacementRequestButton from '@/components/placement/PlacementRequestButto
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SafeHtmlRenderer } from '@/components/common/SafeHtmlRenderer';
 
 interface Facility {
   id: string;
@@ -355,7 +356,12 @@ const FacilityPage = () => {
             <div className="md:col-span-2">
               <div className="prose max-w-none">
                 <h2>About {facility.name}</h2>
-                <div className="rich-content" dangerouslySetInnerHTML={{ __html: facility.description }} />
+                <SafeHtmlRenderer 
+                  htmlContent={facility.description}
+                  className="rich-content"
+                  showFallback={true}
+                  fallbackText="No description available for this facility."
+                />
               </div>
 
               <div className="mt-8">
@@ -558,7 +564,12 @@ const FacilityPage = () => {
             <div className="md:col-span-2">
               <div className="prose max-w-none">
                 <h2>About {partner.first_name || partner.name.split(' ')[0]}</h2>
-                <p>{partner.bio || `${partner.name} is a healthcare professional serving patients in ${partner.service_area || 'the local area'}.`}</p>
+                <SafeHtmlRenderer 
+                  htmlContent={partner.bio || `${partner.name} is a healthcare professional serving patients in ${partner.service_area || 'the local area'}.`}
+                  className="rich-content"
+                  showFallback={true}
+                  fallbackText="No biography available for this professional."
+                />
               </div>
 
               <div className="mt-8">
