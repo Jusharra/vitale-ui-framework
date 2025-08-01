@@ -46,19 +46,31 @@ export function useAccessCheck(userId: string | null, toolName: string) {
   
   useEffect(() => {
     const checkAccess = async () => {
+      console.log('useAccessCheck: Checking access for user:', userId, 'tool:', toolName);
       setIsChecking(true);
-      const access = await hasToolAccess(userId, toolName);
-      setHasAccess(access);
+      
+      try {
+        const access = await hasToolAccess(userId, toolName);
+        console.log('useAccessCheck: Access result:', access);
+        setHasAccess(access);
+      } catch (error) {
+        console.error('useAccessCheck: Error checking access:', error);
+        setHasAccess(false);
+      }
+      
       setIsChecking(false);
     };
     
     if (userId) {
       checkAccess();
     } else {
+      console.log('useAccessCheck: No userId, setting access to false');
       setHasAccess(false);
       setIsChecking(false);
     }
   }, [userId, toolName, hasToolAccess]);
+  
+  console.log('useAccessCheck: Current state - hasAccess:', hasAccess, 'isChecking:', isChecking);
   
   return { 
     hasAccess, 

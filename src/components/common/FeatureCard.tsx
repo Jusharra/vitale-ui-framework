@@ -24,6 +24,19 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
   onClick,
   className
 }) => {
+  const handleClick = () => {
+    console.log('FeatureCard: Button clicked for:', title);
+    console.log('FeatureCard: onClick function exists:', !!onClick);
+    if (onClick) {
+      try {
+        onClick();
+      } catch (error) {
+        console.error('FeatureCard: Error calling onClick:', error);
+      }
+    } else {
+      console.warn('FeatureCard: No onClick handler provided');
+    }
+  };
   return (
     <Card className={cn(
       'feature-card overflow-hidden',
@@ -48,11 +61,11 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
       </CardContent>
       <CardFooter>
         {locked ? (
-          <Button variant="outline" className="w-full" onClick={onClick}>
+          <Button variant="outline" className="w-full" onClick={handleClick}>
             Upgrade to Unlock
           </Button>
         ) : (
-          <Button className="w-full" onClick={onClick}>
+          <Button className="w-full" onClick={handleClick}>
             Access Feature
           </Button>
         )}

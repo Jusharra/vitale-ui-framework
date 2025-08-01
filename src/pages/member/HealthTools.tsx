@@ -25,31 +25,47 @@ const HealthTools = () => {
 
   // Navigation handlers for each tool
   const handleToolClick = (toolName: string) => {
-    switch (toolName) {
-      case 'symptom_checker':
-      case 'virtual_consultation':
-      case 'specialist_referral':
-        navigate('/dashboard/appointments');
-        break;
-      case 'health_assessment':
-      case 'risk_calculator':
-      case 'vital_signs':
-      case 'health_insights':
-        navigate('/dashboard/health-insights');
-        break;
-      case 'concierge':
-        navigate('/dashboard/concierge');
-        break;
-      case 'medication_tracker':
-        navigate('/dashboard/pharmacy');
-        break;
-      default:
-        break;
+    console.log('HealthTools: handleToolClick called with:', toolName);
+    
+    try {
+      switch (toolName) {
+        case 'symptom_checker':
+        case 'virtual_consultation':
+        case 'specialist_referral':
+          console.log('HealthTools: Navigating to appointments');
+          navigate('/dashboard/appointments');
+          break;
+        case 'health_assessment':
+        case 'risk_calculator':
+        case 'vital_signs':
+        case 'health_insights':
+          console.log('HealthTools: Navigating to health-insights');
+          navigate('/dashboard/health-insights');
+          break;
+        case 'concierge':
+          console.log('HealthTools: Navigating to concierge');
+          navigate('/dashboard/concierge');
+          break;
+        case 'medication_tracker':
+          console.log('HealthTools: Navigating to pharmacy');
+          navigate('/dashboard/pharmacy');
+          break;
+        default:
+          console.log('HealthTools: Unknown tool name:', toolName);
+          break;
+      }
+    } catch (error) {
+      console.error('HealthTools: Error in handleToolClick:', error);
     }
   };
 
   const handleUpgradeClick = () => {
-    navigate('/dashboard/membership');
+    console.log('HealthTools: handleUpgradeClick called');
+    try {
+      navigate('/dashboard/membership');
+    } catch (error) {
+      console.error('HealthTools: Error in handleUpgradeClick:', error);
+    }
   };
 
   return (
