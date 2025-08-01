@@ -21,9 +21,11 @@ import {
 
 const Index = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, userRole } = useAuth();
+  const { isAuthenticated, userRole, isLoading } = useAuth();
 
   const handleDashboardClick = () => {
+    if (isLoading) return; // Prevent action while loading
+    
     if (isAuthenticated) {
       if (userRole === 'professional') {
         navigate('/dashboard/professional');

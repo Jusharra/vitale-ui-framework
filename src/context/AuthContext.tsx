@@ -94,7 +94,23 @@ export const AuthProvider = memo(AuthProviderComponent);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    // Return a safe default state instead of throwing immediately
+    return {
+      user: null,
+      session: null,
+      profile: null,
+      isLoading: true,
+      userRole: null,
+      isAuthenticated: false,
+      membershipTier: 'smart' as MembershipTier,
+      subscription: undefined,
+      isTrialing: false,
+      signIn: async () => false,
+      signUp: async () => false,
+      signOut: async () => false,
+      updateProfile: async () => false,
+      refreshSubscription: async () => {},
+    };
   }
   return context;
 };
