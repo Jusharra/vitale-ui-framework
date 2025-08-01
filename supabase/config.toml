@@ -47,3 +47,8 @@ schema = "public"
 verify_jwt = false
 name = "handle-webhook"
 schema = "public"
+
+[[functions]]
+verify_jwt = false
+name = "sync-all-subscriptions"
+schema = "public"
