@@ -8,7 +8,6 @@ import { ThermometerSun } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/hooks/use-toast';
-import { useToolAccess } from '@/hooks/useToolAccess';
 
 interface Delivery {
   id: string;
@@ -24,20 +23,6 @@ const PharmacyDelivery = () => {
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { profile } = useAuth();
-  const { hasToolAccess } = useToolAccess();
-  const [hasAccess, setHasAccess] = useState(false);
-
-  // Check for delivery access
-  useEffect(() => {
-    const checkAccess = async () => {
-      if (profile) {
-        const access = await hasToolAccess(profile.id, 'prescription_delivery');
-        setHasAccess(access);
-      }
-    };
-    
-    checkAccess();
-  }, [profile, hasToolAccess]);
 
   useEffect(() => {
     const fetchDeliveries = async () => {
@@ -87,29 +72,6 @@ const PharmacyDelivery = () => {
     
     fetchDeliveries();
   }, [profile]);
-
-  if (!hasAccess) {
-    return (
-      <Card className="bg-muted/50 border-dashed">
-        <CardHeader>
-          <CardTitle>Premium Feature: Prescription Delivery</CardTitle>
-          <CardDescription>
-            Prescription delivery service is available to members with Smart Access or higher.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center py-6 text-center">
-            <ThermometerSun className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">Upgrade Your Membership</h3>
-            <p className="text-muted-foreground mb-4">
-              Get your prescriptions delivered right to your door with Smart Access or higher membership.
-            </p>
-            <Button>Upgrade Membership</Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   if (isLoading) {
     return <div>Loading deliveries...</div>;
