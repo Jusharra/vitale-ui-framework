@@ -175,7 +175,7 @@ serve(async (req) => {
             name: "Additional Family Members",
             description: "Additional family members for premium membership"
           },
-          unit_amount: 64900, // $649 per additional family member
+          unit_amount: 5000, // $50 per additional family member
           recurring: { interval: interval === 'year' ? 'year' : 'month' },
         },
         quantity: additionalMembers,

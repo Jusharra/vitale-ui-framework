@@ -25,7 +25,7 @@ const PublicStripeSubscriptionButton: React.FC<PublicStripeSubscriptionButtonPro
   const { toast } = useToast();
 
   const basePriceMonthly = 1297;
-  const familyMemberPrice = 649; // $649 per additional family member as per membershipData.ts
+  const familyMemberPrice = 50; // $50 per additional family member
   const yearlyDiscount = 0.20; // 20% discount for yearly billing
   
   const basePrice = interval === 'yearly' ? Math.round(basePriceMonthly * 12 * (1 - yearlyDiscount)) : basePriceMonthly;
