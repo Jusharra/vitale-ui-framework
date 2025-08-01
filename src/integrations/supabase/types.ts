@@ -3078,6 +3078,10 @@ export type Database = {
           email: string
         }[]
       }
+      get_user_role: {
+        Args: { user_id?: string }
+        Returns: string
+      }
       is_vip_member: {
         Args: { user_id: string }
         Returns: boolean
