@@ -92,7 +92,7 @@ const MembershipTierCard: React.FC<MembershipTierCardProps> = ({
         ) : (
           <StripeSubscriptionButton 
             tier={tier.id}
-            buttonText={hasSubscription ? "Switch to" : "Upgrade to"}
+            buttonText={hasSubscription ? "Switch to" : "Get Started"}
             variant="default"
             className="w-full"
           />

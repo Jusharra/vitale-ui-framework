@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
 import MemberPageLayout from '@/components/layout/MemberPageLayout';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { useLocation } from 'react-router-dom';
@@ -128,62 +127,63 @@ const Membership = () => {
       title={t('membership.tier')} 
       description={t('membership.manage')}
     >
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full md:w-[400px] grid-cols-2">
-          <TabsTrigger value="overview">{t('dashboard.overview')}</TabsTrigger>
-          <TabsTrigger value="billing">{t('membership.billing')}</TabsTrigger>
-        </TabsList>
+      <div className="space-y-8">
+        {/* Subscription Status */}
+        <SubscriptionDetails 
+          profile={{...profile, membership_tier: membershipTier}}
+          isTrialing={isTrialing}
+          membershipTiers={[...membershipTiers]}
+          subscriptionData={adaptedSubscriptionData}
+          isLoading={isLoading}
+        />
         
-        <TabsContent value="overview" className="mt-6">
-          <div className="space-y-6">
-            {/* Subscription Details */}
-            <SubscriptionDetails 
-              profile={{...profile, membership_tier: membershipTier}}
-              isTrialing={isTrialing}
-              membershipTiers={[...membershipTiers]}
-              subscriptionData={adaptedSubscriptionData}
-              isLoading={isLoading}
-            />
-            
-            {/* Upgrade Alert if needed */}
-            {upgradeRequired && (
-              <Alert variant="default" className="border-yellow-300 bg-yellow-50">
-                <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                <AlertDescription className="text-yellow-800">
-                  {t('membership.upgradeRequiredFeatureAccess')}
-                </AlertDescription>
-              </Alert>
-            )}
-            
-            {/* Membership Tier Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {membershipTiers.map((tier) => (
-                <MembershipTierCard 
-                  key={tier.id}
-                  tier={tier}
-                  isCurrent={tier.id === membershipTier}
-                  hasSubscription={!!subscription}
-                />
-              ))}
-            </div>
+        {/* Upgrade Alert if needed */}
+        {upgradeRequired && (
+          <Alert variant="default" className="border-yellow-300 bg-yellow-50">
+            <AlertTriangle className="h-4 w-4 text-yellow-600" />
+            <AlertDescription className="text-yellow-800">
+              {t('membership.upgradeRequiredFeatureAccess')}
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        {/* Membership Plans Selection */}
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-xl font-semibold">{subscription ? 'Change Plan' : 'Choose Your Plan'}</h2>
+            <p className="text-muted-foreground">
+              {subscription 
+                ? 'Upgrade or switch to a different membership plan' 
+                : 'Select a membership plan to get started with premium healthcare services'
+              }
+            </p>
           </div>
-        </TabsContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {membershipTiers.map((tier) => (
+              <MembershipTierCard 
+                key={tier.id}
+                tier={tier}
+                isCurrent={tier.id === membershipTier}
+                hasSubscription={!!subscription}
+              />
+            ))}
+          </div>
+        </div>
         
-        <TabsContent value="billing" className="mt-6">
+        {/* Billing Information - Only show if subscription exists */}
+        {subscription && (
           <div className="space-y-6">
-            {/* Billing Information */}
             <BillingInformation 
               isLoading={isLoading} 
               subscriptionData={adaptedSubscriptionData} 
             />
             
-            {/* Payment History */}
             <PaymentHistory 
               hasSubscription={!!subscription}
             />
           </div>
-        </TabsContent>
-      </Tabs>
+        )}
+      </div>
     </MemberPageLayout>
   );
 };
