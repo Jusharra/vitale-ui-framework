@@ -175,20 +175,63 @@ serve(async (req) => {
         if (session.subscription) {
           const subscription = await stripe.subscriptions.retrieve(session.subscription);
           
-          // Update subscription in database
-          await supabaseClient.from('subscriptions').upsert({
+          logStep("Retrieved Stripe subscription details", {
+            subscriptionId: subscription.id,
+            customerId: subscription.customer,
+            status: subscription.status,
+            sessionId: session.id
+          });
+
+          // First try to find existing subscription record by session ID
+          const { data: existingSubscription, error: findError } = await supabaseClient
+            .from('subscriptions')
+            .select('*')
+            .eq('stripe_session_id', session.id)
+            .single();
+
+          if (findError && findError.code !== 'PGRST116') { // PGRST116 = no rows found
+            logStep("Error finding subscription by session ID", { error: findError.message });
+          }
+
+          const subscriptionData = {
             user_id: userId,
             status: subscription.status,
             tier: tier,
             stripe_customer_id: subscription.customer,
             stripe_subscription_id: subscription.id,
+            stripe_session_id: session.id,
             current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
             cancel_at_period_end: subscription.cancel_at_period_end,
             assigned_partner_id: assignedPartnerId || null,
             platform_fee_amount: platformFeeAmount,
             partner_revenue_amount: partnerRevenueAmount,
             updated_at: new Date().toISOString(),
-          }, { onConflict: 'user_id' });
+          };
+
+          if (existingSubscription) {
+            // Update existing record
+            await supabaseClient
+              .from('subscriptions')
+              .update(subscriptionData)
+              .eq('id', existingSubscription.id);
+            
+            logStep("Updated existing subscription record", { 
+              subscriptionRecordId: existingSubscription.id,
+              stripeSubscriptionId: subscription.id,
+              status: subscription.status
+            });
+          } else {
+            // Create new record (fallback upsert)
+            await supabaseClient.from('subscriptions').upsert(subscriptionData, { 
+              onConflict: 'user_id' 
+            });
+            
+            logStep("Created/updated subscription record via upsert", {
+              userId,
+              stripeSubscriptionId: subscription.id,
+              status: subscription.status
+            });
+          }
 
           // Immediately update profile membership tier for instant feature access
           if (subscription.status === 'active') {
@@ -199,12 +242,15 @@ serve(async (req) => {
                 updated_at: new Date().toISOString()
               })
               .eq('id', userId);
+            
+            logStep("Updated profile membership tier to premium", { userId });
           }
 
-          logStep("Subscription and profile updated for instant access", { 
+          logStep("Subscription processing completed successfully", { 
             userId, 
             subscriptionId: subscription.id,
-            status: subscription.status 
+            status: subscription.status,
+            sessionId: session.id
           });
 
           // Convert trial to active subscription if applicable
