@@ -55,7 +55,7 @@ const PlatformSubscriptionCard = () => {
       const { data: partnerData, error: partnerError } = await supabase
         .from('partners')
         .select('platform_subscription_active, full_revenue_eligible, platform_trial_ends_at')
-        .eq('id', user?.id)
+        .eq('user_id', user?.id?.toString())
         .single();
 
       if (partnerError) {
