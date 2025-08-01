@@ -11,6 +11,7 @@ export const membershipTiers: MembershipTierData[] = [
     price: '$1,297',
     interval: 'month',
     yearlyPrice: '$15,564',
+    familyMemberPrice: '$50',
     features: [
       'Complete health tracking and insights',
       'Unlimited telehealth consultations',
@@ -21,7 +22,8 @@ export const membershipTiers: MembershipTierData[] = [
       'Premium vacation packages',
       '24/7 priority support',
       'Access to all health tools',
-      'Personalized care plans'
+      'Personalized care plans',
+      'Family member add-ons available ($50/month each)'
     ],
     notIncluded: [],
     popular: true

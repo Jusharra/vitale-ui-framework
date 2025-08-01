@@ -42,8 +42,8 @@ serve(async (req) => {
 
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const { tier, interval = 'month', trial = true } = await req.json();
-    logStep("Request body parsed", { tier, interval, trial });
+    const { tier, interval = 'month', trial = true, additionalMembers = 0 } = await req.json();
+    logStep("Request body parsed", { tier, interval, trial, additionalMembers });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
 
@@ -136,24 +136,43 @@ serve(async (req) => {
       }
     }
 
+    // Create line items: primary membership + family members
+    const lineItems = [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: { 
+            name: `Vitalé ${tier.charAt(0).toUpperCase() + tier.slice(1)} Membership`,
+            description: "Elite healthcare concierge with dedicated physician partnership"
+          },
+          unit_amount: priceInfo.amount,
+          recurring: { interval: interval === 'year' ? 'year' : 'month' },
+        },
+        quantity: 1,
+      },
+    ];
+
+    // Add family members line item if applicable
+    if (additionalMembers > 0) {
+      lineItems.push({
+        price_data: {
+          currency: "usd",
+          product_data: { 
+            name: "Additional Family Members",
+            description: "Additional family members for premium membership"
+          },
+          unit_amount: 5000, // $50 per additional family member
+          recurring: { interval: interval === 'year' ? 'year' : 'month' },
+        },
+        quantity: additionalMembers,
+      });
+    }
+
     // Create checkout session
     const sessionParams: any = {
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: { 
-              name: `Vitalé ${tier.charAt(0).toUpperCase() + tier.slice(1)} Membership`,
-              description: "Elite healthcare concierge with dedicated physician partnership"
-            },
-            unit_amount: priceInfo.amount,
-            recurring: { interval: interval === 'year' ? 'year' : 'month' },
-          },
-          quantity: 1,
-        },
-      ],
+      line_items: lineItems,
       mode: "subscription",
       success_url: `${req.headers.get("origin")}/member/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/membership`,
@@ -161,6 +180,7 @@ serve(async (req) => {
         user_id: user.id,
         tier,
         interval,
+        additional_members: additionalMembers.toString(),
         assigned_partner_id: assignedPartnerId || '',
         platform_fee_amount: applicationFeeAmount.toString(),
         partner_revenue_amount: (priceInfo.amount - applicationFeeAmount).toString()
@@ -200,6 +220,7 @@ serve(async (req) => {
       status: 'pending',
       tier,
       stripe_session_id: session.id,
+      additional_members_count: additionalMembers,
       assigned_partner_id: assignedPartnerId,
       platform_fee_amount: applicationFeeAmount,
       partner_revenue_amount: priceInfo.amount - applicationFeeAmount,

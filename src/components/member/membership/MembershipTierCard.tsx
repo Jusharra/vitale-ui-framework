@@ -14,6 +14,7 @@ export interface MembershipTierData {
   price: string;
   interval: string;
   yearlyPrice: string;
+  familyMemberPrice?: string;
   description: string;
   features: string[];
   notIncluded: string[];

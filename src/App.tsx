@@ -48,6 +48,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import StripeProvider from '@/components/payments/StripeProvider';
 import SubscriptionSuccess from '@/pages/member/SubscriptionSuccess';
 import FacilityPage from '@/pages/care/[slug]';
+import FamilyManagement from '@/pages/member/FamilyManagement';
 import ProfessionalProfilePage from '@/pages/professional/[slug]';
 import Resources from '@/pages/Resources';
 import Services from '@/pages/Services';
@@ -245,14 +246,23 @@ const App: React.FC = () => {
                     }
                   />
                   
-                  <Route
-                    path="/dashboard/subscription-success"
-                    element={
-                      <ProtectedRoute>
-                        <SubscriptionSuccess />
-                      </ProtectedRoute>
-                    }
-                  />
+                   <Route
+                     path="/dashboard/subscription-success"
+                     element={
+                       <ProtectedRoute>
+                         <SubscriptionSuccess />
+                       </ProtectedRoute>
+                     }
+                   />
+                   
+                   <Route
+                     path="/dashboard/family"
+                     element={
+                       <ProtectedRoute>
+                         <FamilyManagement />
+                       </ProtectedRoute>
+                     }
+                   />
                   
                   {/* Admin routes */}
                   <Route

@@ -506,6 +506,71 @@ export type Database = {
           },
         ]
       }
+      family_groups: {
+        Row: {
+          created_at: string
+          group_name: string | null
+          id: string
+          primary_member_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          group_name?: string | null
+          id?: string
+          primary_member_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          group_name?: string | null
+          id?: string
+          primary_member_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      family_members: {
+        Row: {
+          created_at: string
+          family_group_id: string
+          id: string
+          joined_at: string | null
+          member_type: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          family_group_id: string
+          id?: string
+          joined_at?: string | null
+          member_type?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          family_group_id?: string
+          id?: string
+          joined_at?: string | null
+          member_type?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_members_family_group_id_fkey"
+            columns: ["family_group_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       health_assessments: {
         Row: {
           created_at: string | null
@@ -2437,11 +2502,14 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          additional_members_count: number | null
           assigned_partner_id: string | null
           cancel_at_period_end: boolean | null
           created_at: string | null
           current_period_end: string | null
           current_period_start: string | null
+          family_group_id: string | null
+          family_member_price: number | null
           id: string
           partner_revenue_amount: number | null
           platform_fee_amount: number | null
@@ -2452,11 +2520,14 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          additional_members_count?: number | null
           assigned_partner_id?: string | null
           cancel_at_period_end?: boolean | null
           created_at?: string | null
           current_period_end?: string | null
           current_period_start?: string | null
+          family_group_id?: string | null
+          family_member_price?: number | null
           id?: string
           partner_revenue_amount?: number | null
           platform_fee_amount?: number | null
@@ -2467,11 +2538,14 @@ export type Database = {
           user_id: string
         }
         Update: {
+          additional_members_count?: number | null
           assigned_partner_id?: string | null
           cancel_at_period_end?: boolean | null
           created_at?: string | null
           current_period_end?: string | null
           current_period_start?: string | null
+          family_group_id?: string | null
+          family_member_price?: number | null
           id?: string
           partner_revenue_amount?: number | null
           platform_fee_amount?: number | null
@@ -2487,6 +2561,13 @@ export type Database = {
             columns: ["assigned_partner_id"]
             isOneToOne: false
             referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_family_group_id_fkey"
+            columns: ["family_group_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
             referencedColumns: ["id"]
           },
         ]
