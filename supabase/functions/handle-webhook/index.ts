@@ -190,7 +190,18 @@ serve(async (req) => {
             updated_at: new Date().toISOString(),
           }, { onConflict: 'user_id' });
 
-          logStep("Subscription updated in database", { 
+          // Immediately update profile membership tier for instant feature access
+          if (subscription.status === 'active') {
+            await supabaseClient
+              .from('profiles')
+              .update({
+                membership_tier: 'premium',
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', userId);
+          }
+
+          logStep("Subscription and profile updated for instant access", { 
             userId, 
             subscriptionId: subscription.id,
             status: subscription.status 
@@ -272,9 +283,20 @@ serve(async (req) => {
               })
               .eq('user_id', existingSub.user_id);
 
-            logStep("Subscription status updated", { 
+            // Sync membership tier in profiles table based on subscription status
+            const membershipTier = subscription.status === 'active' ? 'premium' : null;
+            await supabaseClient
+              .from('profiles')
+              .update({
+                membership_tier: membershipTier,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', existingSub.user_id);
+
+            logStep("Subscription and profile updated", { 
               userId: existingSub.user_id,
-              status: subscription.status 
+              status: subscription.status,
+              membershipTier
             });
           }
         }

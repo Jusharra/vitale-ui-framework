@@ -11,17 +11,30 @@ export function useToolAccess() {
     if (!userId) return false;
     
     try {
-      // Simple check - if user has premium membership, they have access to all tools
-      const { data, error } = await supabase
+      // Primary check: Active subscription with premium tier
+      const { data: subscription, error: subError } = await supabase
+        .from('subscriptions')
+        .select('status, tier')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .eq('tier', 'premium')
+        .single();
+      
+      if (!subError && subscription) {
+        return true; // Active premium subscription grants access
+      }
+      
+      // Fallback: Check profile membership tier for backward compatibility
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('membership_tier')
         .eq('id', userId)
         .single();
       
-      if (error) throw error;
+      if (profileError) throw profileError;
       
       // Premium members have access to all tools
-      return (data as any)?.membership_tier === 'premium';
+      return profile?.membership_tier === 'premium';
     } catch (error) {
       console.error('Error checking tool access:', error);
       return false;
