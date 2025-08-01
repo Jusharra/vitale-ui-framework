@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import Layout from '@/components/layout/Layout';
+import RoleAwareLayout from '@/components/layout/RoleAwareLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -152,7 +152,7 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <Layout>
+    <RoleAwareLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Profile Settings</h1>
@@ -405,7 +405,7 @@ const ProfilePage: React.FC = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
+    </RoleAwareLayout>
   );
 };
 

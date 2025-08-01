@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import MemberPageLayout from '@/components/layout/MemberPageLayout';
+import RoleAwareLayout from '@/components/layout/RoleAwareLayout';
 import { useAuth } from '@/context/AuthContext';
 import { useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -34,11 +34,15 @@ const Membership = () => {
   }, [upgradeRequired, t, toast]);
 
   return (
-    <MemberPageLayout 
-      title={t('membership.tier')} 
-      description={t('membership.manage')}
-    >
-      <div className="space-y-8">
+    <RoleAwareLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{t('membership.tier')}</h1>
+          <p className="text-muted-foreground">
+            {t('membership.manage')}
+          </p>
+        </div>
+        <div className="space-y-8">
         {/* Subscription Status */}
         <SubscriptionDetails 
           profile={profile}
@@ -94,8 +98,9 @@ const Membership = () => {
             />
           </div>
         )}
+        </div>
       </div>
-    </MemberPageLayout>
+    </RoleAwareLayout>
   );
 };
 

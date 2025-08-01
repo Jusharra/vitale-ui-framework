@@ -44,7 +44,8 @@ import { AuthProvider } from '@/context/AuthContext';
 import LanguageProvider from '@/components/i18n/LanguageProvider';
 import HealthToolsPage from '@/pages/member/HealthTools';
 import AppointmentsPage from '@/pages/member/Appointments';
-import ProfileRedirect from '@/components/ProfileRedirect';
+import ProfilePage from '@/pages/ProfilePage';
+import SettingsPage from '@/pages/Settings';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import StripeProvider from '@/components/payments/StripeProvider';
 import SubscriptionSuccess from '@/pages/member/SubscriptionSuccess';
@@ -103,7 +104,8 @@ const App: React.FC = () => {
                   <Route path="/blog" element={<BlogIndex />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/profile" element={<ProfileRedirect />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/settings" element={<SettingsPage />} />
                   <Route path="/placements" element={<Placements />} />
                   <Route path="/membership" element={<Membership />} />
                   <Route path="/resources" element={<Resources />} />
