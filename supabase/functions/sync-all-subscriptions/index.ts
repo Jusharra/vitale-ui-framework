@@ -38,7 +38,7 @@ serve(async (req) => {
     // Get all subscriptions with stripe customer IDs that might need syncing
     const { data: subscriptions, error: subscriptionsError } = await supabaseClient
       .from('subscriptions')
-      .select('user_id, stripe_customer_id, status, tier, current_period_end, cancel_at_period_end')
+      .select('id, user_id, email, stripe_customer_id, stripe_subscription_id, status, tier, current_period_end, cancel_at_period_end')
       .not('stripe_customer_id', 'is', null);
 
     if (subscriptionsError) {
@@ -74,9 +74,11 @@ serve(async (req) => {
         let subscriptionTier = null;
         let subscriptionEnd = null;
         let cancelAtPeriodEnd = false;
+        let stripeSubscriptionId = null;
 
         if (hasActiveSub) {
           const stripeSubscription = stripeSubscriptions.data[0];
+          stripeSubscriptionId = stripeSubscription.id;
           subscriptionEnd = new Date(stripeSubscription.current_period_end * 1000).toISOString();
           cancelAtPeriodEnd = stripeSubscription.cancel_at_period_end || false;
 
@@ -95,6 +97,7 @@ serve(async (req) => {
 
           logStep("Active subscription found", { 
             userId: subscription.user_id, 
+            subscriptionId: stripeSubscriptionId,
             tier: subscriptionTier, 
             endDate: subscriptionEnd,
             cancelAtPeriodEnd 
@@ -103,18 +106,23 @@ serve(async (req) => {
           logStep("No active subscription found", { userId: subscription.user_id });
         }
 
+        // Prepare update data with proper null handling
+        const updateData: any = {
+          user_id: subscription.user_id,
+          email: subscription.email, // Preserve existing email
+          stripe_customer_id: subscription.stripe_customer_id,
+          stripe_subscription_id: stripeSubscriptionId,
+          status: hasActiveSub ? 'active' : 'inactive',
+          tier: subscriptionTier,
+          current_period_end: subscriptionEnd,
+          cancel_at_period_end: cancelAtPeriodEnd,
+          updated_at: new Date().toISOString(),
+        };
+
         // Update the subscriptions table
         const { error: upsertError } = await supabaseClient
           .from('subscriptions')
-          .upsert({
-            user_id: subscription.user_id,
-            stripe_customer_id: subscription.stripe_customer_id,
-            status: hasActiveSub ? 'active' : 'inactive',
-            tier: subscriptionTier,
-            current_period_end: subscriptionEnd,
-            cancel_at_period_end: cancelAtPeriodEnd,
-            updated_at: new Date().toISOString(),
-          }, { 
+          .upsert(updateData, { 
             onConflict: 'user_id',
             ignoreDuplicates: false 
           });

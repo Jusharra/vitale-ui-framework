@@ -154,12 +154,19 @@ serve(async (req) => {
         const platformFeeAmount = parseInt(session.metadata?.platform_fee_amount || '0');
         const partnerRevenueAmount = parseInt(session.metadata?.partner_revenue_amount || '0');
         const isGuestCheckout = session.metadata?.is_guest_checkout === 'true';
+        const customerEmail = session.customer_details?.email || session.customer_email;
+
+        // Enhanced validation for essential fields
+        if (!customerEmail) {
+          logStep("ERROR: No customer email found in session", { sessionId: session.id });
+          throw new Error("Customer email is required for subscription processing");
+        }
 
         // For guest checkout, we need to handle user creation differently
         if (isGuestCheckout && !userId) {
           logStep("Guest checkout completed - subscription will be handled by customer email", {
             sessionId: session.id,
-            customerEmail: session.customer_details?.email
+            customerEmail: customerEmail
           });
           // For guest checkout, we'd need additional logic to match or create user
           // This is a more complex flow that would require additional implementation
@@ -167,8 +174,29 @@ serve(async (req) => {
         }
 
         if (!userId) {
-          logStep("No user ID in session metadata");
-          break;
+          logStep("No user ID in session metadata - attempting to handle as guest checkout", {
+            sessionId: session.id,
+            customerEmail: customerEmail
+          });
+          
+          // Try to find existing user by email for guest checkouts
+          const { data: existingUser } = await supabaseClient
+            .from('profiles')
+            .select('id, email')
+            .eq('email', customerEmail)
+            .single();
+            
+          if (!existingUser) {
+            logStep("No existing user found for guest checkout email", { customerEmail });
+            break;
+          }
+          
+          // Use found user ID
+          const foundUserId = existingUser.id;
+          logStep("Found existing user for guest checkout", { 
+            foundUserId, 
+            customerEmail 
+          });
         }
 
         // Get the subscription from Stripe
@@ -195,6 +223,7 @@ serve(async (req) => {
 
           const subscriptionData = {
             user_id: userId,
+            email: customerEmail,
             status: subscription.status,
             tier: tier,
             stripe_customer_id: subscription.customer,
