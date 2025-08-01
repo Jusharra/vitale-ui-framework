@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LanguageSelector from '@/components/i18n/LanguageSelector';
+import SyncDatabaseButton from './SyncDatabaseButton';
 import { useTranslation } from '@/utils/i18n';
 
 const AdminSystemSettings = () => {
@@ -31,10 +32,7 @@ const AdminSystemSettings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Site settings would go here */}
-              <p className="text-muted-foreground text-sm">
-                Coming soon
-              </p>
+              <SyncDatabaseButton />
             </CardContent>
           </Card>
           
