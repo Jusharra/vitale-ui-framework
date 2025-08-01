@@ -46,8 +46,6 @@ const HealthTools = () => {
                 title="Risk Calculator"
                 description="Calculate your risk for common conditions"
                 icon={Heart}
-                locked
-                requiresUpgrade="core"
               />
             </div>
           </div>
@@ -66,15 +64,11 @@ const HealthTools = () => {
                 title="Specialist Referral"
                 description="Get referred to the right specialist quickly"
                 icon={CirclePlus}
-                locked
-                requiresUpgrade="core"
               />
               <FeatureCard
                 title="24/7 Concierge Access"
                 description="On-demand access to healthcare concierge"
                 icon={Calendar}
-                locked
-                requiresUpgrade="vip"
               />
             </div>
           </div>
@@ -98,8 +92,6 @@ const HealthTools = () => {
                 title="Health Insights"
                 description="Get AI-powered insights on your health data"
                 icon={Heart}
-                locked
-                requiresUpgrade="core"
               />
             </div>
           </div>
@@ -119,22 +111,16 @@ const HealthTools = () => {
                 title="Risk Calculator"
                 description="Calculate your risk for common conditions"
                 icon={Heart}
-                locked
-                requiresUpgrade="core"
               />
               <FeatureCard
                 title="Specialist Referral"
                 description="Get referred to the right specialist quickly"
                 icon={CirclePlus}
-                locked
-                requiresUpgrade="core"
               />
               <FeatureCard
                 title="24/7 Concierge Access"
                 description="On-demand access to healthcare concierge"
                 icon={Calendar}
-                locked
-                requiresUpgrade="vip"
               />
             </div>
           </div>
