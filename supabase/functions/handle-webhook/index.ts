@@ -255,29 +255,59 @@ serve(async (req) => {
             subscriptionData.email = customerEmail;
           }
 
-          if (existingSubscription) {
-            // Update existing record
-            await supabaseClient
-              .from('subscriptions')
-              .update(subscriptionData)
-              .eq('id', existingSubscription.id);
-            
-            logStep("Updated existing subscription record", { 
-              subscriptionRecordId: existingSubscription.id,
-              stripeSubscriptionId: subscription.id,
-              status: subscription.status
-            });
-          } else {
-            // Create new record (fallback upsert)
-            await supabaseClient.from('subscriptions').upsert(subscriptionData, { 
-              onConflict: 'user_id' 
-            });
-            
-            logStep("Created/updated subscription record via upsert", {
+          try {
+            if (existingSubscription) {
+              // Update existing record
+              const { error: updateError } = await supabaseClient
+                .from('subscriptions')
+                .update(subscriptionData)
+                .eq('id', existingSubscription.id);
+              
+              if (updateError) {
+                logStep("ERROR: Failed to update existing subscription record", {
+                  error: updateError,
+                  subscriptionRecordId: existingSubscription.id,
+                  stripeSubscriptionId: subscription.id
+                });
+                throw new Error(`Subscription update failed: ${updateError.message}`);
+              }
+              
+              logStep("Updated existing subscription record", { 
+                subscriptionRecordId: existingSubscription.id,
+                stripeSubscriptionId: subscription.id,
+                status: subscription.status
+              });
+            } else {
+              // Create new record using upsert with proper constraint
+              const { error: upsertError } = await supabaseClient
+                .from('subscriptions')
+                .upsert(subscriptionData, { 
+                  onConflict: 'stripe_subscription_id'  // Use unique constraint on stripe_subscription_id
+                });
+              
+              if (upsertError) {
+                logStep("ERROR: Failed to upsert subscription record", {
+                  error: upsertError,
+                  userId: actualUserId,
+                  stripeSubscriptionId: subscription.id
+                });
+                throw new Error(`Subscription upsert failed: ${upsertError.message}`);
+              }
+              
+              logStep("Created/updated subscription record via upsert", {
+                userId: actualUserId,
+                stripeSubscriptionId: subscription.id,
+                status: subscription.status
+              });
+            }
+          } catch (dbError) {
+            logStep("CRITICAL ERROR: Database operation failed", {
+              error: dbError.message,
               userId: actualUserId,
               stripeSubscriptionId: subscription.id,
-              status: subscription.status
+              sessionId: session.id
             });
+            throw dbError;
           }
 
           logStep("Subscription processing completed successfully", {
