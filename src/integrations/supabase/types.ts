@@ -1093,49 +1093,94 @@ export type Database = {
       }
       partner_leads: {
         Row: {
+          admin_notes: string | null
+          application_score: number | null
+          application_type: string | null
+          certifications: Json | null
           conversion_date: string | null
           created_at: string | null
+          detailed_bio: string | null
+          education: Json | null
           first_contact_date: string | null
           id: string
+          info_requests: Json | null
+          insurance_info: Json | null
           last_contact_date: string | null
+          last_status_change: string | null
+          licenses: Json | null
           metadata: Json | null
           next_follow_up: string | null
           notes: string | null
           partner_id: string | null
+          professional_references: Json | null
           profile_id: string | null
+          reviewed_by: string | null
+          service_areas: string[] | null
           source: string | null
           status: string | null
           updated_at: string | null
+          uploaded_documents: Json | null
+          work_history: Json | null
         }
         Insert: {
+          admin_notes?: string | null
+          application_score?: number | null
+          application_type?: string | null
+          certifications?: Json | null
           conversion_date?: string | null
           created_at?: string | null
+          detailed_bio?: string | null
+          education?: Json | null
           first_contact_date?: string | null
           id?: string
+          info_requests?: Json | null
+          insurance_info?: Json | null
           last_contact_date?: string | null
+          last_status_change?: string | null
+          licenses?: Json | null
           metadata?: Json | null
           next_follow_up?: string | null
           notes?: string | null
           partner_id?: string | null
+          professional_references?: Json | null
           profile_id?: string | null
+          reviewed_by?: string | null
+          service_areas?: string[] | null
           source?: string | null
           status?: string | null
           updated_at?: string | null
+          uploaded_documents?: Json | null
+          work_history?: Json | null
         }
         Update: {
+          admin_notes?: string | null
+          application_score?: number | null
+          application_type?: string | null
+          certifications?: Json | null
           conversion_date?: string | null
           created_at?: string | null
+          detailed_bio?: string | null
+          education?: Json | null
           first_contact_date?: string | null
           id?: string
+          info_requests?: Json | null
+          insurance_info?: Json | null
           last_contact_date?: string | null
+          last_status_change?: string | null
+          licenses?: Json | null
           metadata?: Json | null
           next_follow_up?: string | null
           notes?: string | null
           partner_id?: string | null
+          professional_references?: Json | null
           profile_id?: string | null
+          reviewed_by?: string | null
+          service_areas?: string[] | null
           source?: string | null
           status?: string | null
           updated_at?: string | null
+          uploaded_documents?: Json | null
+          work_history?: Json | null
         }
         Relationships: [
           {
@@ -3044,7 +3089,13 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      application_status:
+        | "submitted"
+        | "under_review"
+        | "info_requested"
+        | "resubmitted"
+        | "approved"
+        | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3171,6 +3222,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      application_status: [
+        "submitted",
+        "under_review",
+        "info_requested",
+        "resubmitted",
+        "approved",
+        "rejected",
+      ],
+    },
   },
 } as const
