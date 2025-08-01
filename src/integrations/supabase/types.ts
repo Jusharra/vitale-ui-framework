@@ -1067,47 +1067,6 @@ export type Database = {
         }
         Relationships: []
       }
-      memberships: {
-        Row: {
-          created_at: string | null
-          end_date: string | null
-          id: string
-          membership_type: string | null
-          profile_id: string | null
-          start_date: string | null
-          status: string | null
-          tier: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          end_date?: string | null
-          id?: string
-          membership_type?: string | null
-          profile_id?: string | null
-          start_date?: string | null
-          status?: string | null
-          tier?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          end_date?: string | null
-          id?: string
-          membership_type?: string | null
-          profile_id?: string | null
-          start_date?: string | null
-          status?: string | null
-          tier?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "memberships_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       notes: {
         Row: {
           content: string | null

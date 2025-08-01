@@ -7,6 +7,72 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Input validation utilities
+const validateEmail = (email: string): { isValid: boolean; error?: string; sanitizedValue?: string } => {
+  if (!email || typeof email !== 'string') {
+    return { isValid: false, error: 'Email is required and must be a string' };
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return { isValid: false, error: 'Invalid email format' };
+  }
+
+  if (email.length > 254) {
+    return { isValid: false, error: 'Email address too long' };
+  }
+
+  return { isValid: true, sanitizedValue: email.toLowerCase().trim() };
+};
+
+const validateTier = (tier: string): { isValid: boolean; error?: string; sanitizedValue?: string } => {
+  const allowedTiers = ['premium'];
+  
+  if (!tier || typeof tier !== 'string') {
+    return { isValid: false, error: 'Tier is required and must be a string' };
+  }
+
+  if (!allowedTiers.includes(tier)) {
+    return { isValid: false, error: 'Invalid subscription tier' };
+  }
+
+  return { isValid: true, sanitizedValue: tier };
+};
+
+const validateInterval = (interval: string): { isValid: boolean; error?: string; sanitizedValue?: string } => {
+  const allowedIntervals = ['month', 'year'];
+  
+  if (!interval || typeof interval !== 'string') {
+    return { isValid: false, error: 'Interval is required and must be a string' };
+  }
+
+  if (!allowedIntervals.includes(interval)) {
+    return { isValid: false, error: 'Invalid billing interval' };
+  }
+
+  return { isValid: true, sanitizedValue: interval };
+};
+
+// Rate limiting
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+const checkRateLimit = (identifier: string, maxRequests: number = 5, windowMs: number = 15 * 60 * 1000): { isValid: boolean; error?: string } => {
+  const now = Date.now();
+  const entry = rateLimitStore.get(identifier);
+
+  if (!entry || entry.resetTime < now) {
+    rateLimitStore.set(identifier, { count: 1, resetTime: now + windowMs });
+    return { isValid: true };
+  }
+
+  if (entry.count >= maxRequests) {
+    return { isValid: false, error: `Rate limit exceeded. Try again in ${Math.ceil((entry.resetTime - now) / 1000)} seconds.` };
+  }
+
+  entry.count++;
+  rateLimitStore.set(identifier, entry);
+  return { isValid: true };
+};
+
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
@@ -20,6 +86,16 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
+    // Security: Rate limiting
+    const rateLimitId = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+    const rateLimitCheck = checkRateLimit(rateLimitId, 10, 15 * 60 * 1000); // 10 requests per 15 minutes
+    if (!rateLimitCheck.isValid) {
+      return new Response(
+        JSON.stringify({ error: rateLimitCheck.error }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
 
@@ -30,8 +106,41 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    const { tier, interval = 'month', trial = true, additionalMembers = 0, isGuestCheckout = false } = await req.json();
-    logStep("Request body parsed", { tier, interval, trial, additionalMembers, isGuestCheckout });
+    // Security: Parse and validate request body
+    let requestBody;
+    try {
+      requestBody = await req.json();
+    } catch (error) {
+      logStep('JSON Parse Error', { error: error.message });
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON in request body' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    const { tier, interval = 'month', trial = true, additionalMembers = 0, isGuestCheckout = false } = requestBody;
+    
+    // Security: Input validation
+    const tierValidation = validateTier(tier);
+    if (!tierValidation.isValid) {
+      return new Response(
+        JSON.stringify({ error: tierValidation.error }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const intervalValidation = validateInterval(interval);
+    if (!intervalValidation.isValid) {
+      return new Response(
+        JSON.stringify({ error: intervalValidation.error }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    logStep("Request body parsed and validated", { tier: tierValidation.sanitizedValue, interval: intervalValidation.sanitizedValue, trial, additionalMembers, isGuestCheckout });
 
     let user = null;
     let guestEmail = null;
