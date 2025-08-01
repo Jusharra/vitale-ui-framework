@@ -3,7 +3,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { CheckIcon } from 'lucide-react';
-import StripeSubscriptionButton from '@/components/payments/StripeSubscriptionButton';
+import PublicStripeSubscriptionButton from '@/components/payments/PublicStripeSubscriptionButton';
 
 const Membership = () => {
   const [isYearly, setIsYearly] = useState(false);
@@ -121,11 +121,12 @@ const Membership = () => {
                     </li>
                   </ul>
                   <div className="mt-8">
-                    <StripeSubscriptionButton 
+                    <PublicStripeSubscriptionButton 
                       tier="premium"
                       interval={interval}
                       buttonText="Get Started"
                       className="w-full"
+                      showFamilySelector={true}
                     />
                   </div>
                 </div>
@@ -183,11 +184,12 @@ const Membership = () => {
               Join thousands of members who are taking control of their healthcare experience with Vitalé Health Concierge.
             </p>
             <div className="mt-8">
-              <StripeSubscriptionButton 
+              <PublicStripeSubscriptionButton 
                 tier="premium"
                 interval={interval}
                 buttonText="Sign Up Today"
-                size="lg"
+                className="text-lg px-8 py-3"
+                showFamilySelector={false}
               />
             </div>
           </div>

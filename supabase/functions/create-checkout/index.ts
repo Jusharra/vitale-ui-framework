@@ -30,43 +30,57 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header provided");
+    const { tier, interval = 'month', trial = true, additionalMembers = 0, isGuestCheckout = false } = await req.json();
+    logStep("Request body parsed", { tier, interval, trial, additionalMembers, isGuestCheckout });
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError) throw new Error(`Authentication error: ${userError.message}`);
+    let user = null;
+    let guestEmail = null;
     
-    const user = userData.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
+    if (!isGuestCheckout) {
+      // Authenticated user flow
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader) throw new Error("No authorization header provided");
 
-    logStep("User authenticated", { userId: user.id, email: user.email });
+      const token = authHeader.replace("Bearer ", "");
+      const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
+      if (userError) throw new Error(`Authentication error: ${userError.message}`);
+      
+      user = userData.user;
+      if (!user?.email) throw new Error("User not authenticated or email not available");
+      logStep("User authenticated", { userId: user.id, email: user.email });
+    } else {
+      // Guest checkout flow - we'll collect email in Stripe Checkout
+      logStep("Guest checkout initiated");
+    }
 
-    const { tier, interval = 'month', trial = true, additionalMembers = 0 } = await req.json();
-    logStep("Request body parsed", { tier, interval, trial, additionalMembers });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
 
-    // Check for existing Stripe customer
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    // Check for existing Stripe customer (only for authenticated users)
     let customerId;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-      logStep("Found existing customer", { customerId });
+    if (user?.email) {
+      const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+      if (customers.data.length > 0) {
+        customerId = customers.data[0].id;
+        logStep("Found existing customer", { customerId });
+      }
     }
 
-    // Get user's profile to check for assigned partner
-    const { data: profile, error: profileError } = await supabaseClient
-      .from('profiles')
-      .select('*, assigned_partner_id')
-      .eq('id', user.id)
-      .single();
+    // Get user's profile to check for assigned partner (only for authenticated users)
+    let assignedPartnerId = null;
+    if (user?.id) {
+      const { data: profile, error: profileError } = await supabaseClient
+        .from('profiles')
+        .select('*, assigned_partner_id')
+        .eq('id', user.id)
+        .single();
 
-    if (profileError) {
-      logStep("Profile error", { error: profileError.message });
+      if (profileError) {
+        logStep("Profile error", { error: profileError.message });
+      }
+
+      assignedPartnerId = profile?.assigned_partner_id;
     }
-
-    let assignedPartnerId = profile?.assigned_partner_id;
     let partnerStripeAccount = null;
 
     // If user has an assigned partner, get their Stripe Connect account and platform subscription status
@@ -161,7 +175,7 @@ serve(async (req) => {
             name: "Additional Family Members",
             description: "Additional family members for premium membership"
           },
-          unit_amount: 5000, // $50 per additional family member
+          unit_amount: 64900, // $649 per additional family member
           recurring: { interval: interval === 'year' ? 'year' : 'month' },
         },
         quantity: additionalMembers,
@@ -171,21 +185,28 @@ serve(async (req) => {
     // Create checkout session
     const sessionParams: any = {
       customer: customerId,
-      customer_email: customerId ? undefined : user.email,
+      customer_email: customerId ? undefined : (user?.email || undefined),
       line_items: lineItems,
       mode: "subscription",
       success_url: `${req.headers.get("origin")}/member/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin")}/membership`,
       metadata: {
-        user_id: user.id,
+        user_id: user?.id || '',
         tier,
         interval,
         additional_members: additionalMembers.toString(),
         assigned_partner_id: assignedPartnerId || '',
         platform_fee_amount: applicationFeeAmount.toString(),
-        partner_revenue_amount: (priceInfo.amount - applicationFeeAmount).toString()
+        partner_revenue_amount: (priceInfo.amount - applicationFeeAmount).toString(),
+        is_guest_checkout: isGuestCheckout.toString()
       }
     };
+
+    // For guest checkout, ensure email collection
+    if (isGuestCheckout) {
+      sessionParams.customer_creation = 'always';
+      sessionParams.customer_email = undefined; // Let Stripe collect the email
+    }
 
     // Add trial period if applicable
     if (priceInfo.trial_days > 0) {
@@ -214,21 +235,25 @@ serve(async (req) => {
 
     logStep("Stripe session created", { sessionId: session.id, url: session.url });
 
-    // Store subscription intent in database
-    await supabaseClient.from('subscriptions').upsert({
-      user_id: user.id,
-      status: 'pending',
-      tier,
-      stripe_session_id: session.id,
-      additional_members_count: additionalMembers,
-      assigned_partner_id: assignedPartnerId,
-      platform_fee_amount: applicationFeeAmount,
-      partner_revenue_amount: priceInfo.amount - applicationFeeAmount,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }, { onConflict: 'user_id' });
-
-    logStep("Subscription record created");
+    // Store subscription intent in database (only for authenticated users)
+    if (user?.id) {
+      await supabaseClient.from('subscriptions').upsert({
+        user_id: user.id,
+        status: 'pending',
+        tier,
+        stripe_session_id: session.id,
+        additional_members_count: additionalMembers,
+        assigned_partner_id: assignedPartnerId,
+        platform_fee_amount: applicationFeeAmount,
+        partner_revenue_amount: priceInfo.amount - applicationFeeAmount,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id' });
+      
+      logStep("Subscription record created");
+    } else {
+      logStep("Guest checkout - subscription record will be created after payment completion");
+    }
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
