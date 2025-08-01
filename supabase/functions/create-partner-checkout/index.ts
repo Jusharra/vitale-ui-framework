@@ -90,14 +90,48 @@ serve(async (req) => {
 
     logStep("User confirmed as partner", { userId: user.id, fullName: profile.full_name });
 
-    // Simplified partner record lookup - use only user_id method
+    // Step 1: Verify database connection and table accessibility
+    try {
+      logStep("Verifying database connection and partners table access");
+      const { data: tableTest, error: tableTestError } = await supabaseClient
+        .from('partners')
+        .select('count')
+        .limit(1);
+      
+      if (tableTestError) {
+        logStep("ERROR: Database connection or table access failed", { 
+          error: tableTestError.message,
+          code: tableTestError.code,
+          hint: tableTestError.hint
+        });
+        throw new Error(`Database access verification failed: ${tableTestError.message}`);
+      }
+      
+      logStep("Database connection verified successfully", { tableAccessible: true });
+    } catch (dbTestError) {
+      logStep("CRITICAL ERROR: Cannot access partners table", { 
+        error: dbTestError.message,
+        userId: user.id,
+        userType: typeof user.id
+      });
+      throw new Error(`Database connectivity issue: ${dbTestError.message}`);
+    }
+
+    // Step 2: Partner record lookup with explicit type conversion
     let partner = null;
+    const userIdString = user.id.toString(); // Explicit UUID to string conversion
+    logStep("Starting partner lookup", { 
+      userId: user.id, 
+      userIdString, 
+      userIdType: typeof user.id,
+      stringType: typeof userIdString 
+    });
     
     try {
       const { data: existingPartner, error: partnerQueryError } = await supabaseClient
         .from('partners')
         .select('id, name, email, stripe_connect_account_id, user_id')
-        .eq('user_id', user.id)
+        .eq('user_id', userIdString) // Use converted string
         .maybeSingle();
 
       if (partnerQueryError) {
@@ -109,13 +143,17 @@ serve(async (req) => {
         partner = existingPartner;
         logStep("Existing partner found", { partnerId: partner.id, partnerName: partner.name });
       } else {
-        // Create new partner record
-        logStep("Creating new partner record", { userId: user.id });
+        // Create new partner record with explicit type conversion
+        logStep("Creating new partner record", { 
+          userId: user.id,
+          userIdString: userIdString,
+          email: user.email 
+        });
         
         const { data: newPartner, error: createError } = await supabaseClient
           .from('partners')
           .insert({
-            user_id: user.id,
+            user_id: userIdString, // Use converted string for consistency
             name: profile.full_name || user.email?.split('@')[0] || 'Partner',
             email: user.email,
             status: 'pending'
