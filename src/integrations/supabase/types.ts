@@ -3080,6 +3080,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      generate_slug: {
+        Args: { input_text: string }
+        Returns: string
+      }
       get_user_by_email: {
         Args: { user_email: string }
         Returns: {
