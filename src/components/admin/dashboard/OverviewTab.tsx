@@ -24,15 +24,20 @@ interface OverviewTabProps {
   recentActivities: Activity[];
 }
 
-const OverviewTab: React.FC<OverviewTabProps> = ({ 
+interface OverviewTabExtendedProps extends OverviewTabProps {
+  isLoading?: boolean;
+}
+
+const OverviewTab: React.FC<OverviewTabExtendedProps> = ({ 
   membershipBreakdown, 
-  recentActivities 
+  recentActivities,
+  isLoading = false
 }) => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <MembershipDistribution membershipBreakdown={membershipBreakdown} />
+          <MembershipDistribution membershipBreakdown={membershipBreakdown} isLoading={isLoading} />
         </div>
         <QuickActions />
       </div>

@@ -12,10 +12,10 @@ import PartnersTab from '@/components/admin/dashboard/tabs/PartnersTab';
 import RewardsTab from '@/components/admin/dashboard/tabs/RewardsTab';
 import PromotionsTab from '@/components/admin/dashboard/tabs/PromotionsTab';
 
-// Import mock data
+// Import hooks and mock data
+import { useUserDistribution } from '@/hooks/useUserDistribution';
 import { 
   systemStats, 
-  membershipBreakdown, 
   recentActivities, 
   systemAlerts, 
   leadStats, 
@@ -26,6 +26,7 @@ import {
 
 const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
+  const { membershipBreakdown, isLoading } = useUserDistribution();
 
   return (
     <div className="space-y-8">
@@ -53,6 +54,7 @@ const AdminDashboard: React.FC = () => {
           <OverviewTab 
             membershipBreakdown={membershipBreakdown}
             recentActivities={recentActivities}
+            isLoading={isLoading}
           />
         </TabsContent>
         
