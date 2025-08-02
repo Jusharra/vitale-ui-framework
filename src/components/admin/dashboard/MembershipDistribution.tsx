@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface MembershipTier {
   tier: string;
@@ -39,11 +38,6 @@ const MembershipDistribution: React.FC<MembershipDistributionProps> = ({ members
           ))}
         </div>
       </CardContent>
-      <CardFooter>
-        <Button variant="outline" className="w-full">
-          <span>View Detailed Report</span>
-        </Button>
-      </CardFooter>
     </Card>
   );
 };
