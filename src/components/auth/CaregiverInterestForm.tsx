@@ -7,7 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { UserPlus, ArrowRight } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuthState } from '@/hooks/useAuthState';
+import { UserPlus, ArrowRight, CheckCircle } from 'lucide-react';
 
 const interestFormSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -26,7 +28,9 @@ interface CaregiverInterestFormProps {
 const CaregiverInterestForm: React.FC<CaregiverInterestFormProps> = ({ onClose }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuthState();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const form = useForm<InterestFormData>({
     resolver: zodResolver(interestFormSchema),
@@ -43,29 +47,67 @@ const CaregiverInterestForm: React.FC<CaregiverInterestFormProps> = ({ onClose }
     setIsSubmitting(true);
     
     try {
-      // Store form data in localStorage for the registration process
-      localStorage.setItem('caregiverInterest', JSON.stringify(data));
-      
-      toast({
-        title: "Interest Received!",
-        description: "Redirecting you to complete your caregiver registration...",
-      });
+      // Save caregiver application to partner_leads table
+      const applicationData = {
+        application_type: 'caregiver_application',
+        status: 'submitted',
+        profile_id: user?.id || null,
+        metadata: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          phone: data.phone,
+          email: data.email,
+          city: data.city,
+          submission_date: new Date().toISOString()
+        }
+      };
 
-      // Close dialog and redirect to auth page
-      onClose?.();
-      setTimeout(() => {
-        navigate('/auth?tab=caregiver');
-      }, 1000);
-    } catch (error) {
+      const { error } = await supabase
+        .from('partner_leads')
+        .insert([applicationData]);
+
+      if (error) {
+        throw error;
+      }
+
+      setIsSubmitted(true);
       toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
+        title: "Application Submitted for Review",
+        description: "Your caregiver application has been submitted and is under review. We'll contact you within 1-2 business days.",
+      });
+    } catch (error) {
+      console.error('Error submitting caregiver application:', error);
+      toast({
+        title: "Submission Failed",
+        description: "There was an error submitting your application. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Show success state if form has been submitted
+  if (isSubmitted) {
+    return (
+      <div className="space-y-6 text-center">
+        <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+          <CheckCircle className="h-6 w-6 text-green-600" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900">Application Submitted!</h3>
+        <p className="text-sm text-gray-600">
+          Thank you for your interest in joining our caregiver directory. Your application has been submitted for review and we'll contact you within 1-2 business days.
+        </p>
+        <Button 
+          onClick={() => setIsSubmitted(false)}
+          variant="outline"
+          className="mt-4"
+        >
+          Submit Another Application
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
