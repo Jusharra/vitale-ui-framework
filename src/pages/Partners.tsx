@@ -15,6 +15,7 @@ import { CheckCircle, ArrowRight, Building, Users, FileCheck, MessageSquare, Use
 
 const Partners = () => {
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("facilities");
   const [formData, setFormData] = useState({
     facilityName: '',
     contactPerson: '',
@@ -73,7 +74,7 @@ const Partners = () => {
 
         {/* Partnership Types Tabs */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <Tabs defaultValue="facilities" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
               <TabsTrigger value="facilities" className="flex items-center gap-2">
                 <Building className="h-4 w-4" />
@@ -217,24 +218,17 @@ const Partners = () => {
                   </div>
                 </div>
                 
-                <div className="text-center mt-8">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button size="lg" className="bg-green-600 hover:bg-green-700">
-                        Start Your Caregiver Journey Today
-                        <ArrowRight className="ml-2 h-5 w-5" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Join Our Caregiver Directory</DialogTitle>
-                        <DialogDescription>
-                          Get listed in our premium directory for just $25/month and connect with families in your area.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <CaregiverInterestForm />
-                    </DialogContent>
-                  </Dialog>
+                {/* Caregiver Interest Form */}
+                <div className="bg-white rounded-lg p-8 mt-8 border border-gray-200">
+                  <div className="text-center mb-8">
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      Join Our Caregiver Directory
+                    </h3>
+                    <p className="mt-2 text-gray-600">
+                      Start with your basic information to begin the registration process
+                    </p>
+                  </div>
+                  <CaregiverInterestForm />
                 </div>
               </div>
             </TabsContent>
@@ -330,121 +324,123 @@ const Partners = () => {
           </div>
         </div>
 
-        {/* Partner Form */}
-        <div id="partner-form" className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Apply to Become a Partner Community
-                </h2>
-                <p className="mt-2 text-gray-600">
-                  Fill out the form below to start the conversation.
-                </p>
-              </div>
-
-              {isSubmitted ? (
-                <div className="text-center py-8">
-                  <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-                    <CheckCircle className="h-6 w-6 text-green-600" />
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Application Received</h3>
-                  <p className="text-gray-600 mb-6">
-                    Thank you for your interest in partnering with Vitale Health Concierge. One of our partnership specialists will contact you within 1-2 business days to schedule your discovery call.
+        {/* Partner Form - Only show for Care Facilities tab */}
+        {activeTab === "facilities" && (
+          <div id="partner-form" className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Apply to Become a Partner Community
+                  </h2>
+                  <p className="mt-2 text-gray-600">
+                    Fill out the form below to start the conversation.
                   </p>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setIsSubmitted(false)}
-                  >
-                    Submit Another Application
-                  </Button>
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 gap-6">
-                    <div>
-                      <Label htmlFor="facilityName">Facility Name</Label>
-                      <Input 
-                        id="facilityName" 
-                        name="facilityName" 
-                        value={formData.facilityName}
-                        onChange={handleInputChange}
-                        required 
-                      />
+
+                {isSubmitted ? (
+                  <div className="text-center py-8">
+                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+                      <CheckCircle className="h-6 w-6 text-green-600" />
                     </div>
-                    
-                    <div>
-                      <Label htmlFor="contactPerson">Contact Person</Label>
-                      <Input 
-                        id="contactPerson" 
-                        name="contactPerson" 
-                        value={formData.contactPerson}
-                        onChange={handleInputChange}
-                        required 
-                      />
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Application Received</h3>
+                    <p className="text-gray-600 mb-6">
+                      Thank you for your interest in partnering with Vitale Health Concierge. One of our partnership specialists will contact you within 1-2 business days to schedule your discovery call.
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setIsSubmitted(false)}
+                    >
+                      Submit Another Application
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 gap-6">
                       <div>
-                        <Label htmlFor="phone">Phone</Label>
+                        <Label htmlFor="facilityName">Facility Name</Label>
                         <Input 
-                          id="phone" 
-                          name="phone" 
-                          type="tel" 
-                          value={formData.phone}
+                          id="facilityName" 
+                          name="facilityName" 
+                          value={formData.facilityName}
                           onChange={handleInputChange}
                           required 
                         />
                       </div>
                       
                       <div>
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="contactPerson">Contact Person</Label>
                         <Input 
-                          id="email" 
-                          name="email" 
-                          type="email" 
-                          value={formData.email}
+                          id="contactPerson" 
+                          name="contactPerson" 
+                          value={formData.contactPerson}
                           onChange={handleInputChange}
                           required 
                         />
                       </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <Label htmlFor="phone">Phone</Label>
+                          <Input 
+                            id="phone" 
+                            name="phone" 
+                            type="tel" 
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            required 
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="email">Email</Label>
+                          <Input 
+                            id="email" 
+                            name="email" 
+                            type="email" 
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            required 
+                          />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="cityState">City/State</Label>
+                        <Input 
+                          id="cityState" 
+                          name="cityState" 
+                          value={formData.cityState}
+                          onChange={handleInputChange}
+                          required 
+                        />
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="receiveAgreement" 
+                          checked={formData.receiveAgreement}
+                          onCheckedChange={handleCheckboxChange}
+                        />
+                        <Label htmlFor="receiveAgreement" className="text-sm">
+                          I'd like to receive the agreement and media upload link.
+                        </Label>
+                      </div>
+                      
+                      <Button 
+                        type="submit" 
+                        className="w-full bg-indigo-600 hover:bg-indigo-700"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? 'Submitting...' : 'Submit Application'}
+                      </Button>
                     </div>
-                    
-                    <div>
-                      <Label htmlFor="cityState">City/State</Label>
-                      <Input 
-                        id="cityState" 
-                        name="cityState" 
-                        value={formData.cityState}
-                        onChange={handleInputChange}
-                        required 
-                      />
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="receiveAgreement" 
-                        checked={formData.receiveAgreement}
-                        onCheckedChange={handleCheckboxChange}
-                      />
-                      <Label htmlFor="receiveAgreement" className="text-sm">
-                        I'd like to receive the agreement and media upload link.
-                      </Label>
-                    </div>
-                    
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-indigo-600 hover:bg-indigo-700"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? 'Submitting...' : 'Submit Application'}
-                    </Button>
-                  </div>
-                </form>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                  </form>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Testimonials */}
         <div className="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
