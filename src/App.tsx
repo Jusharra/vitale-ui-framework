@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Index from '@/pages/Index';
 import Placements from '@/pages/Placements';
+import Marketplace from '@/pages/Marketplace';
 import About from '@/pages/About';
 import Financing from '@/pages/Financing';
 import Contact from '@/pages/Contact';
@@ -107,6 +108,7 @@ const App: React.FC = () => {
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/settings" element={<SettingsPage />} />
                   <Route path="/placements" element={<Placements />} />
+                  <Route path="/marketplace" element={<Marketplace />} />
                   <Route path="/membership" element={<Membership />} />
                   <Route path="/resources" element={<Resources />} />
                   <Route path="/services" element={<Services />} />

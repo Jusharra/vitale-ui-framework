@@ -20,7 +20,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     { name: 'About', path: '/about' },
     { name: 'Financing', path: '/financing' },
     { name: 'Membership', path: '/membership' },
-    { name: 'Communities', path: '/placements' },
+    { name: 'Marketplace', path: '/marketplace' },
     { name: 'Services', path: '/services' },
     { name: 'Resources', path: '/resources' },
     { name: 'Partners', path: '/partners' },
