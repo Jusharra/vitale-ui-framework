@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import MediaUploader from '@/components/common/MediaUploader';
 import {
   Dialog,
   DialogContent,
@@ -238,9 +239,16 @@ const AddRewardDialog = ({ open, onOpenChange, onSuccess }: AddRewardDialogProps
               name="image_url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image URL</FormLabel>
+                  <FormLabel>Reward Image</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://example.com/image.jpg" {...field} />
+                    <MediaUploader
+                      currentUrl={field.value}
+                      onUpload={(url) => field.onChange(url)}
+                      onRemove={() => field.onChange('')}
+                      folder="rewards"
+                      accept="image/*"
+                      maxSize={5}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
