@@ -27,6 +27,7 @@ import AdminProfessionalsPage from '@/pages/admin/AdminProfessionalsPage';
 import AdminReportsPage from '@/pages/admin/AdminReportsPage';
 import AdminServicesPage from '@/pages/admin/AdminServicesPage';
 import AdminPartnerApprovalsPage from '@/pages/admin/AdminPartnerApprovalsPage';
+import AdminEarningsPage from '@/pages/admin/AdminEarningsPage';
 import ProfessionalPage from '@/pages/ProfessionalDashboard';
 import MemberConciergePage from '@/pages/member/Concierge';
 import MemberPharmacyPage from '@/pages/member/Pharmacy';
@@ -383,6 +384,14 @@ const App: React.FC = () => {
                     element={
                       <ProtectedRoute requiredRole="admin">
                         <AdminPartnerApprovalsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/admin/earnings"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminEarningsPage />
                       </ProtectedRoute>
                     }
                   />
