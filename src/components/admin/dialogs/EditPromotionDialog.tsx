@@ -36,11 +36,11 @@ const formSchema = z.object({
   description: z.string().optional(),
   type: z.string().min(1, 'Type is required'),
   reward_amount: z.number().min(0, 'Reward amount must be positive'),
-  expires_at: z.string().optional(),
-  status: z.enum(['active', 'inactive', 'expired']),
-  max_uses: z.number().min(1).optional(),
-  current_uses: z.number().min(0).default(0),
-  terms_and_conditions: z.string().optional(),
+  expires_at: z.string().min(1, 'Expiration date is required'),
+  status: z.string().min(1, 'Status is required'),
+  redemption_limit: z.number().min(1).optional(),
+  redemptions_used: z.number().min(0).default(0),
+  terms_conditions: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -68,10 +68,10 @@ const EditPromotionDialog: React.FC<EditPromotionDialogProps> = ({
       type: promotion?.type || '',
       reward_amount: promotion?.reward_amount || 0,
       expires_at: promotion?.expires_at ? promotion.expires_at.split('T')[0] : '',
-      status: promotion?.status || 'active',
-      max_uses: promotion?.max_uses || undefined,
-      current_uses: promotion?.current_uses || 0,
-      terms_and_conditions: promotion?.terms_and_conditions || '',
+      status: promotion?.status || '',
+      redemption_limit: promotion?.redemption_limit || undefined,
+      redemptions_used: promotion?.redemptions_used || 0,
+      terms_conditions: promotion?.terms_conditions || '',
     },
   });
 
@@ -83,10 +83,10 @@ const EditPromotionDialog: React.FC<EditPromotionDialogProps> = ({
         type: promotion.type || '',
         reward_amount: promotion.reward_amount || 0,
         expires_at: promotion.expires_at ? promotion.expires_at.split('T')[0] : '',
-        status: promotion.status || 'active',
-        max_uses: promotion.max_uses || undefined,
-        current_uses: promotion.current_uses || 0,
-        terms_and_conditions: promotion.terms_and_conditions || '',
+        status: promotion.status || '',
+        redemption_limit: promotion.redemption_limit || undefined,
+        redemptions_used: promotion.redemptions_used || 0,
+        terms_conditions: promotion.terms_conditions || '',
       });
     }
   }, [promotion, open, form]);
@@ -100,11 +100,11 @@ const EditPromotionDialog: React.FC<EditPromotionDialogProps> = ({
           description: values.description,
           type: values.type,
           reward_amount: values.reward_amount,
-          expires_at: values.expires_at || null,
+          expires_at: values.expires_at,
           status: values.status,
-          max_uses: values.max_uses || null,
-          current_uses: values.current_uses,
-          terms_and_conditions: values.terms_and_conditions,
+          redemption_limit: values.redemption_limit || null,
+          redemptions_used: values.redemptions_used,
+          terms_conditions: values.terms_conditions,
         })
         .eq('id', promotion.id);
 
@@ -208,9 +208,9 @@ const EditPromotionDialog: React.FC<EditPromotionDialogProps> = ({
                 name="expires_at"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Expiration Date</FormLabel>
+                    <FormLabel>Expiration Date *</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input type="date" {...field} required />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -223,18 +223,9 @@ const EditPromotionDialog: React.FC<EditPromotionDialogProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
-                        <SelectItem value="expired">Expired</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Input placeholder="e.g., active, expired" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -244,10 +235,10 @@ const EditPromotionDialog: React.FC<EditPromotionDialogProps> = ({
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="max_uses"
+                name="redemption_limit"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Max Uses (optional)</FormLabel>
+                    <FormLabel>Redemption Limit (optional)</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
@@ -264,10 +255,10 @@ const EditPromotionDialog: React.FC<EditPromotionDialogProps> = ({
               
               <FormField
                 control={form.control}
-                name="current_uses"
+                name="redemptions_used"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Current Uses</FormLabel>
+                    <FormLabel>Redemptions Used</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
@@ -283,7 +274,7 @@ const EditPromotionDialog: React.FC<EditPromotionDialogProps> = ({
             
             <FormField
               control={form.control}
-              name="terms_and_conditions"
+              name="terms_conditions"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Terms and Conditions</FormLabel>
