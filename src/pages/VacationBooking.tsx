@@ -1,15 +1,15 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import Layout from '@/components/layout/Layout';
+import MainLayout from '@/components/layout/MainLayout';
 import VacationBookingContent from '@/components/vacation/VacationBookingContent';
 
 const VacationBooking = () => {
   const { slug } = useParams<{ slug: string }>();
 
   return (
-    <Layout>
+    <MainLayout>
       <VacationBookingContent packageSlug={slug} />
-    </Layout>
+    </MainLayout>
   );
 };
 
