@@ -12,6 +12,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRegionalPricing } from '@/hooks/useRegionalPricing';
 import { supabase } from '@/integrations/supabase/client';
 import TravelDatePicker from './TravelDatePicker';
+import SocialShareButton from './SocialShareButton';
 import { generateSlug } from '@/utils/stringUtils';
 import { MapPin, Users, Star, Wifi, Car, Coffee, Utensils, Calendar, DollarSign } from 'lucide-react';
 
@@ -274,11 +275,18 @@ const VacationBookingContent: React.FC<{ packageSlug?: string }> = ({ packageSlu
                     )}
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right space-y-2">
                   <div className="text-2xl font-bold text-primary">
                     {formatCurrency(vacationPackage.price)}
                   </div>
                   <div className="text-sm text-muted-foreground">per night</div>
+                  <SocialShareButton
+                    packageName={vacationPackage.destination_name}
+                    packageDescription={vacationPackage.description_short}
+                    packagePrice={vacationPackage.price}
+                    packageImage={vacationPackage.image_url}
+                    bookingUrl={window.location.href}
+                  />
                 </div>
               </div>
             </CardHeader>
