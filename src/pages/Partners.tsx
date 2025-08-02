@@ -68,39 +68,6 @@ const Partners = () => {
             <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
               Whether you're a care facility or an individual caregiver, join our premium network and connect with families seeking quality care options.
             </p>
-            
-            {/* Dual CTA Buttons */}
-            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="bg-indigo-600 hover:bg-indigo-700"
-                onClick={() => document.getElementById('partner-form').scrollIntoView({ behavior: 'smooth' })}
-              >
-                <Building className="mr-2 h-5 w-5" />
-                Partner Your Facility
-              </Button>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="border-indigo-600 text-indigo-600 hover:bg-indigo-50"
-                  >
-                    <UserPlus className="mr-2 h-5 w-5" />
-                    Join as Caregiver
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Join Our Caregiver Directory</DialogTitle>
-                    <DialogDescription>
-                      Get listed in our premium directory for just $25/month and connect with families in your area.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <CaregiverInterestForm />
-                </DialogContent>
-              </Dialog>
-            </div>
           </div>
         </div>
 
