@@ -57,7 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
       <SidebarLink to="/dashboard/share-and-earn" icon={Gift}>Share & Earn</SidebarLink>
       <SidebarLink to="/dashboard/promotions" icon={Tag}>Promotions</SidebarLink>
       <SidebarLink to="/dashboard/messages" icon={MessageSquare}>Messages</SidebarLink>
-      <SidebarLink to="/membership" icon={CreditCard}>Membership</SidebarLink>
+      <SidebarLink to="/dashboard/membership" icon={CreditCard}>Membership</SidebarLink>
       <SidebarLink to="/settings" icon={Settings}>Settings</SidebarLink>
       <SidebarLink to="/profile" icon={User}>Profile</SidebarLink>
       <SidebarLink to="/dashboard/health-tools" icon={Heart}>Health Tools</SidebarLink>
@@ -76,7 +76,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
       <SidebarLink to="/profile" icon={User}>Profile</SidebarLink>
       <SidebarLink to="/dashboard/professional/profile" icon={UserCog}>Professional Settings</SidebarLink>
       <SidebarLink to="/settings" icon={Settings}>Settings</SidebarLink>
-      <SidebarLink to="/membership" icon={CreditCard}>Membership</SidebarLink>
+      <SidebarLink to="/dashboard/membership" icon={CreditCard}>Membership</SidebarLink>
       <SidebarLink to="/dashboard/professional/analytics" icon={BarChart}>Analytics</SidebarLink>
     </>
   );
@@ -99,7 +99,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
       <SidebarLink to="/dashboard/admin/settings" icon={Settings}>System Settings</SidebarLink>
       <SidebarLink to="/profile" icon={User}>Profile</SidebarLink>
       <SidebarLink to="/settings" icon={Settings}>Settings</SidebarLink>
-      <SidebarLink to="/membership" icon={CreditCard}>Membership</SidebarLink>
+      <SidebarLink to="/dashboard/membership" icon={CreditCard}>Membership</SidebarLink>
     </>
   );
 
@@ -112,7 +112,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
       <SidebarLink to="/caregiver/subscription" icon={CreditCard}>Subscription</SidebarLink>
       <SidebarLink to="/profile" icon={User}>Profile</SidebarLink>
       <SidebarLink to="/settings" icon={Settings}>Settings</SidebarLink>
-      <SidebarLink to="/membership" icon={CreditCard}>Membership</SidebarLink>
+      <SidebarLink to="/dashboard/membership" icon={CreditCard}>Membership</SidebarLink>
       <SidebarLink to="/caregiver/messages" icon={MessageSquare}>Messages</SidebarLink>
       <SidebarLink to="/caregiver/earnings" icon={BadgeDollarSign}>Earnings</SidebarLink>
     </>
