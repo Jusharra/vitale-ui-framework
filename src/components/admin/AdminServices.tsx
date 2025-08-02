@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { Search, Plus, Edit, Trash2, Image, Loader2 } from 'lucide-react';
+import MediaUploader from '@/components/common/MediaUploader';
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -117,6 +118,22 @@ const AdminServices = () => {
     setFormData(prev => ({
       ...prev,
       active: checked
+    }));
+  };
+
+  // Handle image upload
+  const handleImageUpload = (url: string) => {
+    setFormData(prev => ({
+      ...prev,
+      image_url: url
+    }));
+  };
+
+  // Handle image removal
+  const handleImageRemove = () => {
+    setFormData(prev => ({
+      ...prev,
+      image_url: ''
     }));
   };
 
@@ -382,28 +399,27 @@ const AdminServices = () => {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="duration">Duration</Label>
-                    <Input
-                      id="duration"
-                      name="duration"
-                      value={formData.duration}
-                      onChange={handleInputChange}
-                      placeholder="e.g., 60 min"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="image_url">Image URL</Label>
-                    <Input
-                      id="image_url"
-                      name="image_url"
-                      value={formData.image_url}
-                      onChange={handleInputChange}
-                      placeholder="https://example.com/image.jpg"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="duration">Duration</Label>
+                  <Input
+                    id="duration"
+                    name="duration"
+                    value={formData.duration}
+                    onChange={handleInputChange}
+                    placeholder="e.g., 60 min"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Service Image</Label>
+                  <MediaUploader
+                    currentUrl={formData.image_url}
+                    onUpload={handleImageUpload}
+                    onRemove={handleImageRemove}
+                    folder="services"
+                    accept="image/*"
+                    maxSize={5}
+                  />
                 </div>
                 
                 <div className="flex items-center space-x-2">
@@ -435,7 +451,8 @@ const AdminServices = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[300px]">Service</TableHead>
+                <TableHead className="w-[80px]">Image</TableHead>
+                <TableHead className="w-[280px]">Service</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Duration</TableHead>
@@ -446,7 +463,7 @@ const AdminServices = () => {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
+                  <TableCell colSpan={7} className="h-24 text-center">
                     <div className="flex justify-center">
                       <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
@@ -454,7 +471,7 @@ const AdminServices = () => {
                 </TableRow>
               ) : filteredServices.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
+                  <TableCell colSpan={7} className="h-24 text-center">
                     {searchTerm ? "No services found matching your search" : "No services found"}
                   </TableCell>
                 </TableRow>
@@ -462,8 +479,21 @@ const AdminServices = () => {
                 filteredServices.map((service) => (
                   <TableRow key={service.id}>
                     <TableCell>
+                      {service.image_url ? (
+                        <img 
+                          src={service.image_url} 
+                          alt={service.name}
+                          className="w-12 h-12 object-cover rounded-md"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-muted rounded-md flex items-center justify-center">
+                          <Image className="h-6 w-6 text-muted-foreground" />
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       <div className="font-medium">{service.name}</div>
-                      <div className="text-xs text-muted-foreground truncate max-w-[280px]">
+                      <div className="text-xs text-muted-foreground truncate max-w-[250px]">
                         {service.description}
                       </div>
                     </TableCell>
@@ -580,28 +610,27 @@ const AdminServices = () => {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-duration">Duration</Label>
-                <Input
-                  id="edit-duration"
-                  name="duration"
-                  value={formData.duration}
-                  onChange={handleInputChange}
-                  placeholder="e.g., 60 min"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="edit-image_url">Image URL</Label>
-                <Input
-                  id="edit-image_url"
-                  name="image_url"
-                  value={formData.image_url}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-duration">Duration</Label>
+              <Input
+                id="edit-duration"
+                name="duration"
+                value={formData.duration}
+                onChange={handleInputChange}
+                placeholder="e.g., 60 min"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Service Image</Label>
+              <MediaUploader
+                currentUrl={formData.image_url}
+                onUpload={handleImageUpload}
+                onRemove={handleImageRemove}
+                folder="services"
+                accept="image/*"
+                maxSize={5}
+              />
             </div>
             
             <div className="flex items-center space-x-2">
