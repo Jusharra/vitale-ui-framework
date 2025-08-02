@@ -32,6 +32,8 @@ import AddPromotionDialog from './dialogs/AddPromotionDialog';
 import AddOfferDialog from './dialogs/AddOfferDialog';
 import AddRewardDialog from './dialogs/AddRewardDialog';
 import EditPromotionDialog from './dialogs/EditPromotionDialog';
+import EditOfferDialog from './dialogs/EditOfferDialog';
+import EditRewardDialog from './dialogs/EditRewardDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -54,9 +56,16 @@ const AdminPromotions: React.FC = () => {
   const [isAddOfferOpen, setIsAddOfferOpen] = useState(false);
   const [isAddRewardOpen, setIsAddRewardOpen] = useState(false);
   const [isEditPromotionOpen, setIsEditPromotionOpen] = useState(false);
+  const [isEditOfferOpen, setIsEditOfferOpen] = useState(false);
+  const [isEditRewardOpen, setIsEditRewardOpen] = useState(false);
   const [selectedPromotion, setSelectedPromotion] = useState(null);
+  const [selectedOffer, setSelectedOffer] = useState(null);
+  const [selectedReward, setSelectedReward] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [promotionToDelete, setPromotionToDelete] = useState(null);
+  const [offerToDelete, setOfferToDelete] = useState(null);
+  const [rewardToDelete, setRewardToDelete] = useState(null);
+  const [deleteType, setDeleteType] = useState('promotion');
   
   const { toast } = useToast();
 
@@ -144,35 +153,92 @@ const AdminPromotions: React.FC = () => {
     setIsEditPromotionOpen(true);
   };
 
+  const handleEditOffer = (offer: any) => {
+    setSelectedOffer(offer);
+    setIsEditOfferOpen(true);
+  };
+
+  const handleEditReward = (reward: any) => {
+    setSelectedReward(reward);
+    setIsEditRewardOpen(true);
+  };
+
   const handleDeletePromotion = (promotion: any) => {
     setPromotionToDelete(promotion);
+    setDeleteType('promotion');
     setDeleteDialogOpen(true);
   };
 
-  const confirmDeletePromotion = async () => {
-    if (!promotionToDelete) return;
+  const handleDeleteOffer = (offer: any) => {
+    setOfferToDelete(offer);
+    setDeleteType('offer');
+    setDeleteDialogOpen(true);
+  };
 
+  const handleDeleteReward = (reward: any) => {
+    setRewardToDelete(reward);
+    setDeleteType('reward');
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
     try {
-      const { error } = await supabase
-        .from('promotions')
-        .delete()
-        .eq('id', promotionToDelete.id);
+      let error;
+      let tableName = '';
+      let itemName = '';
+
+      switch (deleteType) {
+        case 'promotion':
+          if (!promotionToDelete) return;
+          ({ error } = await supabase
+            .from('promotions')
+            .delete()
+            .eq('id', promotionToDelete.id));
+          tableName = 'promotions';
+          itemName = 'Promotion';
+          break;
+        
+        case 'offer':
+          if (!offerToDelete) return;
+          ({ error } = await supabase
+            .from('partner_offers')
+            .delete()
+            .eq('id', offerToDelete.id));
+          tableName = 'partner_offers';
+          itemName = 'Offer';
+          break;
+        
+        case 'reward':
+          if (!rewardToDelete) return;
+          ({ error } = await supabase
+            .from('member_rewards')
+            .delete()
+            .eq('id', rewardToDelete.id));
+          tableName = 'member_rewards';
+          itemName = 'Reward';
+          break;
+        
+        default:
+          return;
+      }
 
       if (error) throw error;
 
       toast({
         title: 'Success',
-        description: 'Promotion deleted successfully',
+        description: `${itemName} deleted successfully`,
       });
 
       await fetchData();
       setDeleteDialogOpen(false);
       setPromotionToDelete(null);
+      setOfferToDelete(null);
+      setRewardToDelete(null);
     } catch (error) {
-      console.error('Error deleting promotion:', error);
+      console.error(`Error deleting ${deleteType}:`, error);
       toast({
         title: 'Error',
-        description: 'Failed to delete promotion',
+        description: `Failed to delete ${deleteType}`,
         variant: 'destructive',
       });
     }
@@ -337,16 +403,25 @@ const AdminPromotions: React.FC = () => {
                               <Badge variant="secondary">Not Available</Badge>
                             )}
                           </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button size="sm" variant="outline">
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button size="sm" variant="outline" className="text-destructive hover:text-destructive">
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
+                           <TableCell className="text-right">
+                             <div className="flex justify-end gap-2">
+                               <Button 
+                                 size="sm" 
+                                 variant="outline"
+                                 onClick={() => handleEditOffer(offer)}
+                               >
+                                 <Edit className="w-4 h-4" />
+                               </Button>
+                               <Button 
+                                 size="sm" 
+                                 variant="outline" 
+                                 className="text-destructive hover:text-destructive"
+                                 onClick={() => handleDeleteOffer(offer)}
+                               >
+                                 <Trash2 className="w-4 h-4" />
+                               </Button>
+                             </div>
+                           </TableCell>
                         </TableRow>
                       ))
                     )}
@@ -398,16 +473,25 @@ const AdminPromotions: React.FC = () => {
                               {reward.status}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button size="sm" variant="outline">
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button size="sm" variant="outline" className="text-destructive hover:text-destructive">
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
+                           <TableCell className="text-right">
+                             <div className="flex justify-end gap-2">
+                               <Button 
+                                 size="sm" 
+                                 variant="outline"
+                                 onClick={() => handleEditReward(reward)}
+                               >
+                                 <Edit className="w-4 h-4" />
+                               </Button>
+                               <Button 
+                                 size="sm" 
+                                 variant="outline" 
+                                 className="text-destructive hover:text-destructive"
+                                 onClick={() => handleDeleteReward(reward)}
+                               >
+                                 <Trash2 className="w-4 h-4" />
+                               </Button>
+                             </div>
+                           </TableCell>
                         </TableRow>
                       ))
                     )}
@@ -446,18 +530,36 @@ const AdminPromotions: React.FC = () => {
         />
       )}
 
+      {selectedOffer && (
+        <EditOfferDialog 
+          open={isEditOfferOpen} 
+          onOpenChange={setIsEditOfferOpen}
+          onSuccess={fetchData}
+          offer={selectedOffer}
+        />
+      )}
+
+      {selectedReward && (
+        <EditRewardDialog 
+          open={isEditRewardOpen} 
+          onOpenChange={setIsEditRewardOpen}
+          onSuccess={fetchData}
+          reward={selectedReward}
+        />
+      )}
+
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Promotion</AlertDialogTitle>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{promotionToDelete?.title}"? This action cannot be undone.
+              This action cannot be undone. This will permanently delete the {deleteType}.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction 
-              onClick={confirmDeletePromotion}
+              onClick={confirmDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
