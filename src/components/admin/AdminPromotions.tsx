@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Award, Briefcase, CalendarPlus, Plus, Search, Trash2, Edit, BarChart2 } from 'lucide-react';
+import { Award, Briefcase, CalendarPlus, Plus, Search, Trash2, Edit, TrendingUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -31,6 +31,17 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import AddPromotionDialog from './dialogs/AddPromotionDialog';
 import AddOfferDialog from './dialogs/AddOfferDialog';
 import AddRewardDialog from './dialogs/AddRewardDialog';
+import EditPromotionDialog from './dialogs/EditPromotionDialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const AdminPromotions: React.FC = () => {
   const [activeTab, setActiveTab] = useState('promotions');
@@ -42,6 +53,10 @@ const AdminPromotions: React.FC = () => {
   const [isAddPromotionOpen, setIsAddPromotionOpen] = useState(false);
   const [isAddOfferOpen, setIsAddOfferOpen] = useState(false);
   const [isAddRewardOpen, setIsAddRewardOpen] = useState(false);
+  const [isEditPromotionOpen, setIsEditPromotionOpen] = useState(false);
+  const [selectedPromotion, setSelectedPromotion] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [promotionToDelete, setPromotionToDelete] = useState(null);
   
   const { toast } = useToast();
 
@@ -121,6 +136,45 @@ const AdminPromotions: React.FC = () => {
         break;
       default:
         break;
+    }
+  };
+
+  const handleEditPromotion = (promotion: any) => {
+    setSelectedPromotion(promotion);
+    setIsEditPromotionOpen(true);
+  };
+
+  const handleDeletePromotion = (promotion: any) => {
+    setPromotionToDelete(promotion);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeletePromotion = async () => {
+    if (!promotionToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('promotions')
+        .delete()
+        .eq('id', promotionToDelete.id);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Success',
+        description: 'Promotion deleted successfully',
+      });
+
+      await fetchData();
+      setDeleteDialogOpen(false);
+      setPromotionToDelete(null);
+    } catch (error) {
+      console.error('Error deleting promotion:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete promotion',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -210,15 +264,24 @@ const AdminPromotions: React.FC = () => {
                           </TableCell>
                           <TableCell className="text-center">
                             <Button variant="ghost" size="sm">
-                              <BarChart2 className="w-4 h-4" />
+                              <TrendingUp className="w-4 h-4" />
                             </Button>
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
-                              <Button size="sm" variant="outline">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => handleEditPromotion(promotion)}
+                              >
                                 <Edit className="w-4 h-4" />
                               </Button>
-                              <Button size="sm" variant="outline" className="text-destructive hover:text-destructive">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="text-destructive hover:text-destructive"
+                                onClick={() => handleDeletePromotion(promotion)}
+                              >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
                             </div>
@@ -373,6 +436,35 @@ const AdminPromotions: React.FC = () => {
         onOpenChange={setIsAddRewardOpen}
         onSuccess={fetchData}
       />
+      
+      {selectedPromotion && (
+        <EditPromotionDialog 
+          open={isEditPromotionOpen} 
+          onOpenChange={setIsEditPromotionOpen}
+          onSuccess={fetchData}
+          promotion={selectedPromotion}
+        />
+      )}
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Promotion</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{promotionToDelete?.title}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDeletePromotion}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 };
