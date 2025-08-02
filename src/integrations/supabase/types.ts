@@ -2935,6 +2935,81 @@ export type Database = {
         }
         Relationships: []
       }
+      vacation_bookings: {
+        Row: {
+          booking_reference: string
+          booking_status: string
+          check_in_date: string
+          check_out_date: string
+          created_at: string
+          discount_amount: number | null
+          guest_email: string
+          guest_name: string
+          guest_phone: string | null
+          id: string
+          membership_tier: string | null
+          number_of_guests: number
+          original_amount: number
+          package_id: string
+          package_name: string
+          payment_status: string
+          special_requests: string | null
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          total_amount: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          booking_reference?: string
+          booking_status?: string
+          check_in_date: string
+          check_out_date: string
+          created_at?: string
+          discount_amount?: number | null
+          guest_email: string
+          guest_name: string
+          guest_phone?: string | null
+          id?: string
+          membership_tier?: string | null
+          number_of_guests?: number
+          original_amount: number
+          package_id: string
+          package_name: string
+          payment_status?: string
+          special_requests?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          total_amount: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          booking_reference?: string
+          booking_status?: string
+          check_in_date?: string
+          check_out_date?: string
+          created_at?: string
+          discount_amount?: number | null
+          guest_email?: string
+          guest_name?: string
+          guest_phone?: string | null
+          id?: string
+          membership_tier?: string | null
+          number_of_guests?: number
+          original_amount?: number
+          package_id?: string
+          package_name?: string
+          payment_status?: string
+          special_requests?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          total_amount?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       vacation_packages: {
         Row: {
           amenities: string[] | null

@@ -53,6 +53,8 @@ import FacilityPage from '@/pages/care/[slug]';
 import FamilyManagement from '@/pages/member/FamilyManagement';
 import ProfessionalProfilePage from '@/pages/professional/[slug]';
 import Resources from '@/pages/Resources';
+import VacationBooking from '@/pages/VacationBooking';
+import BookingSuccess from '@/pages/BookingSuccess';
 
 // Blog pages
 import BlogIndex from '@/pages/blog/index';
@@ -119,6 +121,10 @@ const App: React.FC = () => {
                   
                   {/* Professional routes */}
                   <Route path="/professional/:slug" element={<ProfessionalProfilePage />} />
+                  
+                  {/* Vacation booking routes */}
+                  <Route path="/book/:slug" element={<VacationBooking />} />
+                  <Route path="/booking-success" element={<BookingSuccess />} />
                   
                   {/* Blog post routes */}
                   <Route path="/blog/iv-therapy-hospice-san-mateo-county" element={<SanMateoCountyBlog />} />
