@@ -15,6 +15,7 @@ import { Check, Filter, Plus, Search, Trash, Upload, Edit, Loader2 } from 'lucid
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useVacationPackages, VacationPackage } from '@/hooks/useVacationPackages';
 import EditVacationModal from '@/components/admin/dialogs/EditVacationModal';
+import MediaUploader from '@/components/common/MediaUploader';
 
 const AdminVacations: React.FC = () => {
   const { packages, loading, createPackage, updatePackage, deletePackage, toggleFeatured } = useVacationPackages();
@@ -256,21 +257,15 @@ const AdminVacations: React.FC = () => {
                   </Select>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="image_url">Image URL</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="image_url"
-                      name="image_url"
-                      value={formData.image_url}
-                      onChange={handleInputChange}
-                      placeholder="https://example.com/image.jpg"
-                      className="flex-1"
-                    />
-                    <Button variant="outline" size="icon">
-                      <Upload className="h-4 w-4" />
-                    </Button>
-                  </div>
+                <div className="col-span-2 space-y-2">
+                  <Label>Package Image</Label>
+                  <MediaUploader
+                    currentUrl={formData.image_url || ''}
+                    onUpload={(url) => setFormData({...formData, image_url: url})}
+                    onRemove={() => setFormData({...formData, image_url: ''})}
+                    folder="vacation-packages"
+                    maxSize={10}
+                  />
                 </div>
                 
                 <div className="space-y-2">

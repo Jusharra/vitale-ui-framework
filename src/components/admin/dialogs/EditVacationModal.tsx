@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Upload } from 'lucide-react';
 import { VacationPackage } from '@/hooks/useVacationPackages';
+import MediaUploader from '@/components/common/MediaUploader';
 
 interface EditVacationModalProps {
   isOpen: boolean;
@@ -175,21 +176,15 @@ const EditVacationModal: React.FC<EditVacationModalProps> = ({
               </Select>
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="image_url">Image URL</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="image_url"
-                  name="image_url"
-                  value={formData.image_url || ''}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/image.jpg"
-                  className="flex-1"
-                />
-                <Button variant="outline" size="icon">
-                  <Upload className="h-4 w-4" />
-                </Button>
-              </div>
+            <div className="col-span-2 space-y-2">
+              <Label>Package Image</Label>
+              <MediaUploader
+                currentUrl={formData.image_url || ''}
+                onUpload={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
+                onRemove={() => setFormData(prev => ({ ...prev, image_url: '' }))}
+                folder="vacation-packages"
+                maxSize={10}
+              />
             </div>
             
             <div className="space-y-2">
