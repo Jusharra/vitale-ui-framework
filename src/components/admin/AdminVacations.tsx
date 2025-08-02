@@ -11,101 +11,17 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Check, Filter, Plus, Search, Trash, Upload } from 'lucide-react';
+import { Check, Filter, Plus, Search, Trash, Upload, Edit, Loader2 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-
-// Define the type for vacation packages
-interface VacationPackage {
-  id: string;
-  destination_name: string;
-  region: string;
-  description_short: string;
-  description_full: string;
-  price: number;
-  duration: string;
-  package_type: string;
-  image_url: string;
-  status: string;
-  amenities: string[];
-  available_dates: {
-    start_date: string;
-    end_date: string;
-  };
-  featured: boolean;
-  booking_link?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-// Mock vacation packages data
-const mockVacationPackages: VacationPackage[] = [
-  {
-    id: "vp-001",
-    destination_name: "Bali Serenity Retreat",
-    region: "Asia",
-    description_short: "Luxurious beachfront villas with private pools",
-    description_full: "Experience ultimate tranquility in our exclusive Bali retreat. Nestled between lush tropical gardens and pristine beaches, our resort offers the perfect getaway for those seeking peace and luxury. Each villa features a private pool, outdoor shower, and stunning ocean views.",
-    price: 2499,
-    duration: "7 days",
-    package_type: "Luxury",
-    image_url: "/assets/images/vacations/bali.jpg",
-    status: "active",
-    amenities: ["Private pool", "Spa access", "Daily yoga", "Airport transfer", "All meals included"],
-    available_dates: {
-      start_date: "2025-06-01",
-      end_date: "2025-09-30"
-    },
-    featured: true,
-    created_at: "2025-01-15T10:30:00Z",
-    updated_at: "2025-04-10T14:45:00Z"
-  },
-  {
-    id: "vp-002",
-    destination_name: "Swiss Alps Adventure",
-    region: "Europe",
-    description_short: "Mountain chalets with skiing and hiking packages",
-    description_full: "Discover the breathtaking beauty of the Swiss Alps with our complete adventure package. Stay in authentic wooden chalets with modern amenities and enjoy daily guided activities including skiing, hiking, and mountain biking. Perfect for active families and adventure seekers.",
-    price: 1899,
-    duration: "5 days",
-    package_type: "Adventure",
-    image_url: "/assets/images/vacations/swiss-alps.jpg",
-    status: "active",
-    amenities: ["Ski equipment", "Guided tours", "Hot tub", "Breakfast included", "Mountain views"],
-    available_dates: {
-      start_date: "2025-11-15",
-      end_date: "2026-03-20"
-    },
-    featured: false,
-    created_at: "2025-02-20T09:15:00Z",
-    updated_at: "2025-04-05T11:30:00Z"
-  },
-  {
-    id: "vp-003",
-    destination_name: "Caribbean Cruise Exclusive",
-    region: "Caribbean",
-    description_short: "Luxury cruise with island-hopping experience",
-    description_full: "Set sail on our premium cruise ship and explore the Caribbean's most beautiful islands. This all-inclusive package features luxury cabins, gourmet dining options, and exciting shore excursions at each destination. Enjoy onboard entertainment, spa treatments, and breathtaking ocean views.",
-    price: 3299,
-    duration: "10 days",
-    package_type: "Cruise",
-    image_url: "/assets/images/vacations/caribbean.jpg",
-    status: "draft",
-    amenities: ["Ocean view cabin", "All-inclusive dining", "Pool access", "Evening entertainment", "Island excursions"],
-    available_dates: {
-      start_date: "2025-07-10",
-      end_date: "2025-12-15"
-    },
-    featured: true,
-    created_at: "2025-03-05T16:20:00Z",
-    updated_at: "2025-04-12T10:10:00Z"
-  }
-];
+import { useVacationPackages, VacationPackage } from '@/hooks/useVacationPackages';
+import EditVacationModal from '@/components/admin/dialogs/EditVacationModal';
 
 const AdminVacations: React.FC = () => {
-  const [packages, setPackages] = useState<VacationPackage[]>(mockVacationPackages);
+  const { packages, loading, createPackage, updatePackage, deletePackage, toggleFeatured } = useVacationPackages();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingPackage, setEditingPackage] = useState<VacationPackage | null>(null);
   
   // Form state for adding/editing vacation packages
   const [formData, setFormData] = useState<Partial<VacationPackage>>({
@@ -149,35 +65,35 @@ const AdminVacations: React.FC = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validate form
     if (!formData.destination_name || !formData.region || !formData.description_short) {
       alert("Please fill all required fields");
       return;
     }
 
-    // Add new package with UUID
-    const newPackage: VacationPackage = {
-      id: `vp-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
-      destination_name: formData.destination_name!,
-      region: formData.region!,
-      description_short: formData.description_short!,
-      description_full: formData.description_full || '',
-      price: formData.price || 0,
-      duration: formData.duration || '',
-      package_type: formData.package_type || '',
-      image_url: formData.image_url || '',
-      status: formData.status || 'draft',
-      amenities: formData.amenities || [],
-      available_dates: formData.available_dates as { start_date: string; end_date: string },
-      featured: formData.featured || false,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
+    try {
+      const packageData = {
+        destination_name: formData.destination_name!,
+        region: formData.region!,
+        description_short: formData.description_short!,
+        description_full: formData.description_full || '',
+        price: formData.price || 0,
+        duration: formData.duration || '',
+        package_type: formData.package_type || '',
+        image_url: formData.image_url || '',
+        status: formData.status || 'Draft',
+        amenities: formData.amenities || [],
+        available_dates: formData.available_dates as { start_date: string; end_date: string },
+        featured: formData.featured || false
+      };
 
-    setPackages([...packages, newPackage]);
-    resetForm();
-    setIsAddModalOpen(false);
+      await createPackage(packageData);
+      resetForm();
+      setIsAddModalOpen(false);
+    } catch (error) {
+      console.error('Error creating package:', error);
+    }
   };
 
   const resetForm = () => {
@@ -200,22 +116,22 @@ const AdminVacations: React.FC = () => {
     });
   };
 
-  const deletePackage = (id: string) => {
-    setPackages(packages.filter(pkg => pkg.id !== id));
-  };
-
-  const toggleFeatured = (id: string) => {
-    setPackages(packages.map(pkg => 
-      pkg.id === id ? { ...pkg, featured: !pkg.featured } : pkg
-    ));
-  };
 
   const filteredPackages = packages.filter(pkg => {
     const matchesSearch = pkg.destination_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           pkg.description_short.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = selectedStatus === 'all' || pkg.status === selectedStatus;
+    const matchesStatus = selectedStatus === 'all' || pkg.status.toLowerCase() === selectedStatus.toLowerCase();
     return matchesSearch && matchesStatus;
   });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Loading vacation packages...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -485,7 +401,14 @@ const AdminVacations: React.FC = () => {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
-                            <Button variant="ghost" size="sm">Edit</Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setEditingPackage(pkg)}
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              Edit
+                            </Button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">
@@ -540,6 +463,13 @@ const AdminVacations: React.FC = () => {
           {/* Same table structure but filtered for draft packages */}
         </TabsContent>
       </Tabs>
+
+      <EditVacationModal
+        isOpen={!!editingPackage}
+        onClose={() => setEditingPackage(null)}
+        vacationPackage={editingPackage}
+        onSave={updatePackage}
+      />
     </div>
   );
 };
