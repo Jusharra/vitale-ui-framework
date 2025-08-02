@@ -352,9 +352,9 @@ const AdminVacations: React.FC = () => {
       <Tabs defaultValue="all">
         <TabsList>
           <TabsTrigger value="all">All Packages ({packages.length})</TabsTrigger>
-          <TabsTrigger value="active">Active ({packages.filter(p => p.status === 'active').length})</TabsTrigger>
+          <TabsTrigger value="active">Active ({packages.filter(p => p.status.toLowerCase() === 'active').length})</TabsTrigger>
           <TabsTrigger value="featured">Featured ({packages.filter(p => p.featured).length})</TabsTrigger>
-          <TabsTrigger value="draft">Drafts ({packages.filter(p => p.status === 'draft').length})</TabsTrigger>
+          <TabsTrigger value="draft">Drafts ({packages.filter(p => p.status.toLowerCase() === 'draft').length})</TabsTrigger>
         </TabsList>
         <TabsContent value="all" className="space-y-4">
           <Card>
@@ -441,21 +441,260 @@ const AdminVacations: React.FC = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="active">
-          {/* Same table structure but filtered for active packages */}
+        <TabsContent value="active" className="space-y-4">
           <Card>
             <CardContent className="p-0">
               <Table>
-                {/* ... table implementation similar to "all" tab but filtered */}
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Destination</TableHead>
+                    <TableHead>Region</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Duration</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Featured</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {packages.filter(p => p.status.toLowerCase() === 'active').length > 0 ? (
+                    packages.filter(p => p.status.toLowerCase() === 'active').map((pkg) => (
+                      <TableRow key={pkg.id}>
+                        <TableCell className="font-medium">{pkg.destination_name}</TableCell>
+                        <TableCell>{pkg.region}</TableCell>
+                        <TableCell>${pkg.price.toLocaleString()}</TableCell>
+                        <TableCell>{pkg.duration}</TableCell>
+                        <TableCell>
+                          <Badge variant="default">
+                            {pkg.status.charAt(0).toUpperCase() + pkg.status.slice(1)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => toggleFeatured(pkg.id)}
+                            className={pkg.featured ? 'text-yellow-500 hover:text-yellow-600' : 'text-muted-foreground'}
+                          >
+                            {pkg.featured ? <Check className="h-4 w-4" /> : '-'}
+                          </Button>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setEditingPackage(pkg)}
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              Edit
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">
+                                  <Trash className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Package</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete "{pkg.destination_name}"? This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => deletePackage(pkg.id)}>
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                        No active packages found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
               </Table>
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="featured">
-          {/* Same table structure but filtered for featured packages */}
+        <TabsContent value="featured" className="space-y-4">
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Destination</TableHead>
+                    <TableHead>Region</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Duration</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Featured</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {packages.filter(p => p.featured).length > 0 ? (
+                    packages.filter(p => p.featured).map((pkg) => (
+                      <TableRow key={pkg.id}>
+                        <TableCell className="font-medium">{pkg.destination_name}</TableCell>
+                        <TableCell>{pkg.region}</TableCell>
+                        <TableCell>${pkg.price.toLocaleString()}</TableCell>
+                        <TableCell>{pkg.duration}</TableCell>
+                        <TableCell>
+                          <Badge variant={pkg.status === 'active' ? 'default' : pkg.status === 'draft' ? 'outline' : 'secondary'}>
+                            {pkg.status.charAt(0).toUpperCase() + pkg.status.slice(1)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => toggleFeatured(pkg.id)}
+                            className="text-yellow-500 hover:text-yellow-600"
+                          >
+                            <Check className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setEditingPackage(pkg)}
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              Edit
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">
+                                  <Trash className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Package</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete "{pkg.destination_name}"? This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => deletePackage(pkg.id)}>
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                        No featured packages found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </TabsContent>
-        <TabsContent value="draft">
-          {/* Same table structure but filtered for draft packages */}
+        <TabsContent value="draft" className="space-y-4">
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Destination</TableHead>
+                    <TableHead>Region</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Duration</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Featured</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {packages.filter(p => p.status.toLowerCase() === 'draft').length > 0 ? (
+                    packages.filter(p => p.status.toLowerCase() === 'draft').map((pkg) => (
+                      <TableRow key={pkg.id}>
+                        <TableCell className="font-medium">{pkg.destination_name}</TableCell>
+                        <TableCell>{pkg.region}</TableCell>
+                        <TableCell>${pkg.price.toLocaleString()}</TableCell>
+                        <TableCell>{pkg.duration}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                            {pkg.status.charAt(0).toUpperCase() + pkg.status.slice(1)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => toggleFeatured(pkg.id)}
+                            className={pkg.featured ? 'text-yellow-500 hover:text-yellow-600' : 'text-muted-foreground'}
+                          >
+                            {pkg.featured ? <Check className="h-4 w-4" /> : '-'}
+                          </Button>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setEditingPackage(pkg)}
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              Edit
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">
+                                  <Trash className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Package</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete "{pkg.destination_name}"? This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => deletePackage(pkg.id)}>
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                        No draft packages found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
 
