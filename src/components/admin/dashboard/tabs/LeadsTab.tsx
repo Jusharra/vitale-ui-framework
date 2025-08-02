@@ -68,11 +68,6 @@ const LeadsTab: React.FC<LeadStatsProps> = ({ leadStats }) => {
             ))}
           </div>
         </CardContent>
-        <CardFooter>
-          <Button variant="outline" className="w-full">
-            <span>Generate Lead Report</span>
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );

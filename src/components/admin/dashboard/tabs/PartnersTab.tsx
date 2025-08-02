@@ -1,9 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { FileSpreadsheet, CalendarPlus, Users } from 'lucide-react';
 
 interface Partner {
   name: string;
@@ -78,20 +76,6 @@ const PartnersTab: React.FC<PartnerStatsProps> = ({ partnerStats, totalProfessio
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium">Total Partner Revenue</span>
                   <span className="text-2xl font-semibold">${partnerStats.totalRevenue}</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2 mt-4">
-                  <Button variant="outline" size="sm">
-                    <FileSpreadsheet className="h-4 w-4 mr-2" />
-                    <span>Export Data</span>
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <CalendarPlus className="h-4 w-4 mr-2" />
-                    <span>Last 30 Days</span>
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Users className="h-4 w-4 mr-2" />
-                    <span>Manage Partners</span>
-                  </Button>
                 </div>
               </div>
             </div>

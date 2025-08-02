@@ -72,11 +72,6 @@ const PromotionsTab: React.FC<PromotionStatsProps> = ({ promotionStats }) => {
             ))}
           </div>
         </CardContent>
-        <CardFooter>
-          <Button variant="outline" className="w-full" onClick={() => window.location.href = "/dashboard/admin/promotions"}>
-            <span>Manage Promotions</span>
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );

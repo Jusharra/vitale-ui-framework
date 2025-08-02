@@ -77,14 +77,6 @@ const RewardsTab: React.FC<RewardsStatsProps> = ({ rewardsStats }) => {
             ))}
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="outline">
-            <span>Add New Reward</span>
-          </Button>
-          <Button>
-            <span>Manage All Rewards</span>
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );
