@@ -7,7 +7,7 @@ import { generateSlug } from './stringUtils';
  * @returns Complete booking link URL
  */
 export const generateBookingLink = (destinationName: string, baseUrl?: string): string => {
-  const appUrl = baseUrl || import.meta.env.VITE_APP_URL || 'https://vitalehealthconcierge.doctor';
+  const appUrl = baseUrl || window.location.origin;
   
   // Remove trailing slash from base URL
   const cleanBaseUrl = appUrl.replace(/\/$/, '');
@@ -29,7 +29,7 @@ export const validateBookingLink = (link: string): boolean => {
   
   try {
     const url = new URL(link);
-    const expectedDomain = import.meta.env.VITE_APP_URL || 'https://vitalehealthconcierge.doctor';
+    const expectedDomain = window.location.origin;
     const expectedDomainObj = new URL(expectedDomain);
     
     // Check if domain matches and path starts with /book/
@@ -53,7 +53,7 @@ export const fixBookingLink = (existingLink: string, destinationName: string): s
   
   try {
     const url = new URL(existingLink);
-    const correctDomain = import.meta.env.VITE_APP_URL || 'https://vitalehealthconcierge.doctor';
+    const correctDomain = window.location.origin;
     const correctDomainObj = new URL(correctDomain);
     
     // If domain is wrong, fix it

@@ -12,6 +12,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRegionalPricing } from '@/hooks/useRegionalPricing';
 import { supabase } from '@/integrations/supabase/client';
 import TravelDatePicker from './TravelDatePicker';
+import { generateSlug } from '@/utils/stringUtils';
 import { MapPin, Users, Star, Wifi, Car, Coffee, Utensils, Calendar, DollarSign } from 'lucide-react';
 
 interface VacationPackage {
@@ -80,18 +81,13 @@ const VacationBookingContent: React.FC<{ packageSlug?: string }> = ({ packageSlu
         const { data, error } = await supabase
           .from('vacation_packages')
           .select('*')
-          .eq('status', 'active');
+          .ilike('status', 'active');
 
         if (error) throw error;
 
         // Find package by matching generated slug
         const matchedPackage = data?.find(pkg => {
-          const generatedSlug = pkg.destination_name
-            .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .replace(/^-+|-+$/g, ''); // Remove leading/trailing dashes
+          const generatedSlug = generateSlug(pkg.destination_name);
           return generatedSlug === packageSlug;
         });
 
