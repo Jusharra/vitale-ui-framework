@@ -153,10 +153,9 @@ const AddPromotionDialog = ({ open, onOpenChange, onSuccess }: AddPromotionDialo
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="discount">Discount</SelectItem>
-                        <SelectItem value="cashback">Cashback</SelectItem>
-                        <SelectItem value="referral">Referral</SelectItem>
-                        <SelectItem value="special">Special Offer</SelectItem>
+                        <SelectItem value="offer">Offer</SelectItem>
+                        <SelectItem value="survey">Survey</SelectItem>
+                        <SelectItem value="study">Study</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -254,8 +253,8 @@ const AddPromotionDialog = ({ open, onOpenChange, onSuccess }: AddPromotionDialo
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
+                      <SelectItem value="expired">Expired</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
