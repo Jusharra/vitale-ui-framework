@@ -748,9 +748,12 @@ export type Database = {
           phone: string | null
           profile_id: string | null
           risk_factors: Json | null
+          service_needed: string | null
           source: string | null
           status: string | null
           updated_at: string | null
+          urgency: string | null
+          zip_code: string | null
         }
         Insert: {
           created_at?: string | null
@@ -766,9 +769,12 @@ export type Database = {
           phone?: string | null
           profile_id?: string | null
           risk_factors?: Json | null
+          service_needed?: string | null
           source?: string | null
           status?: string | null
           updated_at?: string | null
+          urgency?: string | null
+          zip_code?: string | null
         }
         Update: {
           created_at?: string | null
@@ -784,9 +790,12 @@ export type Database = {
           phone?: string | null
           profile_id?: string | null
           risk_factors?: Json | null
+          service_needed?: string | null
           source?: string | null
           status?: string | null
           updated_at?: string | null
+          urgency?: string | null
+          zip_code?: string | null
         }
         Relationships: [
           {

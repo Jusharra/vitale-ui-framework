@@ -18,10 +18,12 @@ import {
   Phone, 
   MessageSquare 
 } from 'lucide-react';
+import { useQuickIntakeForm } from '@/hooks/useQuickIntakeForm';
 
 const Index = () => {
   const navigate = useNavigate();
   const { isAuthenticated, userRole, isLoading } = useAuth();
+  const { formData, updateField, submitForm, isSubmitting } = useQuickIntakeForm();
 
   const handleDashboardClick = () => {
     if (isLoading) return; // Prevent action while loading
@@ -344,13 +346,22 @@ const Index = () => {
             
             <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg shadow-lg">
               <h3 className="text-xl font-semibold mb-4">Quick Intake Form</h3>
-              <form className="space-y-4">
+              <form 
+                className="space-y-4"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  await submitForm();
+                }}
+              >
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium mb-1">Full Name</label>
                   <Input 
                     id="name" 
+                    value={formData.fullName}
+                    onChange={(e) => updateField('fullName', e.target.value)}
                     placeholder="Your name" 
                     className="bg-white/20 border-white/30 text-white placeholder:text-white/70" 
+                    disabled={isSubmitting}
                   />
                 </div>
                 
@@ -359,8 +370,11 @@ const Index = () => {
                   <Input 
                     id="email" 
                     type="email" 
+                    value={formData.email}
+                    onChange={(e) => updateField('email', e.target.value)}
                     placeholder="your@email.com" 
                     className="bg-white/20 border-white/30 text-white placeholder:text-white/70" 
+                    disabled={isSubmitting}
                   />
                 </div>
                 
@@ -368,8 +382,11 @@ const Index = () => {
                   <label htmlFor="phone" className="block text-sm font-medium mb-1">Phone Number</label>
                   <Input 
                     id="phone" 
+                    value={formData.phone}
+                    onChange={(e) => updateField('phone', e.target.value)}
                     placeholder="(555) 123-4567" 
                     className="bg-white/20 border-white/30 text-white placeholder:text-white/70" 
+                    disabled={isSubmitting}
                   />
                 </div>
                 
@@ -377,8 +394,11 @@ const Index = () => {
                   <label htmlFor="zip" className="block text-sm font-medium mb-1">Zip Code</label>
                   <Input 
                     id="zip" 
+                    value={formData.zipCode}
+                    onChange={(e) => updateField('zipCode', e.target.value)}
                     placeholder="90210" 
                     className="bg-white/20 border-white/30 text-white placeholder:text-white/70" 
+                    disabled={isSubmitting}
                   />
                 </div>
                 
@@ -386,7 +406,10 @@ const Index = () => {
                   <label htmlFor="service" className="block text-sm font-medium mb-1">Service Needed</label>
                   <select 
                     id="service" 
+                    value={formData.serviceNeeded}
+                    onChange={(e) => updateField('serviceNeeded', e.target.value)}
                     className="w-full rounded-md bg-white/20 border-white/30 text-white p-2 placeholder:text-white/70"
+                    disabled={isSubmitting}
                   >
                     <option value="" className="bg-indigo-700 text-white">Select a service</option>
                     <option value="in-home-care" className="bg-indigo-700 text-white">In-Home Care</option>
@@ -401,7 +424,10 @@ const Index = () => {
                   <label htmlFor="urgency" className="block text-sm font-medium mb-1">Urgency</label>
                   <select 
                     id="urgency" 
+                    value={formData.urgency}
+                    onChange={(e) => updateField('urgency', e.target.value)}
                     className="w-full rounded-md bg-white/20 border-white/30 text-white p-2 placeholder:text-white/70"
+                    disabled={isSubmitting}
                   >
                     <option value="" className="bg-indigo-700 text-white">Select urgency</option>
                     <option value="urgent" className="bg-indigo-700 text-white">Urgent (24-48 hours)</option>
@@ -410,8 +436,12 @@ const Index = () => {
                   </select>
                 </div>
                 
-                <Button type="submit" className="w-full bg-white text-indigo-700 hover:bg-indigo-50">
-                  Submit Request
+                <Button 
+                  type="submit" 
+                  className="w-full bg-white text-indigo-700 hover:bg-indigo-50"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Submitting...' : 'Submit Request'}
                 </Button>
               </form>
             </div>
