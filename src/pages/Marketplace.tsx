@@ -123,6 +123,10 @@ const Marketplace = () => {
   const [activeTab, setActiveTab] = useState<'facilities' | 'professionals' | 'services'>('facilities');
   const [priceRange, setPriceRange] = useState<string>('all');
   const [availability, setAvailability] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [durationFilter, setDurationFilter] = useState<string>('all');
+  const [priceMin, setPriceMin] = useState<number>(0);
+  const [priceMax, setPriceMax] = useState<number>(1000);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [contactForm, setContactForm] = useState({
     name: '',
@@ -133,7 +137,7 @@ const Marketplace = () => {
   });
   const { toast } = useToast();
 
-  // Fetch data from database
+  // Fetch data from database with real-time updates
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -191,6 +195,99 @@ const Marketplace = () => {
     };
 
     fetchData();
+
+    // Set up real-time subscriptions
+    const servicesChannel = supabase
+      .channel('services-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'services'
+        },
+        (payload) => {
+          console.log('Services updated:', payload);
+          // Refetch services on any change
+          if (payload.eventType === 'INSERT' && payload.new.active) {
+            setServices(current => [payload.new as Service, ...current]);
+          } else if (payload.eventType === 'UPDATE' && payload.new.active) {
+            setServices(current => 
+              current.map(service => 
+                service.id === payload.new.id ? payload.new as Service : service
+              )
+            );
+          } else if (payload.eventType === 'DELETE' || (payload.eventType === 'UPDATE' && !payload.new.active)) {
+            setServices(current => 
+              current.filter(service => service.id !== payload.old.id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    const facilitiesChannel = supabase
+      .channel('facilities-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'care_facilities'
+        },
+        (payload) => {
+          console.log('Facilities updated:', payload);
+          if (payload.eventType === 'INSERT' && payload.new.status === 'active') {
+            setFacilities(current => [payload.new as Facility, ...current]);
+          } else if (payload.eventType === 'UPDATE' && payload.new.status === 'active') {
+            setFacilities(current => 
+              current.map(facility => 
+                facility.id === payload.new.id ? payload.new as Facility : facility
+              )
+            );
+          } else if (payload.eventType === 'DELETE' || (payload.eventType === 'UPDATE' && payload.new.status !== 'active')) {
+            setFacilities(current => 
+              current.filter(facility => facility.id !== payload.old.id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    const professionalsChannel = supabase
+      .channel('professionals-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'partners'
+        },
+        (payload) => {
+          console.log('Professionals updated:', payload);
+          if (payload.eventType === 'INSERT' && payload.new.status === 'active') {
+            setProfessionals(current => [payload.new as Professional, ...current]);
+          } else if (payload.eventType === 'UPDATE' && payload.new.status === 'active') {
+            setProfessionals(current => 
+              current.map(professional => 
+                professional.id === payload.new.id ? payload.new as Professional : professional
+              )
+            );
+          } else if (payload.eventType === 'DELETE' || (payload.eventType === 'UPDATE' && payload.new.status !== 'active')) {
+            setProfessionals(current => 
+              current.filter(professional => professional.id !== payload.old.id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscriptions
+    return () => {
+      supabase.removeChannel(servicesChannel);
+      supabase.removeChannel(facilitiesChannel);
+      supabase.removeChannel(professionalsChannel);
+    };
   }, [toast]);
 
   // Filter functions
@@ -254,7 +351,15 @@ const Marketplace = () => {
     
     const matchesCategory = careType === 'all' || service.category === careType;
     
-    return matchesSearch && matchesCategory;
+    const matchesPriceRange = (!service.price) || 
+      (service.price >= priceMin && service.price <= priceMax);
+    
+    const matchesDuration = durationFilter === 'all' || 
+      (durationFilter === 'short' && service.duration && service.duration.includes('30')) ||
+      (durationFilter === 'medium' && service.duration && (service.duration.includes('60') || service.duration.includes('1 hour'))) ||
+      (durationFilter === 'long' && service.duration && (service.duration.includes('90') || service.duration.includes('2 hour')));
+    
+    return matchesSearch && matchesCategory && matchesPriceRange && matchesDuration;
   });
 
   // Helper functions
@@ -475,67 +580,110 @@ const Marketplace = () => {
             </div>
             
             {showFilters && (
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Select value={selectedState} onValueChange={handleStateChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select State" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All States</SelectItem>
-                    <SelectItem value="California">California</SelectItem>
-                    <SelectItem value="Texas">Texas</SelectItem>
-                    <SelectItem value="Arizona">Arizona</SelectItem>
-                    <SelectItem value="Nevada">Nevada</SelectItem>
-                    <SelectItem value="Florida">Florida</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <Select 
-                  value={selectedCounty} 
-                  onValueChange={setSelectedCounty}
-                  disabled={selectedState === 'all'}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={selectedState === 'all' ? "Select State First" : "Select County"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Counties</SelectItem>
-                    {selectedState === 'California' && 
-                      counties.California.map(county => (
-                        <SelectItem key={county} value={county}>{county}</SelectItem>
-                      ))
-                    }
-                    {selectedState === 'Texas' && 
-                      counties.Texas.map(county => (
-                        <SelectItem key={county} value={county}>{county}</SelectItem>
-                      ))
-                    }
-                  </SelectContent>
-                </Select>
+              <div className="mt-4 space-y-4">
+                {/* Common filters for facilities and professionals */}
+                {activeTab !== 'services' && (
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <Select value={selectedState} onValueChange={handleStateChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select State" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All States</SelectItem>
+                        <SelectItem value="California">California</SelectItem>
+                        <SelectItem value="Texas">Texas</SelectItem>
+                        <SelectItem value="Arizona">Arizona</SelectItem>
+                        <SelectItem value="Nevada">Nevada</SelectItem>
+                        <SelectItem value="Florida">Florida</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <Select 
+                      value={selectedCounty} 
+                      onValueChange={setSelectedCounty}
+                      disabled={selectedState === 'all'}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={selectedState === 'all' ? "Select State First" : "Select County"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Counties</SelectItem>
+                        {selectedState === 'California' && 
+                          counties.California.map(county => (
+                            <SelectItem key={county} value={county}>{county}</SelectItem>
+                          ))
+                        }
+                        {selectedState === 'Texas' && 
+                          counties.Texas.map(county => (
+                            <SelectItem key={county} value={county}>{county}</SelectItem>
+                          ))
+                        }
+                      </SelectContent>
+                    </Select>
 
-                <Select value={priceRange} onValueChange={setPriceRange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Price Range" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Prices</SelectItem>
-                    <SelectItem value="$">$ Budget-friendly</SelectItem>
-                    <SelectItem value="$$">$$ Moderate</SelectItem>
-                    <SelectItem value="$$$">$$$ Premium</SelectItem>
-                    <SelectItem value="$$$$">$$$$ Luxury</SelectItem>
-                  </SelectContent>
-                </Select>
+                    <Select value={priceRange} onValueChange={setPriceRange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Price Range" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Prices</SelectItem>
+                        <SelectItem value="$">$ Budget-friendly</SelectItem>
+                        <SelectItem value="$$">$$ Moderate</SelectItem>
+                        <SelectItem value="$$$">$$$ Premium</SelectItem>
+                        <SelectItem value="$$$$">$$$$ Luxury</SelectItem>
+                      </SelectContent>
+                    </Select>
 
-                <Select value={availability} onValueChange={setAvailability}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Availability" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="available">Available Now</SelectItem>
-                    <SelectItem value="full">Waitlist Only</SelectItem>
-                  </SelectContent>
-                </Select>
+                    <Select value={availability} onValueChange={setAvailability}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Availability" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="available">Available Now</SelectItem>
+                        <SelectItem value="full">Waitlist Only</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {/* Enhanced filters for services */}
+                {activeTab === 'services' && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Select value={durationFilter} onValueChange={setDurationFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Duration" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Durations</SelectItem>
+                          <SelectItem value="short">Short (30 min)</SelectItem>
+                          <SelectItem value="medium">Medium (60 min)</SelectItem>
+                          <SelectItem value="long">Long (90+ min)</SelectItem>
+                        </SelectContent>
+                      </Select>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground min-w-fit">Price:</span>
+                        <Input
+                          type="number"
+                          placeholder="Min"
+                          value={priceMin}
+                          onChange={(e) => setPriceMin(Number(e.target.value) || 0)}
+                          className="w-20"
+                        />
+                        <span className="text-muted-foreground">-</span>
+                        <Input
+                          type="number"
+                          placeholder="Max"
+                          value={priceMax}
+                          onChange={(e) => setPriceMax(Number(e.target.value) || 1000)}
+                          className="w-20"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
