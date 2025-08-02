@@ -11,10 +11,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import CaregiverInterestForm from '@/components/auth/CaregiverInterestForm';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuthState } from '@/hooks/useAuthState';
 import { CheckCircle, ArrowRight, Building, Users, FileCheck, MessageSquare, UserPlus, DollarSign, Calendar, Clock, Star, Heart } from 'lucide-react';
 
 const Partners = () => {
   const { toast } = useToast();
+  const { user } = useAuthState();
   const [activeTab, setActiveTab] = useState("facilities");
   const [formData, setFormData] = useState({
     facilityName: '',
@@ -42,19 +45,50 @@ const Partners = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Save facility application to partner_leads table
+      const applicationData = {
+        application_type: 'facility_application',
+        status: 'submitted',
+        profile_id: user?.id || null,
+        metadata: {
+          facilityName: formData.facilityName,
+          contactPerson: formData.contactPerson,
+          phone: formData.phone,
+          email: formData.email,
+          cityState: formData.cityState,
+          receiveAgreement: formData.receiveAgreement,
+          submission_date: new Date().toISOString()
+        }
+      };
+
+      const { error } = await supabase
+        .from('partner_leads')
+        .insert([applicationData]);
+
+      if (error) {
+        throw error;
+      }
+
       setIsSubmitted(true);
       toast({
-        title: "Application Received",
-        description: "Thank you for your interest. We'll be in touch shortly.",
+        title: "Application Submitted for Review",
+        description: "Your facility application has been submitted and is under review. We'll contact you within 1-2 business days.",
       });
-    }, 1500);
+    } catch (error) {
+      console.error('Error submitting facility application:', error);
+      toast({
+        title: "Submission Failed",
+        description: "There was an error submitting your application. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
