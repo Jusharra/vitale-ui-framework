@@ -99,11 +99,11 @@ const CaregiverInterestForm: React.FC<CaregiverInterestFormProps> = ({ onClose }
           Thank you for your interest in joining our caregiver directory. Your application has been submitted for review and we'll contact you within 1-2 business days.
         </p>
         <Button 
-          onClick={() => setIsSubmitted(false)}
+          onClick={onClose}
           variant="outline"
           className="mt-4"
         >
-          Submit Another Application
+          Close
         </Button>
       </div>
     );
@@ -117,7 +117,7 @@ const CaregiverInterestForm: React.FC<CaregiverInterestFormProps> = ({ onClose }
         </div>
         <h3 className="text-lg font-semibold text-gray-900">Join Our Caregiver Directory</h3>
         <p className="text-sm text-gray-600 mt-2">
-          Start with your basic information to begin the registration process
+          Submit your application to join our caregiver directory
         </p>
       </div>
 
@@ -196,12 +196,12 @@ const CaregiverInterestForm: React.FC<CaregiverInterestFormProps> = ({ onClose }
           />
 
           <div className="bg-green-50 p-4 rounded-lg">
-            <h4 className="font-semibold text-green-800 mb-2">What's Next?</h4>
+            <h4 className="font-semibold text-green-800 mb-2">After Submission</h4>
             <ul className="text-sm text-green-700 space-y-1">
-              <li>• Complete your professional profile</li>
-              <li>• Upload certifications and references</li>
-              <li>• Set your availability and rates</li>
-              <li>• Start connecting with families</li>
+              <li>• Application review within 1-2 business days</li>
+              <li>• Email notification with next steps</li>
+              <li>• Profile setup and verification process</li>
+              <li>• Start connecting with families in need</li>
             </ul>
           </div>
 
@@ -211,10 +211,10 @@ const CaregiverInterestForm: React.FC<CaregiverInterestFormProps> = ({ onClose }
             disabled={isSubmitting}
           >
             {isSubmitting ? (
-              'Processing...'
+              'Submitting Application...'
             ) : (
               <>
-                Continue Registration
+                Submit Application
                 <ArrowRight className="ml-2 h-4 w-4" />
               </>
             )}
