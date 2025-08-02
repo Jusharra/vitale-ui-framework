@@ -36,7 +36,7 @@ const AdminVacations: React.FC = () => {
     package_type: '',
     image_url: '',
     booking_link: '',
-    status: 'draft',
+    status: 'Hidden',
     amenities: [],
     available_dates: {
       start_date: '',
@@ -99,7 +99,7 @@ const AdminVacations: React.FC = () => {
         package_type: formData.package_type || '',
         image_url: formData.image_url || '',
         booking_link: formData.booking_link || '',
-        status: formData.status || 'Draft',
+        status: formData.status || 'Hidden',
         amenities: formData.amenities || [],
         available_dates: formData.available_dates as { start_date: string; end_date: string },
         featured: formData.featured || false
@@ -124,7 +124,7 @@ const AdminVacations: React.FC = () => {
       package_type: '',
       image_url: '',
       booking_link: '',
-      status: 'draft',
+      status: 'Hidden',
       amenities: [],
       available_dates: {
         start_date: '',
@@ -144,7 +144,7 @@ const AdminVacations: React.FC = () => {
   const filteredPackages = packages.filter(pkg => {
     const matchesSearch = pkg.destination_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           pkg.description_short.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = selectedStatus === 'all' || pkg.status.toLowerCase() === selectedStatus.toLowerCase();
+    const matchesStatus = selectedStatus === 'all' || pkg.status === selectedStatus;
     return matchesSearch && matchesStatus;
   });
 
@@ -181,9 +181,9 @@ const AdminVacations: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="archived">Archived</SelectItem>
+              <SelectItem value="Active">Active</SelectItem>
+              <SelectItem value="Hidden">Hidden</SelectItem>
+              <SelectItem value="Expired">Expired</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -380,9 +380,9 @@ const AdminVacations: React.FC = () => {
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="archived">Archived</SelectItem>
+                      <SelectItem value="Hidden">Hidden</SelectItem>
+                      <SelectItem value="Active">Active</SelectItem>
+                      <SelectItem value="Expired">Expired</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -409,9 +409,9 @@ const AdminVacations: React.FC = () => {
       <Tabs defaultValue="all">
         <TabsList>
           <TabsTrigger value="all">All Packages ({packages.length})</TabsTrigger>
-          <TabsTrigger value="active">Active ({packages.filter(p => p.status.toLowerCase() === 'active').length})</TabsTrigger>
+          <TabsTrigger value="active">Active ({packages.filter(p => p.status === 'Active').length})</TabsTrigger>
           <TabsTrigger value="featured">Featured ({packages.filter(p => p.featured).length})</TabsTrigger>
-          <TabsTrigger value="draft">Drafts ({packages.filter(p => p.status.toLowerCase() === 'draft').length})</TabsTrigger>
+          <TabsTrigger value="hidden">Hidden ({packages.filter(p => p.status === 'Hidden').length})</TabsTrigger>
         </TabsList>
         <TabsContent value="all" className="space-y-4">
           <Card>
@@ -524,8 +524,8 @@ const AdminVacations: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {packages.filter(p => p.status.toLowerCase() === 'active').length > 0 ? (
-                    packages.filter(p => p.status.toLowerCase() === 'active').map((pkg) => (
+                   {packages.filter(p => p.status === 'Active').length > 0 ? (
+                     packages.filter(p => p.status === 'Active').map((pkg) => (
                       <TableRow key={pkg.id}>
                         <TableCell className="font-medium">{pkg.destination_name}</TableCell>
                         <TableCell>{pkg.region}</TableCell>
@@ -698,7 +698,7 @@ const AdminVacations: React.FC = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="draft" className="space-y-4">
+        <TabsContent value="hidden" className="space-y-4">
           <Card>
             <CardContent className="p-0">
               <Table>
@@ -714,8 +714,8 @@ const AdminVacations: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {packages.filter(p => p.status.toLowerCase() === 'draft').length > 0 ? (
-                    packages.filter(p => p.status.toLowerCase() === 'draft').map((pkg) => (
+                   {packages.filter(p => p.status === 'Hidden').length > 0 ? (
+                     packages.filter(p => p.status === 'Hidden').map((pkg) => (
                       <TableRow key={pkg.id}>
                         <TableCell className="font-medium">{pkg.destination_name}</TableCell>
                         <TableCell>{pkg.region}</TableCell>
@@ -784,7 +784,7 @@ const AdminVacations: React.FC = () => {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                        No draft packages found.
+                        No hidden packages found.
                       </TableCell>
                     </TableRow>
                   )}
