@@ -134,6 +134,12 @@ const AdminVacations: React.FC = () => {
     });
   };
 
+  const handleBookingLink = (bookingLink: string) => {
+    if (bookingLink && validateBookingLink(bookingLink)) {
+      window.open(bookingLink, '_blank', 'noopener,noreferrer');
+    }
+  };
+
 
   const filteredPackages = packages.filter(pkg => {
     const matchesSearch = pkg.destination_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -445,39 +451,49 @@ const AdminVacations: React.FC = () => {
                             {pkg.featured ? <Check className="h-4 w-4" /> : '-'}
                           </Button>
                         </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => setEditingPackage(pkg)}
-                            >
-                              <Edit className="h-4 w-4 mr-1" />
-                              Edit
-                            </Button>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">
-                                  <Trash className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Package</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to delete "{pkg.destination_name}"? This action cannot be undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => deletePackage(pkg.id)} className="bg-red-500 hover:bg-red-600">
-                                    Delete
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
-                        </TableCell>
+                         <TableCell className="text-right">
+                           <div className="flex justify-end gap-2">
+                             <Button 
+                               variant="ghost" 
+                               size="sm"
+                               onClick={() => handleBookingLink(pkg.booking_link || '')}
+                               disabled={!pkg.booking_link || !validateBookingLink(pkg.booking_link)}
+                               title={pkg.booking_link && validateBookingLink(pkg.booking_link) ? "Open booking link" : "No valid booking link"}
+                               className={pkg.booking_link && validateBookingLink(pkg.booking_link) ? "text-blue-600 hover:text-blue-700" : "text-muted-foreground"}
+                             >
+                               <LinkIcon className="h-4 w-4" />
+                             </Button>
+                             <Button 
+                               variant="ghost" 
+                               size="sm"
+                               onClick={() => setEditingPackage(pkg)}
+                             >
+                               <Edit className="h-4 w-4 mr-1" />
+                               Edit
+                             </Button>
+                             <AlertDialog>
+                               <AlertDialogTrigger asChild>
+                                 <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">
+                                   <Trash className="h-4 w-4" />
+                                 </Button>
+                               </AlertDialogTrigger>
+                               <AlertDialogContent>
+                                 <AlertDialogHeader>
+                                   <AlertDialogTitle>Delete Package</AlertDialogTitle>
+                                   <AlertDialogDescription>
+                                     Are you sure you want to delete "{pkg.destination_name}"? This action cannot be undone.
+                                   </AlertDialogDescription>
+                                 </AlertDialogHeader>
+                                 <AlertDialogFooter>
+                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                   <AlertDialogAction onClick={() => deletePackage(pkg.id)} className="bg-red-500 hover:bg-red-600">
+                                     Delete
+                                   </AlertDialogAction>
+                                 </AlertDialogFooter>
+                               </AlertDialogContent>
+                             </AlertDialog>
+                           </div>
+                         </TableCell>
                       </TableRow>
                     ))
                   ) : (
@@ -530,39 +546,49 @@ const AdminVacations: React.FC = () => {
                             {pkg.featured ? <Check className="h-4 w-4" /> : '-'}
                           </Button>
                         </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => setEditingPackage(pkg)}
-                            >
-                              <Edit className="h-4 w-4 mr-1" />
-                              Edit
-                            </Button>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">
-                                  <Trash className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Package</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to delete "{pkg.destination_name}"? This action cannot be undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => deletePackage(pkg.id)}>
-                                    Delete
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
-                        </TableCell>
+                         <TableCell className="text-right">
+                           <div className="flex justify-end gap-2">
+                             <Button 
+                               variant="ghost" 
+                               size="sm"
+                               onClick={() => handleBookingLink(pkg.booking_link || '')}
+                               disabled={!pkg.booking_link || !validateBookingLink(pkg.booking_link)}
+                               title={pkg.booking_link && validateBookingLink(pkg.booking_link) ? "Open booking link" : "No valid booking link"}
+                               className={pkg.booking_link && validateBookingLink(pkg.booking_link) ? "text-blue-600 hover:text-blue-700" : "text-muted-foreground"}
+                             >
+                               <LinkIcon className="h-4 w-4" />
+                             </Button>
+                             <Button 
+                               variant="ghost" 
+                               size="sm"
+                               onClick={() => setEditingPackage(pkg)}
+                             >
+                               <Edit className="h-4 w-4 mr-1" />
+                               Edit
+                             </Button>
+                             <AlertDialog>
+                               <AlertDialogTrigger asChild>
+                                 <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">
+                                   <Trash className="h-4 w-4" />
+                                 </Button>
+                               </AlertDialogTrigger>
+                               <AlertDialogContent>
+                                 <AlertDialogHeader>
+                                   <AlertDialogTitle>Delete Package</AlertDialogTitle>
+                                   <AlertDialogDescription>
+                                     Are you sure you want to delete "{pkg.destination_name}"? This action cannot be undone.
+                                   </AlertDialogDescription>
+                                 </AlertDialogHeader>
+                                 <AlertDialogFooter>
+                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                   <AlertDialogAction onClick={() => deletePackage(pkg.id)}>
+                                     Delete
+                                   </AlertDialogAction>
+                                 </AlertDialogFooter>
+                               </AlertDialogContent>
+                             </AlertDialog>
+                           </div>
+                         </TableCell>
                       </TableRow>
                     ))
                   ) : (
@@ -615,39 +641,49 @@ const AdminVacations: React.FC = () => {
                             <Check className="h-4 w-4" />
                           </Button>
                         </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => setEditingPackage(pkg)}
-                            >
-                              <Edit className="h-4 w-4 mr-1" />
-                              Edit
-                            </Button>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">
-                                  <Trash className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Package</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to delete "{pkg.destination_name}"? This action cannot be undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => deletePackage(pkg.id)}>
-                                    Delete
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
-                        </TableCell>
+                         <TableCell className="text-right">
+                           <div className="flex justify-end gap-2">
+                             <Button 
+                               variant="ghost" 
+                               size="sm"
+                               onClick={() => handleBookingLink(pkg.booking_link || '')}
+                               disabled={!pkg.booking_link || !validateBookingLink(pkg.booking_link)}
+                               title={pkg.booking_link && validateBookingLink(pkg.booking_link) ? "Open booking link" : "No valid booking link"}
+                               className={pkg.booking_link && validateBookingLink(pkg.booking_link) ? "text-blue-600 hover:text-blue-700" : "text-muted-foreground"}
+                             >
+                               <LinkIcon className="h-4 w-4" />
+                             </Button>
+                             <Button 
+                               variant="ghost" 
+                               size="sm"
+                               onClick={() => setEditingPackage(pkg)}
+                             >
+                               <Edit className="h-4 w-4 mr-1" />
+                               Edit
+                             </Button>
+                             <AlertDialog>
+                               <AlertDialogTrigger asChild>
+                                 <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">
+                                   <Trash className="h-4 w-4" />
+                                 </Button>
+                               </AlertDialogTrigger>
+                               <AlertDialogContent>
+                                 <AlertDialogHeader>
+                                   <AlertDialogTitle>Delete Package</AlertDialogTitle>
+                                   <AlertDialogDescription>
+                                     Are you sure you want to delete "{pkg.destination_name}"? This action cannot be undone.
+                                   </AlertDialogDescription>
+                                 </AlertDialogHeader>
+                                 <AlertDialogFooter>
+                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                   <AlertDialogAction onClick={() => deletePackage(pkg.id)}>
+                                     Delete
+                                   </AlertDialogAction>
+                                 </AlertDialogFooter>
+                               </AlertDialogContent>
+                             </AlertDialog>
+                           </div>
+                         </TableCell>
                       </TableRow>
                     ))
                   ) : (
@@ -700,39 +736,49 @@ const AdminVacations: React.FC = () => {
                             {pkg.featured ? <Check className="h-4 w-4" /> : '-'}
                           </Button>
                         </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => setEditingPackage(pkg)}
-                            >
-                              <Edit className="h-4 w-4 mr-1" />
-                              Edit
-                            </Button>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">
-                                  <Trash className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Package</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to delete "{pkg.destination_name}"? This action cannot be undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => deletePackage(pkg.id)}>
-                                    Delete
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
-                        </TableCell>
+                         <TableCell className="text-right">
+                           <div className="flex justify-end gap-2">
+                             <Button 
+                               variant="ghost" 
+                               size="sm"
+                               onClick={() => handleBookingLink(pkg.booking_link || '')}
+                               disabled={!pkg.booking_link || !validateBookingLink(pkg.booking_link)}
+                               title={pkg.booking_link && validateBookingLink(pkg.booking_link) ? "Open booking link" : "No valid booking link"}
+                               className={pkg.booking_link && validateBookingLink(pkg.booking_link) ? "text-blue-600 hover:text-blue-700" : "text-muted-foreground"}
+                             >
+                               <LinkIcon className="h-4 w-4" />
+                             </Button>
+                             <Button 
+                               variant="ghost" 
+                               size="sm"
+                               onClick={() => setEditingPackage(pkg)}
+                             >
+                               <Edit className="h-4 w-4 mr-1" />
+                               Edit
+                             </Button>
+                             <AlertDialog>
+                               <AlertDialogTrigger asChild>
+                                 <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600">
+                                   <Trash className="h-4 w-4" />
+                                 </Button>
+                               </AlertDialogTrigger>
+                               <AlertDialogContent>
+                                 <AlertDialogHeader>
+                                   <AlertDialogTitle>Delete Package</AlertDialogTitle>
+                                   <AlertDialogDescription>
+                                     Are you sure you want to delete "{pkg.destination_name}"? This action cannot be undone.
+                                   </AlertDialogDescription>
+                                 </AlertDialogHeader>
+                                 <AlertDialogFooter>
+                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                   <AlertDialogAction onClick={() => deletePackage(pkg.id)}>
+                                     Delete
+                                   </AlertDialogAction>
+                                 </AlertDialogFooter>
+                               </AlertDialogContent>
+                             </AlertDialog>
+                           </div>
+                         </TableCell>
                       </TableRow>
                     ))
                   ) : (
