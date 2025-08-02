@@ -6,9 +6,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Upload } from 'lucide-react';
+import { Upload, Link as LinkIcon, RefreshCw } from 'lucide-react';
 import { VacationPackage } from '@/hooks/useVacationPackages';
 import MediaUploader from '@/components/common/MediaUploader';
+import { generateBookingLink, validateBookingLink } from '@/utils/bookingLinkUtils';
 
 interface EditVacationModalProps {
   isOpen: boolean;
@@ -49,6 +50,19 @@ const EditVacationModal: React.FC<EditVacationModalProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Auto-generate booking link when destination name changes
+    if (name === 'destination_name' && value.trim()) {
+      const newBookingLink = generateBookingLink(value.trim());
+      setFormData(prev => ({ ...prev, [name]: value, booking_link: newBookingLink }));
+    }
+  };
+
+  const handleGenerateBookingLink = () => {
+    if (formData.destination_name) {
+      const newBookingLink = generateBookingLink(formData.destination_name);
+      setFormData(prev => ({ ...prev, booking_link: newBookingLink }));
+    }
   };
 
   const handleSelectChange = (name: string, value: string) => {
@@ -233,13 +247,36 @@ const EditVacationModal: React.FC<EditVacationModalProps> = ({
           
           <div className="space-y-2">
             <Label htmlFor="booking_link">Booking Link</Label>
-            <Input
-              id="booking_link"
-              name="booking_link"
-              value={formData.booking_link || ''}
-              onChange={handleInputChange}
-              placeholder="https://example.com/book"
-            />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  id="booking_link"
+                  name="booking_link"
+                  value={formData.booking_link || ''}
+                  onChange={handleInputChange}
+                  placeholder="https://vitalehealthconcierge.doctor/book/destination-name"
+                  className={validateBookingLink(formData.booking_link || '') ? 'pr-8' : ''}
+                />
+                {validateBookingLink(formData.booking_link || '') && (
+                  <LinkIcon className="absolute right-2 top-2.5 h-4 w-4 text-green-500" />
+                )}
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleGenerateBookingLink}
+                disabled={!formData.destination_name?.trim()}
+                title="Generate booking link from destination name"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
+            {formData.booking_link && !validateBookingLink(formData.booking_link) && (
+              <p className="text-sm text-amber-600">
+                ⚠️ Link should use the format: https://vitalehealthconcierge.doctor/book/destination-name
+              </p>
+            )}
           </div>
           
           <div className="flex flex-wrap gap-4">

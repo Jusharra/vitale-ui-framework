@@ -11,11 +11,12 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Check, Filter, Plus, Search, Trash, Upload, Edit, Loader2 } from 'lucide-react';
+import { Check, Filter, Plus, Search, Trash, Upload, Edit, Loader2, Link as LinkIcon, RefreshCw } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useVacationPackages, VacationPackage } from '@/hooks/useVacationPackages';
 import EditVacationModal from '@/components/admin/dialogs/EditVacationModal';
 import MediaUploader from '@/components/common/MediaUploader';
+import { generateBookingLink, validateBookingLink } from '@/utils/bookingLinkUtils';
 
 const AdminVacations: React.FC = () => {
   const { packages, loading, createPackage, updatePackage, deletePackage, toggleFeatured } = useVacationPackages();
@@ -34,6 +35,7 @@ const AdminVacations: React.FC = () => {
     duration: '',
     package_type: '',
     image_url: '',
+    booking_link: '',
     status: 'draft',
     amenities: [],
     available_dates: {
@@ -46,6 +48,19 @@ const AdminVacations: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    
+    // Auto-generate booking link when destination name changes
+    if (name === 'destination_name' && value.trim()) {
+      const newBookingLink = generateBookingLink(value.trim());
+      setFormData({ ...formData, [name]: value, booking_link: newBookingLink });
+    }
+  };
+
+  const handleGenerateBookingLink = () => {
+    if (formData.destination_name) {
+      const newBookingLink = generateBookingLink(formData.destination_name);
+      setFormData({ ...formData, booking_link: newBookingLink });
+    }
   };
 
   const handleSelectChange = (name: string, value: string) => {
@@ -83,6 +98,7 @@ const AdminVacations: React.FC = () => {
         duration: formData.duration || '',
         package_type: formData.package_type || '',
         image_url: formData.image_url || '',
+        booking_link: formData.booking_link || '',
         status: formData.status || 'Draft',
         amenities: formData.amenities || [],
         available_dates: formData.available_dates as { start_date: string; end_date: string },
@@ -107,6 +123,7 @@ const AdminVacations: React.FC = () => {
       duration: '',
       package_type: '',
       image_url: '',
+      booking_link: '',
       status: 'draft',
       amenities: [],
       available_dates: {
@@ -310,6 +327,40 @@ const AdminVacations: React.FC = () => {
                   placeholder="Detailed description of the vacation package"
                   rows={4}
                 />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="booking_link">Booking Link</Label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      id="booking_link"
+                      name="booking_link"
+                      value={formData.booking_link || ''}
+                      onChange={handleInputChange}
+                      placeholder="https://vitalehealthconcierge.doctor/book/destination-name"
+                      className={validateBookingLink(formData.booking_link || '') ? 'pr-8' : ''}
+                    />
+                    {validateBookingLink(formData.booking_link || '') && (
+                      <LinkIcon className="absolute right-2 top-2.5 h-4 w-4 text-green-500" />
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateBookingLink}
+                    disabled={!formData.destination_name?.trim()}
+                    title="Generate booking link from destination name"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                </div>
+                {formData.booking_link && !validateBookingLink(formData.booking_link) && (
+                  <p className="text-sm text-amber-600">
+                    ⚠️ Link should use the format: https://vitalehealthconcierge.doctor/book/destination-name
+                  </p>
+                )}
               </div>
               
               <div className="flex flex-wrap gap-4">
