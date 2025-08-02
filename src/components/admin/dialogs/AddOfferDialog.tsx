@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import MediaUploader from '@/components/common/MediaUploader';
 
 const formSchema = z.object({
   title: z.string().min(2, 'Title is required'),
@@ -219,9 +220,16 @@ const AddOfferDialog = ({ open, onOpenChange, onSuccess }: AddOfferDialogProps) 
               name="image_url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image URL</FormLabel>
+                  <FormLabel>Offer Image</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://example.com/image.jpg" {...field} />
+                    <MediaUploader
+                      currentUrl={field.value}
+                      onUpload={(url) => field.onChange(url)}
+                      onRemove={() => field.onChange('')}
+                      folder="partner-offers"
+                      accept="image/*"
+                      maxSize={10}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
