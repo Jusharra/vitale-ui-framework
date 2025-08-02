@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Index from '@/pages/Index';
-import Placements from '@/pages/Placements';
 import Marketplace from '@/pages/Marketplace';
 import About from '@/pages/About';
 import Financing from '@/pages/Financing';
@@ -54,7 +53,6 @@ import FacilityPage from '@/pages/care/[slug]';
 import FamilyManagement from '@/pages/member/FamilyManagement';
 import ProfessionalProfilePage from '@/pages/professional/[slug]';
 import Resources from '@/pages/Resources';
-import Services from '@/pages/Services';
 
 // Blog pages
 import BlogIndex from '@/pages/blog/index';
@@ -107,11 +105,13 @@ const App: React.FC = () => {
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/settings" element={<SettingsPage />} />
-                  <Route path="/placements" element={<Placements />} />
                   <Route path="/marketplace" element={<Marketplace />} />
                   <Route path="/membership" element={<Membership />} />
                   <Route path="/resources" element={<Resources />} />
-                  <Route path="/services" element={<Services />} />
+                  
+                  {/* Redirects for removed pages */}
+                  <Route path="/placements" element={<Navigate to="/marketplace" replace />} />
+                  <Route path="/services" element={<Navigate to="/marketplace" replace />} />
                   
                   {/* Facility routes - order matters, more specific routes first */}
                   <Route path="/care/care-homes/:city/:slug" element={<FacilityPage />} />

@@ -217,7 +217,7 @@ const ProfessionalProfilePage = () => {
             </p>
             <Button 
               className="mt-6" 
-              onClick={() => navigate('/placements')}
+              onClick={() => navigate('/marketplace')}
             >
               View All Professionals
             </Button>
@@ -318,10 +318,10 @@ const ProfessionalProfilePage = () => {
         <div className="mb-8">
           <Button 
             variant="outline" 
-            onClick={() => navigate('/placements')}
+            onClick={() => navigate('/marketplace')}
             className="mb-4"
           >
-            &larr; Back to Placements
+            &larr; Back to Marketplace
           </Button>
           
           <div className="flex flex-col md:flex-row gap-6 items-start">

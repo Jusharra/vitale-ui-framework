@@ -31,11 +31,11 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Services</h3>
             <ul className="space-y-2">
-              <li><Link to="/services/in-home-care" className="text-gray-400 hover:text-white">In-Home Care</Link></li>
-              <li><Link to="/services/iv-therapy" className="text-gray-400 hover:text-white">IV Therapy</Link></li>
-              <li><Link to="/services/hospice" className="text-gray-400 hover:text-white">Hospice Care</Link></li>
-              <li><Link to="/placements" className="text-gray-400 hover:text-white">Assisted Living Communities</Link></li>
-              <li><Link to="/services/wellness" className="text-gray-400 hover:text-white">Wellness Programs</Link></li>
+              <li><Link to="/marketplace" className="text-gray-400 hover:text-white">In-Home Care</Link></li>
+              <li><Link to="/marketplace" className="text-gray-400 hover:text-white">IV Therapy</Link></li>
+              <li><Link to="/marketplace" className="text-gray-400 hover:text-white">Hospice Care</Link></li>
+              <li><Link to="/marketplace" className="text-gray-400 hover:text-white">Assisted Living Communities</Link></li>
+              <li><Link to="/marketplace" className="text-gray-400 hover:text-white">Wellness Programs</Link></li>
             </ul>
           </div>
           

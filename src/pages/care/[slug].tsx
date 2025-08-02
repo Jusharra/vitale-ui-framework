@@ -261,7 +261,7 @@ const FacilityPage = () => {
             </p>
             <Button 
               className="mt-6" 
-              onClick={() => navigate('/placements')}
+              onClick={() => navigate('/marketplace')}
             >
               View All Options
             </Button>
