@@ -86,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role = 'member' }) => {
       <SidebarLink to="/dashboard/admin" icon={Gauge}>Overview</SidebarLink>
       <SidebarLink to="/dashboard/admin/vacations" icon={Palmtree}>Vacations</SidebarLink>
       <SidebarLink to="/dashboard/admin/promotions" icon={Gift}>Promotions</SidebarLink>
-      <SidebarLink to="/dashboard/admin/professionals" icon={UserPlus}>Services</SidebarLink>
+      <SidebarLink to="/dashboard/admin/services" icon={UserPlus}>Services</SidebarLink>
       <SidebarLink to="/dashboard/admin/leads" icon={BarChart}>Leads & Analytics</SidebarLink>
       <SidebarLink to="/dashboard/admin/partner-approvals" icon={UserCheck}>Partner Approvals</SidebarLink>
       <SidebarLink to="/dashboard/admin/care-teams" icon={Users}>Care Teams</SidebarLink>
