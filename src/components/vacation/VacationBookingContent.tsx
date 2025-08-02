@@ -78,19 +78,29 @@ const VacationBookingContent: React.FC<{ packageSlug?: string }> = ({ packageSlu
       }
 
       try {
-        // Generate slug from destination name for matching
+        console.log('Searching for package with slug:', packageSlug);
+        
+        // Fix: Use exact status match "Active" instead of case-insensitive "active"
         const { data, error } = await supabase
           .from('vacation_packages')
           .select('*')
-          .ilike('status', 'active');
+          .eq('status', 'Active');
 
         if (error) throw error;
+
+        console.log('Found packages:', data?.map(pkg => ({ 
+          name: pkg.destination_name, 
+          generatedSlug: generateSlug(pkg.destination_name) 
+        })));
 
         // Find package by matching generated slug
         const matchedPackage = data?.find(pkg => {
           const generatedSlug = generateSlug(pkg.destination_name);
+          console.log(`Comparing: "${generatedSlug}" === "${packageSlug}"`);
           return generatedSlug === packageSlug;
         });
+
+        console.log('Matched package:', matchedPackage?.destination_name || 'None found');
 
         if (matchedPackage) {
           setVacationPackage({
