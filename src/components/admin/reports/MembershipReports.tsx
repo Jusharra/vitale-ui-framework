@@ -94,7 +94,7 @@ const MembershipReports = () => {
       tier,
       count,
       percentage: total > 0 ? (count / total) * 100 : 0,
-      revenue: count * (tier === 'admin' ? 0 : tier === 'partner' ? 150 : tier === 'professional' ? 100 : 50) // Example pricing
+      revenue: count * (tier === 'admin' ? 0 : tier === 'partner' ? 150 : tier === 'caregiver' ? 100 : 50) // Example pricing
     }));
   };
 
@@ -189,7 +189,7 @@ const MembershipReports = () => {
                   <SelectItem value="all">All Roles</SelectItem>
                   <SelectItem value="member">Member</SelectItem>
                   <SelectItem value="partner">Partner</SelectItem>
-                  <SelectItem value="professional">Professional</SelectItem>
+                  <SelectItem value="caregiver">Caregivers</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>
