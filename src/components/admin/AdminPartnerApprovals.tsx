@@ -88,7 +88,30 @@ const AdminPartnerApprovals: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setApplications((data || []) as unknown as Application[]);
+      
+      // Process applications to handle both guest and authenticated submissions
+      const processedApplications = (data || []).map(app => {
+        // For guest applications (profile_id is null), extract data from metadata
+        if (!app.profile_id && app.metadata && typeof app.metadata === 'object') {
+          const metadata = app.metadata as any;
+          return {
+            ...app,
+            profiles: {
+              full_name: metadata.firstName && metadata.lastName 
+                ? `${metadata.firstName} ${metadata.lastName}` 
+                : metadata.firstName || 'Unknown',
+              first_name: metadata.firstName,
+              email: metadata.email,
+              phone: metadata.phone,
+              role: app.application_type === 'caregiver_application' ? 'caregiver' : 'guest',
+              avatar_url: null
+            }
+          };
+        }
+        return app;
+      });
+      
+      setApplications(processedApplications as unknown as Application[]);
     } catch (error) {
       console.error('Error fetching applications:', error);
       toast({
@@ -229,8 +252,9 @@ const AdminPartnerApprovals: React.FC = () => {
 
   const filteredApplications = applications.filter(app => {
     const name = app.profiles?.full_name || app.profiles?.first_name || '';
+    const email = app.profiles?.email || '';
     const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         app.profiles?.email?.toLowerCase().includes(searchTerm.toLowerCase());
+                         email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filter === 'all' || app.status === filter;
     return matchesSearch && matchesFilter;
   });
@@ -266,7 +290,9 @@ const AdminPartnerApprovals: React.FC = () => {
                 {application.profiles?.full_name || application.profiles?.first_name || 'Unknown'}
               </h3>
               <Badge variant={application.profiles?.role === 'partner' ? 'default' : 'secondary'}>
-                {application.profiles?.role}
+                {application.application_type === 'caregiver_application' ? 'Caregiver' : 
+                 application.profiles?.role === 'partner' ? 'Partner' : 
+                 application.profiles?.role || 'Guest'}
               </Badge>
               <div className={`w-3 h-3 rounded-full ${getStatusColor(application.status)}`} />
             </div>
