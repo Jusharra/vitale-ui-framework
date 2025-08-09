@@ -33,11 +33,12 @@ interface TransportFormValues {
   available_24_7: boolean;
   wheelchair_accessible: boolean;
   insurance_accepted: string;
+  profile_image?: string;
 }
 
 const AddTransportDialog = ({ open, onOpenChange, onSuccess }: AddTransportDialogProps) => {
   const { toast } = useToast();
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<TransportFormValues>({
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm<TransportFormValues>({
     defaultValues: {
       name: '',
       email: '',
@@ -48,6 +49,7 @@ const AddTransportDialog = ({ open, onOpenChange, onSuccess }: AddTransportDialo
       available_24_7: false,
       wheelchair_accessible: true,
       insurance_accepted: '',
+      profile_image: '',
     }
   });
 
@@ -197,11 +199,9 @@ const AddTransportDialog = ({ open, onOpenChange, onSuccess }: AddTransportDialo
             <div className="grid gap-2 py-2">
               <Label>Feature Image</Label>
               <MediaUploader
-                currentUrl={''}
-                onUpload={(url) => reset({ ...((window as any).___t||{}), ...((window as any).___t = null), ...{
-                  name: (document.getElementById('name') as HTMLInputElement)?.value || '',
-                } as any); /* noop to satisfy TS */}
-                onRemove={() => {}}
+                currentUrl={watch('profile_image') || ''}
+                onUpload={(url) => setValue('profile_image', url, { shouldDirty: true })}
+                onRemove={() => setValue('profile_image', '', { shouldDirty: true })}
                 folder="transports"
               />
             </div>
