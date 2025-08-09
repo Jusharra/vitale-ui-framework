@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Search, MapPin, Filter, CheckCircle, User, Home, Star, Clock, Calendar, Phone, Mail, Video, MessageSquare } from 'lucide-react';
+import { Search, MapPin, Filter, CheckCircle, User, Home, Star, Clock, Calendar, Phone, Mail, Video, MessageSquare, Ambulance, Pill } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import FacilityDetailCard from '@/components/placement/FacilityDetailCard';
@@ -73,6 +73,32 @@ interface Service {
   created_at?: string;
 }
 
+interface Pharmacy {
+  id: string;
+  name: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  hours?: string;
+  delivery_available?: boolean;
+  status?: string;
+}
+
+interface Transport {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  service_area?: string;
+  services?: string;
+  available_24_7?: boolean;
+  wheelchair_accessible?: boolean;
+  status?: string;
+  rating?: number;
+  profile_image?: string;
+}
+
 // Filter data
 const careServices = [
   { id: 'ambulating', label: 'Ambulating' },
@@ -113,6 +139,8 @@ const Marketplace = () => {
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
+  const [transports, setTransports] = useState<Transport[]>([]);
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
   const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -120,7 +148,7 @@ const Marketplace = () => {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedState, setSelectedState] = useState<string>('all');
   const [selectedCounty, setSelectedCounty] = useState<string>('all');
-  const [activeTab, setActiveTab] = useState<'facilities' | 'professionals' | 'services'>('facilities');
+  const [activeTab, setActiveTab] = useState<'facilities' | 'professionals' | 'services' | 'pharmacies' | 'transport'>('facilities');
   const [priceRange, setPriceRange] = useState<string>('all');
   const [availability, setAvailability] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -181,6 +209,32 @@ const Marketplace = () => {
           console.error('Error fetching services:', servicesError);
         } else {
           setServices(servicesData || []);
+        }
+
+        // Fetch pharmacies
+        const { data: pharmaciesData, error: pharmaciesError } = await supabase
+          .from('pharmacies')
+          .select('*')
+          .eq('status', 'active')
+          .order('created_at', { ascending: false });
+
+        if (pharmaciesError) {
+          console.error('Error fetching pharmacies:', pharmaciesError);
+        } else {
+          setPharmacies(pharmaciesData || []);
+        }
+
+        // Fetch medical transport providers
+        const { data: transportsData, error: transportsError } = await supabase
+          .from('transports')
+          .select('*')
+          .eq('status', 'active')
+          .order('created_at', { ascending: false });
+
+        if (transportsError) {
+          console.error('Error fetching transports:', transportsError);
+        } else {
+          setTransports(transportsData || []);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -362,6 +416,48 @@ const Marketplace = () => {
     return matchesSearch && matchesCategory && matchesPriceRange && matchesDuration;
   });
 
+  const filteredPharmacies = pharmacies.filter((pharmacy) => {
+    const matchesSearch =
+      pharmacy.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (pharmacy.address && pharmacy.address.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (pharmacy.hours && pharmacy.hours.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    let matchesLocation = true;
+    if (selectedState !== 'all') {
+      matchesLocation = pharmacy.address?.includes(selectedState) || false;
+      if (selectedCounty !== 'all') {
+        matchesLocation = pharmacy.address?.includes(selectedCounty) || false;
+      }
+    }
+
+    const matchesAvailability = availability === 'all' ||
+      (availability === 'available' && pharmacy.delivery_available) ||
+      (availability === 'full' && !pharmacy.delivery_available);
+
+    return matchesSearch && matchesLocation && matchesAvailability;
+  });
+
+  const filteredTransports = transports.filter((transport) => {
+    const matchesSearch =
+      transport.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (transport.services && transport.services.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (transport.service_area && transport.service_area.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    let matchesLocation = true;
+    if (selectedState !== 'all') {
+      matchesLocation = transport.service_area?.includes(selectedState) || false;
+      if (selectedCounty !== 'all') {
+        matchesLocation = transport.service_area?.includes(selectedCounty) || false;
+      }
+    }
+
+    const matchesAvailability = availability === 'all' ||
+      (availability === 'available' && (transport.available_24_7 || transport.wheelchair_accessible)) ||
+      availability === 'full';
+
+    return matchesSearch && matchesLocation && matchesAvailability;
+  });
+  
   // Helper functions
   const toggleService = (serviceId: string) => {
     setSelectedServices(current => 
@@ -453,7 +549,7 @@ const Marketplace = () => {
               Healthcare Marketplace
             </h1>
             <p className="mt-4 max-w-3xl text-xl text-muted-foreground lg:mx-auto">
-              Discover trusted care facilities, healthcare professionals, and premium services. 
+              Discover trusted care facilities, healthcare professionals, pharmacies, medical transport, and premium services.
               Connect directly with providers and book consultations instantly.
             </p>
           </div>
@@ -690,7 +786,7 @@ const Marketplace = () => {
 
           {/* Main Tabs */}
           <Tabs defaultValue="facilities" onValueChange={(value) => setActiveTab(value as any)}>
-            <TabsList className="grid w-full grid-cols-3 mb-8">
+            <TabsList className="grid w-full grid-cols-5 mb-8">
               <TabsTrigger value="facilities" className="flex items-center gap-2">
                 <Home className="h-4 w-4" />
                 Care Facilities ({filteredFacilities.length})
@@ -702,6 +798,14 @@ const Marketplace = () => {
               <TabsTrigger value="services" className="flex items-center gap-2">
                 <Star className="h-4 w-4" />
                 Premium Services ({filteredServices.length})
+              </TabsTrigger>
+              <TabsTrigger value="pharmacies" className="flex items-center gap-2">
+                <Pill className="h-4 w-4" />
+                Pharmacies ({filteredPharmacies.length})
+              </TabsTrigger>
+              <TabsTrigger value="transport" className="flex items-center gap-2">
+                <Ambulance className="h-4 w-4" />
+                Medical Transport ({filteredTransports.length})
               </TabsTrigger>
             </TabsList>
 
@@ -976,6 +1080,146 @@ const Marketplace = () => {
                     onClick={() => {
                       setSearchQuery('');
                       setCareType('all');
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Pharmacies Tab */}
+            <TabsContent value="pharmacies">
+              {isLoading ? (
+                <div className="flex justify-center items-center h-64">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+              ) : filteredPharmacies.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredPharmacies.map((pharmacy) => (
+                    <Card key={pharmacy.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <CardTitle className="text-lg">{pharmacy.name}</CardTitle>
+                          {pharmacy.delivery_available && (
+                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Delivery Available</Badge>
+                          )}
+                        </div>
+                        {pharmacy.address && (
+                          <CardDescription className="flex items-center gap-1">
+                            <MapPin className="h-4 w-4" />
+                            {pharmacy.address}
+                          </CardDescription>
+                        )}
+                        {pharmacy.hours && (
+                          <CardDescription>{pharmacy.hours}</CardDescription>
+                        )}
+                      </CardHeader>
+                      <CardFooter>
+                        <div className="flex gap-2 w-full">
+                          {pharmacy.address && (
+                            <Button variant="outline" size="sm" onClick={() => window.open(`https://www.google.com/maps?q=${encodeURIComponent(pharmacy.address!)}`, '_blank')}>
+                              Directions
+                            </Button>
+                          )}
+                          {pharmacy.phone && (
+                            <Button variant="outline" size="sm" onClick={() => (window.location.href = `tel:${pharmacy.phone}`)}>
+                              <Phone className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {pharmacy.email && (
+                            <Button variant="outline" size="sm" onClick={() => (window.location.href = `mailto:${pharmacy.email}`)}>
+                              <Mail className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Pill className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                  <p className="text-lg text-muted-foreground">No pharmacies found matching your criteria.</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-4"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setCareType('all');
+                      setSelectedState('all');
+                      setSelectedCounty('all');
+                      setAvailability('all');
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Medical Transport Tab */}
+            <TabsContent value="transport">
+              {isLoading ? (
+                <div className="flex justify-center items-center h-64">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                </div>
+              ) : filteredTransports.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredTransports.map((transport) => (
+                    <Card key={transport.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <CardTitle className="text-lg">{transport.name}</CardTitle>
+                          <div className="flex gap-2">
+                            {transport.available_24_7 && (
+                              <Badge variant="outline" className="text-xs">24/7</Badge>
+                            )}
+                            {transport.wheelchair_accessible && (
+                              <Badge variant="outline" className="text-xs">Wheelchair</Badge>
+                            )}
+                          </div>
+                        </div>
+                        {transport.service_area && (
+                          <CardDescription className="flex items-center gap-1">
+                            <MapPin className="h-4 w-4" />
+                            {transport.service_area}
+                          </CardDescription>
+                        )}
+                        {transport.services && (
+                          <CardDescription>{transport.services}</CardDescription>
+                        )}
+                      </CardHeader>
+                      <CardFooter>
+                        <div className="flex gap-2 w-full">
+                          {transport.phone && (
+                            <Button variant="outline" size="sm" onClick={() => (window.location.href = `tel:${transport.phone}`)}>
+                              <Phone className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {transport.email && (
+                            <Button variant="outline" size="sm" onClick={() => (window.location.href = `mailto:${transport.email}`)}>
+                              <Mail className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Ambulance className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                  <p className="text-lg text-muted-foreground">No medical transport providers found matching your criteria.</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-4"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setCareType('all');
+                      setSelectedState('all');
+                      setSelectedCounty('all');
+                      setAvailability('all');
                     }}
                   >
                     Clear Filters
