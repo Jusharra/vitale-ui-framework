@@ -11,12 +11,14 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface ServiceInfo {
   id: string;
   name: string;
   price?: number;
   duration?: string;
+  category?: string;
 }
 
 interface Props {
@@ -37,6 +39,40 @@ const MarketplaceServiceBookingDialog: React.FC<Props> = ({ service }) => {
   const [notes, setNotes] = React.useState<string>("");
   const [customerName, setCustomerName] = React.useState("");
   const [customerPhone, setCustomerPhone] = React.useState("");
+
+  type ProfessionalLite = {
+    id: string;
+    name: string;
+    profile_image?: string | null;
+    verified?: boolean | null;
+    rating?: number | null;
+  };
+  const [professionals, setProfessionals] = React.useState<ProfessionalLite[]>([]);
+
+  React.useEffect(() => {
+    if (!open) return;
+    const fetchPros = async () => {
+      try {
+        let query = supabase
+          .from('partners')
+          .select('id,name,profile_image,verified,rating')
+          .eq('status', 'active');
+        if (service.category) {
+          // filter by specialty/category when available
+          // @ts-ignore - contains operator for text[]
+          query = query.contains('specialties', [service.category]);
+        }
+        const { data } = await query
+          .order('verified', { ascending: false })
+          .order('rating', { ascending: false })
+          .limit(3);
+        setProfessionals(data || []);
+      } catch (e) {
+        console.warn('Failed to load professionals for service', e);
+      }
+    };
+    fetchPros();
+  }, [open, service.category]);
 
   const basePriceCents = Number.isFinite(service.price as number)
     ? Math.round((service.price as number) * 100)
@@ -215,6 +251,24 @@ const MarketplaceServiceBookingDialog: React.FC<Props> = ({ service }) => {
                   <>
                     <div className="text-muted-foreground">Duration</div>
                     <div className="font-medium">{service.duration}</div>
+                  </>
+                )}
+                {/* Professional assignment preview */}
+                {professionals.length > 0 ? (
+                  <>
+                    <div className="text-muted-foreground">Professional</div>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={professionals[0].profile_image || undefined} alt={professionals[0].name} />
+                        <AvatarFallback>{professionals[0].name?.charAt(0) || 'P'}</AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium">{professionals[0].name}</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-muted-foreground">Professional</div>
+                    <div className="font-medium">Assigned after payment</div>
                   </>
                 )}
               </div>

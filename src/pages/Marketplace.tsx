@@ -1098,7 +1098,7 @@ const Marketplace = () => {
                         </div>
                       </CardContent>
                       <CardFooter>
-                        <MarketplaceServiceBookingDialog service={{ id: service.id, name: service.name, price: service.price, duration: service.duration }} />
+                        <MarketplaceServiceBookingDialog service={{ id: service.id, name: service.name, price: service.price, duration: service.duration, category: service.category }} />
                       </CardFooter>
                     </Card>
                   ))}
