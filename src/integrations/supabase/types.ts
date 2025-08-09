@@ -837,6 +837,105 @@ export type Database = {
         }
         Relationships: []
       }
+      marketplace_orders: {
+        Row: {
+          amount_cents: number
+          assigned_partner_id: string | null
+          created_at: string
+          currency: string
+          customer_name: string | null
+          customer_phone: string | null
+          id: string
+          notes: string | null
+          provider_id: string | null
+          provider_name: string | null
+          provider_type: string | null
+          service_key: string
+          status: string
+          stripe_payment_intent: string | null
+          stripe_session_id: string | null
+          updated_at: string
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          assigned_partner_id?: string | null
+          created_at?: string
+          currency?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          id?: string
+          notes?: string | null
+          provider_id?: string | null
+          provider_name?: string | null
+          provider_type?: string | null
+          service_key: string
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          assigned_partner_id?: string | null
+          created_at?: string
+          currency?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          id?: string
+          notes?: string | null
+          provider_id?: string | null
+          provider_name?: string | null
+          provider_type?: string | null
+          service_key?: string
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      marketplace_pricing: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          service_key: string
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          service_key: string
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          service_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       media_asset_permissions: {
         Row: {
           asset_id: string

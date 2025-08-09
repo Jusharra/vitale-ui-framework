@@ -497,6 +497,40 @@ const Marketplace = () => {
     });
   };
 
+  const handlePayAndRequest = async (
+    serviceKey: 'pharmacy_delivery' | 'medical_transport',
+    providerType: string,
+    providerId: string,
+    providerName?: string
+  ) => {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase.functions.invoke('create-marketplace-payment', {
+        body: {
+          service_key: serviceKey,
+          provider_type: providerType,
+          provider_id: providerId,
+          provider_name: providerName,
+        },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      } else {
+        throw new Error('No checkout URL returned');
+      }
+    } catch (err: any) {
+      console.error('Marketplace checkout error:', err);
+      toast({
+        title: 'Checkout failed',
+        description: err?.message || 'An error occurred during checkout.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const formatPrice = (price: number) => {
     return `$${price.toFixed(2)}`;
   };
@@ -1116,22 +1150,27 @@ const Marketplace = () => {
                         )}
                       </CardHeader>
                       <CardFooter>
-                        <div className="flex gap-2 w-full">
-                          {pharmacy.address && (
-                            <Button variant="outline" size="sm" onClick={() => window.open(`https://www.google.com/maps?q=${encodeURIComponent(pharmacy.address!)}`, '_blank')}>
-                              Directions
-                            </Button>
-                          )}
-                          {pharmacy.phone && (
-                            <Button variant="outline" size="sm" onClick={() => (window.location.href = `tel:${pharmacy.phone}`)}>
-                              <Phone className="h-4 w-4" />
-                            </Button>
-                          )}
-                          {pharmacy.email && (
-                            <Button variant="outline" size="sm" onClick={() => (window.location.href = `mailto:${pharmacy.email}`)}>
-                              <Mail className="h-4 w-4" />
-                            </Button>
-                          )}
+                        <div className="flex gap-2 w-full justify-between items-center">
+                          <div className="flex gap-2">
+                            {pharmacy.address && (
+                              <Button variant="outline" size="sm" onClick={() => window.open(`https://www.google.com/maps?q=${encodeURIComponent(pharmacy.address!)}`, '_blank')}>
+                                Directions
+                              </Button>
+                            )}
+                            {pharmacy.phone && (
+                              <Button variant="outline" size="sm" onClick={() => (window.location.href = `tel:${pharmacy.phone}`)}>
+                                <Phone className="h-4 w-4" />
+                              </Button>
+                            )}
+                            {pharmacy.email && (
+                              <Button variant="outline" size="sm" onClick={() => (window.location.href = `mailto:${pharmacy.email}`)}>
+                                <Mail className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                          <Button size="sm" onClick={() => handlePayAndRequest('pharmacy_delivery', 'pharmacy', pharmacy.id, pharmacy.name)} disabled={isLoading}>
+                            Pay & Request
+                          </Button>
                         </div>
                       </CardFooter>
                     </Card>
@@ -1191,17 +1230,22 @@ const Marketplace = () => {
                         )}
                       </CardHeader>
                       <CardFooter>
-                        <div className="flex gap-2 w-full">
-                          {transport.phone && (
-                            <Button variant="outline" size="sm" onClick={() => (window.location.href = `tel:${transport.phone}`)}>
-                              <Phone className="h-4 w-4" />
-                            </Button>
-                          )}
-                          {transport.email && (
-                            <Button variant="outline" size="sm" onClick={() => (window.location.href = `mailto:${transport.email}`)}>
-                              <Mail className="h-4 w-4" />
-                            </Button>
-                          )}
+                        <div className="flex gap-2 w-full justify-between items-center">
+                          <div className="flex gap-2">
+                            {transport.phone && (
+                              <Button variant="outline" size="sm" onClick={() => (window.location.href = `tel:${transport.phone}`)}>
+                                <Phone className="h-4 w-4" />
+                              </Button>
+                            )}
+                            {transport.email && (
+                              <Button variant="outline" size="sm" onClick={() => (window.location.href = `mailto:${transport.email}`)}>
+                                <Mail className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                          <Button size="sm" onClick={() => handlePayAndRequest('medical_transport', 'transport', transport.id, transport.name)} disabled={isLoading}>
+                            Pay & Request
+                          </Button>
                         </div>
                       </CardFooter>
                     </Card>

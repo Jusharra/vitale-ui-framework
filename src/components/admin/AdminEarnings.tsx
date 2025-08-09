@@ -45,6 +45,7 @@ const AdminEarnings = () => {
   const [monthlyTrends, setMonthlyTrends] = useState<MonthlyTrend[]>([]);
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
+  const [marketOrders, setMarketOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -66,7 +67,7 @@ const AdminEarnings = () => {
 
       if (subsError) throw subsError;
 
-      // Fetch payment data
+      // Fetch payment data (legacy one-time payments)
       const { data: paymentsData, error: payError } = await supabase
         .from('payment_history')
         .select('*')
@@ -74,6 +75,16 @@ const AdminEarnings = () => {
         .limit(100);
 
       if (payError) throw payError;
+
+      // Fetch marketplace orders (new one-time payments)
+      const { data: marketOrdersData, error: marketErr } = await supabase
+        .from('marketplace_orders')
+        .select('*')
+        .eq('status', 'paid')
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (marketErr) throw marketErr;
 
       // Fetch partner platform subscriptions
       const { data: partnerSubs, error: partnerError } = await supabase
@@ -93,10 +104,12 @@ const AdminEarnings = () => {
         return total + (tierPricing[sub.tier as keyof typeof tierPricing] || 0);
       }, 0);
 
-      const totalRevenue = (paymentsData?.reduce((total, payment) => 
-        payment.status === 'succeeded' ? total + (payment.amount || 0) : total, 0) || 0) / 100;
+      const paymentsCents = (paymentsData?.reduce((total, payment) => 
+        payment.status === 'succeeded' ? total + (payment.amount || 0) : total, 0) || 0);
+      const marketplaceCents = (marketOrdersData?.reduce((total, order) => total + (order.amount_cents || 0), 0) || 0);
+      const totalRevenue = (paymentsCents + marketplaceCents) / 100;
 
-      const oneTimePayments = paymentsData?.length || 0;
+      const oneTimePayments = (paymentsData?.length || 0) + (marketOrdersData?.length || 0);
       
       const partnerRevenue = partnerSubs?.filter(sub => sub.status === 'active').length * 99 || 0;
 
@@ -112,7 +125,7 @@ const AdminEarnings = () => {
       // Set breakdown data
       setRevenueBreakdown([
         { source: 'Member Subscriptions', amount: monthlyRecurringRevenue, percentage: 60 },
-        { source: 'One-time Payments', amount: totalRevenue * 0.25, percentage: 25 },
+        { source: 'One-time Payments', amount: (paymentsCents + marketplaceCents) / 100, percentage: 25 },
         { source: 'Partner Revenue', amount: partnerRevenue, percentage: 15 }
       ]);
 
@@ -128,6 +141,7 @@ const AdminEarnings = () => {
 
       setSubscriptions(subscriptionsData || []);
       setPayments(paymentsData || []);
+      setMarketOrders(marketOrdersData || []);
 
     } catch (error) {
       console.error('Error fetching earnings data:', error);

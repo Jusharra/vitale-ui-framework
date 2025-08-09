@@ -52,3 +52,13 @@ schema = "public"
 verify_jwt = false
 name = "sync-all-subscriptions"
 schema = "public"
+
+[[functions]]
+verify_jwt = false
+name = "create-marketplace-payment"
+schema = "public"
+
+[[functions]]
+verify_jwt = false
+name = "verify-marketplace-payment"
+schema = "public"
