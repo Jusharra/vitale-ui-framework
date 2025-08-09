@@ -15,6 +15,7 @@ import ProfessionalDetailCard from '@/components/placement/ProfessionalDetailCar
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import MarketplaceTransportBookingDialog from "@/components/marketplace/MarketplaceTransportBookingDialog";
 
 // Interfaces
 interface Facility {
@@ -1241,9 +1242,7 @@ const Marketplace = () => {
                               </Button>
                             )}
                           </div>
-                          <Button size="sm" onClick={() => handlePayAndRequest('medical_transport', 'transport', transport.id, transport.name)} disabled={isLoading}>
-                            Pay & Request
-                          </Button>
+                          <MarketplaceTransportBookingDialog transport={{ id: transport.id, name: transport.name }} />
                         </div>
                       </CardFooter>
                     </Card>

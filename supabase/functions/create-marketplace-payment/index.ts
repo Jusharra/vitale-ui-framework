@@ -33,6 +33,26 @@ serve(async (req) => {
     const provider_type = body?.provider_type ? String(body.provider_type) : null;
     const provider_id = body?.provider_id ? String(body.provider_id) : null;
     const provider_name = body?.provider_name ? String(body.provider_name) : null;
+    const customer_name = body?.customer_name ? String(body.customer_name) : null;
+    const customer_phone = body?.customer_phone ? String(body.customer_phone) : null;
+    const booking_details = body?.booking_details ?? null;
+
+    // Try to resolve authenticated user if token is provided (optional)
+    let user_id: string | null = null;
+    let user_email: string | null = null;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+    const authHeader = req.headers.get("authorization") || req.headers.get("Authorization");
+    if (anonKey && authHeader && authHeader.startsWith("Bearer ")) {
+      try {
+        const authClient = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
+        const token = authHeader.replace("Bearer ", "");
+        const { data: userData } = await authClient.auth.getUser(token);
+        user_id = userData.user?.id ?? null;
+        user_email = userData.user?.email ?? null;
+      } catch (e) {
+        console.log("[CREATE-MARKETPLACE-PAYMENT] auth resolution failed");
+      }
+    }
 
     if (!service_key) throw new Error("Missing service_key");
 
@@ -79,6 +99,11 @@ serve(async (req) => {
       currency: priceRow.currency || "usd",
       status: "pending",
       stripe_session_id: session.id,
+      user_id,
+      user_email,
+      customer_name,
+      customer_phone,
+      notes: booking_details ? JSON.stringify({ booking_details }) : null,
     });
     if (insErr) throw insErr;
 
