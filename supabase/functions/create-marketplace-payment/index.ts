@@ -56,6 +56,86 @@ serve(async (req) => {
 
     if (!service_key) throw new Error("Missing service_key");
 
+    // Two pricing paths:
+    // 1) service_booking: derive price from services table and apply member discount
+    // 2) default: use marketplace_pricing table (e.g., medical_transport)
+
+    const origin = req.headers.get("origin") || "https://";
+
+    if (service_key === "service_booking") {
+      if (!provider_id) throw new Error("Missing service id");
+
+      log("Fetching service for booking", { provider_id });
+      const { data: svc, error: svcErr } = await supabase
+        .from("services")
+        .select("id, name, price, active")
+        .eq("id", provider_id)
+        .maybeSingle();
+      if (svcErr) throw svcErr;
+      if (!svc || svc.active === false) throw new Error("Service not available");
+      const baseAmountCents = Math.round(Number(svc.price ?? 0) * 100);
+      if (!baseAmountCents || baseAmountCents <= 0) throw new Error("Invalid service price");
+
+      // Determine member discount (10%) for premium/vip users
+      let finalAmountCents = baseAmountCents;
+      if (user_id) {
+        const { data: userRow } = await supabase
+          .from("users")
+          .select("membership_tier")
+          .eq("id", user_id)
+          .maybeSingle();
+        const tier = (userRow as any)?.membership_tier as string | null;
+        if (tier && (tier.toLowerCase() === "premium" || tier.toLowerCase() === "vip")) {
+          const discount = Math.floor(finalAmountCents * 0.10);
+          finalAmountCents = Math.max(0, finalAmountCents - discount);
+        }
+      }
+
+      log("Creating checkout session (service_booking)", { amount: finalAmountCents });
+      const session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: `${provider_name || svc.name}`,
+              },
+              unit_amount: finalAmountCents,
+            },
+            quantity: 1,
+          },
+        ],
+        success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/marketplace?canceled=1`,
+        automatic_tax: { enabled: false },
+      });
+
+      log("Inserting pending order (service_booking)", { sessionId: session.id });
+      const { error: insErr } = await supabase.from("marketplace_orders").insert({
+        service_key,
+        provider_type: "service",
+        provider_id,
+        provider_name: provider_name || svc.name,
+        amount_cents: finalAmountCents,
+        currency: "usd",
+        status: "pending",
+        stripe_session_id: session.id,
+        user_id,
+        user_email,
+        customer_name,
+        customer_phone,
+        notes: booking_details ? JSON.stringify({ booking_details }) : null,
+      });
+      if (insErr) throw insErr;
+
+      return new Response(JSON.stringify({ url: session.url }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    // Default path (marketplace_pricing), e.g., medical_transport
     log("Fetching pricing", { service_key });
     const { data: priceRow, error: priceErr } = await supabase
       .from("marketplace_pricing")
@@ -66,8 +146,6 @@ serve(async (req) => {
 
     if (priceErr) throw priceErr;
     if (!priceRow) throw new Error("Service not available");
-
-    const origin = req.headers.get("origin") || "https://";
 
     log("Creating checkout session");
     const session = await stripe.checkout.sessions.create({

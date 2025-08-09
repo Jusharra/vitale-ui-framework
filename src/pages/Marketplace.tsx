@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import MarketplaceTransportBookingDialog from "@/components/marketplace/MarketplaceTransportBookingDialog";
+import MarketplaceServiceBookingDialog from "@/components/marketplace/MarketplaceServiceBookingDialog";
 
 // Interfaces
 interface Facility {
@@ -1097,10 +1098,7 @@ const Marketplace = () => {
                         </div>
                       </CardContent>
                       <CardFooter>
-                        <Button className="w-full">
-                          <Calendar className="h-4 w-4 mr-2" />
-                          Book Now
-                        </Button>
+                        <MarketplaceServiceBookingDialog service={{ id: service.id, name: service.name, price: service.price, duration: service.duration }} />
                       </CardFooter>
                     </Card>
                   ))}
