@@ -1694,10 +1694,12 @@ export type Database = {
           email: string | null
           hours: string | null
           id: string
+          images: string[] | null
           insurance_accepted: string | null
           name: string
           partner_id: string | null
           phone: string | null
+          profile_image: string | null
           services: string | null
           status: string | null
         }
@@ -1709,10 +1711,12 @@ export type Database = {
           email?: string | null
           hours?: string | null
           id?: string
+          images?: string[] | null
           insurance_accepted?: string | null
           name: string
           partner_id?: string | null
           phone?: string | null
+          profile_image?: string | null
           services?: string | null
           status?: string | null
         }
@@ -1724,10 +1728,12 @@ export type Database = {
           email?: string | null
           hours?: string | null
           id?: string
+          images?: string[] | null
           insurance_accepted?: string | null
           name?: string
           partner_id?: string | null
           phone?: string | null
+          profile_image?: string | null
           services?: string | null
           status?: string | null
         }
@@ -2920,6 +2926,7 @@ export type Database = {
           created_by: string | null
           email: string | null
           id: string
+          images: string[] | null
           insurance_accepted: string | null
           name: string
           phone: string | null
@@ -2937,6 +2944,7 @@ export type Database = {
           created_by?: string | null
           email?: string | null
           id?: string
+          images?: string[] | null
           insurance_accepted?: string | null
           name: string
           phone?: string | null
@@ -2954,6 +2962,7 @@ export type Database = {
           created_by?: string | null
           email?: string | null
           id?: string
+          images?: string[] | null
           insurance_accepted?: string | null
           name?: string
           phone?: string | null

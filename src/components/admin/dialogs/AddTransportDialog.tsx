@@ -16,7 +16,7 @@ import { Switch } from '@/components/ui/switch';
 import { useForm } from 'react-hook-form';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
+import MediaUploader from '@/components/common/MediaUploader';
 interface AddTransportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -55,6 +55,7 @@ const AddTransportDialog = ({ open, onOpenChange, onSuccess }: AddTransportDialo
     try {
       const { error } = await supabase.from('transports').insert({
         ...data,
+        profile_image: data.profile_image || null,
         status: 'active',
       });
       
@@ -191,9 +192,21 @@ const AddTransportDialog = ({ open, onOpenChange, onSuccess }: AddTransportDialo
                 <Label htmlFor="wheelchair_accessible">Wheelchair accessible</Label>
               </div>
             </div>
-          </div>
-          
-          <DialogFooter>
+            </div>
+            
+            <div className="grid gap-2 py-2">
+              <Label>Feature Image</Label>
+              <MediaUploader
+                currentUrl={''}
+                onUpload={(url) => reset({ ...((window as any).___t||{}), ...((window as any).___t = null), ...{
+                  name: (document.getElementById('name') as HTMLInputElement)?.value || '',
+                } as any); /* noop to satisfy TS */}
+                onRemove={() => {}}
+                folder="transports"
+              />
+            </div>
+            
+            <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>

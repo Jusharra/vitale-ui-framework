@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Loader2 } from 'lucide-react';
+import MediaUploader from '@/components/common/MediaUploader';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -37,6 +38,7 @@ const formSchema = z.object({
   delivery_available: z.boolean().default(false),
   insurance_accepted: z.string().optional(),
   status: z.string().default('active'),
+  profile_image: z.string().url().optional().or(z.literal('')),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -64,6 +66,7 @@ const EditPharmacyDialog = ({ open, onOpenChange, onSuccess, pharmacyId }: EditP
       delivery_available: false,
       insurance_accepted: '',
       status: 'active',
+      profile_image: '',
     },
   });
 
@@ -91,6 +94,7 @@ const EditPharmacyDialog = ({ open, onOpenChange, onSuccess, pharmacyId }: EditP
           delivery_available: data.delivery_available || false,
           insurance_accepted: data.insurance_accepted || '',
           status: data.status || 'active',
+          profile_image: data.profile_image || '',
         });
       } catch (error) {
         console.error('Error fetching pharmacy:', error);
@@ -124,6 +128,7 @@ const EditPharmacyDialog = ({ open, onOpenChange, onSuccess, pharmacyId }: EditP
           delivery_available: values.delivery_available,
           insurance_accepted: values.insurance_accepted,
           status: values.status,
+          profile_image: values.profile_image || null,
         })
         .eq('id', pharmacyId);
 
@@ -292,6 +297,16 @@ const EditPharmacyDialog = ({ open, onOpenChange, onSuccess, pharmacyId }: EditP
                       <FormMessage />
                     </FormItem>
                   )}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <FormLabel>Feature Image</FormLabel>
+                <MediaUploader
+                  currentUrl={form.watch('profile_image') || undefined}
+                  onUpload={(url) => form.setValue('profile_image', url)}
+                  onRemove={() => form.setValue('profile_image', '')}
+                  folder="pharmacies"
                 />
               </div>
               

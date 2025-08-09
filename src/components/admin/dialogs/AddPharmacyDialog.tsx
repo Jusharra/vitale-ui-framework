@@ -26,7 +26,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-
+import MediaUploader from '@/components/common/MediaUploader';
 const formSchema = z.object({
   name: z.string().min(2, 'Name is required'),
   address: z.string().optional(),
@@ -36,6 +36,7 @@ const formSchema = z.object({
   hours: z.string().optional(),
   delivery_available: z.boolean().default(false),
   insurance_accepted: z.string().optional(),
+  profile_image: z.string().url().optional().or(z.literal('')),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -59,6 +60,7 @@ const AddPharmacyDialog = ({ open, onOpenChange, onSuccess }: AddPharmacyDialogP
       hours: '',
       delivery_available: false,
       insurance_accepted: '',
+      profile_image: '',
     },
   });
 
@@ -75,6 +77,7 @@ const AddPharmacyDialog = ({ open, onOpenChange, onSuccess }: AddPharmacyDialogP
           hours: values.hours,
           delivery_available: values.delivery_available,
           insurance_accepted: values.insurance_accepted,
+          profile_image: values.profile_image || null,
           status: 'active',
         });
 
@@ -233,6 +236,17 @@ const AddPharmacyDialog = ({ open, onOpenChange, onSuccess }: AddPharmacyDialogP
                     <FormMessage />
                   </FormItem>
                 )}
+              />
+            </div>
+            
+            <div className="space-y-2 mt-2">
+              <FormLabel>Feature Image</FormLabel>
+              <MediaUploader
+                currentUrl={form.watch('profile_image') || undefined}
+                onUpload={(url) => form.setValue('profile_image', url)}
+                onRemove={() => form.setValue('profile_image', '')}
+                folder="pharmacies"
+                className="mt-2"
               />
             </div>
             
