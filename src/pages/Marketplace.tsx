@@ -1168,9 +1168,7 @@ const Marketplace = () => {
                               </Button>
                             )}
                           </div>
-                          <Button size="sm" onClick={() => handlePayAndRequest('pharmacy_delivery', 'pharmacy', pharmacy.id, pharmacy.name)} disabled={isLoading}>
-                            Pay & Request
-                          </Button>
+                            <span className="text-sm text-muted-foreground">Members-only service</span>
                         </div>
                       </CardFooter>
                     </Card>
