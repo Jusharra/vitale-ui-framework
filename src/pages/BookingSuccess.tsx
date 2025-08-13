@@ -30,14 +30,13 @@ const BookingSuccess = () => {
       }
 
       try {
-        const { data, error } = await supabase
-          .from('vacation_bookings')
-          .select('*')
-          .eq('stripe_session_id', sessionId)
-          .single();
+        const { data, error } = await supabase.rpc('get_vacation_booking_by_session', {
+          p_session_id: sessionId,
+        });
 
         if (error) throw error;
-        setBooking(data);
+        const row = Array.isArray(data) ? data[0] : data;
+        setBooking(row as BookingDetails);
       } catch (error) {
         console.error('Error fetching booking:', error);
       } finally {

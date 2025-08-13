@@ -3278,6 +3278,19 @@ export type Database = {
         Args: { user_id?: string }
         Returns: string
       }
+      get_vacation_booking_by_session: {
+        Args: { p_session_id: string }
+        Returns: {
+          booking_reference: string
+          package_name: string
+          guest_name: string
+          guest_email: string
+          check_in_date: string
+          check_out_date: string
+          number_of_guests: number
+          total_amount: number
+        }[]
+      }
       is_vip_member: {
         Args: { user_id: string }
         Returns: boolean
