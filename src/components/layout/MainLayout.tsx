@@ -41,11 +41,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="py-4 px-6 md:px-8 bg-white shadow-sm">
+      <header className="py-4 px-6 md:px-8 bg-transparent backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/40">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center">
-            <div className="bg-indigo-600 text-white font-bold text-xl px-3 py-1 rounded mr-2">VH</div>
-            <h1 className="text-xl font-bold text-gray-800">Vitale Health Concierge</h1>
+            <h1 className="text-xl md:text-2xl font-bold font-playfair tracking-tight">Vitalé Health Concierge</h1>
           </div>
           
           {/* Desktop Navigation */}
@@ -54,8 +53,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               <Link 
                 key={index} 
                 to={item.path} 
-                className={`text-gray-600 hover:text-indigo-600 transition-colors ${
-                  location.pathname === item.path ? 'text-indigo-600 font-medium' : ''
+                className={`text-muted-foreground hover:text-primary transition-colors ${
+                  location.pathname === item.path ? 'text-primary font-medium' : ''
                 }`}
               >
                 {item.name}
@@ -70,12 +69,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 <Button variant="outline" onClick={signOut}>Sign Out</Button>
               </div>
             ) : (
-              <Button onClick={() => navigate('/auth')}>Sign In</Button>
+              <div className="flex gap-2">
+                <Button variant="luxury" onClick={() => navigate('/contact')}>Concierge Call</Button>
+                <Button variant="outline" onClick={() => navigate('/auth')}>Member Login</Button>
+              </div>
             )}
             
             {/* Mobile menu button */}
             <button 
-              className="md:hidden p-2 rounded-md text-gray-600 hover:text-indigo-600 hover:bg-gray-100"
+              className="md:hidden p-2 rounded-md text-muted-foreground hover:text-primary hover:bg-muted/50"
               onClick={toggleMobileMenu}
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -93,8 +95,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   to={item.path} 
                   className={`px-4 py-2 rounded-md ${
                     location.pathname === item.path 
-                      ? 'bg-indigo-50 text-indigo-600 font-medium' 
-                      : 'text-gray-600 hover:bg-gray-50'
+                      ? 'bg-muted text-primary font-medium' 
+                      : 'text-muted-foreground hover:bg-muted/50'
                   }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >

@@ -44,19 +44,19 @@ const Index = () => {
   return (
     <MainLayout>
       {/* 1. Hero Section */}
-      <section className="relative bg-gradient-to-r from-indigo-50 to-blue-50 py-20 px-4 sm:px-6 lg:px-8">
+      <section className="relative bg-gradient-to-b from-transparent to-muted/50 py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
-                Concierge In-Home Health & Wellness for Aging Loved Ones
+              <h1 className="text-4xl md:text-5xl font-extrabold leading-tight font-playfair">
+                Private, Physician‑Backed Concierge Care for Distinguished Families.
               </h1>
-              <p className="text-xl text-gray-600">
-                Premium IV therapy, private nursing, hospice care, and assisted living placements—trusted, vetted, delivered to your door.
+              <p className="text-xl text-muted-foreground">
+                Discreet in‑home nursing, bespoke wellness, and white‑glove placement—precisely when you need it.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Button size="lg" variant="premium">
-                  Book In-Home Care Now
+                <Button size="lg" variant="luxury">
+                  Schedule a Private Consultation
                 </Button>
                 <Button size="lg" variant="outline">
                   Explore Concierge Services

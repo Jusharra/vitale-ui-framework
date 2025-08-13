@@ -19,6 +19,7 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         premium: "bg-[linear-gradient(135deg,_hsl(var(--brand-ink)),_hsl(var(--brand-gold)))] text-primary-foreground border border-white/10 shadow-[var(--shadow-elegant)] hover:opacity-90",
+        luxury: "bg-[linear-gradient(135deg,_hsl(var(--brand-ink)),_hsl(var(--brand-gold)))] text-primary-foreground border border-white/10 shadow-[var(--shadow-elegant)] hover:opacity-90",
       },
       size: {
         default: "h-10 px-4 py-2",
