@@ -3267,6 +3267,29 @@ export type Database = {
         Args: { input_text: string }
         Returns: string
       }
+      get_public_partners: {
+        Args: { p_limit?: number }
+        Returns: {
+          id: string
+          name: string
+          bio: string
+          specialties: string[]
+          specializations: string[]
+          rating: number
+          accepting_new_patients: boolean
+          verified: boolean
+          service_area: string
+          profile_image: string
+          slug: string
+          consultation_fee_display: string
+          telehealth_enabled: boolean
+          video_consultation: boolean
+          in_person_consultation: boolean
+          languages: string[]
+          virtual_appointment_preferences: Json
+          created_at: string
+        }[]
+      }
       get_user_by_email: {
         Args: { user_email: string }
         Returns: {
