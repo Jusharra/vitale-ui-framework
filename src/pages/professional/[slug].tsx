@@ -69,13 +69,18 @@ const ProfessionalProfilePage = () => {
 
         console.log("Fetching partner with slug:", slug);
 
-        // First try to fetch by exact slug
-        const { data, error } = await supabase
-          .from('partners')
-          .select('id,slug,name,first_name,credentials,practice_name,specialties,languages,specializations,service_area,hourly_rate,bio,accepting_new_patients,telehealth_enabled,status,profile_image,rating,verified,instagram_url,youtube_url,tiktok_url,linkedin_url,facebook_url')
-          .eq('slug', slug)
-          .eq('status', 'active')
-          .maybeSingle();
+        // First try to fetch by exact slug using the public function
+        let data: any = null;
+        let error: any = null;
+        
+        try {
+          const result = await supabase.rpc('get_public_partners', { p_limit: 1000 });
+          if (result.error) throw result.error;
+          const partner = result.data?.find(p => p.slug === slug);
+          data = partner ? { ...partner, status: 'active' } : null;
+        } catch (err) {
+          error = err;
+        }
 
         if (error) {
           console.error('Error fetching partner by slug:', error);
