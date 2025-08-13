@@ -72,7 +72,7 @@ const ProfessionalProfilePage = () => {
         // First try to fetch by exact slug
         const { data, error } = await supabase
           .from('partners')
-          .select('*')
+          .select('id,slug,name,first_name,credentials,practice_name,specialties,languages,specializations,service_area,hourly_rate,bio,accepting_new_patients,telehealth_enabled,status,profile_image,rating,verified,instagram_url,youtube_url,tiktok_url,linkedin_url,facebook_url')
           .eq('slug', slug)
           .eq('status', 'active')
           .maybeSingle();
@@ -92,7 +92,7 @@ const ProfessionalProfilePage = () => {
           // If no exact match found, try a case-insensitive search
           const { data: alternativeData, error: alternativeError } = await supabase
             .from('partners')
-            .select('*')
+            .select('id,slug,name,first_name,credentials,practice_name,specialties,languages,specializations,service_area,hourly_rate,bio,accepting_new_patients,telehealth_enabled,status,profile_image,rating,verified,instagram_url,youtube_url,tiktok_url,linkedin_url,facebook_url')
             .eq('status', 'active')
             .ilike('slug', `%${slug}%`)
             .limit(1)

@@ -55,10 +55,10 @@ const Index = () => {
                 Premium IV therapy, private nursing, hospice care, and assisted living placements—trusted, vetted, delivered to your door.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700">
+                <Button size="lg" variant="premium">
                   Book In-Home Care Now
                 </Button>
-                <Button size="lg" variant="outline" className="border-indigo-600 text-indigo-600 hover:bg-indigo-50">
+                <Button size="lg" variant="outline">
                   Explore Concierge Services
                 </Button>
               </div>

@@ -27,9 +27,9 @@ const MembershipBadge: React.FC<MembershipBadgeProps> = ({
 
   return (
     <span className={cn(
-      'inline-flex items-center justify-center font-medium rounded-full',
-      type === 'premium' && 'bg-gradient-to-r from-purple-600 to-blue-600 text-white',
-      type === 'inactive' && 'bg-muted text-muted-foreground',
+      'inline-flex items-center justify-center font-medium rounded-full border',
+      type === 'premium' && 'bg-[linear-gradient(120deg,_hsl(var(--brand-ink))_0%,_hsl(var(--brand-ink))_70%,_hsl(var(--brand-gold))_100%)] text-primary-foreground border-white/10',
+      type === 'inactive' && 'bg-muted text-muted-foreground border-transparent',
       sizeClasses[size],
       className
     )}>

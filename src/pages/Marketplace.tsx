@@ -189,7 +189,7 @@ const Marketplace = () => {
         // Fetch professionals
         const { data: professionalsData, error: professionalsError } = await supabase
           .from('partners')
-          .select('*')
+          .select('id,slug,name,practice_name,specialties,languages,service_area,hourly_rate,bio,accepting_new_patients,telehealth_enabled,status,profile_image,rating,verified,credentials')
           .eq('status', 'active')
           .order('verified', { ascending: false })
           .order('created_at', { ascending: false });
@@ -321,16 +321,35 @@ const Marketplace = () => {
         },
         (payload) => {
           console.log('Professionals updated:', payload);
+          const pick = (row: any) => ({
+            id: row.id,
+            slug: row.slug,
+            name: row.name,
+            practice_name: row.practice_name,
+            specialties: row.specialties,
+            languages: row.languages,
+            service_area: row.service_area,
+            hourly_rate: row.hourly_rate,
+            bio: row.bio,
+            accepting_new_patients: row.accepting_new_patients,
+            telehealth_enabled: row.telehealth_enabled,
+            status: row.status,
+            profile_image: row.profile_image,
+            rating: row.rating,
+            verified: row.verified,
+            credentials: row.credentials,
+          });
+
           if (payload.eventType === 'INSERT' && payload.new.status === 'active') {
-            setProfessionals(current => [payload.new as Professional, ...current]);
+            setProfessionals(current => [pick(payload.new), ...current]);
           } else if (payload.eventType === 'UPDATE' && payload.new.status === 'active') {
-            setProfessionals(current => 
-              current.map(professional => 
-                professional.id === payload.new.id ? payload.new as Professional : professional
+            setProfessionals(current =>
+              current.map(professional =>
+                professional.id === payload.new.id ? pick(payload.new) as any : professional
               )
             );
           } else if (payload.eventType === 'DELETE' || (payload.eventType === 'UPDATE' && payload.new.status !== 'active')) {
-            setProfessionals(current => 
+            setProfessionals(current =>
               current.filter(professional => professional.id !== payload.old.id)
             );
           }
@@ -1319,9 +1338,9 @@ const Marketplace = () => {
                 <MessageSquare className="h-5 w-5 mr-2" />
                 Contact Our Team
               </Button>
-              <Button variant="outline" size="lg" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+              <Button variant="outline" size="lg">
                 <Phone className="h-5 w-5 mr-2" />
-                Call (555) 123-4567
+                Call Concierge
               </Button>
             </div>
           </div>
