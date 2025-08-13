@@ -70,7 +70,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               </div>
             ) : (
               <div className="flex gap-2">
-                <Button variant="luxury" onClick={() => navigate('/contact')}>Concierge Call</Button>
                 <Button variant="outline" onClick={() => navigate('/auth')}>Member Login</Button>
               </div>
             )}
