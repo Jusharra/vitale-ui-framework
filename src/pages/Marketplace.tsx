@@ -17,7 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import MarketplaceTransportBookingDialog from "@/components/marketplace/MarketplaceTransportBookingDialog";
 import MarketplaceServiceBookingDialog from "@/components/marketplace/MarketplaceServiceBookingDialog";
-
+import { Helmet } from 'react-helmet';
 // Interfaces
 interface Facility {
   id: string;
@@ -186,18 +186,14 @@ const Marketplace = () => {
           setFacilities(facilitiesData || []);
         }
         
-        // Fetch professionals
-        const { data: professionalsData, error: professionalsError } = await supabase
-          .from('partners')
-          .select('id,slug,name,practice_name,specialties,languages,service_area,hourly_rate,bio,accepting_new_patients,telehealth_enabled,status,profile_image,rating,verified,credentials')
-          .eq('status', 'active')
-          .order('verified', { ascending: false })
-          .order('created_at', { ascending: false });
+        // Fetch professionals via secure RPC
+        const { data: professionalsData, error: professionalsError } = await (supabase as any)
+          .rpc('get_public_partners', { p_limit: 100 });
         
         if (professionalsError) {
           console.error('Error fetching professionals:', professionalsError);
         } else {
-          setProfessionals(professionalsData || []);
+          setProfessionals((professionalsData as any[]) || []);
         }
 
         // Fetch services
@@ -365,6 +361,11 @@ const Marketplace = () => {
     };
   }, [toast]);
 
+  // Reset category when switching tabs to avoid mismatched filters
+  useEffect(() => {
+    setCareType('all');
+  }, [activeTab]);
+
   // Filter functions
   const filteredFacilities = facilities.filter(facility => {
     const matchesSearch = 
@@ -455,7 +456,11 @@ const Marketplace = () => {
       (availability === 'available' && pharmacy.delivery_available) ||
       (availability === 'full' && !pharmacy.delivery_available);
 
-    return matchesSearch && matchesLocation && matchesAvailability;
+    const matchesCategory = careType === 'all' ||
+      (careType === 'delivery' && pharmacy.delivery_available) ||
+      (careType === 'in_store' && pharmacy.delivery_available === false);
+
+    return matchesSearch && matchesLocation && matchesAvailability && matchesCategory;
   });
 
   const filteredTransports = transports.filter((transport) => {
@@ -476,7 +481,13 @@ const Marketplace = () => {
       (availability === 'available' && (transport.available_24_7 || transport.wheelchair_accessible)) ||
       availability === 'full';
 
-    return matchesSearch && matchesLocation && matchesAvailability;
+    const matchesCategory = careType === 'all' ||
+      (careType === 'wheelchair_accessible' && !!transport.wheelchair_accessible) ||
+      (careType === 'available_24_7' && !!transport.available_24_7) ||
+      (careType === 'non_emergency' && (transport.services?.toLowerCase().includes('non-emergency') || transport.services?.toLowerCase().includes('non emergency'))) ||
+      (careType === 'ambulance' && transport.services?.toLowerCase().includes('ambulance'));
+
+    return matchesSearch && matchesLocation && matchesAvailability && matchesCategory;
   });
   
   // Helper functions
@@ -598,6 +609,11 @@ const Marketplace = () => {
     <MainLayout>
       <div className="bg-background py-12" id="marketplace-top">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Helmet>
+            <title>Healthcare Marketplace | Find Care & Providers</title>
+            <meta name="description" content="Healthcare marketplace to find facilities, professionals, services, pharmacies, and medical transport." />
+            <link rel="canonical" href="/marketplace" />
+          </Helmet>
           {/* Hero Section */}
           <div className="lg:text-center mb-12">
             <h1 className="text-4xl font-extrabold text-foreground sm:text-5xl">
@@ -626,7 +642,7 @@ const Marketplace = () => {
                 <SelectTrigger>
                   <SelectValue placeholder="Category / Specialty" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-50">
                   <SelectItem value="all">All Categories</SelectItem>
                   {activeTab === 'facilities' && (
                     <>
@@ -655,6 +671,20 @@ const Marketplace = () => {
                       <SelectItem value="specialist">Specialist</SelectItem>
                       <SelectItem value="therapy">Therapy</SelectItem>
                       <SelectItem value="nutrition">Nutrition</SelectItem>
+                    </>
+                  )}
+                  {activeTab === 'pharmacies' && (
+                    <>
+                      <SelectItem value="delivery">Delivery Available</SelectItem>
+                      <SelectItem value="in_store">In-Store Only</SelectItem>
+                    </>
+                  )}
+                  {activeTab === 'transport' && (
+                    <>
+                      <SelectItem value="wheelchair_accessible">Wheelchair Accessible</SelectItem>
+                      <SelectItem value="available_24_7">24/7 Available</SelectItem>
+                      <SelectItem value="non_emergency">Non-Emergency</SelectItem>
+                      <SelectItem value="ambulance">Ambulance</SelectItem>
                     </>
                   )}
                 </SelectContent>
@@ -739,7 +769,7 @@ const Marketplace = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Select State" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="z-50">
                         <SelectItem value="all">All States</SelectItem>
                         <SelectItem value="California">California</SelectItem>
                         <SelectItem value="Texas">Texas</SelectItem>
@@ -757,7 +787,7 @@ const Marketplace = () => {
                       <SelectTrigger>
                         <SelectValue placeholder={selectedState === 'all' ? "Select State First" : "Select County"} />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="z-50">
                         <SelectItem value="all">All Counties</SelectItem>
                         {selectedState === 'California' && 
                           counties.California.map(county => (
@@ -776,7 +806,7 @@ const Marketplace = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Price Range" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="z-50">
                         <SelectItem value="all">All Prices</SelectItem>
                         <SelectItem value="$">$ Budget-friendly</SelectItem>
                         <SelectItem value="$$">$$ Moderate</SelectItem>
@@ -789,7 +819,7 @@ const Marketplace = () => {
                       <SelectTrigger>
                         <SelectValue placeholder="Availability" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="z-50">
                         <SelectItem value="all">All</SelectItem>
                         <SelectItem value="available">Available Now</SelectItem>
                         <SelectItem value="full">Waitlist Only</SelectItem>
@@ -806,12 +836,12 @@ const Marketplace = () => {
                         <SelectTrigger>
                           <SelectValue placeholder="Duration" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Durations</SelectItem>
-                          <SelectItem value="short">Short (30 min)</SelectItem>
-                          <SelectItem value="medium">Medium (60 min)</SelectItem>
-                          <SelectItem value="long">Long (90+ min)</SelectItem>
-                        </SelectContent>
+                          <SelectContent className="z-50">
+                            <SelectItem value="all">All Durations</SelectItem>
+                            <SelectItem value="short">Short (30 min)</SelectItem>
+                            <SelectItem value="medium">Medium (60 min)</SelectItem>
+                            <SelectItem value="long">Long (90+ min)</SelectItem>
+                          </SelectContent>
                       </Select>
 
                       <div className="flex items-center gap-2">
