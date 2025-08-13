@@ -876,12 +876,9 @@ const Marketplace = () => {
                     <Card key={facility.id} className="overflow-hidden border border-border bg-card hover:shadow-[var(--shadow-elegant)] transition-shadow cursor-pointer" onClick={() => setSelectedFacility(facility)}>
                       {facility.image_url && (
                         <div className="h-48 overflow-hidden">
-                          <img 
-                            src={facility.image_url} 
-                            alt={facility.name} 
-                            className="w-full h-full object-cover" />
-                        </div>
-                      )}
+                          <img
+                            src={facility.image_url}
+                            alt={facility.name}
                             className="w-full h-full object-cover transition-transform hover:scale-105"
                           />
                         </div>
