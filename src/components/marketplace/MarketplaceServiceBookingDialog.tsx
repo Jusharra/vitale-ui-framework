@@ -158,7 +158,7 @@ const MarketplaceServiceBookingDialog: React.FC<Props> = ({ service }) => {
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
       <DialogTrigger asChild>
-        <Button className="w-full">
+        <Button className="w-full" variant="luxury">
           <CalendarIcon className="h-4 w-4 mr-2" />
           Book Now
         </Button>

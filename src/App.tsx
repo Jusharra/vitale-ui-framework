@@ -56,6 +56,7 @@ import ProfessionalProfilePage from '@/pages/professional/[slug]';
 import Resources from '@/pages/Resources';
 import VacationBooking from '@/pages/VacationBooking';
 import BookingSuccess from '@/pages/BookingSuccess';
+import RegionLanding from '@/pages/regions/RegionLanding';
 
 // Blog pages
 import BlogIndex from '@/pages/blog/index';
@@ -142,6 +143,9 @@ const App: React.FC = () => {
                   <Route path="/blog/iv-therapy-hospice-san-diego-county" element={<SanDiegoCountyBlog />} />
                   <Route path="/blog/iv-therapy-hospice-ventura-county" element={<VenturaCountyBlog />} />
                   <Route path="/blog/iv-therapy-hospice-fort-bend-county" element={<FortBendCountyBlog />} />
+
+                  {/* Regions */}
+                  <Route path="/regions/:state/:county" element={<RegionLanding />} />
                   
                   {/* Dashboard router to handle role-based routing */}
                   <Route

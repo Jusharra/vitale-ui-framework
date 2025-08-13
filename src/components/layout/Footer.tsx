@@ -49,6 +49,13 @@ const Footer: React.FC = () => {
             </ul>
           </div>
         </div>
+        {/* Trust strip */}
+        <div className="mt-10 border-t border-border/30 pt-6 flex flex-wrap gap-6 items-center text-sm text-muted-foreground/80">
+          <span>HIPAA Compliant</span>
+          <span>RN/LVN Network</span>
+          <span>Concierge Medicine Partners</span>
+          <span>Verified Providers</span>
+        </div>
         
         <div className="border-t border-border/30 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground/70">© {new Date().getFullYear()} Vitalé Health Concierge. All rights reserved.</p>

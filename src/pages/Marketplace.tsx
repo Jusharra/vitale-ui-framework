@@ -873,12 +873,15 @@ const Marketplace = () => {
               ) : filteredFacilities.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredFacilities.map((facility) => (
-                    <Card key={facility.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setSelectedFacility(facility)}>
+                    <Card key={facility.id} className="overflow-hidden border border-border bg-card hover:shadow-[var(--shadow-elegant)] transition-shadow cursor-pointer" onClick={() => setSelectedFacility(facility)}>
                       {facility.image_url && (
                         <div className="h-48 overflow-hidden">
                           <img 
                             src={facility.image_url} 
                             alt={facility.name} 
+                            className="w-full h-full object-cover" />
+                        </div>
+                      )}
                             className="w-full h-full object-cover transition-transform hover:scale-105"
                           />
                         </div>
@@ -958,10 +961,10 @@ const Marketplace = () => {
               ) : filteredProfessionals.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredProfessionals.map((professional) => (
-                    <Card key={professional.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setSelectedProfessional(professional)}>
+                    <Card key={professional.id} className="overflow-hidden border border-border bg-card hover:shadow-[var(--shadow-elegant)] transition-shadow cursor-pointer" onClick={() => setSelectedProfessional(professional)}>
                       <CardHeader>
                         <div className="flex items-center gap-4">
-                          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center overflow-hidden border border-border">
                             {professional.profile_image ? (
                               <img src={professional.profile_image} alt={professional.name} className="w-full h-full object-cover" />
                             ) : (
@@ -1149,7 +1152,7 @@ const Marketplace = () => {
               ) : filteredPharmacies.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredPharmacies.map((pharmacy) => (
-                    <Card key={pharmacy.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <Card key={pharmacy.id} className="overflow-hidden border border-border bg-card hover:shadow-[var(--shadow-elegant)] transition-shadow"> 
                       <CardHeader>
                         <div className="flex justify-between items-start">
                           <CardTitle className="text-lg">{pharmacy.name}</CardTitle>
@@ -1222,7 +1225,7 @@ const Marketplace = () => {
               ) : filteredTransports.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredTransports.map((transport) => (
-                    <Card key={transport.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <Card key={transport.id} className="overflow-hidden border border-border bg-card hover:shadow-[var(--shadow-elegant)] transition-shadow">
                       <CardHeader>
                         <div className="flex justify-between items-start">
                           <CardTitle className="text-lg">{transport.name}</CardTitle>

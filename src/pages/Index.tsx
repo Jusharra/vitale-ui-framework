@@ -1,10 +1,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import MainLayout from '@/components/layout/MainLayout';
 import { Input } from '@/components/ui/input';
+import { Helmet } from 'react-helmet';
 import { 
   Home, 
   Droplet, 
@@ -43,18 +43,22 @@ const Index = () => {
 
   return (
     <MainLayout>
+      <Helmet>
+        <title>Private, Physician‑Backed Concierge Care | Vitalé</title>
+        <meta name="description" content="Discreet in‑home nursing, bespoke wellness, and white‑glove placement—precisely when you need it." />
+        <link rel="canonical" href="https://vitalehealthconcierge.doctor/" />
+      </Helmet>
       {/* 1. Hero Section */}
-      <section className="relative bg-gradient-to-b from-transparent to-muted/50 py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <section className="relative py-24 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <h1 className="text-4xl md:text-5xl font-extrabold leading-tight font-playfair">
+              <h1 className="text-4xl md:text-5xl font-semibold leading-tight font-playfair">
                 Private, Physician‑Backed Concierge Care for Distinguished Families.
               </h1>
               <p className="text-xl text-muted-foreground">
                 Discreet in‑home nursing, bespoke wellness, and white‑glove placement—precisely when you need it.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row gap-4 pt-2">
                 <Button size="lg" variant="luxury">
                   Schedule a Private Consultation
                 </Button>
@@ -63,16 +67,27 @@ const Index = () => {
                 </Button>
               </div>
             </div>
-            <div className="rounded-lg overflow-hidden shadow-xl">
-              <img 
-                src="https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg" 
-                alt="Professional nurse helping an elder at home" 
+            <div className="rounded-xl overflow-hidden shadow-[var(--shadow-elegant)] border border-border">
+              <img
+                src="https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg"
+                alt="Discreet in‑home nursing in a luxury residence"
                 className="w-full h-full object-cover"
+                loading="eager"
               />
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+        {/* Affluent counties strip */}
+        <section className="pb-8 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <p className="text-sm uppercase tracking-wide text-muted-foreground mb-3">Trusted across California and Texas</p>
+            <div className="flex flex-wrap gap-2">
+              {['Beverly Hills','Bel Air','Marin','Palo Alto','San Mateo','Newport Coast','Westlake','River Oaks','The Woodlands','Westlake Austin'].map((c)=> (
+                <span key={c} className="text-xs px-3 py-1 rounded-full border border-border bg-card text-foreground/80">{c}</span>
+              ))}
+            </div>
+          </div>
+        </section>
 
       {/* 2. What We Offer */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
@@ -137,63 +152,36 @@ const Index = () => {
       </section>
 
       {/* 3. Offer Stack */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-indigo-900 text-white">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[hsl(var(--brand-ink))] text-[hsl(var(--background))]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
-            <span className="inline-block px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-semibold mb-3">
-              EXCLUSIVE OFFERS
+            <span className="inline-block px-3 py-1 bg-white/10 rounded-full text-sm font-semibold mb-3">
+              Exclusive Benefits
             </span>
-            <h2 className="text-3xl font-bold">The Vitale Advantage</h2>
-            <p className="mt-3 text-indigo-200 text-lg">
-              Unlock premium benefits with our concierge health services
+            <h2 className="text-3xl font-playfair font-semibold">The Vitalé Advantage</h2>
+            <p className="mt-3 text-white/80 text-lg">
+              Private coordination, priority access, and white‑glove execution.
             </p>
           </div>
-          
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 shadow-lg border border-indigo-700">
+          <div className="rounded-xl p-8 border border-white/10 bg-white/5 backdrop-blur-sm">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="font-semibold text-lg">First-time Clients: Get up to $250 off</h3>
-                  <p className="text-indigo-200">Your first concierge booking with Vitale Health</p>
+              {[
+                ['First‑time Clients: Up to $250 off','Your first concierge booking'],
+                ['Priority Fast‑Track Placement','24–48hr turnarounds for urgent needs'],
+                ['Private Care Coordination','Your dedicated coordinator, 24/7'],
+                ['Physician‑Led Oversight','Executive health, guided by physicians']
+              ].map(([title,sub]) => (
+                <div className="flex items-start gap-3" key={title}>
+                  <span className="mt-1 h-6 w-6 rounded-full border border-white/20 inline-flex items-center justify-center text-xs">✓</span>
+                  <div>
+                    <h3 className="font-medium text-lg">{title}</h3>
+                    <p className="text-white/70">{sub}</p>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="font-semibold text-lg">Free 8-Day/7-Night Vacation</h3>
-                  <p className="text-indigo-200">With select care plans for qualifying members</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="font-semibold text-lg">Free Meal Vouchers + Hotel Credits</h3>
-                  <p className="text-indigo-200">For caregivers supporting your loved ones</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="font-semibold text-lg">AI-Powered 24/7 Nurse Assistant</h3>
-                  <p className="text-indigo-200">Included in select plans for round-the-clock support</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="font-semibold text-lg">VIP Fast-Track Placement</h3>
-                  <p className="text-indigo-200">24–48hr turnarounds for urgent care needs</p>
-                </div>
-              </div>
+              ))}
             </div>
-            
             <div className="mt-8 text-center">
-              <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white px-8">
+              <Button size="lg" variant="luxury" className="px-8">
                 Claim My Concierge Offer
               </Button>
             </div>

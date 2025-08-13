@@ -145,7 +145,7 @@ const MarketplaceTransportBookingDialog: React.FC<Props> = ({ transport }) => {
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
       <DialogTrigger asChild>
-        <Button size="sm">Book Transport</Button>
+        <Button size="sm" variant="luxury">Book Transport</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         {step === 1 ? (
