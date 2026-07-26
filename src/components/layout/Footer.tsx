@@ -1,68 +1,153 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Phone, MessageSquare } from 'lucide-react';
+import { Phone, AlertTriangle } from 'lucide-react';
+
+const PHONE_NUMBER = '(888) 400-2273';
+const PHONE_HREF = 'tel:+18884002273';
+
+const SERVICES = [
+  { name: 'Same-Day Healthcare', href: '/services/same-day-healthcare-coordination' },
+  { name: 'Mobile Doctor', href: '/services/mobile-doctor-coordination' },
+  { name: 'Private Nurse', href: '/services/private-nurse-coordination' },
+  { name: 'Home Healthcare', href: '/services/home-healthcare-coordination' },
+  { name: 'Senior Care Navigation', href: '/services/senior-care-navigation' },
+  { name: 'Concierge Coordination', href: '/services/concierge-healthcare-coordination' },
+  { name: 'Medical Transportation', href: '/services/medical-transportation-coordination' },
+  { name: 'Mobile Lab', href: '/services/mobile-lab-coordination' },
+];
+
+const CITIES = [
+  { name: 'Phoenix, AZ', href: '/phoenix' },
+  { name: 'Scottsdale, AZ', href: '/scottsdale' },
+  { name: 'Dallas, TX', href: '/dallas' },
+  { name: 'Fort Worth, TX', href: '/fort-worth' },
+  { name: 'Tampa, FL', href: '/' },
+  { name: 'Naples, FL', href: '/' },
+  { name: 'Nashville, TN', href: '/' },
+  { name: 'Charlotte, NC', href: '/' },
+];
+
+const COMPANY = [
+  { name: 'About', href: '/about' },
+  { name: 'Services', href: '/services' },
+
+  { name: 'For Providers', href: '/partners' },
+  { name: 'Contact', href: '/contact' },
+  { name: 'Member Login', href: '/auth' },
+];
 
 const Footer: React.FC = () => {
   return (
-    <footer className="py-12 px-4 sm:px-6 lg:px-8 bg-[hsl(var(--brand-ink))] text-[hsl(var(--background))]">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center mb-4">
-              <span className="text-xl font-bold font-playfair">Vitalé Health Concierge</span>
+    <footer className="bg-[hsl(var(--brand-ink))] text-white">
+      {/* ── MAIN GRID ── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+
+          {/* Brand + CTA */}
+          <div className="lg:col-span-1 space-y-5">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-white/40 mb-1">
+                Healthcare Coordination Platform
+              </p>
+              <span className="text-xl font-bold font-playfair leading-tight">
+                Vitalé Health Concierge
+              </span>
             </div>
-            <p className="text-muted-foreground/80 mb-6">
-              Private, physician-backed concierge care. Discreet and immediate support for distinguished families.
+            <p className="text-sm text-white/60 leading-relaxed">
+              We connect patients with independent licensed healthcare professionals — same day when available. AZ · TX · FL · TN · NC.
             </p>
-            <div className="flex gap-4">
-              <Button variant="luxury" size="sm" className="flex items-center gap-2">
+            <div className="space-y-3 pt-1">
+              <a
+                href={PHONE_HREF}
+                className="flex items-center gap-2.5 bg-[hsl(var(--brand-gold))] text-[hsl(var(--brand-ink))] font-bold text-sm px-5 py-3 rounded-xl hover:brightness-110 transition-all w-fit"
+              >
                 <Phone className="h-4 w-4" />
-                <span>Concierge Call</span>
-              </Button>
-              <Button variant="outline" size="sm" className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4" />
-                <span>Text Concierge</span>
-              </Button>
+                {PHONE_NUMBER}
+              </a>
+              <p className="text-xs text-white/40">
+                Available 24/7 · Real coordinator answers
+              </p>
             </div>
           </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Services</h3>
-            <ul className="space-y-2">
-              <li><Link to="/marketplace" className="text-gray-400 hover:text-white">In-Home Care</Link></li>
-              <li><Link to="/marketplace" className="text-gray-400 hover:text-white">IV Therapy</Link></li>
-              <li><Link to="/marketplace" className="text-gray-400 hover:text-white">Hospice Care</Link></li>
-              <li><Link to="/marketplace" className="text-gray-400 hover:text-white">Assisted Living Communities</Link></li>
-              <li><Link to="/marketplace" className="text-gray-400 hover:text-white">Wellness Programs</Link></li>
+
+          {/* Services */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-white/40">Services</h3>
+            <ul className="space-y-2.5">
+              {SERVICES.map(({ name, href }) => (
+                <li key={href}>
+                  <Link
+                    to={href}
+                    className="text-sm text-white/60 hover:text-white transition-colors"
+                  >
+                    {name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Company</h3>
-            <ul className="space-y-2">
-              <li><Link to="/about" className="text-gray-400 hover:text-white">About Us</Link></li>
-              <li><Link to="/blog" className="text-gray-400 hover:text-white">Blog</Link></li>
-              <li><Link to="/careers" className="text-gray-400 hover:text-white">Careers</Link></li>
-              <li><Link to="/contact" className="text-gray-400 hover:text-white">Contact</Link></li>
-              <li><Link to="/partners" className="text-gray-400 hover:text-white">For Providers</Link></li>
+
+          {/* Cities */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-white/40">Our Markets</h3>
+            <ul className="space-y-2.5">
+              {CITIES.map(({ name, href }) => (
+                <li key={name}>
+                  <Link
+                    to={href}
+                    className="text-sm text-white/60 hover:text-white transition-colors"
+                  >
+                    {name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-white/40">Company</h3>
+            <ul className="space-y-2.5">
+              {COMPANY.map(({ name, href }) => (
+                <li key={href}>
+                  <Link
+                    to={href}
+                    className="text-sm text-white/60 hover:text-white transition-colors"
+                  >
+                    {name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
-        {/* Trust strip */}
-        <div className="mt-10 border-t border-border/30 pt-6 flex flex-wrap gap-6 items-center text-sm text-muted-foreground/80">
-          <span>HIPAA Compliant</span>
-          <span>RN/LVN Network</span>
-          <span>Concierge Medicine Partners</span>
-          <span>Verified Providers</span>
+
+        {/* ── TRUST STRIP ── */}
+        <div className="mt-12 pt-6 border-t border-white/10 flex flex-wrap gap-x-8 gap-y-2 text-xs text-white/40 font-medium uppercase tracking-wider">
+          <span>Licensed &amp; Verified Providers</span>
+          <span>24/7 Coordination</span>
+          <span>Cash-Pay · Private-Pay</span>
+          <span>Non-Emergency Services Only</span>
+          <span>AZ · TX · FL · TN · NC</span>
         </div>
-        
-        <div className="border-t border-border/30 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-muted-foreground/70">© {new Date().getFullYear()} Vitalé Health Concierge. All rights reserved.</p>
-          <div className="flex gap-6 mt-4 md:mt-0">
-            <Link to="/privacy" className="text-sm text-muted-foreground/80 hover:text-foreground">Privacy Policy</Link>
-            <Link to="/terms" className="text-sm text-muted-foreground/80 hover:text-foreground">Terms of Service</Link>
-            <Link to="/accessibility" className="text-sm text-muted-foreground/80 hover:text-foreground">Accessibility</Link>
+
+        {/* ── BOTTOM BAR ── */}
+        <div className="mt-8 pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="space-y-2">
+            <p className="text-xs text-white/40">
+              © {new Date().getFullYear()} Vitalé Health Concierge. All rights reserved.
+            </p>
+            <div className="flex items-start gap-1.5 text-xs text-white/30">
+              <AlertTriangle className="h-3 w-3 shrink-0 mt-0.5" />
+              <span>
+                Vitalé is a coordination platform, not a clinical provider. For medical emergencies, call 911 or go to your nearest emergency department.
+              </span>
+            </div>
+          </div>
+          <div className="flex gap-5 shrink-0">
+            <Link to="/privacy" className="text-xs text-white/40 hover:text-white transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="text-xs text-white/40 hover:text-white transition-colors">Terms of Service</Link>
+            <Link to="/accessibility" className="text-xs text-white/40 hover:text-white transition-colors">Accessibility</Link>
           </div>
         </div>
       </div>

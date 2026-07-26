@@ -1,91 +1,138 @@
 import React, { useState } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
-import { Button } from '@/components/ui/button';
+import { Helmet } from 'react-helmet';
+import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import CaregiverInterestForm from '@/components/auth/CaregiverInterestForm';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuthState } from '@/hooks/useAuthState';
-import { CheckCircle, ArrowRight, Building, Users, FileCheck, MessageSquare, UserPlus, DollarSign, Calendar, Clock, Star, Heart } from 'lucide-react';
+import {
+  Phone,
+  CheckCircle,
+  ChevronDown,
+  ChevronRight,
+  Stethoscope,
+  UserCheck,
+  FlaskConical,
+  Car,
+  Star,
+  DollarSign,
+  ShieldCheck,
+  Users,
+} from 'lucide-react';
 
-const Partners = () => {
+const PHONE_NUMBER = '(888) 400-2273';
+const PHONE_HREF = 'tel:+18884002273';
+
+const PROVIDER_TYPES = [
+  { icon: Stethoscope, label: 'Physician (MD / DO)', description: 'Board-certified physicians available for independent mobile and in-home visits.' },
+  { icon: UserCheck, label: 'Nurse Practitioner (NP)', description: 'Advanced practice NPs who can independently evaluate, diagnose, and prescribe.' },
+  { icon: UserCheck, label: 'Registered Nurse (RN)', description: 'Licensed RNs for IV therapy, wound care, post-surgical monitoring, and skilled home visits.' },
+  { icon: FlaskConical, label: 'Mobile Phlebotomist', description: 'Certified phlebotomists who perform blood draws and specimen collection at patient locations.' },
+  { icon: Car, label: 'Medical Transport Operator', description: 'Licensed non-emergency medical transport operators with appropriate vehicles and trained personnel.' },
+  { icon: Star, label: 'Specialty Provider', description: 'Physical therapists, occupational therapists, and other licensed specialists offering in-home services.' },
+];
+
+const WHY_JOIN = [
+  {
+    icon: DollarSign,
+    title: 'Cash-Pay Patients — No Billing Headaches',
+    body: 'Every patient Vitalé coordinates is private-pay. You receive payment directly — no insurance claims, no prior authorizations, no chasing reimbursements.',
+  },
+  {
+    icon: Users,
+    title: 'Pre-Screened, High-Intent Requests',
+    body: 'We qualify patients before connecting them to you. You receive requests from people who are ready to schedule, know the cost, and have already agreed to private-pay terms.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'You Stay Independent',
+    body: 'You set your own clinical fees, your own schedule, and your own service area. Vitalé coordinates the access — you retain full clinical and business independence.',
+  },
+  {
+    icon: Star,
+    title: 'Consistent Volume Without Marketing Overhead',
+    body: 'Instead of spending time on marketing, SEO, or social media, you focus on patient care. We generate and coordinate the demand.',
+  },
+];
+
+const FAQS = [
+  {
+    q: 'Do I give up my independence by joining Vitalé\'s network?',
+    a: 'No. You remain an independent licensed professional. You set your own rates, accept only the requests you choose, and operate under your own license and liability. Vitalé coordinates the connection between you and the patient — nothing more.',
+  },
+  {
+    q: 'How does Vitalé make money if I set my own fees?',
+    a: 'Vitalé charges a coordination fee to the patient separately from your clinical visit fee. Patients are aware of and agree to both fees before any visit is confirmed. Your rate is your rate — we do not take a cut of your clinical charges.',
+  },
+  {
+    q: 'What markets do you currently coordinate in?',
+    a: 'We currently coordinate in Phoenix, Scottsdale, Dallas, Fort Worth, Tampa, Naples, Boca Raton, Jacksonville, Nashville, and Charlotte. We are expanding. If you\'re in a market we\'re not yet active in, submit your application and we\'ll notify you when coordination begins in your area.',
+  },
+  {
+    q: 'What licensing and credentials are required?',
+    a: 'All providers must hold a current, unrestricted license in their state of practice, carry appropriate professional liability insurance, and pass a credential verification review before being onboarded into the network.',
+  },
+  {
+    q: 'How quickly after applying can I start receiving coordination requests?',
+    a: 'After submitting your application, our team reviews credentials and conducts a brief onboarding call. Most providers are onboarded within 5–7 business days of completing verification.',
+  },
+  {
+    q: 'Can I limit the types of requests I receive?',
+    a: 'Yes. During onboarding, you specify the service types you offer, your geographic radius, your availability windows, and any patient populations you do not serve. We coordinate only within those parameters.',
+  },
+];
+
+const PROVIDER_TYPE_OPTIONS = [
+  'Physician (MD / DO)',
+  'Nurse Practitioner (NP)',
+  'Registered Nurse (RN)',
+  'Mobile Phlebotomist',
+  'Medical Transport Operator',
+  'Physical Therapist',
+  'Occupational Therapist',
+  'Other',
+];
+
+const Partners: React.FC = () => {
   const { toast } = useToast();
-  const { user } = useAuthState();
-  const [activeTab, setActiveTab] = useState("facilities");
-  const [formData, setFormData] = useState({
-    facilityName: '',
-    contactPerson: '',
-    phone: '',
-    email: '',
-    cityState: '',
-    receiveAgreement: false
-  });
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    providerType: '',
+    licenseState: '',
+    phone: '',
+    email: '',
+    serviceArea: '',
+    message: '',
+  });
 
-  const handleInputChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleCheckboxChange = (checked) => {
-    setFormData(prev => ({
-      ...prev,
-      receiveAgreement: checked
-    }));
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
     try {
-      // Save facility application to partner_leads table
-      const applicationData = {
-        application_type: 'facility_application',
+      const { error } = await supabase.from('partner_leads').insert([{
+        application_type: 'provider_application',
         status: 'submitted',
-        profile_id: user?.id || null,
         metadata: {
-          facilityName: formData.facilityName,
-          contactPerson: formData.contactPerson,
-          phone: formData.phone,
-          email: formData.email,
-          cityState: formData.cityState,
-          receiveAgreement: formData.receiveAgreement,
-          submission_date: new Date().toISOString()
-        }
-      };
-
-      const { error } = await supabase
-        .from('partner_leads')
-        .insert([applicationData]);
-
-      if (error) {
-        throw error;
-      }
-
+          ...formData,
+          submission_date: new Date().toISOString(),
+        },
+      }]);
+      if (error) throw error;
       setIsSubmitted(true);
-      toast({
-        title: "Application Submitted for Review",
-        description: "Your facility application has been submitted and is under review. We'll contact you within 1-2 business days.",
-      });
-    } catch (error) {
-      console.error('Error submitting facility application:', error);
-      toast({
-        title: "Submission Failed",
-        description: "There was an error submitting your application. Please try again.",
-        variant: "destructive",
-      });
+      toast({ title: 'Application Received', description: 'We\'ll review your credentials and follow up within 1–2 business days.' });
+    } catch {
+      toast({ title: 'Submission Failed', description: 'Please try again or call us directly.', variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }
@@ -93,598 +140,244 @@ const Partners = () => {
 
   return (
     <MainLayout>
-      <div className="bg-white py-12">
-        {/* Enhanced Hero Section */}
-        <div className="bg-gradient-to-r from-indigo-50 to-blue-50 py-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto text-center">
-            <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
-              Partner With Us to Transform Healthcare
-            </h1>
-            <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
-              Whether you're a care facility or an individual caregiver, join our premium network and connect with families seeking quality care options.
-            </p>
-          </div>
+      <Helmet>
+        <title>Join Our Provider Network | Vitalé Health Concierge</title>
+        <meta
+          name="description"
+          content="Independent licensed physicians, NPs, RNs, mobile phlebotomists, and transport operators — join Vitalé's coordinated provider network. Cash-pay patients, no billing headaches, full independence."
+        />
+        <link rel="canonical" href="https://vitalehealthconcierge.doctor/partners" />
+      </Helmet>
+
+      {/* ── BREADCRUMB ── */}
+      <nav className="bg-background border-b border-border px-4 sm:px-6 lg:px-8 py-3">
+        <div className="max-w-5xl mx-auto flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+          <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+          <span className="text-foreground font-medium">For Providers</span>
         </div>
+      </nav>
 
-        {/* Partnership Types Tabs */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
-              <TabsTrigger value="facilities" className="flex items-center gap-2">
-                <Building className="h-4 w-4" />
-                Care Facilities
-              </TabsTrigger>
-              <TabsTrigger value="caregivers" className="flex items-center gap-2">
-                <Heart className="h-4 w-4" />
-                Individual Caregivers
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="facilities" className="mt-12">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900">
-                  Premium Exposure. Verified Referrals. Concierge-Level Support.
-                </h2>
-                <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-                  We're not another public directory or broker service. We are a placement concierge platform designed for quality-first communities and private clients.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-indigo-100 p-4 rounded-full mb-4">
-                    <Building className="h-8 w-8 text-indigo-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Community Visibility</h3>
-                  <p className="text-gray-600">Exclusive listings that showcase your facility to qualified families</p>
-                </div>
-                
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-indigo-100 p-4 rounded-full mb-4">
-                    <Users className="h-8 w-8 text-indigo-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Verified Leads</h3>
-                  <p className="text-gray-600">Quality opportunities from families in your region seeking care</p>
-                </div>
-                
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-indigo-100 p-4 rounded-full mb-4">
-                    <FileCheck className="h-8 w-8 text-indigo-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Referral Integrity</h3>
-                  <p className="text-gray-600">Transparent process with concierge protection for your community</p>
-                </div>
-                
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-indigo-100 p-4 rounded-full mb-4">
-                    <MessageSquare className="h-8 w-8 text-indigo-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Digital Support</h3>
-                  <p className="text-gray-600">Custom media assets and communication tools for your team</p>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="caregivers" className="mt-12">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900">
-                  Build Your Client Base. Set Your Schedule. Grow Your Business.
-                </h2>
-                <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-                  Join our vetted directory of professional caregivers for just $25/month and connect with families seeking trusted care providers in your area.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-green-100 p-4 rounded-full mb-4">
-                    <DollarSign className="h-8 w-8 text-green-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Earn More</h3>
-                  <p className="text-gray-600">Connect with clients willing to pay premium rates for quality care</p>
-                </div>
-                
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-green-100 p-4 rounded-full mb-4">
-                    <Calendar className="h-8 w-8 text-green-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Flexible Schedule</h3>
-                  <p className="text-gray-600">Choose your availability and work when it suits your lifestyle</p>
-                </div>
-                
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-green-100 p-4 rounded-full mb-4">
-                    <Star className="h-8 w-8 text-green-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Professional Growth</h3>
-                  <p className="text-gray-600">Build your reputation with verified reviews and testimonials</p>
-                </div>
-                
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-green-100 p-4 rounded-full mb-4">
-                    <UserPlus className="h-8 w-8 text-green-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Client Matching</h3>
-                  <p className="text-gray-600">Get matched with families based on your skills and location</p>
-                </div>
-              </div>
-
-              {/* Caregiver Benefits Section */}
-              <div className="bg-green-50 rounded-lg p-8 mt-12">
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900">Why Caregivers Choose Our Directory</h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0">
-                      <div className="flex items-center justify-center h-8 w-8 rounded-md bg-green-500 text-white">
-                        <CheckCircle className="h-5 w-5" />
-                      </div>
-                    </div>
-                    <div className="ml-3">
-                      <h4 className="text-lg font-medium text-gray-900">Vetted Clients</h4>
-                      <p className="text-gray-600">All families are screened for serious care needs and payment ability</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0">
-                      <div className="flex items-center justify-center h-8 w-8 rounded-md bg-green-500 text-white">
-                        <Clock className="h-5 w-5" />
-                      </div>
-                    </div>
-                    <div className="ml-3">
-                      <h4 className="text-lg font-medium text-gray-900">No Competition</h4>
-                      <p className="text-gray-600">Limited caregivers per area ensures quality opportunities for all</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0">
-                      <div className="flex items-center justify-center h-8 w-8 rounded-md bg-green-500 text-white">
-                        <DollarSign className="h-5 w-5" />
-                      </div>
-                    </div>
-                    <div className="ml-3">
-                      <h4 className="text-lg font-medium text-gray-900">Affordable Entry</h4>
-                      <p className="text-gray-600">Just $25/month with no setup fees or long-term contracts</p>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Caregiver Interest Form */}
-                <div className="bg-white rounded-lg p-8 mt-8 border border-gray-200">
-                  <div className="text-center mb-8">
-                    <h3 className="text-2xl font-bold text-gray-900">
-                      Join Our Caregiver Directory
-                    </h3>
-                    <p className="mt-2 text-gray-600">
-                      Start with your basic information to begin the registration process
-                    </p>
-                  </div>
-                  <CaregiverInterestForm />
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-
-
-        {/* Sneak Peek Section */}
-        <div className="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900">
-                Here's a Hint of What We Build for Our Partners
-              </h2>
-            </div>
-            
-            <Carousel className="w-full max-w-4xl mx-auto">
-              <CarouselContent>
-                <CarouselItem>
-                  <div className="p-1">
-                    <img 
-                      src="https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg" 
-                      alt="Tailored profile listing example" 
-                      className="w-full h-80 object-cover rounded-lg shadow-md"
-                    />
-                  </div>
-                </CarouselItem>
-                <CarouselItem>
-                  <div className="p-1">
-                    <img 
-                      src="https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg" 
-                      alt="Branded facility highlight page" 
-                      className="w-full h-80 object-cover rounded-lg shadow-md"
-                    />
-                  </div>
-                </CarouselItem>
-                <CarouselItem>
-                  <div className="p-1">
-                    <img 
-                      src="https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg" 
-                      alt="Secure communication tools" 
-                      className="w-full h-80 object-cover rounded-lg shadow-md"
-                    />
-                  </div>
-                </CarouselItem>
-                <CarouselItem>
-                  <div className="p-1">
-                    <img 
-                      src="https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg" 
-                      alt="Family support platform" 
-                      className="w-full h-80 object-cover rounded-lg shadow-md"
-                    />
-                  </div>
-                </CarouselItem>
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 max-w-4xl mx-auto">
-              <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-                <p className="font-medium">Tailored profile listings that convert</p>
-              </div>
-              <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-                <p className="font-medium">Branded facility highlight pages</p>
-              </div>
-              <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-                <p className="font-medium">Secure communication tools</p>
-              </div>
-              <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-                <p className="font-medium">Family support platform</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Partnership Agreement Teaser */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="bg-indigo-50 rounded-lg p-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              We believe in clear communication and ethical placement relationships.
-            </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
-              To unlock the full program, we'll send over a simple Partnership Agreement and show you how we track referrals for you.
-            </p>
-            <Button 
-              size="lg" 
-              className="bg-indigo-600 hover:bg-indigo-700"
-              onClick={() => document.getElementById('partner-form').scrollIntoView({ behavior: 'smooth' })}
+      {/* ── HERO ── */}
+      <section className="bg-[hsl(var(--brand-ink))] text-white py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto space-y-6">
+          <p className="text-primary text-sm font-semibold uppercase tracking-widest">
+            Independent Providers · Licensed Professionals · Our Network
+          </p>
+          <h1 className="text-4xl md:text-5xl font-bold font-playfair leading-tight">
+            Join the Vitalé Provider Network
+          </h1>
+          <p className="text-lg text-white/75 max-w-2xl leading-relaxed">
+            Vitalé connects independent licensed healthcare professionals with pre-screened, cash-pay patients who need care at their location. You keep your independence. We coordinate the access.
+          </p>
+          <div className="flex flex-wrap gap-4 pt-2">
+            <a
+              href="#apply"
+              className="inline-flex items-center gap-2 bg-[hsl(var(--brand-gold))] text-[hsl(var(--brand-ink))] font-bold text-xl px-8 py-4 rounded-xl hover:brightness-110 transition-all shadow-[0_4px_24px_hsl(var(--brand-gold)/0.5)]"
             >
-              Request a Discovery Call
-            </Button>
+              Apply to Join
+            </a>
+            <a
+              href={PHONE_HREF}
+              className="inline-flex items-center gap-3 border border-white/30 text-white font-semibold text-base px-6 py-4 rounded-xl hover:bg-white/10 transition-all"
+            >
+              <Phone className="h-5 w-5" /> {PHONE_NUMBER}
+            </a>
           </div>
         </div>
+      </section>
 
-        {/* Partner Form - Only show for Care Facilities tab */}
-        {activeTab === "facilities" && (
-          <div id="partner-form" className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    Apply to Become a Partner Community
-                  </h2>
-                  <p className="mt-2 text-gray-600">
-                    Fill out the form below to start the conversation.
-                  </p>
-                </div>
+      {/* ── WHO WE'RE LOOKING FOR ── */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-background">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold font-playfair mb-3">Who We Work With</h2>
+          <p className="text-muted-foreground mb-10 max-w-2xl">
+            We coordinate patients with independently licensed professionals across six provider categories. All providers must hold a current, unrestricted state license and carry appropriate liability coverage.
+          </p>
 
-                {isSubmitted ? (
-                  <div className="text-center py-8">
-                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-                      <CheckCircle className="h-6 w-6 text-green-600" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Application Received</h3>
-                    <p className="text-gray-600 mb-6">
-                      Thank you for your interest in partnering with Vitale Health Concierge. One of our partnership specialists will contact you within 1-2 business days to schedule your discovery call.
-                    </p>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setIsSubmitted(false)}
-                    >
-                      Submit Another Application
-                    </Button>
-                  </div>
-                ) : (
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 gap-6">
-                      <div>
-                        <Label htmlFor="facilityName">Facility Name</Label>
-                        <Input 
-                          id="facilityName" 
-                          name="facilityName" 
-                          value={formData.facilityName}
-                          onChange={handleInputChange}
-                          required 
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="contactPerson">Contact Person</Label>
-                        <Input 
-                          id="contactPerson" 
-                          name="contactPerson" 
-                          value={formData.contactPerson}
-                          onChange={handleInputChange}
-                          required 
-                        />
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <Label htmlFor="phone">Phone</Label>
-                          <Input 
-                            id="phone" 
-                            name="phone" 
-                            type="tel" 
-                            value={formData.phone}
-                            onChange={handleInputChange}
-                            required 
-                          />
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="email">Email</Label>
-                          <Input 
-                            id="email" 
-                            name="email" 
-                            type="email" 
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            required 
-                          />
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="cityState">City/State</Label>
-                        <Input 
-                          id="cityState" 
-                          name="cityState" 
-                          value={formData.cityState}
-                          onChange={handleInputChange}
-                          required 
-                        />
-                      </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="receiveAgreement" 
-                          checked={formData.receiveAgreement}
-                          onCheckedChange={handleCheckboxChange}
-                        />
-                        <Label htmlFor="receiveAgreement" className="text-sm">
-                          I'd like to receive the agreement and media upload link.
-                        </Label>
-                      </div>
-                      
-                      <Button 
-                        type="submit" 
-                        className="w-full bg-indigo-600 hover:bg-indigo-700"
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting ? 'Submitting...' : 'Submit Application'}
-                      </Button>
-                    </div>
-                  </form>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Testimonials */}
-        <div className="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900">What Our Partners Say</h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {/* Facility Testimonials */}
-              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold">
-                      SC
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-base text-gray-600">
-                      "Partnering with Vitale Health Concierge has transformed our approach to new resident acquisition. The quality of referrals and the concierge support for families has been exceptional."
-                    </p>
-                    <div className="mt-4">
-                      <p className="text-base font-medium text-gray-900">Sarah Collins</p>
-                      <p className="text-sm text-gray-500">Executive Director, Oakridge Senior Living</p>
-                    </div>
-                  </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {PROVIDER_TYPES.map(({ icon: Icon, label, description }) => (
+              <div key={label} className="rounded-2xl border border-border bg-card p-6 space-y-3">
+                <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Icon className="h-6 w-6 text-primary" />
                 </div>
+                <h3 className="font-bold text-base">{label}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
               </div>
-              
-              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold">
-                      MJ
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-base text-gray-600">
-                      "The digital assets and custom profile page Vitale created for our community have significantly improved our online presence. Their concierge approach ensures families are well-prepared when they arrive for tours."
-                    </p>
-                    <div className="mt-4">
-                      <p className="text-base font-medium text-gray-900">Michael Johnson</p>
-                      <p className="text-sm text-gray-500">Marketing Director, Sunset Gardens Memory Care</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Caregiver Testimonials */}
-              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-semibold">
-                      ER
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-base text-gray-600">
-                      "Since joining the directory, I've connected with 3 long-term clients who value quality care. The $25/month investment has paid for itself many times over."
-                    </p>
-                    <div className="mt-4">
-                      <p className="text-base font-medium text-gray-900">Elena Rodriguez</p>
-                      <p className="text-sm text-gray-500">Certified Home Health Aide</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-semibold">
-                      DT
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-base text-gray-600">
-                      "What I love most is the professional approach. Families are already screened and serious about finding quality care. It saves me so much time compared to other platforms."
-                    </p>
-                    <div className="mt-4">
-                      <p className="text-base font-medium text-gray-900">David Thompson</p>
-                      <p className="text-sm text-gray-500">Licensed Practical Nurse</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
+      </section>
 
-        {/* FAQ Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">Frequently Asked Questions</h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Facility FAQs */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-indigo-500">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">How does the facility partnership process work?</h3>
-              <p className="text-gray-600">
-                After your application, we'll schedule a discovery call to understand your community and needs. We'll then provide a partnership agreement and set up your digital profile on our platform.
-              </p>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-indigo-500">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">What types of facilities do you work with?</h3>
-              <p className="text-gray-600">
-                We partner with assisted living communities, memory care facilities, board and care homes, hospice providers, and other senior living options that meet our quality standards.
-              </p>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-indigo-500">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">How are facility referrals handled?</h3>
-              <p className="text-gray-600">
-                Our concierge team carefully matches families with appropriate communities based on needs, preferences, and location. We provide warm introductions and coordinate tours when appropriate.
-              </p>
-            </div>
+      {/* ── WHY JOIN ── */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-muted/40 border-y border-border">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold font-playfair mb-3">Why Join Vitalé</h2>
+          <p className="text-muted-foreground mb-10 max-w-2xl">
+            Four reasons independent providers choose to receive coordinated referrals through our platform.
+          </p>
 
-            {/* Caregiver FAQs */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-green-500">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">How do I join the caregiver directory?</h3>
-              <p className="text-gray-600">
-                Start by completing our caregiver registration form. We'll review your qualifications and background, then set up your subscription and profile listing in our directory.
-              </p>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-green-500">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">What qualifications do I need?</h3>
-              <p className="text-gray-600">
-                We require relevant certifications (CNA, HHA, CPR, etc.), verifiable experience in caregiving, background check clearance, and professional references from previous clients or employers.
-              </p>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-green-500">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">How much can I earn as a caregiver?</h3>
-              <p className="text-gray-600">
-                Rates vary by location, experience, and specialties. Our caregivers typically earn $20-40+ per hour, with many building long-term client relationships that provide steady income.
-              </p>
-            </div>
-
-            {/* General FAQs */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-gray-400">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">What regions do you currently serve?</h3>
-              <p className="text-gray-600">
-                We currently operate in select counties throughout California and Texas, with plans to expand to additional states in the near future.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-gray-400">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Is there ongoing support available?</h3>
-              <p className="text-gray-600">
-                Yes! We provide dedicated support to both facility partners and caregivers, including training resources, best practices guidance, and assistance with client matching.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-gray-400">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">How do you ensure quality matches?</h3>
-              <p className="text-gray-600">
-                We use detailed profiles, location matching, specialty requirements, and availability preferences to connect families with the most suitable care providers or facilities.
-              </p>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {WHY_JOIN.map(({ icon: Icon, title, body }) => (
+              <div key={title} className="rounded-2xl border border-border bg-card p-6 flex gap-5">
+                <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <Icon className="h-6 w-6 text-primary" />
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="font-bold text-base">{title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
+      </section>
 
-        {/* Final Dual CTA */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 py-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-white">
-              Ready to Transform Your Healthcare Journey?
-            </h2>
-            <p className="mt-4 text-xl text-indigo-100 max-w-3xl mx-auto">
-              Whether you're a care facility or an individual caregiver, join our premium network and start connecting with families today.
-            </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="bg-white text-indigo-600 hover:bg-indigo-50"
-                onClick={() => document.getElementById('partner-form').scrollIntoView({ behavior: 'smooth' })}
+      {/* ── APPLICATION FORM ── */}
+      <section id="apply" className="py-16 px-4 sm:px-6 lg:px-8 bg-background scroll-mt-6">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold font-playfair mb-3">Apply to Join the Network</h2>
+          <p className="text-muted-foreground mb-10">
+            Submit your information below. We'll review your credentials and follow up within 1–2 business days to schedule a brief onboarding call.
+          </p>
+
+          {isSubmitted ? (
+            <div className="rounded-2xl border border-border bg-card px-8 py-12 text-center space-y-4">
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                <CheckCircle className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="font-bold text-xl">Application Received</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed max-w-md mx-auto">
+                Thank you for your interest in joining the Vitalé provider network. Our team will review your credentials and reach out within 1–2 business days.
+              </p>
+              <button
+                onClick={() => setIsSubmitted(false)}
+                className="text-sm text-primary font-semibold hover:underline"
               >
-                <Building className="mr-2 h-5 w-5" />
-                Partner Your Facility
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="bg-transparent border-white text-white hover:bg-white hover:text-indigo-600"
-                  >
-                    <UserPlus className="mr-2 h-5 w-5" />
-                    Join as Caregiver
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Join Our Caregiver Directory</DialogTitle>
-                    <DialogDescription>
-                      Get listed in our premium directory for just $25/month and connect with families in your area.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <CaregiverInterestForm />
-                </DialogContent>
-              </Dialog>
+                Submit another application
+              </button>
             </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="space-y-1.5">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input id="name" name="name" value={formData.name} onChange={handleChange} required placeholder="Dr. Jane Smith" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="providerType">Provider Type</Label>
+                  <select
+                    id="providerType"
+                    name="providerType"
+                    value={formData.providerType}
+                    onChange={handleChange}
+                    required
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <option value="">Select type…</option>
+                    {PROVIDER_TYPE_OPTIONS.map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="space-y-1.5">
+                  <Label htmlFor="licenseState">License State(s)</Label>
+                  <Input id="licenseState" name="licenseState" value={formData.licenseState} onChange={handleChange} required placeholder="AZ, TX, FL…" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="serviceArea">Primary Service Area</Label>
+                  <Input id="serviceArea" name="serviceArea" value={formData.serviceArea} onChange={handleChange} required placeholder="Phoenix, AZ" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="space-y-1.5">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input id="phone" name="phone" type="tel" value={formData.phone} onChange={handleChange} required placeholder="(555) 000-0000" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required placeholder="you@example.com" />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="message">Anything else we should know? (optional)</Label>
+                <Textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  rows={4}
+                  placeholder="Services you offer, availability, geographic coverage, questions…"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-[hsl(var(--brand-gold))] text-[hsl(var(--brand-ink))] font-bold text-lg py-4 rounded-xl hover:brightness-110 transition-all disabled:opacity-60"
+              >
+                {isSubmitting ? 'Submitting…' : 'Submit Application'}
+              </button>
+              <p className="text-xs text-muted-foreground text-center">
+                We review all applications manually. You will not be added to any list without a conversation first.
+              </p>
+            </form>
+          )}
+        </div>
+      </section>
+
+      {/* ── FAQ ── */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-muted/40 border-t border-border">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold font-playfair mb-3">Provider FAQs</h2>
+          <p className="text-muted-foreground mb-10">Common questions from providers considering the network.</p>
+
+          <div className="space-y-3">
+            {FAQS.map(({ q, a }, idx) => (
+              <Collapsible
+                key={q}
+                open={openFaq === idx}
+                onOpenChange={open => setOpenFaq(open ? idx : null)}
+              >
+                <CollapsibleTrigger className="w-full flex items-center justify-between gap-4 px-6 py-4 bg-card border border-border rounded-xl text-left hover:border-primary/40 transition-colors">
+                  <span className="font-semibold text-sm md:text-base">{q}</span>
+                  <ChevronDown className={`h-5 w-5 text-muted-foreground shrink-0 transition-transform duration-200 ${openFaq === idx ? 'rotate-180' : ''}`} />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="px-6 py-4 text-muted-foreground text-sm leading-relaxed border border-t-0 border-border rounded-b-xl bg-card">
+                  {a}
+                </CollapsibleContent>
+              </Collapsible>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* ── FINAL CTA ── */}
+      <section className="bg-[hsl(var(--brand-ink))] text-white py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto text-center space-y-6">
+          <h2 className="text-3xl md:text-4xl font-bold font-playfair">
+            Questions Before Applying?
+          </h2>
+          <p className="text-white/70 text-lg">
+            Call us directly. We'll give you a straightforward answer about whether the network is a good fit for your practice and service area.
+          </p>
+          <a
+            href={PHONE_HREF}
+            className="inline-flex items-center justify-center gap-3 bg-[hsl(var(--brand-gold))] text-[hsl(var(--brand-ink))] font-bold text-2xl md:text-3xl px-10 py-5 rounded-xl hover:brightness-110 transition-all shadow-[0_6px_30px_hsl(var(--brand-gold)/0.5)]"
+          >
+            <Phone className="h-7 w-7" /> {PHONE_NUMBER}
+          </a>
+          <p className="text-white/40 text-sm">
+            Available 24/7 · Or{' '}
+            <a href="#apply" className="underline hover:text-white/70">submit your application above</a>
+          </p>
+        </div>
+      </section>
     </MainLayout>
   );
 };

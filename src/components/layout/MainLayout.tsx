@@ -18,12 +18,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const menuItems = [
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
+    { name: 'Services', path: '/services' },
     { name: 'Financing', path: '/financing' },
     { name: 'Membership', path: '/membership' },
-    { name: 'Marketplace', path: '/marketplace' },
-    { name: 'Resources', path: '/resources' },
+
     { name: 'Partners', path: '/partners' },
-    { name: 'Blog', path: '/blog' },
+
     { name: 'Contact', path: '/contact' },
   ];
 

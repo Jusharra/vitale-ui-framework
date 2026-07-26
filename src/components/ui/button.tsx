@@ -13,13 +13,13 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-primary/40 bg-background hover:bg-primary/10 hover:text-primary",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        ghost: "hover:bg-primary/10 hover:text-primary",
         link: "text-primary underline-offset-4 hover:underline",
-        premium: "bg-[linear-gradient(135deg,_hsl(var(--brand-ink)),_hsl(var(--brand-gold)))] text-primary-foreground border border-white/10 shadow-[var(--shadow-elegant)] hover:opacity-90",
-        luxury: "bg-[linear-gradient(135deg,_hsl(var(--brand-ink)),_hsl(var(--brand-gold)))] text-primary-foreground border border-white/10 shadow-[var(--shadow-elegant)] hover:opacity-90",
+        premium: "bg-[hsl(var(--brand-gold))] text-[hsl(var(--brand-ink))] font-semibold border border-[hsl(var(--brand-gold)/0.6)] shadow-[0_4px_14px_hsl(var(--brand-gold)/0.4)] hover:brightness-110 hover:shadow-[0_6px_20px_hsl(var(--brand-gold)/0.55)] transition-all",
+        luxury: "bg-[hsl(var(--brand-gold))] text-[hsl(var(--brand-ink))] font-semibold border border-[hsl(var(--brand-gold)/0.6)] shadow-[0_4px_14px_hsl(var(--brand-gold)/0.4)] hover:brightness-110 hover:shadow-[0_6px_20px_hsl(var(--brand-gold)/0.55)] transition-all",
       },
       size: {
         default: "h-10 px-4 py-2",

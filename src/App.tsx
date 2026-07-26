@@ -58,6 +58,26 @@ import VacationBooking from '@/pages/VacationBooking';
 import BookingSuccess from '@/pages/BookingSuccess';
 import RegionLanding from '@/pages/regions/RegionLanding';
 
+// City landing pages (MVP)
+import PhoenixPage from '@/pages/cities/phoenix';
+import ScottsdalePage from '@/pages/cities/scottsdale';
+import DallasPage from '@/pages/cities/dallas';
+import FortWorthPage from '@/pages/cities/fort-worth';
+
+// City service pages — Phoenix
+import PhoenixMobileDoctorPage from '@/pages/cities/phoenix/mobile-doctor';
+
+// Services hub + individual service pages
+import ServicesPage from '@/pages/Services';
+import SameDayPage from '@/pages/services/same-day-healthcare-coordination';
+import MobileDoctorServicePage from '@/pages/services/mobile-doctor-coordination';
+import PrivateNursePage from '@/pages/services/private-nurse-coordination';
+import HomeHealthcarePage from '@/pages/services/home-healthcare-coordination';
+import SeniorCarePage from '@/pages/services/senior-care-navigation';
+import ConciergeHealthcarePage from '@/pages/services/concierge-healthcare-coordination';
+import MedicalTransportPage from '@/pages/services/medical-transportation-coordination';
+import MobileLabPage from '@/pages/services/mobile-lab-coordination';
+
 // Blog pages
 import BlogIndex from '@/pages/blog/index';
 import SanMateoCountyBlog from '@/pages/blog/iv-therapy-hospice-san-mateo-county';
@@ -115,7 +135,17 @@ const App: React.FC = () => {
                   
                   {/* Redirects for removed pages */}
                   <Route path="/placements" element={<Navigate to="/marketplace" replace />} />
-                  <Route path="/services" element={<Navigate to="/marketplace" replace />} />
+
+                  {/* Services hub + individual service pages */}
+                  <Route path="/services" element={<ServicesPage />} />
+                  <Route path="/services/same-day-healthcare-coordination" element={<SameDayPage />} />
+                  <Route path="/services/mobile-doctor-coordination" element={<MobileDoctorServicePage />} />
+                  <Route path="/services/private-nurse-coordination" element={<PrivateNursePage />} />
+                  <Route path="/services/home-healthcare-coordination" element={<HomeHealthcarePage />} />
+                  <Route path="/services/senior-care-navigation" element={<SeniorCarePage />} />
+                  <Route path="/services/concierge-healthcare-coordination" element={<ConciergeHealthcarePage />} />
+                  <Route path="/services/medical-transportation-coordination" element={<MedicalTransportPage />} />
+                  <Route path="/services/mobile-lab-coordination" element={<MobileLabPage />} />
                   
                   {/* Facility routes - order matters, more specific routes first */}
                   <Route path="/care/care-homes/:city/:slug" element={<FacilityPage />} />
@@ -143,6 +173,15 @@ const App: React.FC = () => {
                   <Route path="/blog/iv-therapy-hospice-san-diego-county" element={<SanDiegoCountyBlog />} />
                   <Route path="/blog/iv-therapy-hospice-ventura-county" element={<VenturaCountyBlog />} />
                   <Route path="/blog/iv-therapy-hospice-fort-bend-county" element={<FortBendCountyBlog />} />
+
+                  {/* City landing pages */}
+                  <Route path="/phoenix" element={<PhoenixPage />} />
+                  <Route path="/scottsdale" element={<ScottsdalePage />} />
+                  <Route path="/dallas" element={<DallasPage />} />
+                  <Route path="/fort-worth" element={<FortWorthPage />} />
+
+                  {/* City service pages — Phoenix */}
+                  <Route path="/phoenix/mobile-doctor" element={<PhoenixMobileDoctorPage />} />
 
                   {/* Regions */}
                   <Route path="/regions/:state/:county" element={<RegionLanding />} />
